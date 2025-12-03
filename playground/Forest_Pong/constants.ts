@@ -1,6 +1,7 @@
 
-export const CANVAS_WIDTH = 1280;
-export const CANVAS_HEIGHT = 720;
+// Standard table tennis proportions: length > width (portrait orientation)
+export const CANVAS_WIDTH = 720;
+export const CANVAS_HEIGHT = 1280;
 
 // Vertical Layout: Paddles are wide and short
 export const PADDLE_WIDTH = 120;

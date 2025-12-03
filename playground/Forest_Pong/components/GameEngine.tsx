@@ -427,27 +427,18 @@ export const GameEngine: React.FC = () => {
 
   // --- Rendering UI Overlays ---
   return (
-    <div className="relative w-full h-full flex justify-center items-center bg-black">
+    <div className="relative w-full h-full flex justify-center items-center gap-8 bg-black">
       
       {/* Main Game Canvas */}
       <div className="relative shadow-2xl rounded-xl overflow-hidden border-4 border-green-900/50">
-        <canvas 
-            ref={canvasRef} 
-            width={CANVAS_WIDTH} 
-            height={CANVAS_HEIGHT} 
-            className="block bg-[#0f2310] max-w-full max-h-[85vh] aspect-video object-contain"
+        <canvas
+            ref={canvasRef}
+            width={CANVAS_WIDTH}
+            height={CANVAS_HEIGHT}
+            className="block bg-[#0f2310] max-w-full max-h-[85vh] object-contain"
         />
 
         {/* --- UI Overlays Inside Game Board --- */}
-
-        {/* Score Board (Center Right) */}
-        <div className="absolute top-1/2 right-4 -translate-y-1/2 flex flex-col items-center space-y-4 bg-black/30 backdrop-blur-sm p-4 rounded-xl border border-white/10 text-white font-bold text-3xl z-10">
-            <div className="text-xs text-slate-400">AI</div>
-            <span className="text-slate-400 text-4xl">{scores.ai}</span>
-            <div className="w-8 h-1 bg-white/20 rounded-full"></div>
-            <span className="text-yellow-400 text-4xl">{scores.player}</span>
-            <div className="text-xs text-yellow-400">YOU</div>
-        </div>
 
         {/* Status Indicator (Top Left) */}
         <div className="absolute top-4 left-4 flex items-center space-x-2 z-20">
@@ -544,6 +535,15 @@ export const GameEngine: React.FC = () => {
             />
             <div className="absolute bottom-1 left-1 text-[10px] text-white/80 bg-black/50 px-1 rounded">Camera Feed</div>
         </div>
+
+      {/* Score Board - Next to Table */}
+      <div className="flex flex-col items-center space-y-6 bg-black/30 backdrop-blur-sm p-6 rounded-xl border border-white/10 text-white font-bold min-w-[120px]">
+          <div className="text-xs text-slate-400 uppercase tracking-wider">AI</div>
+          <span className="text-slate-400 text-5xl tabular-nums">{scores.ai}</span>
+          <div className="w-12 h-1 bg-white/20 rounded-full"></div>
+          <span className="text-yellow-400 text-5xl tabular-nums">{scores.player}</span>
+          <div className="text-xs text-yellow-400 uppercase tracking-wider">YOU</div>
+      </div>
     </div>
   );
 };
