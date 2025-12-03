@@ -1,0 +1,7 @@
+{
+  "name": "Forest Pong Motion",
+  "description": "A 2D motion-controlled Ping Pong game set in a forest theme. Use your hand gestures to control the paddle and play against an AI.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
