@@ -1,0 +1,7 @@
+{
+  "name": "Forest Ping Pong AI",
+  "description": "A 2D motion-controlled Ping Pong game using hand gestures via MediaPipe.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
