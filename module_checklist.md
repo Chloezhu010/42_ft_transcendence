@@ -5,6 +5,24 @@
 > Bonus: up to 5 extra points for modules beyond 14
 
 ---
+## Proposed modules to implement
+- web: 6
+    - frontend + backend frametwork: 2
+    - Public API (API key, rate limiting, docs, 5 endpoints): 2
+    - complete notification: 1
+    - Custom-made design system with reusable components, including a proper color palette, typography, and icons (minimum: 10 reusable components): 1
+- accessiblity: 1
+    - multi-language: 1
+- user management: 3
+    - Standard user management and authentication: 2
+    - Implement remote authentication with OAuth 2.0 (Google, GitHub, 42, etc.): 1
+- AI: 3
+    - Implement a complete LLM system interface: 2
+    - voice/ speech interaction: 1
+- DevOps: 5
+    - Prometheus + Grafana monitoring： 2
+    - backend as microservices: 2
+    - Health check and status page system with automated backups and disaster recovery procedures: 1
 
 ## Coverage Key
 
@@ -174,21 +192,3 @@ Based on what already exists in the codebase, this combination reaches exactly 1
 
 > **Note:** Modules 3 and 4 (Standard user management, Public API) require the mandatory auth system (blocker #13 in `checklist.md`) to be completed first. Do mandatory blockers before module work.
 
-## Notes
-- web: 6
-    - frontend + backend frametwork: 2
-    - Public API (API key, rate limiting, docs, 5 endpoints): 2
-    - complete notification: 1
-    - Custom-made design system with reusable components, including a proper color palette, typography, and icons (minimum: 10 reusable components): 1
-- accessiblity: 1
-    - multi-language: 1
-- user management: 3
-    - Standard user management and authentication: 2
-    - Implement remote authentication with OAuth 2.0 (Google, GitHub, 42, etc.): 1
-- AI: 3
-    - Implement a complete LLM system interface: 2
-    - voice/ speech interaction: 1
-- DevOps: 5
-    - Prometheus + Grafana monitoring： 2
-    - backend as microservices: 2
-    - Health check and status page system with automated backups and disaster recovery procedures: 1
