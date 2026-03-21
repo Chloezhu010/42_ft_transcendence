@@ -5,24 +5,52 @@
 > Bonus: up to 5 extra points for modules beyond 14
 
 ---
-## Proposed modules to implement
-- web: 6
-    - frontend + backend frametwork: 2
-    - Public API (API key, rate limiting, docs, 5 endpoints): 2
-    - complete notification: 1
-    - Custom-made design system with reusable components, including a proper color palette, typography, and icons (minimum: 10 reusable components): 1
-- accessiblity: 1
-    - multi-language: 1
-- user management: 3
-    - Standard user management and authentication: 2
-    - Implement remote authentication with OAuth 2.0 (Google, GitHub, 42, etc.): 1
-- AI: 3
-    - Implement a complete LLM system interface: 2
-    - voice/ speech interaction: 1
-- DevOps: 5
-    - Prometheus + Grafana monitoring： 2
-    - backend as microservices: 2
-    - Health check and status page system with automated backups and disaster recovery procedures: 1
+
+## Proposed Modules to Implement
+
+> **Total proposed: 19 pts** (14 required + 5 buffer — buffer protects against a module being rejected at evaluation)
+
+| # | Category | Module | Type | Pts | Status | Risk | Notes |
+|---|----------|--------|------|-----|--------|------|-------|
+| 1 | Web | Use a framework for both frontend and backend | Major | 2 | ✅ Done | Low | React 19 + FastAPI — claimable immediately |
+| 2 | Web | Public API (secured API key, rate limiting, docs, 5 endpoints) | Major | 2 | ⚠️ Partial | Low | FastAPI auto-docs + 7 endpoints exist; add API key header + rate limiter |
+| 3 | Web | Complete notification system | Minor | 1 | ⚠️ Partial | Low | `sonner` already installed; wire to all create/update/delete actions |
+| 4 | Web | Custom design system (10+ reusable components) | Minor | 1 | ⚠️ Partial | Low | 9/10 components exist; add 1 more (e.g. `Card` or `Badge`) |
+| 5 | Accessibility | Multiple languages — i18n (3 languages) | Minor | 1 | ❌ Not started | Low | `i18next` + language switcher + 3 full translations |
+| 6 | User Management | Standard user management and authentication | Major | 2 | ❌ Not started | Medium | Profile update, avatar upload, friends + online status — **requires mandatory auth blocker to be resolved first** |
+| 7 | User Management | OAuth 2.0 (42 School / GitHub / Google) | Minor | 1 | ❌ Not started | Low | **Depends on #6** — OAuth extends the auth system; 42 OAuth fits naturally for a 42 project |
+| 7b | User Management | User activity analytics and insights dashboard | Minor | 1 | ❌ Not started | Low | **Depends on #6** — per-user stats: stories generated, panels created, favourite art styles, generation history; simple charts on profile page |
+| 8 | AI | LLM system interface (Gemini story + image generation) | Major | 2 | ⚠️ Partial | Low | Core generation works; **add streaming responses** — subject explicitly requires it |
+| 9 | AI | Voice / speech integration | Minor | 1 | ❌ Not started | Low | TTS reading comic panels aloud fits naturally for a children's app; Web Speech API is built into Chrome (no extra library) |
+| 10 | DevOps | Prometheus + Grafana monitoring | Major | 2 | ❌ Not started | Medium | `prometheus-fastapi-instrumentator` gives FastAPI metrics in ~5 lines; add Prometheus + Grafana to Docker Compose |
+| 11 | DevOps | Backend as microservices | Major | 2 | ❌ Not started | ⚠️ High | Full architectural rewrite — split monolith into auth-service / story-service / ai-service; significant inter-service communication work |
+| 12 | DevOps | Health check + status page + automated backups | Minor | 1 | ⚠️ Partial | Low | `GET /health` exists; add status UI page + SQLite backup cron + recovery docs |
+
+### Point Breakdown
+
+| Category | Modules | Pts |
+|----------|---------|-----|
+| Web | Frameworks + Public API + Notification + Design system | 6 |
+| Accessibility | Multi-language | 1 |
+| User Management | Standard auth + OAuth + User activity analytics | 4 |
+| AI | LLM interface + Voice/speech | 3 |
+| DevOps | Prometheus/Grafana + Microservices + Health check | 5 |
+| **Total proposed** | | **19** |
+
+| **Minimum required** | | **14** |
+| **Buffer** | Protects against 1 Major + 1 Minor, or 5 Minors being rejected | **+5** |
+
+### Dependencies & Implementation Order
+
+```
+Mandatory auth (blocker) ──► Standard user management (#6) ──► OAuth 2.0 (#7)
+                         ──► Public API (#2)  ← benefits from user-scoped API keys
+LLM interface (#8)       ──► add streaming before claiming
+Microservices (#11)      ──► do last — highest risk, can drop if time is short
+```
+
+### Risk Note — Backend as Microservices (#11)
+This is the only high-risk module in the list. It requires splitting the entire FastAPI backend into separate services (auth, story/panel, AI/Gemini), each with its own Docker container and inter-service HTTP communication. If the team runs short on time, **drop this module** — the 4pt buffer means you still reach 16pts without it, comfortably above the 14pt minimum.
 
 ## Coverage Key
 
@@ -162,33 +190,19 @@
 
 ## Summary
 
-| Status | Modules | Max pts available |
-|--------|---------|------------------|
-| ✅ Fully covered | Use frameworks (Major) | **2 pts** |
-| ⚠️ Partially covered | LLM interface (Major), Public API (Major), Custom design system (Minor), PWA (Minor), File upload (Minor), Notification system (Minor), Health check (Minor) | up to **9 pts** |
-| ❌ Not started | Everything else | — |
-| 🚫 Blocked (need a game) | 10 modules across Gaming, Game stats, AI Opponent, Blockchain tournament | 0 pts available |
+| Status | Proposed modules | Pts |
+|--------|-----------------|-----|
+| ✅ Done | Frameworks (Web) | 2 |
+| ⚠️ Partial — low effort to complete | Public API, Notification system, Design system, LLM interface, Health check | 7 |
+| ❌ Not started — medium effort | Standard user management, OAuth, User activity analytics, Multi-language, Prometheus + Grafana | 7 |
+| ❌ Not started — high effort | Backend as microservices | 2 |
+| ❌ Not started — low effort | Voice/speech | 1 |
+| **Total proposed** | | **18** |
 
-**Confirmed points: 2 / 14**
-**Maximum reachable with partial work only: 11 / 14** ← still 3 pts short
-
----
-
-## Recommended Path to 14 Points
-
-Based on what already exists in the codebase, this combination reaches exactly 14 with the least new work:
-
-| # | Module | Type | Pts | Effort | Notes |
-|---|--------|------|-----|--------|-------|
-| 1 | Use frameworks (frontend + backend) | Major | 2 | ✅ done | React + FastAPI |
-| 2 | LLM system interface | Major | 2 | Low | Add streaming to Gemini calls |
-| 3 | Standard user management | Major | 2 | Medium | Needs auth first (mandatory anyway) |
-| 4 | Public API | Major | 2 | Low | Add API key header + rate limiting middleware |
-| 5 | Custom design system | Minor | 1 | Minimal | Add 1 more component (currently 9/10) |
-| 6 | PWA | Minor | 1 | Low | Link manifest + add service worker |
-| 7 | File upload | Minor | 1 | Medium | Upgrade base64 → proper multipart upload with validation |
-| 8 | Notification system | Minor | 1 | Low | `sonner` already installed — wire to all CRUD actions |
-| **Total** | | | **14** | | |
-
-> **Note:** Modules 3 and 4 (Standard user management, Public API) require the mandatory auth system (blocker #13 in `checklist.md`) to be completed first. Do mandatory blockers before module work.
+| Symbol | Meaning |
+|--------|---------|
+| ✅ | Already implemented — claimable now |
+| ⚠️ | Partially implemented — needs specific work to claim |
+| ❌ | Not started |
+| 🚫 | Blocked — requires a game module (we have none) |
 
