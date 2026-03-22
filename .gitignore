@@ -1,4 +1,6 @@
 *.db
+*.db-shm
+*.db-wal
 backend/images/*.png
 backend/images/*.jpg
 backend/__pycache__/
@@ -14,3 +16,4 @@ frontend/.env.local
 AGENTS.md
 CLAUDE.md
 docs/
+.gstack/
