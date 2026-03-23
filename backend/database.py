@@ -18,9 +18,32 @@ async def init_db():
 async def _create_tables(db: aiosqlite.Connection):
     """Create tables if they don't exist."""
     await db.executescript("""
+        CREATE TABLE IF NOT EXISTS users (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT, -- unique ID for each user
+            email           TEXT NOT NULL UNIQUE, -- unique email for login
+            username        TEXT NOT NULL UNIQUE, -- unique username for display
+            password_hash   TEXT NOT NULL, -- hashed password for security
+            avatar_path     TEXT DEFAULT 'default-avatar.png', -- path to user's avatar image
+            is_online       BOOLEAN NOT NULL DEFAULT 0, -- online status for presence indication
+            created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- timestamp of account creation
+            updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- timestamp of last profile update
+        );
+                           
+        CREATE TABLE IF NOT EXISTS friendships (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT, -- unique ID for each friendship
+            requester_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, -- user who sent the friend request
+            addressee_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, -- user who received the friend request
+            status          TEXT NOT NULL DEFAULT 'pending' 
+                            CHECK(status IN ('pending', 'accepted', 'rejected')), -- status of the friend request
+            created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+            CHECK(requester_id != addressee_id), -- prevent self-friendship
+            UNIQUE(requester_id, addressee_id) -- prevent duplicate friendships
+        );
+                           
         CREATE TABLE IF NOT EXISTS kid_profiles (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id TEXT NOT NULL DEFAULT 'local-user',
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
             name TEXT NOT NULL,
             gender TEXT NOT NULL CHECK(gender IN ('boy', 'girl', 'neutral')),
             skin_tone TEXT NOT NULL,
@@ -35,7 +58,7 @@ async def _create_tables(db: aiosqlite.Connection):
 
         CREATE TABLE IF NOT EXISTS stories (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id TEXT NOT NULL DEFAULT 'local-user',
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
             kid_profile_id INTEGER NOT NULL REFERENCES kid_profiles(id) ON DELETE CASCADE,
             title TEXT,
             foreword TEXT,
