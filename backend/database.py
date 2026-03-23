@@ -1,8 +1,8 @@
 """
 SQLite database setup with aiosqlite.
 """
-import os
-import aiosqlite
+import os # for env variables
+import aiosqlite # for async SQLite access
 
 # Single connection (initialized on startup)
 _db: aiosqlite.Connection | None = None
@@ -11,16 +11,9 @@ DB_PATH = os.getenv("DB_PATH", "wondercomic.db")
 
 
 async def init_db():
-    """Initialize the database connection and create tables."""
-    global _db
-    if _db is None:
-        _db = await aiosqlite.connect(DB_PATH)
-        _db.row_factory = aiosqlite.Row
-        await _db.execute("PRAGMA journal_mode=WAL")
-        await _db.execute("PRAGMA foreign_keys=ON")
-        await _create_tables(_db)
-    return _db
-
+    """Create tables on startup."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        await _create_tables(db) # create tables if they don't exist
 
 async def _create_tables(db: aiosqlite.Connection):
     """Create tables if they don't exist."""
@@ -67,16 +60,13 @@ async def _create_tables(db: aiosqlite.Connection):
     """)
     await db.commit()
 
-
-async def close_db():
-    """Close the database connection."""
-    global _db
-    if _db:
-        await _db.close()
-        _db = None
-
-
 async def get_db():
-    """FastAPI dependency that provides a database connection."""
-    db = await init_db()
-    yield db
+    """Per-request database connection generator."""
+    db = await aiosqlite.connect(DB_PATH)
+    db.row_factory = aiosqlite.Row # return rows as dict-like objects
+    await db.execute("PRAGMA journal_mode=WAL") # concurrent read/write
+    await db.execute("PRAGMA foreign_keys=ON") # enforce foreign key constraints
+    try:
+        yield db
+    finally:
+        await db.close()

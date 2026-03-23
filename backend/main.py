@@ -16,7 +16,7 @@ import aiosqlite
 # Load .env from project root (parent of backend/)
 load_dotenv(Path(__file__).parent.parent / ".env")
 
-from database import get_db, init_db, close_db
+from database import get_db, init_db
 from models import (
     StoryCreate,
     StoryResponse,
