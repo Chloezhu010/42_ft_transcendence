@@ -126,7 +126,10 @@ def test_token_invalid_with_wrong_secret():
 
 def test_token_invalid_if_tampered():
     token = create_access_token(1)
-    # flip last character
-    tampered = token[:-1] + ("A" if token[-1] != "A" else "B")
+    # tamper with the payload (middle) section
+    parts = token.split(".")
+    payload = parts[1]
+    tampered_payload = payload[:-1] + ("A" if payload[-1] != "A" else "B")
+    tampered = f"{parts[0]}.{tampered_payload}.{parts[2]}"
     with pytest.raises(JWTError):
         jwt.decode(tampered, SECRET_KEY, algorithms=[ALGORITHM])

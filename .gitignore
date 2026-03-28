@@ -16,4 +16,4 @@ frontend/dist/
 CLAUDE.md
 
 docs/
-.gstack/
+backend/tests/__pycache__/
