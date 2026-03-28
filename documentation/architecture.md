@@ -11,7 +11,7 @@
 | Backend framework | FastAPI (Python 3.13+) | Async-native, Pydantic validation, auto OpenAPI docs |
 | Database | SQLite via aiosqlite | Zero-setup, WAL mode for concurrent reads |
 | Auth | JWT (PyJWT) + bcrypt (passlib) | Stateless tokens, industry-standard password hashing |
-| AI | Google Gemini API (`@google/genai`) | Story scripts + panel image generation |
+| AI | Google Gemini API | Story scripts + panel image generation |
 | HTTPS | nginx (reverse proxy + TLS) | Mandatory per subject; terminates TLS in front of both services |
 | Containerization | Docker Compose | Single-command startup as required by subject |
 
@@ -37,9 +37,9 @@ users
 
 friendships
 ├── id            INTEGER PRIMARY KEY AUTOINCREMENT
-├── user_id       INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
-├── friend_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
-├── status        TEXT CHECK(status IN ('pending','accepted','blocked'))
+├── requester_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
+├── addressee_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
+├── status        TEXT CHECK(status IN ('pending','accepted', 'rejected', 'blocked'))
 └── created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
 kid_profiles
