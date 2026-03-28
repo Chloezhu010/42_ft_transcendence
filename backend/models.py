@@ -6,6 +6,48 @@ from typing import List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
+# --- Auth Models ---
+class SignupRequest(BaseModel):
+    """Request body for user signup."""
+    email: str
+    username: str
+    password: str
+
+class LoginRequest(BaseModel):
+    """Request body for user login."""
+    email: str
+    password: str
+
+class TokenResponse(BaseModel):
+    """Response containing the authentication token."""
+    access_token: str
+    token_type: str = "bearer"
+
+# --- User Models ---
+class UserResponse(BaseModel):
+    """User data in responses."""
+    id: int
+    email: str
+    username: str
+    avatar_url: str | None
+    is_online: bool
+    created_at: datetime
+
+class UserUpdateRequest(BaseModel):
+    """Request body for updating user profile."""
+    username: str | None
+    email: str | None
+
+# --- Friendship Models ---
+class FriendResponse(BaseModel):
+    """Friendship data in responses."""
+    id: int
+    username: str
+    avatar_url: str | None
+    is_online: bool
+    friendship_status: str # 'pending', 'accepted'
+    is_requester: bool # True if current user is the requester of the friendship
+
 # --- Kid Profile Models ---
 
 class KidProfileCreate(BaseModel):
