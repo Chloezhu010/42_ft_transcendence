@@ -1,9 +1,10 @@
 """
 Pydantic models for request/response validation.
 """
-from pydantic import BaseModel, Field
-from typing import Optional, Literal, List
 from datetime import datetime
+from typing import List, Literal, Optional
+
+from pydantic import BaseModel, Field
 
 # --- Auth Models ---
 class SignupRequest(BaseModel):
@@ -158,6 +159,7 @@ class GenerateStoryScriptRequest(BaseModel):
 
 class GeneratedPanel(BaseModel):
     """A generated panel from the story script (also used as Gemini structured output schema)."""
+
     id: str = Field(description="Panel identifier, e.g. '1', '2', '3'")
     text: str = Field(description="The narrative text for this panel, 8-12 words")
     imagePrompt: str = Field(description="Detailed image prompt for this panel with cinematic direction")
@@ -165,9 +167,15 @@ class GeneratedPanel(BaseModel):
 
 class GenerateStoryScriptResponse(BaseModel):
     """Response containing the generated story script (also used as Gemini structured output schema)."""
+
     title: str = Field(description="The title of the comic book story")
     foreword: str = Field(description="A short foreword, max 30 words")
-    characterDescription: str = Field(description="Detailed description of all characters including their appearance and outfits")
+    characterDescription: str = Field(
+        description=(
+            "Detailed description of all characters including "
+            "their appearance and outfits"
+        )
+    )
     coverImagePrompt: str = Field(description="Image prompt for the cover showing the hero and companion")
     panels: List[GeneratedPanel] = Field(description="List of story panels")
 

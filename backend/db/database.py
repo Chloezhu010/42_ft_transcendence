@@ -1,8 +1,13 @@
 """
 SQLite database setup with aiosqlite.
 """
-import os # for env variables
-import aiosqlite # for async SQLite access
+import os  # for env variables
+from pathlib import Path
+
+import aiosqlite  # for async SQLite access
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).resolve().parent.parent.parent / ".env")
 
 # Single connection (initialized on startup)
 _db: aiosqlite.Connection | None = None
@@ -13,7 +18,8 @@ DB_PATH = os.getenv("DB_PATH", "wondercomic.db")
 async def init_db():
     """Create tables on startup."""
     async with aiosqlite.connect(DB_PATH) as db:
-        await _create_tables(db) # create tables if they don't exist
+        await _create_tables(db)  # create tables if they don't exist
+
 
 async def _create_tables(db: aiosqlite.Connection):
     """Create tables if they don't exist."""
@@ -32,7 +38,8 @@ async def _create_tables(db: aiosqlite.Connection):
         CREATE TABLE IF NOT EXISTS friendships (
             id              INTEGER PRIMARY KEY AUTOINCREMENT, -- unique ID for each friendship
             requester_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, -- user who sent the friend request
-            addressee_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, -- user who received the friend request
+            addressee_id    INTEGER NOT NULL REFERENCES users(id)
+                            ON DELETE CASCADE, -- user who received the friend request
             status          TEXT NOT NULL DEFAULT 'pending' 
                             CHECK(status IN ('pending', 'accepted', 'rejected')), -- status of the friend request
             created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -81,14 +88,20 @@ async def _create_tables(db: aiosqlite.Connection):
             UNIQUE(story_id, panel_order)
         );
     """)
+    # Seed a default local user for dev mode
+    await db.execute("""
+        INSERT OR IGNORE INTO users (id, email, username, password_hash)
+        VALUES (1, 'local@dev', 'local-user', 'none')
+    """)
     await db.commit()
+
 
 async def get_db():
     """Per-request database connection generator."""
     db = await aiosqlite.connect(DB_PATH)
-    db.row_factory = aiosqlite.Row # return rows as dict-like objects
-    await db.execute("PRAGMA journal_mode=WAL") # concurrent read/write
-    await db.execute("PRAGMA foreign_keys=ON") # enforce foreign key constraints
+    db.row_factory = aiosqlite.Row  # return rows as dict-like objects
+    await db.execute("PRAGMA journal_mode=WAL")  # concurrent read/write
+    await db.execute("PRAGMA foreign_keys=ON")  # enforce foreign key constraints
     try:
         yield db
     finally:
