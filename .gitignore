@@ -1,16 +1,16 @@
 *.db
 *.db-shm
 *.db-wal
-backend/images/*.png
-backend/images/*.jpg
+backend/images/
 backend/__pycache__/
 backend/.venv/
+backend/.ruff_cache/
 frontend/node_modules/
 frontend/dist/
 
 .env
 .env.local
-frontend/.env.local
+
 .DS_Store
 
 AGENTS.md

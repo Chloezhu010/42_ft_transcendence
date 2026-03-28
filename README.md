@@ -67,7 +67,7 @@ The application is fully multi-user: each account has isolated story data, an av
 git clone https://github.com/<your-org>/ft_transcendence.git
 cd ft_transcendence
 cp .env.example .env
-# Edit .env — fill in GEMINI_API_KEY and SECRET_KEY at minimum
+# Edit .env — fill in GEMINI_API_KEY
 docker compose up --build
 ```
 
@@ -88,7 +88,7 @@ docker compose logs frontend   # Frontend logs only
 
 **Backend** (from `backend/`):
 ```bash
-uv sync
+uv sync --extra test
 uv run uvicorn main:app --reload --port 8000
 ```
 
@@ -100,6 +100,24 @@ npm test          # run tests (vitest)
 npm run build     # production build → dist/
 ```
 
+### Pre-push Checks
+
+Run the checks for the area you changed before pushing:
+
+**Backend** (from `backend/`):
+```bash
+ruff check .
+uv run pytest
+```
+
+**Frontend** (from `frontend/`):
+```bash
+npm test
+npm run build
+```
+
+If your change touches both sides, run both sets of checks.
+
 ### Environment Variables
 
 Copy `.env.example` to `.env` and fill in required values:
@@ -107,7 +125,6 @@ Copy `.env.example` to `.env` and fill in required values:
 | Variable | Description | Required |
 |----------|-------------|----------|
 | `GEMINI_API_KEY` | Google Gemini API key | **Yes** |
-| `SECRET_KEY` | JWT signing secret (`openssl rand -hex 32`) | **Yes** |
 | `VITE_API_BASE_URL` | Backend URL seen by browser (default: `http://localhost:8000`) | No |
 | `FRONTEND_URL` | CORS allowed origin (default: `http://localhost:3000`) | No |
 | `DB_PATH` | SQLite database file path (default: `wondercomic.db`) | No |
