@@ -2,7 +2,7 @@
 *.db-shm
 *.db-wal
 backend/images/
-backend/__pycache__/
+**/__pycache__/
 backend/.venv/
 backend/.ruff_cache/
 frontend/node_modules/
