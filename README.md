@@ -54,7 +54,7 @@ Copy `.env.example` to `.env` and fill in required values:
 
 ## Docs
 
-- [Development Guide](docs/development.md) — local dev, docker commands, pre-push checks
-- [Architecture](docs/architecture.md) — tech stack details, database schema
-- [Roadmap](docs/roadmap.md) — features, modules, implementation phases, contributions
-- [Resources](docs/resources.md) — documentation links, AI usage
+- [Development Guide](documentation/development.md) — local dev, docker commands, pre-push checks
+- [Architecture](documentation/architecture.md) — tech stack details, database schema
+- [Roadmap](documentation/roadmap.md) — features, modules, implementation phases, contributions
+- [Resources](documentation/resources.md) — documentation links, AI usage
