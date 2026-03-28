@@ -88,6 +88,11 @@ async def _create_tables(db: aiosqlite.Connection):
             UNIQUE(story_id, panel_order)
         );
     """)
+    # Seed a default local user for dev mode
+    await db.execute("""
+        INSERT OR IGNORE INTO users (id, email, username, password_hash)
+        VALUES (1, 'local@dev', 'local-user', 'none')
+    """)
     await db.commit()
 
 

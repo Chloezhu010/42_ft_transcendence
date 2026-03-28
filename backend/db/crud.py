@@ -21,7 +21,7 @@ from models import (
 IMAGES_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "images")
 os.makedirs(IMAGES_DIR, exist_ok=True)
 
-USER_ID = "local-user"
+USER_ID = 1
 
 
 # --- Helpers ---

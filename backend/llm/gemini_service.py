@@ -151,7 +151,7 @@ Scene: {prompt}.
 Cinematic angles, characters interact with each other/world — NEVER face the camera. Full-bleed, borderless."""
 
         response = await client.aio.models.generate_content(
-            model="gemini-3-pro-image-preview",
+            model="gemini-3.1-flash-image-preview",
             contents=full_prompt,
             config=types.GenerateContentConfig(
                 response_modalities=["image", "text"],
@@ -186,7 +186,7 @@ Preserve composition and style. Characters must NOT face the camera."""
         )
 
         response = await client.aio.models.generate_content(
-            model="gemini-3-pro-image-preview",
+            model="gemini-3.1-flash-image-preview",
             contents=[image_data, full_prompt],
             config=types.GenerateContentConfig(
                 response_modalities=["image", "text"],
