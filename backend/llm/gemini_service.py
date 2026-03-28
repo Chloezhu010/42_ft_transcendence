@@ -1,14 +1,19 @@
 """
 Gemini API service for story and image generation.
 """
-import os
 import asyncio
-import random
 import base64
+import os
+import random
+from pathlib import Path
+
+from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
 from models import GenerateStoryScriptResponse
+
+load_dotenv(Path(__file__).resolve().parent.parent.parent / ".env")
 
 # Initialize client with API key from environment
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY", ""))
@@ -19,7 +24,10 @@ ART_STYLES = {
     "Pencil Sketch": "Hand-drawn colored pencil sketch with visible strokes and soft pastel colors.",
     "Digital Pop": "Vibrant modern digital vector art with clean lines, flat bold colors, high contrast.",
 }
-DEFAULT_STYLE = "Bold black ink outlines, vibrant flat colors, clean cel-shading. No 3D, no gradients, no text in images."
+DEFAULT_STYLE = (
+    "Bold black ink outlines, vibrant flat colors, clean cel-shading. "
+    "No 3D, no gradients, no text in images."
+)
 
 
 def get_style_prompt(style: str | None) -> str:
@@ -90,7 +98,13 @@ async def generate_story_script(
     """Generate a 10-panel story script."""
 
     async def _generate():
-        hero_desc = f"The child in the attached photo ({gender})" if photo_base64 else f"A {gender} child with {skin_tone} skin, {hair_color} hair, {eye_color} eyes"
+        if photo_base64:
+            hero_desc = f"The child in the attached photo ({gender})"
+        else:
+            hero_desc = (
+                f"A {gender} child with {skin_tone} skin, "
+                f"{hair_color} hair, {eye_color} eyes"
+            )
         theme = f"{archetype or 'adventure'} adventure about {dream or 'discovering something amazing'}"
 
         prompt = f"""Create a 10-panel children's comic story. Simple vocabulary, 6-10 words per panel.
@@ -137,7 +151,7 @@ Scene: {prompt}.
 Cinematic angles, characters interact with each other/world — NEVER face the camera. Full-bleed, borderless."""
 
         response = await client.aio.models.generate_content(
-            model="gemini-3-pro-image-preview",
+            model="gemini-3.1-flash-image-preview",
             contents=full_prompt,
             config=types.GenerateContentConfig(
                 response_modalities=["image", "text"],
@@ -149,7 +163,13 @@ Cinematic angles, characters interact with each other/world — NEVER face the c
     return await with_retry(_generate)
 
 
-async def edit_panel_image(image_base64: str, original_prompt: str, edit_prompt: str, cast_guide: str, style: str | None = None) -> str:
+async def edit_panel_image(
+    image_base64: str,
+    original_prompt: str,
+    edit_prompt: str,
+    cast_guide: str,
+    style: str | None = None,
+) -> str:
     """Edit an existing comic panel image, returns base64 encoded image."""
 
     async def _generate():
@@ -166,7 +186,7 @@ Preserve composition and style. Characters must NOT face the camera."""
         )
 
         response = await client.aio.models.generate_content(
-            model="gemini-3-pro-image-preview",
+            model="gemini-3.1-flash-image-preview",
             contents=[image_data, full_prompt],
             config=types.GenerateContentConfig(
                 response_modalities=["image", "text"],

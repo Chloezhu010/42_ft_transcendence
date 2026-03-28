@@ -2,7 +2,6 @@
 name = "backend"
 version = "0.1.0"
 description = "WonderComic backend - AI-powered comic book stories"
-readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "aiosqlite>=0.20.0",
@@ -20,6 +19,16 @@ test = [
     "httpx>=0.27.0",
     "pytest-mock>=3.12.0",
 ]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

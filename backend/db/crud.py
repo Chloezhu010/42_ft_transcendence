@@ -1,22 +1,27 @@
 """
 CRUD operations for database entities (async SQLite).
 """
-import os
 import base64
+import os
 import uuid
 
 import aiosqlite
 
 from models import (
-    KidProfileCreate, KidProfileResponse,
-    PanelCreate, PanelResponse,
-    StoryCreate, StoryResponse, StoryListItem, StoryUpdatePanels,
+    KidProfileCreate,
+    KidProfileResponse,
+    PanelCreate,
+    PanelResponse,
+    StoryCreate,
+    StoryListItem,
+    StoryResponse,
+    StoryUpdatePanels,
 )
 
-IMAGES_DIR = os.path.join(os.path.dirname(__file__), "images")
+IMAGES_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "images")
 os.makedirs(IMAGES_DIR, exist_ok=True)
 
-USER_ID = "local-user"
+USER_ID = 1
 
 
 # --- Helpers ---
