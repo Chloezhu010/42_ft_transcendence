@@ -11,6 +11,9 @@ from db.database import get_db # to access the database connection
 
 # --- Config constants ---
 SECRET_KEY = os.getenv("SECRET_KEY") # from .env for JWT signing
+if not SECRET_KEY or not SECRET_KEY.strip():
+    raise ValueError("SECRET_KEY environment variable is not set or is empty")
+
 ALGORITHM = "HS256" # JWT signing algorithm
 TOKEN_EXPIRE_HOURS = 24 # Token validity duration
 
