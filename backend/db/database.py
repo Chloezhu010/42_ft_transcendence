@@ -1,6 +1,7 @@
 """
 SQLite database setup with aiosqlite.
 """
+
 import os  # for env variables
 from pathlib import Path
 

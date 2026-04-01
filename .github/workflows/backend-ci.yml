@@ -8,7 +8,6 @@ on:
   push:
     branches:
       - main
-      - master
     paths:
       - "backend/**"
       - ".github/workflows/backend-ci.yml"
@@ -34,8 +33,11 @@ jobs:
       - name: Install backend dependencies
         run: uv sync --extra test
 
-      - name: Run Ruff
+      - name: Run Ruff lint
         run: uv tool run ruff check .
+
+      - name: Run Ruff format check
+        run: uv tool run ruff format --check .
 
       - name: Run pytest
         run: uv run pytest

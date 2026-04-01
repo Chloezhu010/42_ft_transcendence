@@ -1,6 +1,7 @@
 """
 FastAPI main application with CORS and API routes.
 """
+
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -56,7 +57,6 @@ app.include_router(generation.router)
 
 
 # --- Health Check ---
-
 @app.get("/health")
 async def health_check(db: aiosqlite.Connection = Depends(get_db)):
     """Health check for uptime monitoring."""

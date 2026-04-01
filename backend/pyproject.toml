@@ -8,9 +8,9 @@ dependencies = [
     "bcrypt>=5.0.0",
     "fastapi>=0.128.0",
     "google-genai>=1.0.0",
-    "pydantic>=2.12.5",
+    "pydantic[email]>=2.12.5",
     "python-dotenv>=1.0.0",
-    "python-jose[cryptography]>=3.5.0",
+    "PyJWT>=2.8.0",
     "python-multipart>=0.0.22",
     "uvicorn>=0.40.0",
 ]
@@ -27,7 +27,7 @@ test = [
 line-length = 120
 
 [tool.ruff.lint]
-select = ["E", "F", "I"]
+select = ["E", "F", "I", "UP"]
 
 [tool.ruff.format]
 quote-style = "double"

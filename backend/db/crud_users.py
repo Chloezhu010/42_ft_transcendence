@@ -7,34 +7,33 @@ from auth_utils import hash_password  # for password hashing and token creation
 # --- User identity ---
 async def create_user(db: aiosqlite.Connection, username: str, email: str, password: str) -> int:
     """Create a new user and return their ID."""
-    hashed_pwd = hash_password(password) # hash the password before storing
+    hashed_pwd = hash_password(password)  # hash the password before storing
     cursor = await db.execute(
-        "INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)",
-        (username, email, hashed_pwd)
+        "INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)", (username, email, hashed_pwd)
     )
-    await db.commit() # commit the transaction to save changes
-    return cursor.lastrowid # return the ID of the newly created user
+    await db.commit()  # commit the transaction to save changes
+    return cursor.lastrowid  # return the ID of the newly created user
+
 
 async def get_user_by_email(db: aiosqlite.Connection, email: str) -> Row | None:
     """Fetch a user by their email address. Returns None if not found."""
     async with db.execute("SELECT * FROM users WHERE email = ?", (email,)) as cursor:
-        return await cursor.fetchone() # return the user row or None if not found
+        return await cursor.fetchone()  # return the user row or None if not found
+
 
 async def get_user_by_id(db: aiosqlite.Connection, user_id: int) -> Row | None:
     """Fetch a user by their ID. Returns None if not found."""
     async with db.execute("SELECT * FROM users WHERE id = ?", (user_id,)) as cursor:
-        return await cursor.fetchone() # return the user row or None if not found
+        return await cursor.fetchone()  # return the user row or None if not found
+
 
 # --- User profile management ---
 async def update_user(
-        db: aiosqlite.Connection,
-        user_id: int, 
-        username: str | None = None,
-        email: str | None = None
-)-> Row | None:
+    db: aiosqlite.Connection, user_id: int, username: str | None = None, email: str | None = None
+) -> Row | None:
     """Update a user's profile info. Returns the updated user row."""
     # Precheck if user exists
-    current_user = await get_user_by_id(db, user_id) # fetch current user data
+    current_user = await get_user_by_id(db, user_id)  # fetch current user data
     if not current_user:
         return None
     # Build dynamic sql query based on provided fields
@@ -52,10 +51,7 @@ async def update_user(
     values.append(user_id)
     # Execute the update query
     try:
-        await db.execute(
-            f"UPDATE users SET {', '.join(updates)} WHERE id = ?",
-            values
-        )
+        await db.execute(f"UPDATE users SET {', '.join(updates)} WHERE id = ?", values)
         await db.commit()
     except aiosqlite.IntegrityError as exc:
         # Handle unique constraint violations (e.g. duplicate email or username)
@@ -67,6 +63,7 @@ async def update_user(
     # Return the updated user data
     return await get_user_by_id(db, user_id)
 
+
 async def update_avatar(db: aiosqlite.Connection, user_id: int, avatar_path: str) -> Row | None:
     """Update a user's avatar URL."""
     # Check if user exists
@@ -75,12 +72,12 @@ async def update_avatar(db: aiosqlite.Connection, user_id: int, avatar_path: str
         return None
     # Update the avatar path
     await db.execute(
-        "UPDATE users SET avatar_path = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
-        (avatar_path, user_id)
+        "UPDATE users SET avatar_path = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?", (avatar_path, user_id)
     )
     await db.commit()
     # Return the updated user data
     return await get_user_by_id(db, user_id)
+
 
 async def set_online_status(db: aiosqlite.Connection, user_id: int, is_online: bool) -> Row | None:
     """Set a user's online status."""
@@ -90,23 +87,24 @@ async def set_online_status(db: aiosqlite.Connection, user_id: int, is_online: b
         return None
     # Update the online status
     await db.execute(
-        "UPDATE users SET is_online = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
-        (is_online, user_id)
+        "UPDATE users SET is_online = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?", (is_online, user_id)
     )
     await db.commit()
     # Return the updated user data
     return await get_user_by_id(db, user_id)
 
+
 # --- Friends ---
 async def get_friendship_between(db, user_id: int, other_user_id: int) -> Row | None:
-   """Check if there is a friendship between two users. Returns the friendship row or None."""
-   async with db.execute(
-       "SELECT * FROM friendships"
-       " WHERE (requester_id = ? AND addressee_id = ?)"
-       " OR (requester_id = ? AND addressee_id = ?)",
-       (user_id, other_user_id, other_user_id, user_id)
-   ) as cursor:
-       return await cursor.fetchone() # return the friendship row or None if not found
+    """Check if there is a friendship between two users. Returns the friendship row or None."""
+    async with db.execute(
+        "SELECT * FROM friendships"
+        " WHERE (requester_id = ? AND addressee_id = ?)"
+        " OR (requester_id = ? AND addressee_id = ?)",
+        (user_id, other_user_id, other_user_id, user_id),
+    ) as cursor:
+        return await cursor.fetchone()  # return the friendship row or None if not found
+
 
 async def send_friend_request(db, requester_id: int, addressee_id: int) -> Row:
     """Send a friend request from requester to addressee. Returns the created friendship row."""
@@ -125,16 +123,14 @@ async def send_friend_request(db, requester_id: int, addressee_id: int) -> Row:
             raise ValueError("Users  are already friends")
         raise ValueError("A friend request already exists")
     # Add friend request to DB
-    await db.execute(
-        "INSERT INTO friendships (requester_id, addressee_id) VALUES (?, ?)",
-        (requester_id, addressee_id)
-    )
+    await db.execute("INSERT INTO friendships (requester_id, addressee_id) VALUES (?, ?)", (requester_id, addressee_id))
     await db.commit()
     # Return the created friendship row
     friendship = await get_friendship_between(db, requester_id, addressee_id)
     if friendship is None:
         raise RuntimeError("Failed to create friend request")
     return friendship
+
 
 async def accept_friend_request(db, current_user_id: int, requester_id: int) -> Row | None:
     """Accept a friend request. Returns the updated friendship row or None if not found."""
@@ -147,16 +143,14 @@ async def accept_friend_request(db, current_user_id: int, requester_id: int) -> 
     if friendship["addressee_id"] != current_user_id:
         raise ValueError("Only the addressee can accept the friend request")
     # Update the friendship status to accepted
-    await db.execute(
-        "UPDATE friendships SET status = 'accepted' WHERE id = ?",
-        (friendship["id"],)
-    )
+    await db.execute("UPDATE friendships SET status = 'accepted' WHERE id = ?", (friendship["id"],))
     await db.commit()
     # Return the updated friendship row
     updated_friendship = await get_friendship_between(db, current_user_id, requester_id)
     if updated_friendship is None:
         raise RuntimeError("Failed to update friend request")
     return updated_friendship
+
 
 async def remove_friend(db, user_id: int, friend_id: int) -> bool:
     """Remove a friend (both accepted and pending). Returns True if a row was deleted."""
@@ -165,13 +159,11 @@ async def remove_friend(db, user_id: int, friend_id: int) -> bool:
     if friendship is None:
         raise ValueError("Friendship not found")
     # Delete the friendship
-    await db.execute(
-        "DELETE FROM friendships WHERE id = ?",
-        (friendship["id"],)
-    )
+    await db.execute("DELETE FROM friendships WHERE id = ?", (friendship["id"],))
     await db.commit()
     # Return True to indicate a friendship was removed
     return True
+
 
 async def get_friends(db, user_id: int) -> list[Row]:
     """Get a list of accepted friends for the given user id. Returns a list of user rows."""
@@ -189,9 +181,10 @@ async def get_friends(db, user_id: int) -> list[Row]:
         WHERE f.status = 'accepted'
         ORDER BY f.created_at DESC
         """,
-        (user_id, user_id)
+        (user_id, user_id),
     ) as cursor:
-        return await cursor.fetchall() # return a list of accepted friends
+        return await cursor.fetchall()  # return a list of accepted friends
+
 
 async def get_pending_requests(db, user_id: int) -> list[Row]:
     """Get a list of pending friend requests for the given user id. Returns a list of user rows."""
@@ -206,6 +199,6 @@ async def get_pending_requests(db, user_id: int) -> list[Row]:
         WHERE f.addressee_id = ? AND f.status = 'pending'
         ORDER BY f.created_at DESC
         """,
-        (user_id,)
+        (user_id,),
     ) as cursor:
-        return await cursor.fetchall() # return a list of pending friend requests
+        return await cursor.fetchall()  # return a list of pending friend requests
