@@ -1,10 +1,6 @@
-import os
-
 import aiosqlite
 import pytest
 import pytest_asyncio
-
-os.environ["SECRET_KEY"] = "testsecret"
 
 from auth_utils import verify_password
 from db.crud_users import (

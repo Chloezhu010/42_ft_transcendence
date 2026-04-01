@@ -10,13 +10,16 @@ from jwt.exceptions import InvalidTokenError  # for handling JWT errors
 
 from db.database import get_db  # to access the database connection
 
-# --- Config constants ---
-SECRET_KEY = os.getenv("SECRET_KEY")  # from .env for JWT signing
-if not SECRET_KEY or not SECRET_KEY.strip():
-    raise ValueError("SECRET_KEY environment variable is not set or is empty")
+ALGORITHM = "HS256"
+TOKEN_EXPIRE_HOURS = 24
 
-ALGORITHM = "HS256"  # JWT signing algorithm
-TOKEN_EXPIRE_HOURS = 24  # Token validity duration
+
+def _get_secret_key() -> str:
+    key = os.getenv("SECRET_KEY")
+    if not key or not key.strip():
+        raise ValueError("SECRET_KEY environment variable is not set or is empty")
+    return key
+
 
 security = HTTPBearer()  # for extracting the token from the Authorization header
 
@@ -45,7 +48,7 @@ def create_access_token(user_id: int) -> str:
         "sub": str(user_id),  # subject is the user ID
         "exp": datetime.now(UTC) + timedelta(hours=TOKEN_EXPIRE_HOURS),  # token expiration time
     }
-    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)  # encode the token
+    return jwt.encode(payload, _get_secret_key(), algorithm=ALGORITHM)
 
 
 # --- get_current_user dependency ---
@@ -60,8 +63,8 @@ async def get_current_user(
     )
     # decode the token and extract user ID
     try:
-        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])  # decode the token
-        user_id: str = payload.get("sub")  # get user ID from token payload
+        payload = jwt.decode(credentials.credentials, _get_secret_key(), algorithms=[ALGORITHM])
+        user_id: str | None = payload.get("sub")  # get user ID from token payload
         if user_id is None:
             raise unauthorized
     except InvalidTokenError:

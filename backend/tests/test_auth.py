@@ -1,7 +1,4 @@
 import os
-
-os.environ["SECRET_KEY"] = "test-secret-key-that-is-long-enough-for-hs256"
-
 from datetime import UTC, datetime
 
 import jwt
@@ -10,7 +7,7 @@ from jwt.exceptions import InvalidTokenError
 
 from auth_utils import ALGORITHM, create_access_token, hash_password, verify_password
 
-SECRET_KEY = "test-secret-key-that-is-long-enough-for-hs256"
+SECRET_KEY = os.environ["SECRET_KEY"]
 
 
 # --- hash_password ---
