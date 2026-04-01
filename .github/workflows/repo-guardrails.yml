@@ -1,0 +1,68 @@
+name: Repo Guardrails
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  commit-and-pr-conventions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check pull request title
+        if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          if [[ ! "$PR_TITLE" =~ ^(feat|fix|chore|docs|refactor|test|ci)(\(.+\))?:\ .+ ]]; then
+            echo "PR title must use a conventional prefix such as feat:, fix:, chore:, docs:, refactor:, test:, or ci:."
+            exit 1
+          fi
+
+      - name: Check latest commit subject
+        if: github.event_name == 'push'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Validate latest commit subject
+        if: github.event_name == 'push'
+        run: |
+          COMMIT_SUBJECT="$(git log -1 --pretty=%s)"
+          if [[ ! "$COMMIT_SUBJECT" =~ ^(feat|fix|chore|docs|refactor|test|ci)(\(.+\))?:\ .+ ]]; then
+            echo "Latest commit subject must use a conventional prefix such as feat:, fix:, chore:, docs:, refactor:, test:, or ci:."
+            exit 1
+          fi
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+
+  frontend-boundary-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure frontend does not import backend code
+        run: |
+          if grep -RInE \
+            --include='*.ts' \
+            --include='*.tsx' \
+            --include='*.js' \
+            --include='*.jsx' \
+            "from ['\"][./]{1,2}.*/backend/|from ['\"][./]{1,2}.*/backend['\"]|import\(['\"][./]{1,2}.*/backend/|import\(['\"][./]{1,2}.*/backend['\"]" \
+            frontend; then
+            echo "Frontend code must not import backend modules."
+            exit 1
+          fi
