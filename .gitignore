@@ -14,6 +14,7 @@ frontend/dist/
 .DS_Store
 
 CLAUDE.md
+.claude/
 
 docs/
 backend/tests/__pycache__/

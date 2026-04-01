@@ -1,10 +1,13 @@
 import os
+
 os.environ["SECRET_KEY"] = "testsecret"
 
-import pytest
 from datetime import datetime, timezone
-from jose import jwt, JWTError
-from auth_utils import hash_password, verify_password, create_access_token, ALGORITHM
+
+import pytest
+from jose import JWTError, jwt
+
+from auth_utils import ALGORITHM, create_access_token, hash_password, verify_password
 
 SECRET_KEY = "testsecret"
 

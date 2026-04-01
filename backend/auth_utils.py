@@ -1,13 +1,13 @@
-import os # for environment variable access
-from datetime import datetime, timedelta # for token expiration
+import os  # for environment variable access
+from datetime import datetime, timedelta  # for token expiration
 
-from fastapi import Depends, HTTPException, status # to extract the token from the Authorization header
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials # for token-based authentication
-from jose import JWTError, jwt # for encoding and decoding JWT tokens
-import bcrypt # to hash/verify pwd
-import aiosqlite # for async SQLite access
+import aiosqlite  # for async SQLite access
+import bcrypt  # to hash/verify pwd
+from fastapi import Depends, HTTPException, status  # to extract the token from the Authorization header
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer  # for token-based authentication
+from jose import JWTError, jwt  # for encoding and decoding JWT tokens
 
-from db.database import get_db # to access the database connection
+from db.database import get_db  # to access the database connection
 
 # --- Config constants ---
 SECRET_KEY = os.getenv("SECRET_KEY") # from .env for JWT signing

@@ -6,6 +6,7 @@ from typing import List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
+
 # --- Auth Models ---
 class SignupRequest(BaseModel):
     """Request body for user signup."""

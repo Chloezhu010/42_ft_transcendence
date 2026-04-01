@@ -1,6 +1,7 @@
-import aiosqlite # for async SQLite access
-from aiosqlite import Row # for type hinting database rows
-from auth_utils import hash_password, verify_password, create_access_token # for password hashing and token creation
+import aiosqlite  # for async SQLite access
+from aiosqlite import Row  # for type hinting database rows
+
+from auth_utils import hash_password  # for password hashing and token creation
 
 
 # --- User identity ---
@@ -100,7 +101,9 @@ async def set_online_status(db: aiosqlite.Connection, user_id: int, is_online: b
 async def get_friendship_between(db, user_id: int, other_user_id: int) -> Row | None:
    """Check if there is a friendship between two users. Returns the friendship row or None."""
    async with db.execute(
-       "SELECT * FROM friendships WHERE (requester_id = ? AND addressee_id = ?) OR (requester_id = ? AND addressee_id = ?)",
+       "SELECT * FROM friendships"
+       " WHERE (requester_id = ? AND addressee_id = ?)"
+       " OR (requester_id = ? AND addressee_id = ?)",
        (user_id, other_user_id, other_user_id, user_id)
    ) as cursor:
        return await cursor.fetchone() # return the friendship row or None if not found
@@ -122,7 +125,7 @@ async def send_friend_request(db, requester_id: int, addressee_id: int) -> Row:
             raise ValueError("Users  are already friends")
         raise ValueError("A friend request already exists")
     # Add friend request to DB
-    cursor = await db.execute(
+    await db.execute(
         "INSERT INTO friendships (requester_id, addressee_id) VALUES (?, ?)",
         (requester_id, addressee_id)
     )
