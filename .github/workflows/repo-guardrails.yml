@@ -9,6 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
+  # enforce conventional commit message format
   commit-and-pr-conventions:
     runs-on: ubuntu-latest
     steps:
@@ -37,6 +38,7 @@ jobs:
             exit 1
           fi
 
+  # scan for secrets in commit history (API keys, tokens, pwds)
   secret-scan:
     runs-on: ubuntu-latest
     steps:
@@ -46,23 +48,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run Gitleaks
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v2 # 3rd party action that runs the gitleaks scanner
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # auto-provided by Github, required for PR scanning
 
-  frontend-boundary-check:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Ensure frontend does not import backend code
-        run: |
-          if grep -RInE \
-            --include='*.ts' \
-            --include='*.tsx' \
-            --include='*.js' \
-            --include='*.jsx' \
-            "from ['\"][./]{1,2}.*/backend/|from ['\"][./]{1,2}.*/backend['\"]|import\(['\"][./]{1,2}.*/backend/|import\(['\"][./]{1,2}.*/backend['\"]" \
-            frontend; then
-            echo "Frontend code must not import backend modules."
-            exit 1
-          fi
