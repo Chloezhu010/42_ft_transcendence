@@ -23,11 +23,11 @@ jobs:
             exit 1
           fi
 
-      - name: Check latest commit subject
+      - name: Checkout
         if: github.event_name == 'push'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
-          fetch-depth: 2
+          fetch-depth: 1
 
       - name: Validate latest commit subject
         if: github.event_name == 'push'
@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
