@@ -9,6 +9,7 @@ from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from config import get_config
 from db.database import get_db, init_db
@@ -53,6 +54,9 @@ app.mount("/images", StaticFiles(directory=str(images_dir)), name="images")
 # Register routers
 app.include_router(stories.router)
 app.include_router(generation.router)
+
+# Expose /metrics endpoint for Prometheus scraping
+Instrumentator().instrument(app).expose(app)
 
 
 # --- Health Check ---
