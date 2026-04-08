@@ -65,7 +65,6 @@ const GalleryPage: React.FC = () => {
                     src={book.cover_image_url}
                     alt={book.title || 'Untitled Story'}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    loadingClassName="w-full h-full"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-300 font-black text-4xl">?</div>

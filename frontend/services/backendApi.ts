@@ -73,71 +73,6 @@ export interface StoryListItem {
     profile: KidProfileResponse;
 }
 
-export interface SaveStoryParams {
-    profile: {
-        name: string;
-        gender: 'boy' | 'girl' | 'neutral';
-        skin_tone: string;
-        hair_color: string;
-        eye_color: string;
-        favorite_color: string;
-        dream?: string;
-        archetype?: string;
-    };
-    title?: string;
-    foreword?: string;
-    character_description?: string;
-    cover_image_prompt?: string;
-    cover_image_base64?: string;
-    panels: Array<{
-        panel_order: number;
-        text: string;
-        image_prompt?: string;
-        image_base64?: string;
-    }>;
-}
-
-/**
- * Save a complete story to the backend.
- */
-export async function saveStory(params: SaveStoryParams): Promise<number> {
-    const response = await apiFetch(`${API_BASE}/stories`, {
-        method: 'POST',
-        body: JSON.stringify(params),
-    });
-
-    if (!response.ok) {
-        throw new Error(`Failed to save story: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data.id;
-}
-
-export interface UpdateStoryParams {
-    is_unlocked: boolean;
-    panels: Array<{
-        panel_order: number;
-        text: string;
-        image_prompt?: string;
-        image_base64?: string;
-    }>;
-}
-
-/**
- * Update story panels.
- */
-export async function updateStory(storyId: number, params: UpdateStoryParams): Promise<void> {
-    const response = await apiFetch(`${API_BASE}/stories/${storyId}`, {
-        method: 'PATCH',
-        body: JSON.stringify(params),
-    });
-
-    if (!response.ok) {
-        throw new Error(`Failed to update story: ${response.statusText}`);
-    }
-}
-
 /**
  * Update a single panel's image after editing.
  */
@@ -210,20 +145,6 @@ export interface KidProfileForGeneration {
     photo_base64?: string;  // Pure base64, no data URL prefix
 }
 
-export interface GeneratedPanel {
-    id: string;
-    text: string;
-    imagePrompt: string;
-}
-
-export interface GeneratedStoryScript {
-    title: string;
-    foreword: string;
-    characterDescription: string;
-    coverImagePrompt: string;
-    panels: GeneratedPanel[];
-}
-
 export interface GenerateAndSaveStoryResponse {
     story: StoryDetailResponse;
 }
@@ -245,51 +166,6 @@ export async function generateAndSaveStory(
     }
 
     return response.json();
-}
-
-/**
- * Generate a story script using Gemini AI.
- */
-export async function generateStoryScript(
-    profile: KidProfileForGeneration
-): Promise<GeneratedStoryScript> {
-    const response = await apiFetch(`${API_BASE}/generate/story-script`, {
-        method: 'POST',
-        body: JSON.stringify({ profile }),
-    });
-
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error.detail || `Failed to generate story: ${response.statusText}`);
-    }
-
-    return response.json();
-}
-
-/**
- * Generate a comic panel image using Gemini AI.
- */
-export async function generatePanelImage(
-    prompt: string,
-    castGuide: string,
-    artStyle?: string
-): Promise<string> {
-    const response = await apiFetch(`${API_BASE}/generate/panel-image`, {
-        method: 'POST',
-        body: JSON.stringify({
-            prompt,
-            cast_guide: castGuide,
-            style: artStyle,
-        }),
-    });
-
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error.detail || `Failed to generate image: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return `data:image/png;base64,${data.image_base64}`;
 }
 
 /**

@@ -8,14 +8,9 @@ interface StorageImageProps {
   src: string | null | undefined;
   alt: string;
   className?: string;
-  loadingClassName?: string;
 }
 
-const StorageImage: React.FC<StorageImageProps> = ({
-  src,
-  alt,
-  className = '',
-}) => {
+const StorageImage: React.FC<StorageImageProps> = ({ src, alt, className = '' }) => {
   const imageUrl = getImageUrl(src ?? undefined);
 
   if (!imageUrl) {

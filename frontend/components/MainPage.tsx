@@ -5,9 +5,9 @@ import KidWizard from './KidWizard';
 import ComicPanel from './ComicPanel';
 import MagicLoader from './MagicLoader';
 import StorageImage from './StorageImage';
-import { KidProfile, Story } from '../types';
+import { KidProfile } from '../types';
 import { getStory } from '../services/backendApi';
-import { useStoryGenerator } from '../hooks/useStoryGenerator';
+import { mapApiStory, useStoryGenerator } from '../hooks/useStoryGenerator';
 import { SketchyButton } from './design-system/Primitives';
 import { Heading, Text, Label } from './design-system/Typography';
 
@@ -22,7 +22,6 @@ const MainPage: React.FC = () => {
   const [view, setView] = useState<AppState>(AppState.ONBOARDING);
   const [profile, setProfile] = useState<KidProfile | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const {
     story,
@@ -58,33 +57,17 @@ const MainPage: React.FC = () => {
     setView(AppState.GENERATING_SCRIPT);
     try {
       const data = await getStory(storyId);
-      const loadedStory: Story = {
-        title: data.title || '',
-        foreword: data.foreword || '',
-        characterDescription: data.character_description || '',
-        coverImagePrompt: data.cover_image_prompt || '',
-        coverImageUrl: data.cover_image_url || undefined,
-        panels: data.panels.map((p: any) => ({
-          id: String(p.id),
-          text: p.text,
-          imagePrompt: p.image_prompt || '',
-          imageUrl: p.image_url || undefined,
-          isGenerating: false,
-        })),
-      };
       setProfile({
         name: data.profile.name,
         gender: data.profile.gender,
-        ageRange: data.profile.age_range || '3-6',
         skinTone: data.profile.skin_tone,
         hairColor: data.profile.hair_color,
         eyeColor: data.profile.eye_color,
         favoriteColor: data.profile.favorite_color,
         dream: data.profile.dream || '',
-        personality: '',
-        archetype: data.profile.archetype,
+        archetype: data.profile.archetype ?? undefined,
       });
-      setStory(loadedStory);
+      setStory(mapApiStory(data));
       setSavedStoryId(storyId);
       setCurrentPage(0);
       setView(AppState.STORYBOARD);
@@ -100,11 +83,7 @@ const MainPage: React.FC = () => {
   const totalStates = 2 + spreadsNeeded;
 
   const navigate = (dir: number) => {
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentPage(p => Math.max(0, Math.min(totalStates - 1, p + dir)));
-      setIsTransitioning(false);
-    }, 50);
+    setCurrentPage(p => Math.max(0, Math.min(totalStates - 1, p + dir)));
   };
 
   return (
@@ -166,7 +145,7 @@ const MainPage: React.FC = () => {
               {currentPage === 0 && (
                 <div className="w-full h-full bg-brand-primary rounded-r-3xl shadow-[20px_20px_60px_rgba(0,0,0,0.3)] overflow-hidden border-y-8 border-r-8 border-brand-secondary relative">
                   {story.coverImageUrl ? (
-                    <StorageImage src={story.coverImageUrl} alt={story.title || 'Cover'} className="w-full h-full object-cover" loadingClassName="w-full h-full" />
+                    <StorageImage src={story.coverImageUrl} alt={story.title || 'Cover'} className="w-full h-full object-cover" />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center bg-brand-secondary animate-pulse text-white font-bold">Painting Cover...</div>
                   )}

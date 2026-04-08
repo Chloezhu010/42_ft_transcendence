@@ -6,7 +6,7 @@ import {
 } from '../services/backendApi';
 import { KidProfile, Story, ComicPanelData } from '../types';
 
-function mapApiStory(data: StoryDetailResponse): Story {
+export function mapApiStory(data: StoryDetailResponse): Story {
   return {
     title: data.title || '',
     foreword: data.foreword || '',
@@ -64,7 +64,6 @@ export const useStoryGenerator = () => {
     if (savedStoryId && panelOrder !== -1 && updated.imageUrl) {
       try {
         await updatePanelImage(savedStoryId, panelOrder, updated.imageUrl);
-        console.log(`Panel ${panelOrder} saved to backend`);
       } catch (err) {
         console.error('Failed to save panel edit:', err);
       }

@@ -1,4 +1,3 @@
-
 export interface KidProfile {
   name: string;
   gender: 'boy' | 'girl' | 'neutral';
@@ -7,7 +6,6 @@ export interface KidProfile {
   eyeColor: string;
   favoriteColor: string;
   dream: string;
-  personality: string;
   archetype?: string;
   photoUrl?: string;
   artStyle?: string;
