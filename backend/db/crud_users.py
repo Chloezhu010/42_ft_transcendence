@@ -120,7 +120,7 @@ async def send_friend_request(db, requester_id: int, addressee_id: int) -> Row:
     existing_friendship = await get_friendship_between(db, requester_id, addressee_id)
     if existing_friendship is not None:
         if existing_friendship["status"] == "accepted":
-            raise ValueError("Users  are already friends")
+            raise ValueError("Users are already friends")
         raise ValueError("A friend request already exists")
     # Add friend request to DB
     await db.execute("INSERT INTO friendships (requester_id, addressee_id) VALUES (?, ?)", (requester_id, addressee_id))
