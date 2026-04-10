@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import KidWizard from './KidWizard';
 import ComicPanel from './ComicPanel';
+import PreviewView from './PreviewView';
 import MagicLoader from './MagicLoader';
 import StorageImage from './StorageImage';
 import { KidProfile, Story } from '../types';
@@ -14,6 +15,7 @@ import { Heading, Text, Label } from './design-system/Typography';
 enum AppState {
   ONBOARDING,
   GENERATING_SCRIPT,
+  PREVIEW,
   STORYBOARD,
 }
 
@@ -27,9 +29,10 @@ const MainPage: React.FC = () => {
   const {
     story,
     setStory,
-    savedStoryId,
     setSavedStoryId,
-    generateStory,
+    generateStoryPreview,
+    generateFullStoryFromPreview,
+    hasPendingPreview,
     updatePanel,
   } = useStoryGenerator();
 
@@ -45,12 +48,31 @@ const MainPage: React.FC = () => {
     setView(AppState.GENERATING_SCRIPT);
 
     try {
-      await generateStory(p);
-      setView(AppState.STORYBOARD);
+      await generateStoryPreview(p);
+      setView(AppState.PREVIEW);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Generation failed';
       toast.error(message);
       setView(AppState.ONBOARDING);
+    }
+  };
+
+  const handleGenerateFullStory = async () => {
+    if (!hasPendingPreview) {
+      toast.error('Preview expired. Please generate again.');
+      setView(AppState.ONBOARDING);
+      return;
+    }
+
+    setView(AppState.GENERATING_SCRIPT);
+    try {
+      await generateFullStoryFromPreview();
+      setCurrentPage(0);
+      setView(AppState.STORYBOARD);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Generation failed';
+      toast.error(message);
+      setView(AppState.PREVIEW);
     }
   };
 
@@ -122,6 +144,16 @@ const MainPage: React.FC = () => {
       )}
 
       {view === AppState.GENERATING_SCRIPT && <MagicLoader />}
+
+      {view === AppState.PREVIEW && story && (
+        <PreviewView
+          story={story}
+          profile={profile}
+          updatePanel={updatePanel}
+          onGenerate={handleGenerateFullStory}
+          onStartOver={() => setView(AppState.ONBOARDING)}
+        />
+      )}
 
       {view === AppState.STORYBOARD && story && (
         <div className="flex-1 flex flex-col animate-in fade-in duration-700 h-[calc(100vh-140px)] relative">

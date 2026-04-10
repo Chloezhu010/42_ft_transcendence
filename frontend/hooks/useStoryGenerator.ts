@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import {
-  generateAndSaveStory,
+  generatePanelImage,
+  generateStoryScript,
+  getStory,
+  KidProfileForGeneration,
+  saveStory,
   updatePanelImage,
   StoryDetailResponse,
 } from '../services/backendApi';
@@ -23,32 +27,134 @@ function mapApiStory(data: StoryDetailResponse): Story {
   };
 }
 
+function mapProfileToApi(p: KidProfile): KidProfileForGeneration {
+  return {
+    name: p.name,
+    gender: p.gender,
+    skin_tone: p.skinTone,
+    hair_color: p.hairColor,
+    eye_color: p.eyeColor,
+    favorite_color: p.favoriteColor,
+    dream: p.dream,
+    archetype: p.archetype,
+    art_style: p.artStyle,
+    photo_base64: p.photoUrl?.startsWith('data:')
+      ? p.photoUrl.split(',')[1]
+      : undefined,
+  };
+}
+
+interface PendingGeneration {
+  profileForApi: KidProfileForGeneration;
+  previewStory: Story;
+}
+
 export const useStoryGenerator = () => {
   const [story, setStory] = useState<Story | null>(null);
   const [savedStoryId, setSavedStoryId] = useState<number | null>(null);
+  const [pendingGeneration, setPendingGeneration] = useState<PendingGeneration | null>(null);
 
-  const generateStory = async (p: KidProfile) => {
-    // Convert camelCase to snake_case for API
-    const profileForApi = {
-      name: p.name,
-      gender: p.gender,
-      skin_tone: p.skinTone,
-      hair_color: p.hairColor,
-      eye_color: p.eyeColor,
-      favorite_color: p.favoriteColor,
-      dream: p.dream,
-      archetype: p.archetype,
-      art_style: p.artStyle,
-      photo_base64: p.photoUrl?.startsWith('data:')
-        ? p.photoUrl.split(',')[1]
-        : undefined,
+  const generateStoryPreview = async (p: KidProfile) => {
+    const profileForApi = mapProfileToApi(p);
+    const script = await generateStoryScript(profileForApi);
+
+    if (!script.panels.length) {
+      throw new Error('Story generation failed: no panels returned.');
+    }
+
+    const lastPanelIndex = script.panels.length - 1;
+    const [firstImage, lastImage] = await Promise.all([
+      generatePanelImage(
+        script.panels[0].imagePrompt,
+        script.characterDescription,
+        profileForApi.art_style
+      ),
+      generatePanelImage(
+        script.panels[lastPanelIndex].imagePrompt,
+        script.characterDescription,
+        profileForApi.art_style
+      ),
+    ]);
+
+    const previewStory: Story = {
+      title: script.title,
+      foreword: script.foreword,
+      characterDescription: script.characterDescription,
+      coverImagePrompt: script.coverImagePrompt,
+      panels: script.panels.map((panel, index) => ({
+        id: panel.id || String(index + 1),
+        text: panel.text,
+        imagePrompt: panel.imagePrompt,
+        imageUrl: index === 0 ? firstImage : index === lastPanelIndex ? lastImage : undefined,
+        isGenerating: false,
+      })),
     };
 
-    // Single API call: generate script + generate images + save to DB
-    const result = await generateAndSaveStory(profileForApi);
+    setSavedStoryId(null);
+    setPendingGeneration({ profileForApi, previewStory });
+    setStory(previewStory);
+  };
 
-    setSavedStoryId(result.story.id);
-    setStory(mapApiStory(result.story));
+  const generateFullStoryFromPreview = async () => {
+    if (!pendingGeneration) {
+      throw new Error('No preview is available. Please generate a preview first.');
+    }
+
+    const { profileForApi, previewStory } = pendingGeneration;
+    const lastPanelIndex = previewStory.panels.length - 1;
+
+    const coverImagePromise = generatePanelImage(
+      previewStory.coverImagePrompt,
+      previewStory.characterDescription,
+      profileForApi.art_style
+    );
+    const panelImagePromises = previewStory.panels.map((panel, index) => {
+      if (index === 0 || index === lastPanelIndex) {
+        if (!panel.imageUrl) {
+          throw new Error('Preview images are missing. Please regenerate the preview.');
+        }
+        return Promise.resolve(panel.imageUrl);
+      }
+      return generatePanelImage(
+        panel.imagePrompt,
+        previewStory.characterDescription,
+        profileForApi.art_style
+      );
+    });
+
+    const [coverImage, panelImages] = await Promise.all([
+      coverImagePromise,
+      Promise.all(panelImagePromises),
+    ]);
+
+    const storyId = await saveStory({
+      profile: {
+        name: profileForApi.name,
+        gender: profileForApi.gender,
+        skin_tone: profileForApi.skin_tone,
+        hair_color: profileForApi.hair_color,
+        eye_color: profileForApi.eye_color,
+        favorite_color: profileForApi.favorite_color,
+        dream: profileForApi.dream,
+        archetype: profileForApi.archetype,
+      },
+      title: previewStory.title,
+      foreword: previewStory.foreword,
+      character_description: previewStory.characterDescription,
+      cover_image_prompt: previewStory.coverImagePrompt,
+      cover_image_base64: coverImage,
+      panels: previewStory.panels.map((panel, index) => ({
+        panel_order: index,
+        text: panel.text,
+        image_prompt: panel.imagePrompt,
+        image_base64: panelImages[index],
+      })),
+    });
+
+    const savedStory = await getStory(storyId);
+    setSavedStoryId(storyId);
+    setStory(mapApiStory(savedStory));
+    setPendingGeneration(null);
   };
 
   const updatePanel = async (updated: ComicPanelData) => {
@@ -76,7 +182,9 @@ export const useStoryGenerator = () => {
     setStory,
     savedStoryId,
     setSavedStoryId,
-    generateStory,
+    generateStoryPreview,
+    generateFullStoryFromPreview,
+    hasPendingPreview: Boolean(pendingGeneration),
     updatePanel,
   };
 };
