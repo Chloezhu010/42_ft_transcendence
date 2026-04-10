@@ -15,9 +15,9 @@ TOKEN_EXPIRE_HOURS = 24
 
 
 def _get_secret_key() -> str:
-    key = os.getenv("SECRET_KEY")
+    key = os.getenv("JWT_SECRET_KEY")
     if not key or not key.strip():
-        raise ValueError("SECRET_KEY environment variable is not set or is empty")
+        raise ValueError("JWT_SECRET_KEY environment variable is not set or is empty")
     return key
 
 

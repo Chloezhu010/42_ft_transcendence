@@ -66,7 +66,7 @@ Existing WonderComic code to adapt (keep the logic, add user-scoping):
 - [ ] `backend/models.py` — add `UserCreate`, `UserResponse`, `LoginRequest`, `TokenResponse` models
 - [ ] `frontend/App.tsx` — add auth routes, protected route wrapper, footer links
 - [ ] `frontend/services/backendApi.ts` — add `Authorization: Bearer <token>` header; add auth API calls
-- [ ] `docker-compose.yml` — add nginx service, add `SECRET_KEY` env var
+- [ ] `docker-compose.yml` — add nginx service, add `JWT_SECRET_KEY` env var
 
 ### Phase 3 — Module Implementation
 
