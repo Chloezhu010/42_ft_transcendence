@@ -1,6 +1,7 @@
 """
 AI generation API routes (story scripts, panel images).
 """
+
 import traceback
 
 import aiosqlite

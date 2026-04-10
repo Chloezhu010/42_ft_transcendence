@@ -1,0 +1,53 @@
+name: Repo Guardrails
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  # enforce conventional commit message format
+  commit-and-pr-conventions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check pull request title
+        if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          if [[ ! "$PR_TITLE" =~ ^(feat|fix|chore|docs|refactor|test|ci)(\(.+\))?:\ .+ ]]; then
+            echo "PR title must use a conventional prefix such as feat:, fix:, chore:, docs:, refactor:, test:, or ci:."
+            exit 1
+          fi
+
+      - name: Checkout
+        if: github.event_name == 'push'
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Validate latest commit subject
+        if: github.event_name == 'push'
+        run: |
+          COMMIT_SUBJECT="$(git log -1 --pretty=%s)"
+          if [[ ! "$COMMIT_SUBJECT" =~ ^(feat|fix|chore|docs|refactor|test|ci)(\(.+\))?:\ .+ ]]; then
+            echo "Latest commit subject must use a conventional prefix such as feat:, fix:, chore:, docs:, refactor:, test:, or ci:."
+            exit 1
+          fi
+
+  # scan for secrets in commit history (API keys, tokens, pwds)
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2 # 3rd party action that runs the gitleaks scanner
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # auto-provided by Github, required for PR scanning
+

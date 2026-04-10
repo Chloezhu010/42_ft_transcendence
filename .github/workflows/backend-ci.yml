@@ -1,0 +1,43 @@
+name: Backend CI
+
+on:
+  pull_request:
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-ci.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-ci.yml"
+  workflow_dispatch:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.13"
+          enable-cache: true
+
+      - name: Install backend dependencies
+        run: uv sync --extra test
+
+      - name: Run Ruff lint
+        run: uv tool run ruff check .
+
+      - name: Run Ruff format check
+        run: uv tool run ruff format --check .
+
+      - name: Run pytest
+        run: uv run pytest

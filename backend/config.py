@@ -1,6 +1,7 @@
 """
 Environment configuration with validation.
 """
+
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -41,9 +42,7 @@ def validate_environment() -> Config:
     """
     gemini_api_key = os.getenv("GEMINI_API_KEY")
     if not gemini_api_key:
-        raise ValueError(
-            "Missing required environment variables:\n  - GEMINI_API_KEY is required"
-        )
+        raise ValueError("Missing required environment variables:\n  - GEMINI_API_KEY is required")
 
     return Config(
         gemini_api_key=gemini_api_key,

@@ -51,7 +51,7 @@ This repo uses **React + Vite + TypeScript** on the frontend and **FastAPI + Pyd
 - Keep backend changes compatible with `pytest` when tests exist or are added.
 - Prefer targeted tests for new behavior over broad, low-signal tests.
 - Before pushing, run the relevant checks for the code you changed.
-- Backend changes should pass `ruff check .` and `uv run pytest` from `backend/`.
+- Backend changes should pass `ruff format --check .`, `ruff check .` and `uv run pytest` from `backend/`.
 - Frontend changes should pass `npm test` and `npm run build` from `frontend/`.
 - If a change spans frontend and backend, run both sides before pushing.
 

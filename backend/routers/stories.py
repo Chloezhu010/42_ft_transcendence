@@ -1,6 +1,7 @@
 """
 Story CRUD API routes.
 """
+
 import aiosqlite
 from fastapi import APIRouter, Depends, HTTPException
 
