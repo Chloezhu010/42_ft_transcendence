@@ -7,7 +7,7 @@ from jwt.exceptions import InvalidTokenError
 
 from auth_utils import ALGORITHM, create_access_token, hash_password, verify_password
 
-SECRET_KEY = os.environ["SECRET_KEY"]
+JWT_SECRET_KEY = os.environ["JWT_SECRET_KEY"]
 
 
 # --- hash_password ---
@@ -102,32 +102,32 @@ def test_token_has_three_parts():
 
 def test_token_sub_is_user_id_as_string():
     token = create_access_token(42)
-    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
     assert payload["sub"] == "42"
 
 
 def test_token_sub_for_user_id_1():
     token = create_access_token(1)
-    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
     assert payload["sub"] == "1"
 
 
 def test_token_has_exp_claim():
     token = create_access_token(1)
-    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
     assert "exp" in payload
 
 
 def test_token_exp_is_in_the_future():
     token = create_access_token(1)
-    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
     now = datetime.now(UTC).timestamp()
     assert payload["exp"] > now
 
 
 def test_token_exp_is_roughly_24h():
     token = create_access_token(1)
-    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
     now = datetime.now(UTC).timestamp()
     hours = (payload["exp"] - now) / 3600
     assert 23 < hours <= 24  # allow slight timing slack
@@ -140,7 +140,7 @@ def test_different_users_get_different_tokens():
 def test_token_signed_with_correct_secret():
     token = create_access_token(7)
     # should decode without raising
-    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
     assert payload["sub"] == "7"
 
 
@@ -158,4 +158,4 @@ def test_token_invalid_if_tampered():
     tampered_payload = payload[:-1] + ("A" if payload[-1] != "A" else "B")
     tampered = f"{parts[0]}.{tampered_payload}.{parts[2]}"
     with pytest.raises(InvalidTokenError):
-        jwt.decode(tampered, SECRET_KEY, algorithms=[ALGORITHM])
+        jwt.decode(tampered, JWT_SECRET_KEY, algorithms=[ALGORITHM])

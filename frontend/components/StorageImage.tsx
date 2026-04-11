@@ -2,7 +2,7 @@
  * Image component that resolves backend storage filenames to full URLs.
  */
 import React from 'react';
-import { getImageUrl } from '../services/backendApi';
+import { getImageUrl } from '../services/imageUtils';
 
 interface StorageImageProps {
   src: string | null | undefined;

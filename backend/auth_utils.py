@@ -15,9 +15,9 @@ TOKEN_EXPIRE_HOURS = 24
 
 
 def _get_secret_key() -> str:
-    key = os.getenv("SECRET_KEY")
+    key = os.getenv("JWT_SECRET_KEY")
     if not key or not key.strip():
-        raise ValueError("SECRET_KEY environment variable is not set or is empty")
+        raise ValueError("JWT_SECRET_KEY environment variable is not set or is empty")
     return key
 
 
@@ -67,10 +67,11 @@ async def get_current_user(
         user_id: str | None = payload.get("sub")  # get user ID from token payload
         if user_id is None:
             raise unauthorized
-    except InvalidTokenError:
+        user_id_int = int(user_id)
+    except (InvalidTokenError, ValueError, TypeError):
         raise unauthorized
     # Fetch user from DB to verify they still exist (e.g. not deleted)
-    async with db.execute("SELECT id, username, email FROM users WHERE id = ?", (int(user_id),)) as cursor:
+    async with db.execute("SELECT id, username, email FROM users WHERE id = ?", (user_id_int,)) as cursor:
         user = await cursor.fetchone()
         if user is None:  # user not found in DB
             raise unauthorized

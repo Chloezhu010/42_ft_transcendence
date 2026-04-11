@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { getStories, deleteStory, StoryListItem } from '../services/backendApi';
+import { deleteStory, getStories, StoryListItem } from '../services/storyApi';
 import StorageImage from './StorageImage';
 
 const GalleryPage: React.FC = () => {
@@ -30,7 +30,7 @@ const GalleryPage: React.FC = () => {
     if (window.confirm('Are you sure you want to delete this story? This cannot be undone.')) {
       try {
         await deleteStory(id);
-        setStories(stories.filter(s => s.id !== id));
+        setStories(previousStories => previousStories.filter(story => story.id !== id));
       } catch (err) {
         console.error("Failed to delete story", err);
         toast.error("Failed to delete story.");
