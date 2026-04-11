@@ -56,7 +56,8 @@ app.include_router(stories.router)
 app.include_router(generation.router)
 
 # Expose /metrics endpoint for Prometheus scraping
-Instrumentator().instrument(app).expose(app)
+# Exclude internal endpoints to avoid noise in dashboards
+Instrumentator(excluded_handlers=["/metrics", "/health"]).instrument(app).expose(app)
 
 
 # --- Health Check ---

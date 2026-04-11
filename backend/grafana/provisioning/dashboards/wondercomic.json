@@ -62,12 +62,12 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(http_requests_total{job=\"wondercomic-backend\",status_code=~\"5..\"}[1m])) / sum(rate(http_requests_total{job=\"wondercomic-backend\"}[1m]))",
+          "expr": "sum(rate(http_requests_total{job=\"wondercomic-backend\",status_code=~\"5..\"}[1m])) / sum(rate(http_requests_total{job=\"wondercomic-backend\"}[1m])) or vector(0)",
           "legendFormat": "5xx error rate",
           "refId": "A"
         },
         {
-          "expr": "sum(rate(http_requests_total{job=\"wondercomic-backend\",status_code=~\"4..\"}[1m])) / sum(rate(http_requests_total{job=\"wondercomic-backend\"}[1m]))",
+          "expr": "sum(rate(http_requests_total{job=\"wondercomic-backend\",status_code=~\"4..\"}[1m])) / sum(rate(http_requests_total{job=\"wondercomic-backend\"}[1m])) or vector(0)",
           "legendFormat": "4xx error rate",
           "refId": "B"
         }
@@ -153,7 +153,7 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(http_requests_total{job=\"wondercomic-backend\",status_code=~\"5..\"}[5m])) / sum(rate(http_requests_total{job=\"wondercomic-backend\"}[5m]))",
+          "expr": "sum(rate(http_requests_total{job=\"wondercomic-backend\",status_code=~\"5..\"}[5m])) / sum(rate(http_requests_total{job=\"wondercomic-backend\"}[5m])) or vector(0)",
           "legendFormat": "5xx Rate",
           "refId": "A"
         }
