@@ -175,7 +175,7 @@ async def get_friends(db, user_id: int) -> list[Row]:
         """
         SELECT
             u.id, u.username, u.avatar_path, u.is_online,
-            f.id AS friendship_id, f.status, f.created_at
+            f.id AS friendship_id, f.requester_id, f.status, f.created_at
         FROM friendships f
         JOIN users u
             ON (
