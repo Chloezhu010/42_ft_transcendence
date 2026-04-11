@@ -1,7 +1,6 @@
 """
-Auth router (handle signup, login, logout, user management)
+Auth router (handle signup, login, logout)
 """
-import aiosqlite
 from fastapi import APIRouter, Depends, HTTPException
 from auth_utils import (
     create_access_token,
@@ -10,6 +9,7 @@ from auth_utils import (
 )
 from db.crud_users import (
     create_user,
+    get_user_by_email,
     get_user_by_username,
     set_online_status,
 )
@@ -26,8 +26,9 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 async def signup(body: SignupRequest, db = Depends(get_db)):
     """Signup: check email isn't taken, create user, return JWT token."""
     # Check if username or email already exists
-    existing_user = await get_user_by_username(db, body.username)
-    if existing_user:
+    if await get_user_by_email(db, body.email):
+        raise HTTPException(status_code=400, detail="Email already taken")
+    if await get_user_by_username(db, body.username):
         raise HTTPException(status_code=400, detail="Username already taken")
     # Create new user
     user_id = await create_user(db, body.username, body.email, body.password)
@@ -39,8 +40,8 @@ async def signup(body: SignupRequest, db = Depends(get_db)):
 async def login(body: LoginRequest, db = Depends(get_db)):
     """Login: verify password, set user online, return JWT token."""
     # Fetch user by email
-    user = await get_user_by_username(db, body.email)
-    if not user or not verify_password(body.password, user["password"]):
+    user = await get_user_by_email(db, body.email)
+    if not user or not verify_password(body.password, user["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     # Set user online
     await set_online_status(db, user["id"], True)
@@ -52,3 +53,4 @@ async def login(body: LoginRequest, db = Depends(get_db)):
 async def logout(current_user = Depends(get_current_user), db = Depends(get_db)):
     """Logout: validate jwt token, set offline."""
     await set_online_status(db, current_user["id"], False)
+    return {"message": "Logged out successfully"}
