@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from 'sonner';
-import { editPanelImage, getImageUrl } from '../services/backendApi';
+import { editPanelImage } from '../services/generationApi';
+import { getImageUrl } from '../services/imageUtils';
 import { KidProfile, ComicPanelData } from '../types';
 import { SketchyButton } from './design-system/Primitives';
 

@@ -2,51 +2,17 @@ import { useState } from 'react';
 import {
   generatePanelImage,
   generateStoryScript,
-  getStory,
   KidProfileForGeneration,
-  saveStory,
-  updatePanelImage,
-  StoryDetailResponse,
-} from '../services/backendApi';
+} from '../services/generationApi';
+import { imageSourceToPureBase64 } from '../services/imageUtils';
+import { getStory, saveStory, updatePanelImage, updateStory } from '../services/storyApi';
+import { mapApiStoryToStory, mapKidProfileToGenerationProfile } from '../services/storyMappers';
 import { KidProfile, Story, ComicPanelData } from '../types';
-
-function mapApiStory(data: StoryDetailResponse): Story {
-  return {
-    title: data.title || '',
-    foreword: data.foreword || '',
-    characterDescription: data.character_description || '',
-    coverImagePrompt: data.cover_image_prompt || '',
-    coverImageUrl: data.cover_image_url || undefined,
-    panels: data.panels.map(p => ({
-      id: String(p.id),
-      text: p.text,
-      imagePrompt: p.image_prompt || '',
-      imageUrl: p.image_url || undefined,
-      isGenerating: false,
-    })),
-  };
-}
-
-function mapProfileToApi(p: KidProfile): KidProfileForGeneration {
-  return {
-    name: p.name,
-    gender: p.gender,
-    skin_tone: p.skinTone,
-    hair_color: p.hairColor,
-    eye_color: p.eyeColor,
-    favorite_color: p.favoriteColor,
-    dream: p.dream,
-    archetype: p.archetype,
-    art_style: p.artStyle,
-    photo_base64: p.photoUrl?.startsWith('data:')
-      ? p.photoUrl.split(',')[1]
-      : undefined,
-  };
-}
 
 interface PendingGeneration {
   profileForApi: KidProfileForGeneration;
   previewStory: Story;
+  previewStoryId: number;
 }
 
 export const useStoryGenerator = () => {
@@ -55,7 +21,7 @@ export const useStoryGenerator = () => {
   const [pendingGeneration, setPendingGeneration] = useState<PendingGeneration | null>(null);
 
   const generateStoryPreview = async (p: KidProfile) => {
-    const profileForApi = mapProfileToApi(p);
+    const profileForApi = mapKidProfileToGenerationProfile(p);
     const script = await generateStoryScript(profileForApi);
 
     if (!script.panels.length) {
@@ -90,44 +56,14 @@ export const useStoryGenerator = () => {
       })),
     };
 
-    setSavedStoryId(null);
-    setPendingGeneration({ profileForApi, previewStory });
-    setStory(previewStory);
-  };
+    const previewPanels = await Promise.all(previewStory.panels.map(async (panel, index) => ({
+      panel_order: index,
+      text: panel.text,
+      image_prompt: panel.imagePrompt,
+      image_base64: panel.imageUrl ? await imageSourceToPureBase64(panel.imageUrl) : undefined,
+    })));
 
-  const generateFullStoryFromPreview = async () => {
-    if (!pendingGeneration) {
-      throw new Error('No preview is available. Please generate a preview first.');
-    }
-
-    const { profileForApi, previewStory } = pendingGeneration;
-    const lastPanelIndex = previewStory.panels.length - 1;
-
-    const coverImagePromise = generatePanelImage(
-      previewStory.coverImagePrompt,
-      previewStory.characterDescription,
-      profileForApi.art_style
-    );
-    const panelImagePromises = previewStory.panels.map((panel, index) => {
-      if (index === 0 || index === lastPanelIndex) {
-        if (!panel.imageUrl) {
-          throw new Error('Preview images are missing. Please regenerate the preview.');
-        }
-        return Promise.resolve(panel.imageUrl);
-      }
-      return generatePanelImage(
-        panel.imagePrompt,
-        previewStory.characterDescription,
-        profileForApi.art_style
-      );
-    });
-
-    const [coverImage, panelImages] = await Promise.all([
-      coverImagePromise,
-      Promise.all(panelImagePromises),
-    ]);
-
-    const storyId = await saveStory({
+    const previewStoryId = await saveStory({
       profile: {
         name: profileForApi.name,
         gender: profileForApi.gender,
@@ -142,18 +78,77 @@ export const useStoryGenerator = () => {
       foreword: previewStory.foreword,
       character_description: previewStory.characterDescription,
       cover_image_prompt: previewStory.coverImagePrompt,
-      cover_image_base64: coverImage,
+      panels: previewPanels,
+    });
+
+    setSavedStoryId(previewStoryId);
+    setPendingGeneration({ profileForApi, previewStory, previewStoryId });
+    setStory(previewStory);
+  };
+
+  const generateFullStoryFromPreview = async () => {
+    if (!pendingGeneration) {
+      throw new Error('No preview is available. Please generate a preview first.');
+    }
+
+    const { profileForApi, previewStory, previewStoryId } = pendingGeneration;
+    const lastPanelIndex = previewStory.panels.length - 1;
+
+    const coverImagePromise = generatePanelImage(
+      previewStory.coverImagePrompt,
+      previewStory.characterDescription,
+      profileForApi.art_style
+    );
+    const panelImagePromises = previewStory.panels.map(async (panel, index) => {
+      if (index === 0 || index === lastPanelIndex) {
+        if (!panel.imageUrl) {
+          throw new Error('Preview images are missing. Please regenerate the preview.');
+        }
+        return imageSourceToPureBase64(panel.imageUrl);
+      }
+      const generatedImage = await generatePanelImage(
+        panel.imagePrompt,
+        previewStory.characterDescription,
+        profileForApi.art_style
+      );
+      return imageSourceToPureBase64(generatedImage);
+    });
+
+    const [coverImage, panelImageBase64List] = await Promise.all([
+      coverImagePromise,
+      Promise.all(panelImagePromises),
+    ]);
+    const coverImageBase64 = await imageSourceToPureBase64(coverImage);
+
+    await updateStory(previewStoryId, {
+      is_unlocked: true,
+      cover_image_base64: coverImageBase64,
       panels: previewStory.panels.map((panel, index) => ({
         panel_order: index,
         text: panel.text,
         image_prompt: panel.imagePrompt,
-        image_base64: panelImages[index],
+        image_base64: panelImageBase64List[index],
       })),
     });
 
-    const savedStory = await getStory(storyId);
+    const savedStory = await getStory(previewStoryId);
+    setSavedStoryId(previewStoryId);
+    setStory(mapApiStoryToStory(savedStory));
+    setPendingGeneration(null);
+  };
+
+  const restorePendingPreview = (storyId: number, storyFromDb: Story, profile: KidProfile) => {
+    const profileForApi = mapKidProfileToGenerationProfile(profile);
     setSavedStoryId(storyId);
-    setStory(mapApiStory(savedStory));
+    setStory(storyFromDb);
+    setPendingGeneration({
+      profileForApi,
+      previewStory: storyFromDb,
+      previewStoryId: storyId,
+    });
+  };
+
+  const clearPendingPreview = () => {
     setPendingGeneration(null);
   };
 
@@ -162,9 +157,14 @@ export const useStoryGenerator = () => {
 
     const panelOrder = story.panels.findIndex(p => p.id === updated.id);
 
-    setStory({
-      ...story,
-      panels: story.panels.map(p => p.id === updated.id ? updated : p)
+    setStory(previousStory => {
+      if (!previousStory) return previousStory;
+      return {
+        ...previousStory,
+        panels: previousStory.panels.map(panel =>
+          panel.id === updated.id ? updated : panel
+        ),
+      };
     });
 
     setPendingGeneration(prev => {
@@ -195,6 +195,8 @@ export const useStoryGenerator = () => {
     setSavedStoryId,
     generateStoryPreview,
     generateFullStoryFromPreview,
+    restorePendingPreview,
+    clearPendingPreview,
     hasPendingPreview: Boolean(pendingGeneration),
     updatePanel,
   };
