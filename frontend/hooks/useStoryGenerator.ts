@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   generatePanelImage,
   generateStoryScript,
@@ -137,7 +137,7 @@ export const useStoryGenerator = () => {
     setPendingGeneration(null);
   };
 
-  const restorePendingPreview = (storyId: number, storyFromDb: Story, profile: KidProfile) => {
+  const restorePendingPreview = useCallback((storyId: number, storyFromDb: Story, profile: KidProfile) => {
     const profileForApi = mapKidProfileToGenerationProfile(profile);
     setSavedStoryId(storyId);
     setStory(storyFromDb);
@@ -146,11 +146,11 @@ export const useStoryGenerator = () => {
       previewStory: storyFromDb,
       previewStoryId: storyId,
     });
-  };
+  }, []);
 
-  const clearPendingPreview = () => {
+  const clearPendingPreview = useCallback(() => {
     setPendingGeneration(null);
-  };
+  }, []);
 
   const updatePanel = async (updated: ComicPanelData) => {
     if (!story) return;
