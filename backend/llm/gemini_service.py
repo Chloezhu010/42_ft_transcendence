@@ -15,7 +15,7 @@ from google import genai
 from google.genai import types
 
 from llm.streaming import StoryIntroStreamer
-from models import GenerateStoryScriptResponse
+from models import GenerateStoryScriptResponse, KidProfileCreate
 
 STORY_SCRIPT_MODEL = "gemini-3-flash-preview"
 INTRO_FIELDS: tuple[str, ...] = ("title", "foreword")
@@ -89,36 +89,27 @@ async def with_retry(fn, max_retries: int = 3, base_delay: float = 2.0):
     raise last_error
 
 
-def _build_story_script_prompt(
-    *,
-    name: str,
-    gender: str,
-    skin_tone: str,
-    hair_color: str,
-    eye_color: str,
-    favorite_color: str,
-    dream: str | None,
-    archetype: str | None,
-    art_style: str | None,
-    with_photo: bool,
-) -> str:
+def _build_story_script_prompt(profile: KidProfileCreate) -> str:
     """Build the Gemini prompt used for both batch and streaming generation."""
-    if with_photo:
-        hero_desc = f"The child in the attached photo ({gender})"
+    if profile.photo_base64:
+        hero_desc = f"The child in the attached photo ({profile.gender})"
     else:
-        hero_desc = f"A {gender} child with {skin_tone} skin, {hair_color} hair, {eye_color} eyes"
-    theme = f"{archetype or 'adventure'} adventure about {dream or 'discovering something amazing'}"
+        hero_desc = (
+            f"A {profile.gender} child with {profile.skin_tone} skin, "
+            f"{profile.hair_color} hair, {profile.eye_color} eyes"
+        )
+    theme = f"{profile.archetype or 'adventure'} adventure about {profile.dream or 'discovering something amazing'}"
 
     return f"""Create a 10-panel children's comic story. Simple vocabulary, 6-10 words per panel.
 
 HERO: {hero_desc}, depicted as a 5-6 year old. Do NOT age up.
-THEME: {theme}. Favorite color: {favorite_color}. Art style: {art_style or "classic comic"}.
+THEME: {theme}. Favorite color: {profile.favorite_color}. Art style: {profile.art_style or "classic comic"}.
 STRUCTURE: Panels 1-3 setup, 4-7 conflict, 8-10 resolution.
 
 In characterDescription, describe the hero + a companion with physical traits and outfits for visual consistency.
 In coverImagePrompt, use a dynamic cinematic composition (no side-by-side posing).
 In each panel imagePrompt, use cinematic angles and show characters interacting — NEVER facing the camera.
-Foreword: max 30 words. Use hero's name "{name}" only in story text, not image prompts."""
+Foreword: max 30 words. Use hero's name "{profile.name}" only in story text, not image prompts."""
 
 
 def _build_story_script_contents(prompt: str, photo_base64: str | None) -> list | str:
@@ -139,32 +130,12 @@ _STORY_SCRIPT_CONFIG: dict[str, Any] = {
 
 
 async def generate_story_script(
-    name: str,
-    gender: str,
-    skin_tone: str,
-    hair_color: str,
-    eye_color: str,
-    favorite_color: str,
-    dream: str | None = None,
-    archetype: str | None = None,
-    art_style: str | None = None,
-    photo_base64: str | None = None,
+    profile: KidProfileCreate,
 ) -> dict:
     """Generate a 10-panel story script."""
 
-    prompt = _build_story_script_prompt(
-        name=name,
-        gender=gender,
-        skin_tone=skin_tone,
-        hair_color=hair_color,
-        eye_color=eye_color,
-        favorite_color=favorite_color,
-        dream=dream,
-        archetype=archetype,
-        art_style=art_style,
-        with_photo=photo_base64 is not None,
-    )
-    contents = _build_story_script_contents(prompt, photo_base64)
+    prompt = _build_story_script_prompt(profile)
+    contents = _build_story_script_contents(prompt, profile.photo_base64)
 
     async def _generate() -> dict:
         response = await client.aio.models.generate_content(
@@ -179,16 +150,7 @@ async def generate_story_script(
 
 
 async def generate_story_script_stream(
-    name: str,
-    gender: str,
-    skin_tone: str,
-    hair_color: str,
-    eye_color: str,
-    favorite_color: str,
-    dream: str | None = None,
-    archetype: str | None = None,
-    art_style: str | None = None,
-    photo_base64: str | None = None,
+    profile: KidProfileCreate,
 ) -> AsyncIterator[dict]:
     """Stream a 10-panel story script.
 
@@ -204,19 +166,8 @@ async def generate_story_script_stream(
     :func:`with_retry`. Callers should fall back to
     :func:`generate_story_script` if they need retry semantics.
     """
-    prompt = _build_story_script_prompt(
-        name=name,
-        gender=gender,
-        skin_tone=skin_tone,
-        hair_color=hair_color,
-        eye_color=eye_color,
-        favorite_color=favorite_color,
-        dream=dream,
-        archetype=archetype,
-        art_style=art_style,
-        with_photo=photo_base64 is not None,
-    )
-    contents = _build_story_script_contents(prompt, photo_base64)
+    prompt = _build_story_script_prompt(profile)
+    contents = _build_story_script_contents(prompt, profile.photo_base64)
 
     response_stream = await client.aio.models.generate_content_stream(
         model=STORY_SCRIPT_MODEL,

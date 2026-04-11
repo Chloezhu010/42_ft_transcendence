@@ -53,18 +53,7 @@ async def generate_and_save_story(
     """Generate story script + images and save to DB."""
     # 1. Generate story script via Gemini
     try:
-        result = await gen_script(
-            name=request.profile.name,
-            gender=request.profile.gender,
-            skin_tone=request.profile.skin_tone,
-            hair_color=request.profile.hair_color,
-            eye_color=request.profile.eye_color,
-            favorite_color=request.profile.favorite_color,
-            dream=request.profile.dream,
-            archetype=request.profile.archetype,
-            art_style=request.profile.art_style,
-            photo_base64=request.profile.photo_base64,
-        )
+        result = await gen_script(profile=request.profile)
     except Exception as e:
         print(f"Story script generation error: {e}")
         traceback.print_exc()
@@ -128,18 +117,7 @@ async def generate_story_script(
 ):
     """Generate a story script using Gemini AI."""
     try:
-        result = await gen_script(
-            name=request.profile.name,
-            gender=request.profile.gender,
-            skin_tone=request.profile.skin_tone,
-            hair_color=request.profile.hair_color,
-            eye_color=request.profile.eye_color,
-            favorite_color=request.profile.favorite_color,
-            dream=request.profile.dream,
-            archetype=request.profile.archetype,
-            art_style=request.profile.art_style,
-            photo_base64=request.profile.photo_base64,
-        )
+        result = await gen_script(profile=request.profile)
         return result
     except Exception as e:
         print(f"Story script generation error: {e}")
@@ -157,18 +135,7 @@ async def _stream_story_script_events(
     Gemini might reject a request mid-stream.
     """
     try:
-        async for event in gen_script_stream(
-            name=request.profile.name,
-            gender=request.profile.gender,
-            skin_tone=request.profile.skin_tone,
-            hair_color=request.profile.hair_color,
-            eye_color=request.profile.eye_color,
-            favorite_color=request.profile.favorite_color,
-            dream=request.profile.dream,
-            archetype=request.profile.archetype,
-            art_style=request.profile.art_style,
-            photo_base64=request.profile.photo_base64,
-        ):
+        async for event in gen_script_stream(profile=request.profile):
             yield (json.dumps(event) + "\n").encode("utf-8")
     except Exception as err:
         print(f"Streaming story script error: {err}")
