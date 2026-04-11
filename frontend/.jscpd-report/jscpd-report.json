@@ -1,0 +1,565 @@
+{
+  "statistics": {
+    "detectionDate": "2026-04-11T14:57:43.053Z",
+    "formats": {
+      "typescript": {
+        "sources": {
+          "tests/services/generationApi.test.ts": {
+            "lines": 72,
+            "tokens": 608,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "services/storyMappers.ts": {
+            "lines": 50,
+            "tokens": 503,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "services/storyApi.ts": {
+            "lines": 168,
+            "tokens": 1274,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "services/imageUtils.ts": {
+            "lines": 56,
+            "tokens": 436,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "services/generationApi.ts": {
+            "lines": 220,
+            "tokens": 1966,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "services/backendApi.ts": {
+            "lines": 13,
+            "tokens": 41,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "services/apiClient.ts": {
+            "lines": 14,
+            "tokens": 116,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "hooks/useStoryGenerator.ts": {
+            "lines": 235,
+            "tokens": 1997,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "types.ts": {
+            "lines": 28,
+            "tokens": 193,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 856,
+          "tokens": 7134,
+          "sources": 9,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "tsx": {
+        "sources": {
+          "components/design-system/Typography.tsx": {
+            "lines": 37,
+            "tokens": 390,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "components/design-system/Primitives.tsx": {
+            "lines": 28,
+            "tokens": 207,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "components/design-system/Icons.tsx": {
+            "lines": 39,
+            "tokens": 463,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "components/design-system/Forms.tsx": {
+            "lines": 18,
+            "tokens": 159,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "components/StoryboardView.tsx": {
+            "lines": 164,
+            "tokens": 1740,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 10,
+            "duplicatedTokens": 75,
+            "percentage": 6.1,
+            "percentageTokens": 4.31,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "components/StoryIntroStream.tsx": {
+            "lines": 93,
+            "tokens": 705,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "components/StorageImage.tsx": {
+            "lines": 22,
+            "tokens": 175,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "components/PreviewView.tsx": {
+            "lines": 158,
+            "tokens": 1335,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 10,
+            "duplicatedTokens": 75,
+            "percentage": 6.33,
+            "percentageTokens": 5.62,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "components/MainPage.tsx": {
+            "lines": 232,
+            "tokens": 1880,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "components/MagicLoader.tsx": {
+            "lines": 31,
+            "tokens": 364,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "components/KidWizard.tsx": {
+            "lines": 352,
+            "tokens": 3665,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "components/GalleryPage.tsx": {
+            "lines": 110,
+            "tokens": 983,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "components/ComicPanel.tsx": {
+            "lines": 130,
+            "tokens": 1080,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "index.tsx": {
+            "lines": 27,
+            "tokens": 180,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "App.tsx": {
+            "lines": 49,
+            "tokens": 405,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 1490,
+          "tokens": 13731,
+          "sources": 15,
+          "clones": 1,
+          "duplicatedLines": 10,
+          "duplicatedTokens": 75,
+          "percentage": 0.67,
+          "percentageTokens": 0.55,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "javascript": {
+        "sources": {
+          "components/design-system/Primitives.tsx": {
+            "lines": 1,
+            "tokens": 29,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "components/design-system/Icons.tsx": {
+            "lines": 18,
+            "tokens": 303,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "components/design-system/Forms.tsx": {
+            "lines": 9,
+            "tokens": 83,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "components/StoryboardView.tsx": {
+            "lines": 114,
+            "tokens": 1254,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "components/StorageImage.tsx": {
+            "lines": 0,
+            "tokens": 15,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "components/PreviewView.tsx": {
+            "lines": 106,
+            "tokens": 845,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "components/MainPage.tsx": {
+            "lines": 29,
+            "tokens": 190,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "components/KidWizard.tsx": {
+            "lines": 243,
+            "tokens": 2354,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "components/GalleryPage.tsx": {
+            "lines": 20,
+            "tokens": 162,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "components/ComicPanel.tsx": {
+            "lines": 52,
+            "tokens": 395,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "App.tsx": {
+            "lines": 28,
+            "tokens": 245,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 620,
+          "tokens": 5875,
+          "sources": 11,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "css": {
+        "sources": {
+          "components/StoryIntroStream.tsx": {
+            "lines": 9,
+            "tokens": 78,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "components/MagicLoader.tsx": {
+            "lines": 3,
+            "tokens": 91,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 12,
+          "tokens": 169,
+          "sources": 2,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      }
+    },
+    "total": {
+      "lines": 2978,
+      "tokens": 26909,
+      "sources": 37,
+      "clones": 1,
+      "duplicatedLines": 10,
+      "duplicatedTokens": 75,
+      "percentage": 0.34,
+      "percentageTokens": 0.28,
+      "newDuplicatedLines": 0,
+      "newClones": 0
+    }
+  },
+  "duplicates": [
+    {
+      "format": "tsx",
+      "lines": 11,
+      "fragment": ";\n\n  return (\n    <div className=\"flex-1 flex flex-col animate-in fade-in duration-700 h-[calc(100vh-140px)] relative\">\n      <div className=\"absolute top-4 left-4 z-30\">\n        <Link to=\"/gallery\" className=\"text-sm font-bold text-brand-muted hover:text-brand-primary flex items-center gap-2 transition-colors bg-white/80 backdrop-blur-sm py-3 px-6 rounded-full shadow-soft border-2 border-brand-primary/10\">\n          <span>←</span> Back to Library\n        </Link>\n      </div>\n\n      <div",
+      "tokens": 0,
+      "firstFile": {
+        "name": "components/PreviewView.tsx",
+        "start": 23,
+        "end": 33,
+        "startLoc": {
+          "line": 23,
+          "column": 2,
+          "position": 305
+        },
+        "endLoc": {
+          "line": 33,
+          "column": 4,
+          "position": 380
+        }
+      },
+      "secondFile": {
+        "name": "components/StoryboardView.tsx",
+        "start": 30,
+        "end": 40,
+        "startLoc": {
+          "line": 30,
+          "column": 2,
+          "position": 360
+        },
+        "endLoc": {
+          "line": 40,
+          "column": 14,
+          "position": 435
+        }
+      }
+    }
+  ]
+}

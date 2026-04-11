@@ -12,9 +12,12 @@ export default defineConfig({
   },
   plugins: [react()],
   resolve: {
-    alias: {
-      '@': __dirname,
-    },
+    alias: [
+      {
+        find: /^@\//,
+        replacement: `${__dirname}/`,
+      },
+    ],
   },
   // Load .env from project root unless building on Vercel
   envDir: process.env.VERCEL ? '.' : '..',

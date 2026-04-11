@@ -42,8 +42,8 @@ class StoryIntroStreamer:
 
     Feed raw text chunks via :meth:`feed` and collect :class:`IntroDelta`
     events in the order the characters arrive. The parser handles standard
-    JSON string escapes but ignores ``\\uXXXX`` sequences, which do not appear
-    in the story titles or forewords Gemini produces for this project.
+    JSON string escapes, including ``\\uXXXX`` unicode escapes (with surrogate
+    pair support).
 
     The parser stops emitting events once all tracked fields have been seen,
     so callers can safely keep feeding trailing JSON bytes without side
@@ -59,6 +59,8 @@ class StoryIntroStreamer:
         self._field_index: int = 0
         self._inside_value: bool = False
         self._pending_escape: bool = False
+        self._pending_unicode_digits: str | None = None
+        self._pending_high_surrogate: int | None = None
 
     @property
     def is_done(self) -> bool:
@@ -128,11 +130,23 @@ class StoryIntroStreamer:
         while index < buffer_len:
             char = self._buffer[index]
 
+            if self._pending_unicode_digits is not None:
+                if char.lower() in "0123456789abcdef":
+                    self._pending_unicode_digits = f"{self._pending_unicode_digits}{char}"
+                    index += 1
+                    if len(self._pending_unicode_digits) < 4:
+                        continue
+                    self._emit_decoded_unicode_escape(delta_chars)
+                    self._pending_unicode_digits = None
+                    continue
+                # Invalid unicode escape; clear pending state and keep parsing.
+                self._pending_unicode_digits = None
+
             if self._pending_escape:
                 self._pending_escape = False
-                # `\uXXXX` sequences would need four more characters. We drop
-                # them on the floor here rather than shipping partial glyphs.
-                if char != "u":
+                if char == "u":
+                    self._pending_unicode_digits = ""
+                else:
                     delta_chars.append(_JSON_ESCAPES.get(char, char))
                 index += 1
                 continue
@@ -151,3 +165,29 @@ class StoryIntroStreamer:
 
         self._buffer = ""
         return "".join(delta_chars), False
+
+    def _emit_decoded_unicode_escape(self, delta_chars: list[str]) -> None:
+        """Decode a complete ``\\uXXXX`` sequence into one or more characters."""
+        code_point = int(self._pending_unicode_digits, 16)
+
+        if 0xD800 <= code_point <= 0xDBFF:
+            if self._pending_high_surrogate is not None:
+                delta_chars.append("\uFFFD")
+            self._pending_high_surrogate = code_point
+            return
+
+        if 0xDC00 <= code_point <= 0xDFFF:
+            if self._pending_high_surrogate is None:
+                delta_chars.append("\uFFFD")
+                return
+            high = self._pending_high_surrogate
+            combined = 0x10000 + ((high - 0xD800) << 10) + (code_point - 0xDC00)
+            delta_chars.append(chr(combined))
+            self._pending_high_surrogate = None
+            return
+
+        if self._pending_high_surrogate is not None:
+            delta_chars.append("\uFFFD")
+            self._pending_high_surrogate = None
+
+        delta_chars.append(chr(code_point))
