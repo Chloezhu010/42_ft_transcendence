@@ -120,7 +120,6 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
     eyeColor: 'Blue',
     favoriteColor: 'Purple',
     dream: '',
-    personality: '',
     archetype: 'Brave Explorer',
     photoUrl: '',
     artStyle: 'Classic Comic',

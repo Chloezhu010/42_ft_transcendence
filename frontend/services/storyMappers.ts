@@ -28,7 +28,6 @@ export function mapApiProfileToKidProfile(profile: KidProfileResponse): KidProfi
     eyeColor: profile.eye_color,
     favoriteColor: profile.favorite_color,
     dream: profile.dream || '',
-    personality: '',
     archetype: profile.archetype || undefined,
     artStyle: profile.art_style || undefined,
   };

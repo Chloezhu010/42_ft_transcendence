@@ -1,6 +1,5 @@
 import { apiFetch, API_BASE } from './apiClient';
 import { imageSourceToPureBase64 } from './imageUtils';
-import { StoryDetailResponse } from './storyApi';
 
 export interface KidProfileForGeneration {
   name: string;
@@ -27,29 +26,6 @@ export interface GeneratedStoryScript {
   characterDescription: string;
   coverImagePrompt: string;
   panels: GeneratedPanel[];
-}
-
-export interface GenerateAndSaveStoryResponse {
-  story: StoryDetailResponse;
-}
-
-/**
- * Generate story script + images and save to DB.
- */
-export async function generateAndSaveStory(
-  profile: KidProfileForGeneration
-): Promise<GenerateAndSaveStoryResponse> {
-  const response = await apiFetch(`${API_BASE}/stories/generate`, {
-    method: 'POST',
-    body: JSON.stringify({ profile }),
-  });
-
-  if (!response.ok) {
-    const error = (await response.json().catch(() => ({}))) as { detail?: string };
-    throw new Error(error.detail || `Failed to generate story: ${response.statusText}`);
-  }
-
-  return (await response.json()) as GenerateAndSaveStoryResponse;
 }
 
 /**
