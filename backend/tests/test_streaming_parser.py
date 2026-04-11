@@ -76,6 +76,29 @@ def test_decodes_standard_escapes() -> None:
     assert result["foreword"] == "Line one\nLine two"
 
 
+def test_decodes_unicode_escape_sequence_across_chunks() -> None:
+    streamer = StoryIntroStreamer(("title", "foreword"))
+    chunks = [
+        '{"title": "Caf\\u0',
+        '0e9", "foreword": "na\\u00efve"}',
+    ]
+
+    result = _collected(streamer, chunks)
+
+    assert result["title"] == "Café"
+    assert result["foreword"] == "naïve"
+
+
+def test_decodes_unicode_surrogate_pairs() -> None:
+    streamer = StoryIntroStreamer(("title", "foreword"))
+    payload = '{"title": "Star \\ud83c\\udf1f", "foreword": "Rocket \\ud83d\\ude80"}'
+
+    result = _collected(streamer, [payload])
+
+    assert result["title"] == "Star 🌟"
+    assert result["foreword"] == "Rocket 🚀"
+
+
 def test_emits_deltas_incrementally_per_character() -> None:
     streamer = StoryIntroStreamer(("title",))
     streamer.feed('{"title": "')

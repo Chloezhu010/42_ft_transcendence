@@ -172,13 +172,13 @@ class StoryIntroStreamer:
 
         if 0xD800 <= code_point <= 0xDBFF:
             if self._pending_high_surrogate is not None:
-                delta_chars.append("\uFFFD")
+                delta_chars.append("\ufffd")
             self._pending_high_surrogate = code_point
             return
 
         if 0xDC00 <= code_point <= 0xDFFF:
             if self._pending_high_surrogate is None:
-                delta_chars.append("\uFFFD")
+                delta_chars.append("\ufffd")
                 return
             high = self._pending_high_surrogate
             combined = 0x10000 + ((high - 0xD800) << 10) + (code_point - 0xDC00)
@@ -187,7 +187,7 @@ class StoryIntroStreamer:
             return
 
         if self._pending_high_surrogate is not None:
-            delta_chars.append("\uFFFD")
+            delta_chars.append("\ufffd")
             self._pending_high_surrogate = None
 
         delta_chars.append(chr(code_point))
