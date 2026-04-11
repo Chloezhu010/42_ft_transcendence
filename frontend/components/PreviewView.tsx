@@ -39,6 +39,7 @@ const PreviewView: React.FC<Props> = ({ story, profile, updatePanel, onGenerate,
       {/* Navigation arrows */}
       <SketchyButton
         variant="outline"
+        aria-label="Previous page"
         onClick={() => flipTo(-1)}
         disabled={previewPage === 0}
         className={`absolute left-0 top-1/2 -translate-y-1/2 z-40 w-16 h-16 flex items-center justify-center text-2xl !p-0 rounded-full ${previewPage === 0 ? 'opacity-0 pointer-events-none' : ''}`}
@@ -49,6 +50,7 @@ const PreviewView: React.FC<Props> = ({ story, profile, updatePanel, onGenerate,
 
       <SketchyButton
         variant="outline"
+        aria-label="Next page"
         onClick={() => flipTo(1)}
         disabled={previewPage === totalPages - 1}
         className={`absolute right-0 top-1/2 -translate-y-1/2 z-40 w-16 h-16 flex items-center justify-center text-2xl !p-0 rounded-full ${previewPage === totalPages - 1 ? 'opacity-0 pointer-events-none' : ''}`}
