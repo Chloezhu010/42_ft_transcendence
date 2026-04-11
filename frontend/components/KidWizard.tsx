@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { KidProfile } from '../types';
 import { SketchyButton } from './design-system/Primitives';
 import { Icons } from './design-system/Icons';
@@ -111,6 +112,7 @@ const ColorGrid: React.FC<ColorGridProps> = ({ options, selected, onSelect, labe
 );
 
 const KidWizard: React.FC<Props> = ({ onSubmit }) => {
+  const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [profile, setProfile] = useState<KidProfile>({
     name: '',
@@ -179,7 +181,7 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
 
         {step === 1 && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex-1 flex flex-col justify-center">
-            <Heading className="mb-8 text-brand-dark">Who is the Hero?</Heading>
+            <Heading className="mb-8 text-brand-dark">{t('kidWizard.heroQuestion')}</Heading>
             <SketchyInput
               autoFocus
               placeholder="Hero's name..."
@@ -205,17 +207,17 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
 
         {step === 2 && (
           <div className="animate-in fade-in duration-500 flex-1 overflow-y-auto">
-            <Heading className="mb-10 text-brand-dark">Appearance</Heading>
+            <Heading className="mb-10 text-brand-dark">{t('kidWizard.appearance')}</Heading>
             <ColorGrid label="Skin Tone" options={SKIN_TONES} selected={profile.skinTone} onSelect={value => setProfile(previous => ({ ...previous, skinTone: value }))} />
             <ColorGrid label="Hair Color" options={HAIR_COLORS} selected={profile.hairColor} onSelect={value => setProfile(previous => ({ ...previous, hairColor: value }))} />
             <ColorGrid label="Eye Color" options={EYE_COLORS} selected={profile.eyeColor} onSelect={value => setProfile(previous => ({ ...previous, eyeColor: value }))} />
 
             <div className="mb-8 mt-10 pt-8 border-t border-brand-light px-4">
-              <Label className="block mb-6 text-brand-primary text-sm">Photo (Optional)</Label>
+              <Label className="block mb-6 text-brand-primary text-sm">{t('kidWizard.photoOptional')}</Label>
               <div className="flex gap-4">
                 <label className="flex-1 flex flex-col items-center justify-center p-8 rounded-3xl border-4 border-dashed border-brand-primary/20 cursor-pointer hover:border-brand-primary transition-colors bg-brand-light/30 hover:bg-brand-light">
                   <span className="text-4xl mb-2">📸</span>
-                  <span className="text-sm font-semibold text-brand-primary uppercase">Upload Photo</span>
+                  <span className="text-sm font-semibold text-brand-primary uppercase">{t('kidWizard.uploadPhoto')}</span>
                   <input
                     type="file"
                     accept="image/*"
@@ -259,7 +261,7 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
 
         {step === 3 && (
           <div className="animate-in fade-in duration-500 flex-1">
-            <Heading className="mb-8 text-brand-dark">Role & Archetype</Heading>
+            <Heading className="mb-8 text-brand-dark">{t('kidWizard.roleArchetype')}</Heading>
             <div className="grid grid-cols-2 gap-4">
               {ARCHETYPES.map(arc => (
                 <button
@@ -283,7 +285,7 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
 
         {step === 4 && (
           <div className="animate-in fade-in duration-500 flex-1 flex flex-col justify-center">
-            <Heading className="mb-6 text-brand-dark">The Grand Dream</Heading>
+            <Heading className="mb-6 text-brand-dark">{t('kidWizard.grandDream')}</Heading>
             <SketchyTextarea
               autoFocus
               placeholder="e.g. To explore a planet made of candy..."
@@ -296,10 +298,10 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
 
         {step === 5 && (
           <div className="animate-in fade-in duration-500 flex-1">
-            <Heading className="mb-10 text-brand-dark">Your Style & Palette</Heading>
+            <Heading className="mb-10 text-brand-dark">{t('kidWizard.stylePalette')}</Heading>
 
             <div className="mb-12">
-              <Label className="block mb-6 text-brand-primary text-sm">Art Style</Label>
+              <Label className="block mb-6 text-brand-primary text-sm">{t('kidWizard.artStyle')}</Label>
               <div className="grid grid-cols-2 gap-4">
                 {ART_STYLES.map(style => (
                   <button
@@ -316,7 +318,7 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
             </div>
 
             <div className="border-t border-brand-light pt-10">
-              <Label className="block mb-6 text-brand-primary text-sm">Favorite Color</Label>
+              <Label className="block mb-6 text-brand-primary text-sm">{t('kidWizard.favoriteColor')}</Label>
               <ColorGrid label="" options={FAVORITE_COLORS} selected={profile.favoriteColor} onSelect={value => setProfile(previous => ({ ...previous, favoriteColor: value }))} />
             </div>
           </div>
@@ -339,9 +341,9 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
             className="flex items-center gap-2 px-8 py-4 font-black rounded-2xl shadow-lg transition-all bg-yellow-400 text-purple-900 hover:-translate-y-1 hover:shadow-xl"
           >
             {step < totalSteps ? (
-              <>Continue <span className="text-lg">→</span></>
+              <>{t('kidWizard.continue')} <span className="text-lg">→</span></>
             ) : (
-              <>Create My Story ✨</>
+              <>{t('kidWizard.createStory')}</>
             )}
           </button>
         </div>

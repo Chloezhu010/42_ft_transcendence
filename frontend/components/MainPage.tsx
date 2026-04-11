@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import KidWizard from './KidWizard';
@@ -19,6 +20,7 @@ enum AppState {
 }
 
 const MainPage: React.FC = () => {
+  const { t } = useTranslation();
   const { id: bookId } = useParams<{ id: string }>();
   const [view, setView] = useState<AppState>(AppState.ONBOARDING);
   const [profile, setProfile] = useState<KidProfile | null>(null);
@@ -126,9 +128,9 @@ const MainPage: React.FC = () => {
         <div className="animate-in fade-in slide-in-from-top-4 duration-700">
           <div className="text-center mb-10">
             <Heading variant="h1" className="mb-4 text-brand-dark">
-              Your Child's <span className="text-brand-primary underline decoration-brand-accent decoration-8">Legend</span>
+              {t('mainPage.yourChilds')} <span className="text-brand-primary underline decoration-brand-accent decoration-8">{t('mainPage.legend')}</span>
             </Heading>
-            <Text className="text-brand-muted italic">Transform bedtime stories into cinematic comic book experiences.</Text>
+            <Text className="text-brand-muted italic">{t('mainPage.transformStories')}</Text>
           </div>
           <KidWizard onSubmit={handleWizardComplete} />
         </div>

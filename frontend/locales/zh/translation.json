@@ -1,0 +1,47 @@
+{
+  "app": {
+    "myLibrary": "我的图书馆"
+  },
+  "comicPanel": {
+    "paintingScene": "绘制场景...",
+    "magicRevision": "魔法修订",
+    "requestChange": "为这一特定场景请求更改。",
+    "magicFailed": "哎呀！魔法失败了。请重试。",
+    "awaitingVision": "等待愿景",
+    "editScene": "编辑场景",
+    "editPlaceholder": "例如 添加一个好奇的小机器人查看地图...",
+    "close": "关闭",
+    "applyMagic": "应用魔法 ✨"
+  },
+  "galleryPage": {
+    "mySavedBooks": "我保存的书籍",
+    "noStoriesFound": "还没有找到任何故事。",
+    "readNow": "现在阅读",
+    "untitledMasterpiece": "无标题杰作",
+    "deleteStory": "您确定要删除此故事吗？这无法撤消。"
+  },
+  "kidWizard": {
+    "heroQuestion": "谁是英雄？",
+    "appearance": "外观",
+    "photoOptional": "照片（可选）",
+    "uploadPhoto": "上传照片",
+    "roleArchetype": "角色和原型",
+    "grandDream": "伟大的梦想",
+    "stylePalette": "您的风格和调色板",
+    "artStyle": "艺术风格",
+    "favoriteColor": "最喜欢的颜色",
+    "continue": "继续",
+    "createStory": "创建我的故事 ✨"
+  },
+  "magicLoader": {
+    "bindingTale": "绑定故事...",
+    "paintingInteractions": "绘制电影互动并构建您英雄的遗产"
+  },
+  "mainPage": {
+    "yourChilds": "您的孩子的",
+    "legend": "传说",
+    "transformStories": "将睡前故事转变为电影漫画体验。",
+    "startAdventure": "开始您的冒险",
+    "viewLibrary": "查看图书馆"
+  }
+}

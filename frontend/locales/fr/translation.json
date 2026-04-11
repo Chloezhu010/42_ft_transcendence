@@ -1,0 +1,47 @@
+{
+  "app": {
+    "myLibrary": "Ma Bibliothèque"
+  },
+  "comicPanel": {
+    "paintingScene": "Peindre une Scène...",
+    "magicRevision": "Révision Magique",
+    "requestChange": "Demander une modification pour cette scène spécifique.",
+    "magicFailed": "Oups! La magie a échoué. Réessayez.",
+    "awaitingVision": "En attente de Vision",
+    "editScene": "Modifier la Scène",
+    "editPlaceholder": "p.ex. Ajouter un petit robot curieux regardant la carte...",
+    "close": "Fermer",
+    "applyMagic": "Appliquer la Magie ✨"
+  },
+  "galleryPage": {
+    "mySavedBooks": "Mes Livres Sauvegardés",
+    "noStoriesFound": "Aucune histoire trouvée pour le moment.",
+    "readNow": "LIRE MAINTENANT",
+    "untitledMasterpiece": "Chef-d'œuvre sans titre",
+    "deleteStory": "Êtes-vous sûr de vouloir supprimer cette histoire? Cela ne peut pas être annulé."
+  },
+  "kidWizard": {
+    "heroQuestion": "Qui est le Héros?",
+    "appearance": "Apparence",
+    "photoOptional": "Photo (Optionnel)",
+    "uploadPhoto": "Télécharger une Photo",
+    "roleArchetype": "Rôle et Archétype",
+    "grandDream": "Le Grand Rêve",
+    "stylePalette": "Votre Style et Palette",
+    "artStyle": "Style Artistique",
+    "favoriteColor": "Couleur Préférée",
+    "continue": "Continuer",
+    "createStory": "Créer Mon Histoire ✨"
+  },
+  "magicLoader": {
+    "bindingTale": "Lier l'Histoire...",
+    "paintingInteractions": "Peindre les interactions cinématiques et construire l'héritage de votre héros"
+  },
+  "mainPage": {
+    "yourChilds": "De Votre Enfant",
+    "legend": "Légende",
+    "transformStories": "Transformez les histoires du soir en expériences de bandes dessinées cinématiques.",
+    "startAdventure": "Commencez Votre Aventure",
+    "viewLibrary": "Voir la Bibliothèque"
+  }
+}

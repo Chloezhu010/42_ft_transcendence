@@ -1,0 +1,47 @@
+{
+  "app": {
+    "myLibrary": "My Library"
+  },
+  "comicPanel": {
+    "paintingScene": "Painting Scene...",
+    "magicRevision": "Magic Revision",
+    "requestChange": "Request a change for this specific scene.",
+    "magicFailed": "Oops! Magic failed. Try again.",
+    "awaitingVision": "Awaiting Vision",
+    "editScene": "Edit Scene",
+    "editPlaceholder": "e.g. Add a curious little robot looking at the map...",
+    "close": "Close",
+    "applyMagic": "Apply Magic ✨"
+  },
+  "galleryPage": {
+    "mySavedBooks": "My Saved Books",
+    "noStoriesFound": "No stories found yet.",
+    "readNow": "READ NOW",
+    "untitledMasterpiece": "Untitled Masterpiece",
+    "deleteStory": "Are you sure you want to delete this story? This cannot be undone."
+  },
+  "kidWizard": {
+    "heroQuestion": "Who is the Hero?",
+    "appearance": "Appearance",
+    "photoOptional": "Photo (Optional)",
+    "uploadPhoto": "Upload Photo",
+    "roleArchetype": "Role & Archetype",
+    "grandDream": "The Grand Dream",
+    "stylePalette": "Your Style & Palette",
+    "artStyle": "Art Style",
+    "favoriteColor": "Favorite Color",
+    "continue": "Continue",
+    "createStory": "Create My Story ✨"
+  },
+  "magicLoader": {
+    "bindingTale": "Binding the Tale...",
+    "paintingInteractions": "Painting cinematic interactions & building your hero's legacy"
+  },
+  "mainPage": {
+    "yourChilds": "Your Child's",
+    "legend": "Legend",
+    "transformStories": "Transform bedtime stories into cinematic comic book experiences.",
+    "startAdventure": "Start Your Adventure",
+    "viewLibrary": "View Library"
+  }
+}

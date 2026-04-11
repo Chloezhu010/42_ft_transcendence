@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { deleteStory, getStories, StoryListItem } from '../services/storyApi';
 import StorageImage from './StorageImage';
 
 const GalleryPage: React.FC = () => {
+  const { t } = useTranslation();
   const [stories, setStories] = useState<StoryListItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -27,7 +29,7 @@ const GalleryPage: React.FC = () => {
 
   const handleDelete = async (e: React.MouseEvent, id: number) => {
     e.preventDefault(); // Prevent navigation if triggered within a link (though it's not)
-    if (window.confirm('Are you sure you want to delete this story? This cannot be undone.')) {
+    if (window.confirm(t('galleryPage.deleteStory'))) {
       try {
         await deleteStory(id);
         setStories(previousStories => previousStories.filter(story => story.id !== id));
@@ -41,7 +43,7 @@ const GalleryPage: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 animate-in fade-in duration-700">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-4xl font-black text-gray-800">My Saved Books</h2>
+        <h2 className="text-4xl font-black text-gray-800">{t('galleryPage.mySavedBooks')}</h2>
       </div>
 
       {loading ? (
@@ -74,12 +76,12 @@ const GalleryPage: React.FC = () => {
                     to={`/book/${book.id}`} 
                     className="px-8 py-3 bg-white text-purple-900 font-black rounded-full shadow-xl transform scale-90 group-hover:scale-100 transition-all"
                   >
-                    READ NOW
+                    {t('galleryPage.readNow')}
                   </Link>
                 </div>
               </div>
               <div className="p-5">
-                <h3 className="text-xl font-black text-gray-800 leading-tight mb-2 line-clamp-2">{book.title || 'Untitled Masterpiece'}</h3>
+                <h3 className="text-xl font-black text-gray-800 leading-tight mb-2 line-clamp-2">{book.title || t('galleryPage.untitledMasterpiece')}</h3>
                 <div className="flex flex-wrap gap-2">
                   <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full uppercase tracking-wide">
                     {book.profile.name}

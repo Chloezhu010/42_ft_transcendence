@@ -1,0 +1,47 @@
+{
+  "app": {
+    "myLibrary": "私のライブラリ"
+  },
+  "comicPanel": {
+    "paintingScene": "シーンを描画中...",
+    "magicRevision": "魔法の修正",
+    "requestChange": "この特定のシーンの変更をリクエストします。",
+    "magicFailed": "あぁ！魔法が失敗しました。もう一度試してください。",
+    "awaitingVision": "ビジョンを待っています",
+    "editScene": "シーンを編集",
+    "editPlaceholder": "例 好奇心旺盛な小さなロボットが地図を見ています...",
+    "close": "閉じる",
+    "applyMagic": "魔法を適用✨"
+  },
+  "galleryPage": {
+    "mySavedBooks": "保存された書籍",
+    "noStoriesFound": "まだストーリーが見つかりません。",
+    "readNow": "今読む",
+    "untitledMasterpiece": "無題の傑作",
+    "deleteStory": "このストーリーを削除してもよろしいですか？これは元に戻すことはできません。"
+  },
+  "kidWizard": {
+    "heroQuestion": "ヒーローは誰ですか？",
+    "appearance": "外観",
+    "photoOptional": "写真（オプション）",
+    "uploadPhoto": "写真をアップロード",
+    "roleArchetype": "役割とアーキタイプ",
+    "grandDream": "壮大な夢",
+    "stylePalette": "あなたのスタイルと色合い",
+    "artStyle": "アートスタイル",
+    "favoriteColor": "好きな色",
+    "continue": "続行",
+    "createStory": "私のストーリーを作成✨"
+  },
+  "magicLoader": {
+    "bindingTale": "物語を結合中...",
+    "paintingInteractions": "映画的なインタラクションを描き、あなたのヒーローの遺産を構築する"
+  },
+  "mainPage": {
+    "yourChilds": "お子さんの",
+    "legend": "伝説",
+    "transformStories": "就寝時のストーリーを映画的なコミックブックの経験に変えます。",
+    "startAdventure": "冒険を開始",
+    "viewLibrary": "ライブラリを表示"
+  }
+}

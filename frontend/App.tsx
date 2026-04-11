@@ -1,9 +1,12 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Routes, Route, useNavigate, Outlet, Link } from 'react-router-dom';
 import MainPage from './components/MainPage';
 import GalleryPage from './components/GalleryPage';
+import LanguageSwitcher from './components/LanguageSwitcher';
 
 const AppLayout = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -17,11 +20,12 @@ const AppLayout = () => {
             <img src="/logo-highres.png" alt="WonderComic logo" className="h-14 w-auto object-contain" />
           </div>
           <div className="flex items-center space-x-3">
+            <LanguageSwitcher />
             <Link
               to="/gallery"
               className="text-sm font-bold text-brand-muted hover:text-brand-primary transition-colors px-4 py-2 rounded-full hover:bg-brand-light"
             >
-              My Library
+              {t('app.myLibrary', { defaultValue: 'My Library' })}
             </Link>
           </div>
         </div>
