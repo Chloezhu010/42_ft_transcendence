@@ -1,5 +1,95 @@
 # Architecture
 
+## System Topology
+
+The stack runs as three Docker Compose services behind nginx. nginx terminates TLS and fans requests out by prefix: `/api`, `/health`, and `/images` reach FastAPI, everything else reaches the Vite dev server. FastAPI owns every side effect — SQLite writes, the images volume, and all Gemini calls — so the frontend never talks to external services directly.
+
+```mermaid
+flowchart LR
+    User(("User<br/>Browser"))
+    Gemini["Google Gemini API<br/>text + images"]
+
+    subgraph Compose["Docker Compose"]
+        direction LR
+        Nginx["nginx<br/>HTTPS · reverse proxy"]
+        Vite["frontend<br/>Vite + React"]
+        Fast["backend<br/>FastAPI + Pydantic"]
+        DB[("SQLite<br/>wondercomic.db")]
+        ImgVol[("images volume<br/>cover + panels")]
+    end
+
+    User -- "HTTPS :443" --> Nginx
+    Nginx -- "/" --> Vite
+    Nginx -- "/api, /health" --> Fast
+    Nginx -- "/images" --> Fast
+    Fast -- "aiosqlite" --> DB
+    Fast -- "save / read" --> ImgVol
+    Fast -->|"REST + NDJSON stream"| Gemini
+```
+
+## Story Generation Flow
+
+From a completed `KidWizard` to the `PreviewView`, the frontend streams the story intro as it is written, generates the first and last preview images in parallel, and persists a draft before flipping to the storybook. The streaming endpoint is the only interactive piece; everything else is classic request/response.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as User
+    participant FE as Frontend
+    participant BE as FastAPI
+    participant LLM as Gemini
+    participant DB as SQLite
+
+    U->>FE: submit KidWizard
+    FE->>BE: POST /generate/story-script/stream
+    BE->>LLM: stream generate_content
+    loop each chunk
+        LLM-->>BE: partial JSON
+        BE-->>FE: intro_delta (title / foreword)
+        FE-->>U: typewriter render
+    end
+    LLM-->>BE: full script JSON
+    BE-->>FE: script event (validated)
+
+    par first preview image
+        FE->>BE: /generate/panel-image
+        BE->>LLM: image request
+    and last preview image
+        FE->>BE: /generate/panel-image
+        BE->>LLM: image request
+    end
+    LLM-->>BE: base64 PNGs
+    BE-->>FE: images
+
+    FE->>BE: POST /api/stories (draft)
+    BE->>DB: insert story + panels
+    BE-->>FE: story id
+    FE-->>U: switch to PreviewView
+```
+
+## Frontend View States
+
+`MainPage` drives the whole experience with a five-state machine (`frontend/components/MainPage.tsx:15`). There are two entry points into the graph: a fresh visit to `/` drops the user in `ONBOARDING`, while a deep link to `/book/:id` jumps straight into `GENERATING_SCRIPT` and then branches based on whether the loaded story is a draft or fully illustrated.
+
+```mermaid
+stateDiagram-v2
+    [*] --> ONBOARDING
+    ONBOARDING --> STREAMING_INTRO: wizard submit
+    STREAMING_INTRO --> PREVIEW: draft saved (+600ms hold)
+    STREAMING_INTRO --> ONBOARDING: stream error
+    PREVIEW --> GENERATING_SCRIPT: unlock full story
+    PREVIEW --> ONBOARDING: start over
+    GENERATING_SCRIPT --> STORYBOARD: images ready
+    GENERATING_SCRIPT --> PREVIEW: error / loaded draft
+    GENERATING_SCRIPT --> ONBOARDING: load error
+```
+
+Notes:
+
+- `STREAMING_INTRO` renders `StoryIntroStream.tsx` and is held on screen for at least 600 ms after the last delta, so the typewriter text does not vanish the instant Gemini finishes.
+- `GENERATING_SCRIPT` is reused as a generic "busy" state for both full-story generation (after preview unlock) and deep-link hydration — the successor state depends on which one kicked it off.
+- `STORYBOARD` has no coded exit transition; the user leaves it by navigating away via React Router (e.g. header logo, `My Library` link), which unmounts `MainPage` entirely.
+
 ## Tech Stack
 
 | Layer | Technology | Why |
