@@ -17,6 +17,12 @@
       "react-dom"
     ],
     "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
     "isolatedModules": true,
     "moduleDetection": "force",
     "allowJs": true,
