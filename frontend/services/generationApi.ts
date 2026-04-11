@@ -1,5 +1,5 @@
-import { apiFetch, API_BASE } from './apiClient';
-import { imageSourceToPureBase64 } from './imageUtils';
+import { apiFetch, API_BASE } from '@/services/apiClient';
+import { imageSourceToPureBase64 } from '@/services/imageUtils';
 
 export interface KidProfileForGeneration {
   name: string;

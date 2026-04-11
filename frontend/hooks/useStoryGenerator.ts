@@ -5,11 +5,11 @@ import {
   KidProfileForGeneration,
   StoryIntroField,
   streamStoryScript,
-} from '../services/generationApi';
-import { imageSourceToPureBase64 } from '../services/imageUtils';
-import { getStory, saveStory, updatePanelImage, updateStory } from '../services/storyApi';
-import { mapApiStoryToStory, mapKidProfileToGenerationProfile } from '../services/storyMappers';
-import { KidProfile, Story, ComicPanelData } from '../types';
+} from '@/services/generationApi';
+import { imageSourceToPureBase64 } from '@/services/imageUtils';
+import { getStory, saveStory, updatePanelImage, updateStory } from '@/services/storyApi';
+import { mapApiStoryToStory, mapKidProfileToGenerationProfile } from '@/services/storyMappers';
+import { KidProfile, Story, ComicPanelData } from '@/types';
 
 export type IntroDeltaHandler = (field: StoryIntroField, delta: string) => void;
 

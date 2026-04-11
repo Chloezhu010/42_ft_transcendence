@@ -1,4 +1,4 @@
-import { apiFetch, API_BASE } from './apiClient';
+import { apiFetch, API_BASE } from '@/services/apiClient';
 
 export interface KidProfileResponse {
   id: number;

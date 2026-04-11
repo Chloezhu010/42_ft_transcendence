@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { KidProfile } from '../types';
-import { SketchyButton } from './design-system/Primitives';
-import { Icons } from './design-system/Icons';
-import { Heading, Label } from './design-system/Typography';
-import { SketchyInput, SketchyTextarea } from './design-system/Forms';
+import { KidProfile } from '@/types';
+import { SketchyButton } from '@/components/design-system/Primitives';
+import { Icons } from '@/components/design-system/Icons';
+import { Heading, Label } from '@/components/design-system/Typography';
+import { SketchyInput, SketchyTextarea } from '@/components/design-system/Forms';
 
 interface Props {
   onSubmit: (profile: KidProfile) => void;

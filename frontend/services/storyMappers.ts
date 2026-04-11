@@ -1,6 +1,6 @@
-import { KidProfile, Story } from '../types';
-import { KidProfileForGeneration } from './generationApi';
-import { KidProfileResponse, StoryDetailResponse } from './storyApi';
+import { KidProfile, Story } from '@/types';
+import { KidProfileForGeneration } from '@/services/generationApi';
+import { KidProfileResponse, StoryDetailResponse } from '@/services/storyApi';
 
 export function mapApiStoryToStory(data: StoryDetailResponse): Story {
   return {

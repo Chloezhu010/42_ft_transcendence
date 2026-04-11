@@ -1,4 +1,4 @@
-import { API_BASE_URL } from './apiClient';
+import { API_BASE_URL } from '@/services/apiClient';
 
 /**
  * Get full image URL from a storage filename.

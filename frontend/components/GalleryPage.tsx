@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { deleteStory, getStories, StoryListItem } from '../services/storyApi';
-import StorageImage from './StorageImage';
+import { deleteStory, getStories, StoryListItem } from '@/services/storyApi';
+import StorageImage from '@/components/StorageImage';
 
 const GalleryPage: React.FC = () => {
   const [stories, setStories] = useState<StoryListItem[]>([]);

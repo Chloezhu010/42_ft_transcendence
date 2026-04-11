@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heading, Label, Text } from './design-system/Typography';
+import { Heading, Label, Text } from '@/components/design-system/Typography';
 
 interface Props {
   /** Title text that has streamed in so far. */

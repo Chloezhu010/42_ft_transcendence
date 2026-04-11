@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import ComicPanel from './ComicPanel';
-import StorageImage from './StorageImage';
-import { SketchyButton } from './design-system/Primitives';
-import { Heading, Label, Text } from './design-system/Typography';
-import { ComicPanelData, KidProfile, Story } from '../types';
+import ComicPanel from '@/components/ComicPanel';
+import StorageImage from '@/components/StorageImage';
+import { SketchyButton } from '@/components/design-system/Primitives';
+import { Heading, Label, Text } from '@/components/design-system/Typography';
+import { ComicPanelData, KidProfile, Story } from '@/types';
 
 interface StoryboardViewProps {
   story: Story;

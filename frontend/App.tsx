@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route, useNavigate, Outlet, Link } from 'react-router-dom';
-import MainPage from './components/MainPage';
-import GalleryPage from './components/GalleryPage';
+import MainPage from '@/components/MainPage';
+import GalleryPage from '@/components/GalleryPage';
 
 const AppLayout = () => {
   const navigate = useNavigate();

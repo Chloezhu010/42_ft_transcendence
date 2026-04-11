@@ -1,16 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import KidWizard from './KidWizard';
-import PreviewView from './PreviewView';
-import MagicLoader from './MagicLoader';
-import StoryIntroStream from './StoryIntroStream';
-import StoryboardView from './StoryboardView';
-import { KidProfile } from '../types';
-import { getStory } from '../services/storyApi';
-import { mapApiProfileToKidProfile, mapApiStoryToStory } from '../services/storyMappers';
-import { useStoryGenerator } from '../hooks/useStoryGenerator';
-import { Heading, Text } from './design-system/Typography';
+import KidWizard from '@/components/KidWizard';
+import PreviewView from '@/components/PreviewView';
+import MagicLoader from '@/components/MagicLoader';
+import StoryIntroStream from '@/components/StoryIntroStream';
+import StoryboardView from '@/components/StoryboardView';
+import { KidProfile } from '@/types';
+import { getStory } from '@/services/storyApi';
+import { mapApiProfileToKidProfile, mapApiStoryToStory } from '@/services/storyMappers';
+import { useStoryGenerator } from '@/hooks/useStoryGenerator';
+import { Heading, Text } from '@/components/design-system/Typography';
 
 enum AppState {
   ONBOARDING,

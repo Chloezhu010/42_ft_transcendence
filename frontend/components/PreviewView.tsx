@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import ComicPanel from './ComicPanel';
-import { KidProfile, Story, ComicPanelData } from '../types';
-import { SketchyButton } from './design-system/Primitives';
-import { Heading, Text, Label } from './design-system/Typography';
+import ComicPanel from '@/components/ComicPanel';
+import { KidProfile, Story, ComicPanelData } from '@/types';
+import { SketchyButton } from '@/components/design-system/Primitives';
+import { Heading, Text, Label } from '@/components/design-system/Typography';
 
 interface Props {
   story: Story;
