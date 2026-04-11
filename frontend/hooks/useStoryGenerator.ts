@@ -167,6 +167,17 @@ export const useStoryGenerator = () => {
       panels: story.panels.map(p => p.id === updated.id ? updated : p)
     });
 
+    setPendingGeneration(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        previewStory: {
+          ...prev.previewStory,
+          panels: prev.previewStory.panels.map(p => p.id === updated.id ? updated : p),
+        },
+      };
+    });
+
     if (savedStoryId && panelOrder !== -1 && updated.imageUrl) {
       try {
         await updatePanelImage(savedStoryId, panelOrder, updated.imageUrl);
