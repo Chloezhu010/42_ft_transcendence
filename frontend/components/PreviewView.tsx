@@ -78,12 +78,13 @@ const PreviewView: React.FC<Props> = ({ story, profile, updatePanel, onGenerate,
                   <Text className="text-brand-dark/80 italic border-l-4 border-brand-accent pl-6">
                     "{story.foreword}"
                   </Text>
-                  <div
+                  <button
+                    type="button"
                     onClick={() => flipTo(1)}
-                    className="mt-8 cursor-pointer text-brand-primary/40 hover:text-brand-primary transition-colors text-sm font-bold"
+                    className="mt-8 text-brand-primary/40 hover:text-brand-primary transition-colors text-sm font-bold"
                   >
                     Turn page →
-                  </div>
+                  </button>
                 </div>
               ) : (
                 <ComicPanel
