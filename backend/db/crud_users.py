@@ -110,6 +110,32 @@ async def get_friendship_between(db, user_id: int, other_user_id: int) -> Row | 
         return await cursor.fetchone()  # return the friendship row or None if not found
 
 
+async def get_friend_view(db, viewer_id: int, other_user_id: int) -> Row | None:
+    """Return a joined friendship+user row shaped for FriendResponse.
+
+    Columns: u.id, u.username, u.avatar_path, u.is_online, f.requester_id, f.status.
+    u.id is always the *other* user's id (the friend, from viewer_id's perspective),
+    matching the contract used by get_friends / get_pending_requests.
+
+    Used by the friend router to build response bodies after send/accept writes
+    without leaking that concern into the CRUD write functions (which must keep
+    returning raw friendships rows — see test_crud_users.py).
+    """
+    async with db.execute(
+        """
+        SELECT
+            u.id, u.username, u.avatar_path, u.is_online,
+            f.requester_id, f.status
+        FROM friendships f
+        JOIN users u ON u.id = ?
+        WHERE (f.requester_id = ? AND f.addressee_id = ?)
+           OR (f.requester_id = ? AND f.addressee_id = ?)
+        """,
+        (other_user_id, viewer_id, other_user_id, other_user_id, viewer_id),
+    ) as cursor:
+        return await cursor.fetchone()
+
+
 async def send_friend_request(db, requester_id: int, addressee_id: int) -> Row:
     """Send a friend request from requester to addressee. Returns the created friendship row."""
     # Validation checks
@@ -129,15 +155,15 @@ async def send_friend_request(db, requester_id: int, addressee_id: int) -> Row:
     # Add friend request to DB
     await db.execute("INSERT INTO friendships (requester_id, addressee_id) VALUES (?, ?)", (requester_id, addressee_id))
     await db.commit()
-    # Return the created friendship row
+    # Return the raw friendships row (CRUD contract; router re-queries via get_friend_view).
     friendship = await get_friendship_between(db, requester_id, addressee_id)
     if friendship is None:
         raise RuntimeError("Failed to create friend request")
     return friendship
 
 
-async def accept_friend_request(db, current_user_id: int, requester_id: int) -> Row | None:
-    """Accept a friend request. Returns the updated friendship row or None if not found."""
+async def accept_friend_request(db, current_user_id: int, requester_id: int) -> Row:
+    """Accept a friend request. Returns the updated raw friendships row."""
     # Check if the friend request exists and is pending
     friendship = await get_friendship_between(db, current_user_id, requester_id)
     if friendship is None:
@@ -149,7 +175,7 @@ async def accept_friend_request(db, current_user_id: int, requester_id: int) -> 
     # Update the friendship status to accepted
     await db.execute("UPDATE friendships SET status = 'accepted' WHERE id = ?", (friendship["id"],))
     await db.commit()
-    # Return the updated friendship row
+    # Return the raw updated friendships row (CRUD contract; router re-queries via get_friend_view).
     updated_friendship = await get_friendship_between(db, current_user_id, requester_id)
     if updated_friendship is None:
         raise RuntimeError("Failed to update friend request")
@@ -191,12 +217,17 @@ async def get_friends(db, user_id: int) -> list[Row]:
 
 
 async def get_pending_requests(db, user_id: int) -> list[Row]:
-    """Get a list of pending friend requests for the given user id. Returns a list of user rows."""
+    """Get a list of pending *incoming* friend requests for the given user id.
+
+    Returns rows shaped for FriendResponse: the viewer is always the addressee,
+    so the "other user" (u.*) is the requester. requester_id is included so the
+    router's is_requester check stays consistent with get_friends.
+    """
     async with db.execute(
         """
         SELECT
             u.id, u.username, u.avatar_path, u.is_online,
-            f.id AS friendship_id, f.status, f.created_at
+            f.id AS friendship_id, f.requester_id, f.status, f.created_at
         FROM friendships f
         JOIN users u
             ON f.requester_id = u.id
