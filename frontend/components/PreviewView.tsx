@@ -16,6 +16,7 @@ interface Props {
 const PreviewView: React.FC<Props> = ({ story, profile, updatePanel, onGenerate, onStartOver }) => {
   const [previewPage, setPreviewPage] = useState(0);
   const totalPages = 2;
+  const middlePanelCount = Math.max(0, story.panels.length - 2);
 
   const flipTo = (dir: number) => {
     setPreviewPage(p => Math.max(0, Math.min(totalPages - 1, p + dir)));
@@ -109,7 +110,7 @@ const PreviewView: React.FC<Props> = ({ story, profile, updatePanel, onGenerate,
                   <div className="text-5xl mb-6">✨</div>
                   <Heading variant="h3" className="text-brand-primary mb-3">Like what you see?</Heading>
                   <Text className="text-brand-dark/60 italic mb-8 text-sm">
-                    We'll fill in the {story.panels.length - 2} panels between opening and ending.
+                    We'll fill in the {middlePanelCount} panels between opening and ending.
                   </Text>
                   <div className="flex flex-col gap-3 w-full max-w-[220px]">
                     <SketchyButton onClick={onGenerate} className="px-6 py-3 rounded-full text-sm w-full">
