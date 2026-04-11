@@ -1,13 +1,17 @@
 import { useCallback, useState } from 'react';
 import {
+  GeneratedStoryScript,
   generatePanelImage,
-  generateStoryScript,
   KidProfileForGeneration,
+  StoryIntroField,
+  streamStoryScript,
 } from '../services/generationApi';
 import { imageSourceToPureBase64 } from '../services/imageUtils';
 import { getStory, saveStory, updatePanelImage, updateStory } from '../services/storyApi';
 import { mapApiStoryToStory, mapKidProfileToGenerationProfile } from '../services/storyMappers';
 import { KidProfile, Story, ComicPanelData } from '../types';
+
+export type IntroDeltaHandler = (field: StoryIntroField, delta: string) => void;
 
 interface PendingGeneration {
   profileForApi: KidProfileForGeneration;
@@ -20,10 +24,10 @@ export const useStoryGenerator = () => {
   const [savedStoryId, setSavedStoryId] = useState<number | null>(null);
   const [pendingGeneration, setPendingGeneration] = useState<PendingGeneration | null>(null);
 
-  const generateStoryPreview = async (p: KidProfile) => {
-    const profileForApi = mapKidProfileToGenerationProfile(p);
-    const script = await generateStoryScript(profileForApi);
-
+  const buildPreviewStory = async (
+    profileForApi: KidProfileForGeneration,
+    script: GeneratedStoryScript
+  ): Promise<Story> => {
     if (!script.panels.length) {
       throw new Error('Story generation failed: no panels returned.');
     }
@@ -42,7 +46,7 @@ export const useStoryGenerator = () => {
       ),
     ]);
 
-    const previewStory: Story = {
+    return {
       title: script.title,
       foreword: script.foreword,
       characterDescription: script.characterDescription,
@@ -55,15 +59,22 @@ export const useStoryGenerator = () => {
         isGenerating: false,
       })),
     };
+  };
 
-    const previewPanels = await Promise.all(previewStory.panels.map(async (panel, index) => ({
-      panel_order: index,
-      text: panel.text,
-      image_prompt: panel.imagePrompt,
-      image_base64: panel.imageUrl ? await imageSourceToPureBase64(panel.imageUrl) : undefined,
-    })));
+  const persistPreviewStory = async (
+    profileForApi: KidProfileForGeneration,
+    previewStory: Story
+  ): Promise<number> => {
+    const previewPanels = await Promise.all(
+      previewStory.panels.map(async (panel, index) => ({
+        panel_order: index,
+        text: panel.text,
+        image_prompt: panel.imagePrompt,
+        image_base64: panel.imageUrl ? await imageSourceToPureBase64(panel.imageUrl) : undefined,
+      }))
+    );
 
-    const previewStoryId = await saveStory({
+    return saveStory({
       profile: {
         name: profileForApi.name,
         gender: profileForApi.gender,
@@ -80,10 +91,33 @@ export const useStoryGenerator = () => {
       cover_image_prompt: previewStory.coverImagePrompt,
       panels: previewPanels,
     });
+  };
 
+  const finalizePreview = (
+    profileForApi: KidProfileForGeneration,
+    previewStory: Story,
+    previewStoryId: number
+  ) => {
     setSavedStoryId(previewStoryId);
     setPendingGeneration({ profileForApi, previewStory, previewStoryId });
     setStory(previewStory);
+  };
+
+  /**
+   * Generate a story preview whose title and foreword stream in through the
+   * provided `onIntroDelta` callback. The promise resolves only once the
+   * preview images are ready and the draft has been saved, so callers can
+   * safely transition to the storybook view immediately afterwards.
+   */
+  const generateStoryPreviewStreaming = async (
+    p: KidProfile,
+    onIntroDelta: IntroDeltaHandler
+  ) => {
+    const profileForApi = mapKidProfileToGenerationProfile(p);
+    const script = await streamStoryScript(profileForApi, { onIntroDelta });
+    const previewStory = await buildPreviewStory(profileForApi, script);
+    const previewStoryId = await persistPreviewStory(profileForApi, previewStory);
+    finalizePreview(profileForApi, previewStory, previewStoryId);
   };
 
   const generateFullStoryFromPreview = async () => {
@@ -192,7 +226,7 @@ export const useStoryGenerator = () => {
     setStory,
     savedStoryId,
     setSavedStoryId,
-    generateStoryPreview,
+    generateStoryPreviewStreaming,
     generateFullStoryFromPreview,
     restorePendingPreview,
     clearPendingPreview,

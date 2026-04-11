@@ -1,9 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import KidWizard from './KidWizard';
 import PreviewView from './PreviewView';
 import MagicLoader from './MagicLoader';
+import StoryIntroStream from './StoryIntroStream';
 import StoryboardView from './StoryboardView';
 import { KidProfile } from '../types';
 import { getStory } from '../services/storyApi';
@@ -13,15 +14,37 @@ import { Heading, Text } from './design-system/Typography';
 
 enum AppState {
   ONBOARDING,
+  STREAMING_INTRO,
   GENERATING_SCRIPT,
   PREVIEW,
   STORYBOARD,
 }
 
+interface IntroStreamState {
+  title: string;
+  foreword: string;
+  isStreaming: boolean;
+  isPreparingPreview: boolean;
+}
+
+const INITIAL_INTRO_STATE: IntroStreamState = {
+  title: '',
+  foreword: '',
+  isStreaming: false,
+  isPreparingPreview: false,
+};
+
 const MainPage: React.FC = () => {
   const { id: bookId } = useParams<{ id: string }>();
   const [view, setView] = useState<AppState>(AppState.ONBOARDING);
   const [profile, setProfile] = useState<KidProfile | null>(null);
+  const [introStream, setIntroStream] = useState<IntroStreamState>(INITIAL_INTRO_STATE);
+  // Guards the paint-to-preview transition: we only want to flip to the
+  // storybook once the user has had a beat to read the streamed intro.
+  const introHoldTimerRef = useRef<number | null>(null);
+  // Minimum dwell on the intro view after streaming completes, so the text
+  // does not vanish the instant Gemini finishes.
+  const INTRO_MIN_HOLD_MS = 600;
 
   const {
     story,
@@ -29,7 +52,7 @@ const MainPage: React.FC = () => {
     setSavedStoryId,
     restorePendingPreview,
     clearPendingPreview,
-    generateStoryPreview,
+    generateStoryPreviewStreaming,
     generateFullStoryFromPreview,
     hasPendingPreview,
     updatePanel,
@@ -80,14 +103,55 @@ const MainPage: React.FC = () => {
     void loadStoryFromHistory(parsedStoryId);
   }, [bookId, loadStoryFromHistory]);
 
+  const cancelIntroHoldTimer = useCallback(() => {
+    if (introHoldTimerRef.current !== null) {
+      window.clearTimeout(introHoldTimerRef.current);
+      introHoldTimerRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => cancelIntroHoldTimer, [cancelIntroHoldTimer]);
+
   const handleWizardComplete = async (nextProfile: KidProfile) => {
     setProfile(nextProfile);
-    setView(AppState.GENERATING_SCRIPT);
+    cancelIntroHoldTimer();
+    setIntroStream({ ...INITIAL_INTRO_STATE, isStreaming: true });
+    setView(AppState.STREAMING_INTRO);
+
+    let lastDeltaAt = Date.now();
 
     try {
-      await generateStoryPreview(nextProfile);
+      await generateStoryPreviewStreaming(nextProfile, (field, delta) => {
+        lastDeltaAt = Date.now();
+        setIntroStream((previous) => ({
+          ...previous,
+          [field]: previous[field] + delta,
+        }));
+      });
+
+      setIntroStream((previous) => ({
+        ...previous,
+        isStreaming: false,
+        isPreparingPreview: true,
+      }));
+
+      // Keep the intro on-screen for a short beat after the last character
+      // arrived so the user can finish reading it before we flip pages.
+      const elapsedSinceLastDelta = Date.now() - lastDeltaAt;
+      const remainingHold = Math.max(0, INTRO_MIN_HOLD_MS - elapsedSinceLastDelta);
+
+      await new Promise<void>((resolve) => {
+        introHoldTimerRef.current = window.setTimeout(() => {
+          introHoldTimerRef.current = null;
+          resolve();
+        }, remainingHold);
+      });
+
+      setIntroStream(INITIAL_INTRO_STATE);
       setView(AppState.PREVIEW);
     } catch (err) {
+      cancelIntroHoldTimer();
+      setIntroStream(INITIAL_INTRO_STATE);
       const message = err instanceof Error ? err.message : 'Generation failed';
       toast.error(message);
       setView(AppState.ONBOARDING);
@@ -132,6 +196,15 @@ const MainPage: React.FC = () => {
           </div>
           <KidWizard onSubmit={handleWizardComplete} />
         </div>
+      )}
+
+      {view === AppState.STREAMING_INTRO && (
+        <StoryIntroStream
+          title={introStream.title}
+          foreword={introStream.foreword}
+          isStreaming={introStream.isStreaming}
+          isPreparingPreview={introStream.isPreparingPreview}
+        />
       )}
 
       {view === AppState.GENERATING_SCRIPT && <MagicLoader />}
