@@ -47,6 +47,121 @@ export async function generateStoryScript(
   return (await response.json()) as GeneratedStoryScript;
 }
 
+export type StoryIntroField = 'title' | 'foreword';
+
+export interface StreamStoryScriptCallbacks {
+  onIntroDelta?: (field: StoryIntroField, delta: string) => void;
+  signal?: AbortSignal;
+}
+
+const INTRO_DELTA_CHARS_PER_TICK = 2;
+const INTRO_DELTA_TICK_MS = 22;
+
+const delay = (ms: number): Promise<void> => new Promise((resolve) => {
+  globalThis.setTimeout(resolve, ms);
+});
+
+async function emitIntroDeltaSmoothly(
+  field: StoryIntroField,
+  delta: string,
+  onIntroDelta?: (field: StoryIntroField, delta: string) => void
+): Promise<void> {
+  if (!onIntroDelta || delta.length === 0) {
+    return;
+  }
+
+  const characters = Array.from(delta);
+  for (let index = 0; index < characters.length; index += INTRO_DELTA_CHARS_PER_TICK) {
+    const chunk = characters.slice(index, index + INTRO_DELTA_CHARS_PER_TICK).join('');
+    onIntroDelta(field, chunk);
+    if (index + INTRO_DELTA_CHARS_PER_TICK < characters.length) {
+      await delay(INTRO_DELTA_TICK_MS);
+    }
+  }
+}
+
+// Events emitted by POST /api/generate/story-script/stream. Kept in sync with
+// backend/routers/generation.py.
+type StoryStreamEvent =
+  | { type: 'intro_delta'; field: StoryIntroField; delta: string }
+  | { type: 'script'; script: GeneratedStoryScript }
+  | { type: 'error'; message: string };
+
+/**
+ * Stream a story script, surfacing title/foreword chunks as they arrive.
+ *
+ * Resolves with the fully parsed script once the backend has finished. If the
+ * backend emits an `error` event, or the stream terminates without a `script`
+ * event, the returned promise rejects.
+ */
+export async function streamStoryScript(
+  profile: KidProfileForGeneration,
+  callbacks: StreamStoryScriptCallbacks = {}
+): Promise<GeneratedStoryScript> {
+  const response = await apiFetch(`${API_BASE}/generate/story-script/stream`, {
+    method: 'POST',
+    body: JSON.stringify({ profile }),
+    signal: callbacks.signal,
+  });
+
+  if (!response.ok || !response.body) {
+    const error = (await response.json().catch(() => ({}))) as { detail?: string };
+    throw new Error(error.detail || `Failed to stream story: ${response.statusText}`);
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let finalScript: GeneratedStoryScript | null = null;
+
+  const handleEvent = async (event: StoryStreamEvent): Promise<void> => {
+    switch (event.type) {
+      case 'intro_delta':
+        await emitIntroDeltaSmoothly(event.field, event.delta, callbacks.onIntroDelta);
+        return;
+      case 'script':
+        finalScript = event.script;
+        return;
+      case 'error':
+        throw new Error(event.message);
+    }
+  };
+
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (value) {
+        buffer += decoder.decode(value, { stream: true });
+        let newlineIndex = buffer.indexOf('\n');
+        while (newlineIndex >= 0) {
+          const line = buffer.slice(0, newlineIndex).trim();
+          buffer = buffer.slice(newlineIndex + 1);
+          if (line.length > 0) {
+            await handleEvent(JSON.parse(line) as StoryStreamEvent);
+          }
+          newlineIndex = buffer.indexOf('\n');
+        }
+      }
+      if (done) {
+        break;
+      }
+    }
+
+    const trailing = buffer.trim();
+    if (trailing.length > 0) {
+      await handleEvent(JSON.parse(trailing) as StoryStreamEvent);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  if (!finalScript) {
+    throw new Error('Story stream ended before a script was produced.');
+  }
+
+  return finalScript;
+}
+
 /**
  * Generate a comic panel image using Gemini AI.
  */
