@@ -1,8 +1,9 @@
 /**
- * Image component that resolves backend storage filenames to full URLs.
+ * Image wrapper that accepts either stored filenames or direct URLs.
+ * Keeps backend URL assembly out of calling components.
  */
 import React from 'react';
-import { getImageUrl } from '@/services/imageUtils';
+import { getImageUrl } from '@/utils';
 
 interface StorageImageProps {
   src: string | null | undefined;

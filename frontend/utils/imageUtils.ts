@@ -1,4 +1,9 @@
-import { API_BASE_URL } from '@/services/apiClient';
+/**
+ * Role: Hold image-related helper functions with no React dependency.
+ * Input: Storage filenames, URLs, data URLs, or raw base64 strings.
+ * Flow: Resolve the image source once, then normalize it into the format the caller needs.
+ */
+import { BACKEND_BASE_URL } from '@/utils/runtimeConfig';
 
 /**
  * Get full image URL from a storage filename.
@@ -7,7 +12,7 @@ import { API_BASE_URL } from '@/services/apiClient';
 export function getImageUrl(filename: string | null | undefined): string | undefined {
   if (!filename) return undefined;
   if (filename.startsWith('data:') || filename.startsWith('http')) return filename;
-  return `${API_BASE_URL}/images/${filename}`;
+  return `${BACKEND_BASE_URL}/images/${filename}`;
 }
 
 /**

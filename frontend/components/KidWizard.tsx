@@ -1,17 +1,35 @@
-import React, { useState } from 'react';
-import { KidProfile } from '@/types';
+/**
+ * Controlled onboarding wizard UI for editing a kid profile.
+ * The page owns the data; this component only renders steps and emits user intent.
+ */
+import React from 'react';
+import type { KidProfile } from '@/types';
 import { SketchyButton } from '@/components/design-system/Primitives';
 import { Icons } from '@/components/design-system/Icons';
 import { Heading, Label } from '@/components/design-system/Typography';
 import { SketchyInput, SketchyTextarea } from '@/components/design-system/Forms';
 
-interface Props {
-  onSubmit: (profile: KidProfile) => void;
+interface KidWizardProps {
+  step: number;
+  profile: KidProfile;
+  onProfileChange: (nextProfile: KidProfile) => void;
+  onNextStep: () => void;
+  onPreviousStep: () => void;
+  onPhotoSelect: (file: File) => Promise<void>;
+  onPhotoRemove: () => void;
+  onSubmit: () => Promise<void>;
 }
 
 interface ColorOption {
   label: string;
   hex: string;
+}
+
+interface ColorGridProps {
+  options: ColorOption[];
+  selected: string;
+  onSelect: (value: string) => void;
+  label: string;
 }
 
 type GenderOption = KidProfile['gender'];
@@ -79,95 +97,99 @@ const STEP_LABELS = [
 
 const GENDERS: GenderOption[] = ['boy', 'girl', 'neutral'];
 
-interface ColorGridProps {
-  options: ColorOption[];
-  selected: string;
-  onSelect: (value: string) => void;
-  label: string;
-}
-
 const ColorGrid: React.FC<ColorGridProps> = ({ options, selected, onSelect, label }) => (
   <div className="mb-8 animate-in fade-in slide-in-from-bottom-2 duration-500 px-4">
     <Label className="block mb-6 text-brand-primary text-sm">{label}</Label>
     <div className="flex flex-wrap gap-6">
-      {options.map(opt => (
+      {options.map((option) => (
         <button
-          key={opt.label}
-          onClick={() => onSelect(opt.label)}
-          className={`group relative w-12 h-12 rounded-full border-4 transition-all duration-300 ${selected === opt.label ? 'border-brand-primary scale-125 z-10 shadow-soft' : 'border-gray-100 hover:scale-110'}`}
-          style={{ backgroundColor: opt.hex }}
-          title={opt.label}
+          key={option.label}
+          type="button"
+          onClick={() => onSelect(option.label)}
+          className={`group relative w-12 h-12 rounded-full border-4 transition-all duration-300 ${
+            selected === option.label
+              ? 'border-brand-primary scale-125 z-10 shadow-soft'
+              : 'border-gray-100 hover:scale-110'
+          }`}
+          style={{ backgroundColor: option.hex }}
+          title={option.label}
         >
-          {selected === opt.label && (
+          {selected === option.label && (
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-2 h-2 bg-white rounded-full shadow-lg" />
             </div>
           )}
-          <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-brand-dark opacity-0 group-hover:opacity-100 transition-opacity uppercase whitespace-nowrap">{opt.label}</span>
+          <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-brand-dark opacity-0 group-hover:opacity-100 transition-opacity uppercase whitespace-nowrap">
+            {option.label}
+          </span>
         </button>
       ))}
     </div>
   </div>
 );
 
-const KidWizard: React.FC<Props> = ({ onSubmit }) => {
-  const [step, setStep] = useState(1);
-  const [profile, setProfile] = useState<KidProfile>({
-    name: '',
-    gender: 'boy',
-    skinTone: 'Fair',
-    hairColor: 'Brown',
-    eyeColor: 'Blue',
-    favoriteColor: 'Purple',
-    dream: '',
-    archetype: 'Brave Explorer',
-    photoUrl: '',
-    artStyle: 'Classic Comic',
-  });
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-
+const KidWizard: React.FC<KidWizardProps> = ({
+  step,
+  profile,
+  onProfileChange,
+  onNextStep,
+  onPreviousStep,
+  onPhotoSelect,
+  onPhotoRemove,
+  onSubmit,
+}) => {
   const totalSteps = STEP_LABELS.length;
   const progressWidth = `${(step / totalSteps) * 100}%`;
+  const photoPreview = profile.photoUrl || null;
+
+  const updateProfileField = <Key extends keyof KidProfile>(field: Key, value: KidProfile[Key]) => {
+    onProfileChange({
+      ...profile,
+      [field]: value,
+    });
+  };
 
   return (
     <div className="max-w-3xl mx-auto px-4">
-      {/* Progress bar */}
       <div className="mb-4">
         <div className="h-2 bg-purple-100 rounded-full overflow-hidden">
           <div className="h-full bg-yellow-400 transition-all duration-500" style={{ width: progressWidth }} />
         </div>
       </div>
 
-      {/* Step indicators */}
       <div className="mb-6">
         <div className="flex justify-between items-center">
-          {STEP_LABELS.map(({ step: s, label, icon }) => (
+          {STEP_LABELS.map(({ step: currentStep, label, icon }) => (
             <div
-              key={s}
+              key={currentStep}
               className={`flex flex-col items-center transition-all duration-300 ${
-                s === step
+                currentStep === step
                   ? 'scale-110'
-                  : s < step
+                  : currentStep < step
                     ? 'opacity-70'
                     : 'opacity-40'
               }`}
             >
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg mb-1 transition-all duration-300 ${
-                s === step
-                  ? 'bg-purple-600 text-white shadow-lg ring-4 ring-purple-200'
-                  : s < step
-                    ? 'bg-yellow-400 text-purple-900'
-                    : 'bg-gray-100 text-gray-400'
-              }`}>
-                {s < step ? '✓' : icon}
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center text-lg mb-1 transition-all duration-300 ${
+                  currentStep === step
+                    ? 'bg-purple-600 text-white shadow-lg ring-4 ring-purple-200'
+                    : currentStep < step
+                      ? 'bg-yellow-400 text-purple-900'
+                      : 'bg-gray-100 text-gray-400'
+                }`}
+              >
+                {currentStep < step ? '✓' : icon}
               </div>
-              <span className={`text-xs font-bold uppercase tracking-wide transition-colors ${
-                s === step
-                  ? 'text-purple-600'
-                  : s < step
-                    ? 'text-yellow-600'
-                    : 'text-gray-400'
-              }`}>
+              <span
+                className={`text-xs font-bold uppercase tracking-wide transition-colors ${
+                  currentStep === step
+                    ? 'text-purple-600'
+                    : currentStep < step
+                      ? 'text-yellow-600'
+                      : 'text-gray-400'
+                }`}
+              >
                 {label}
               </span>
             </div>
@@ -176,7 +198,6 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
       </div>
 
       <div className="bg-white rounded-[2rem] shadow-xl border-2 border-purple-900/5 p-8 md:p-12 min-h-[500px] flex flex-col">
-
         {step === 1 && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex-1 flex flex-col justify-center">
             <Heading className="mb-8 text-brand-dark">Who is the Hero?</Heading>
@@ -184,15 +205,15 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
               autoFocus
               placeholder="Hero's name..."
               value={profile.name}
-              onChange={e => setProfile(previous => ({ ...previous, name: e.target.value }))}
+              onChange={(event) => updateProfileField('name', event.target.value)}
               className="mb-8"
             />
             <div className="flex gap-4">
-              {GENDERS.map(gender => (
+              {GENDERS.map((gender) => (
                 <SketchyButton
                   key={gender}
                   variant={profile.gender === gender ? 'primary' : 'outline'}
-                  onClick={() => setProfile(previous => ({ ...previous, gender }))}
+                  onClick={() => updateProfileField('gender', gender)}
                   className="flex-1 py-4 capitalize text-xl rounded-2xl"
                   style={{ borderRadius: '16px' }}
                 >
@@ -206,9 +227,9 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
         {step === 2 && (
           <div className="animate-in fade-in duration-500 flex-1 overflow-y-auto">
             <Heading className="mb-10 text-brand-dark">Appearance</Heading>
-            <ColorGrid label="Skin Tone" options={SKIN_TONES} selected={profile.skinTone} onSelect={value => setProfile(previous => ({ ...previous, skinTone: value }))} />
-            <ColorGrid label="Hair Color" options={HAIR_COLORS} selected={profile.hairColor} onSelect={value => setProfile(previous => ({ ...previous, hairColor: value }))} />
-            <ColorGrid label="Eye Color" options={EYE_COLORS} selected={profile.eyeColor} onSelect={value => setProfile(previous => ({ ...previous, eyeColor: value }))} />
+            <ColorGrid label="Skin Tone" options={SKIN_TONES} selected={profile.skinTone} onSelect={(value) => updateProfileField('skinTone', value)} />
+            <ColorGrid label="Hair Color" options={HAIR_COLORS} selected={profile.hairColor} onSelect={(value) => updateProfileField('hairColor', value)} />
+            <ColorGrid label="Eye Color" options={EYE_COLORS} selected={profile.eyeColor} onSelect={(value) => updateProfileField('eyeColor', value)} />
 
             <div className="mb-8 mt-10 pt-8 border-t border-brand-light px-4">
               <Label className="block mb-6 text-brand-primary text-sm">Photo (Optional)</Label>
@@ -220,32 +241,21 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
                     type="file"
                     accept="image/*"
                     className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
                       if (file) {
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          const imageDataUrl = reader.result;
-                          if (typeof imageDataUrl !== 'string') {
-                            return;
-                          }
-                          setPhotoPreview(imageDataUrl);
-                          setProfile(previous => ({ ...previous, photoUrl: imageDataUrl }));
-                        };
-                        reader.readAsDataURL(file);
+                        void onPhotoSelect(file);
                       }
                     }}
                   />
                 </label>
+
                 {photoPreview && (
                   <div className="flex-1 relative rounded-3xl overflow-hidden border-4 border-brand-accent">
                     <img src={photoPreview} alt="Preview" className="w-full h-32 object-cover" />
                     <button
                       type="button"
-                      onClick={() => {
-                        setPhotoPreview(null);
-                        setProfile(previous => ({ ...previous, photoUrl: '' }));
-                      }}
+                      onClick={onPhotoRemove}
                       className="absolute top-2 right-2 bg-red-400 text-white rounded-full w-8 h-8 flex items-center justify-center font-semibold text-lg hover:bg-red-500 border border-white shadow-sm"
                     >
                       ×
@@ -261,20 +271,25 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
           <div className="animate-in fade-in duration-500 flex-1">
             <Heading className="mb-8 text-brand-dark">Role & Archetype</Heading>
             <div className="grid grid-cols-2 gap-4">
-              {ARCHETYPES.map(arc => (
+              {ARCHETYPES.map((archetype) => (
                 <button
-                  key={arc.id}
-                  onClick={() => setProfile(previous => ({ ...previous, archetype: arc.label }))}
-                  className={`p-6 rounded-3xl border-4 text-left transition-all hover:-translate-y-1 ${profile.archetype === arc.label ? 'border-brand-primary bg-brand-light shadow-soft' : 'border-brand-primary/10 bg-white hover:border-brand-primary/30'}`}
+                  key={archetype.id}
+                  type="button"
+                  onClick={() => updateProfileField('archetype', archetype.label)}
+                  className={`p-6 rounded-3xl border-4 text-left transition-all hover:-translate-y-1 ${
+                    profile.archetype === archetype.label
+                      ? 'border-brand-primary bg-brand-light shadow-soft'
+                      : 'border-brand-primary/10 bg-white hover:border-brand-primary/30'
+                  }`}
                 >
                   <div className="mb-2">
-                    <arc.Icon
+                    <archetype.Icon
                       className="w-10 h-10"
-                      color={profile.archetype === arc.label ? '#9D6BCF' : '#7D6391'}
+                      color={profile.archetype === archetype.label ? '#9D6BCF' : '#7D6391'}
                     />
                   </div>
-                  <div className="font-semibold text-lg text-brand-primary">{arc.label}</div>
-                  <div className="text-xs text-brand-muted font-semibold">{arc.description}</div>
+                  <div className="font-semibold text-lg text-brand-primary">{archetype.label}</div>
+                  <div className="text-xs text-brand-muted font-semibold">{archetype.description}</div>
                 </button>
               ))}
             </div>
@@ -288,7 +303,7 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
               autoFocus
               placeholder="e.g. To explore a planet made of candy..."
               value={profile.dream}
-              onChange={e => setProfile(previous => ({ ...previous, dream: e.target.value }))}
+              onChange={(event) => updateProfileField('dream', event.target.value)}
               className="min-h-[120px]"
             />
           </div>
@@ -301,11 +316,16 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
             <div className="mb-12">
               <Label className="block mb-6 text-brand-primary text-sm">Art Style</Label>
               <div className="grid grid-cols-2 gap-4">
-                {ART_STYLES.map(style => (
+                {ART_STYLES.map((style) => (
                   <button
                     key={style.id}
-                    onClick={() => setProfile(previous => ({ ...previous, artStyle: style.label }))}
-                    className={`p-6 rounded-3xl border-4 text-center transition-all hover:-translate-y-1 ${profile.artStyle === style.label ? 'border-brand-primary bg-brand-light shadow-soft' : 'border-brand-primary/10 bg-white hover:border-brand-primary/30'}`}
+                    type="button"
+                    onClick={() => updateProfileField('artStyle', style.label)}
+                    className={`p-6 rounded-3xl border-4 text-center transition-all hover:-translate-y-1 ${
+                      profile.artStyle === style.label
+                        ? 'border-brand-primary bg-brand-light shadow-soft'
+                        : 'border-brand-primary/10 bg-white hover:border-brand-primary/30'
+                    }`}
                   >
                     <div className="text-4xl mb-2">{style.icon}</div>
                     <div className="font-semibold text-lg text-brand-primary">{style.label}</div>
@@ -317,25 +337,32 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
 
             <div className="border-t border-brand-light pt-10">
               <Label className="block mb-6 text-brand-primary text-sm">Favorite Color</Label>
-              <ColorGrid label="" options={FAVORITE_COLORS} selected={profile.favoriteColor} onSelect={value => setProfile(previous => ({ ...previous, favoriteColor: value }))} />
+              <ColorGrid label="" options={FAVORITE_COLORS} selected={profile.favoriteColor} onSelect={(value) => updateProfileField('favoriteColor', value)} />
             </div>
           </div>
         )}
 
         <div className="flex justify-between items-center mt-auto pt-8 border-t border-purple-50">
-          {/* Back button */}
           {step > 1 ? (
             <button
-              onClick={() => setStep(s => s - 1)}
+              type="button"
+              onClick={onPreviousStep}
               className="flex items-center gap-2 px-6 py-3 font-black text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-xl uppercase tracking-widest text-sm transition-all"
             >
               <span className="text-lg">←</span> Back
             </button>
           ) : <div className="w-24" />}
 
-          {/* Continue/Submit button */}
           <button
-            onClick={() => step < totalSteps ? setStep(s => s + 1) : onSubmit(profile)}
+            type="button"
+            onClick={() => {
+              if (step < totalSteps) {
+                onNextStep();
+                return;
+              }
+
+              void onSubmit();
+            }}
             className="flex items-center gap-2 px-8 py-4 font-black rounded-2xl shadow-lg transition-all bg-yellow-400 text-purple-900 hover:-translate-y-1 hover:shadow-xl"
           >
             {step < totalSteps ? (

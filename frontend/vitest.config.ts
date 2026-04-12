@@ -10,6 +10,10 @@ export default defineConfig({
   resolve: {
     alias: [
       {
+        find: '@api',
+        replacement: `${__dirname}/client-api/index.ts`,
+      },
+      {
         find: /^@\//,
         replacement: `${__dirname}/`,
       },

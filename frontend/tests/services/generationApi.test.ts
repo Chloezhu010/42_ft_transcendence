@@ -1,10 +1,13 @@
+/**
+ * Tests for generation API streaming behavior.
+ */
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
   type GeneratedStoryScript,
   type KidProfileForGeneration,
   streamStoryScript,
-} from '@/services/generationApi';
+} from '@api';
 
 const PROFILE: KidProfileForGeneration = {
   name: 'Leo',

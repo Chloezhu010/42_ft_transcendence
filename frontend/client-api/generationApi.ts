@@ -1,5 +1,8 @@
-import { apiFetch, API_BASE } from '@/services/apiClient';
-import { imageSourceToPureBase64 } from '@/services/imageUtils';
+/**
+ * Typed client calls for AI generation endpoints.
+ */
+import { API_BASE, apiFetch } from './apiClient';
+import { imageSourceToPureBase64 } from '@/utils';
 
 export interface KidProfileForGeneration {
   name: string;

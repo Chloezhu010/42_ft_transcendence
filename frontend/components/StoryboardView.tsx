@@ -1,26 +1,30 @@
+/**
+ * Finished storybook UI.
+ * Keeps only local reading state and forwards edit requests to the page layer.
+ */
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import ComicPanel from '@/components/ComicPanel';
 import StorageImage from '@/components/StorageImage';
 import { SketchyButton } from '@/components/design-system/Primitives';
 import { Heading, Label, Text } from '@/components/design-system/Typography';
-import { ComicPanelData, KidProfile, Story } from '@/types';
+import type { ComicPanelData, KidProfile, Story } from '@/types';
 
 interface StoryboardViewProps {
   story: Story;
   profile: KidProfile | null;
-  updatePanel: (panel: ComicPanelData) => void | Promise<void>;
+  onEditPanelImage: (panel: ComicPanelData, editPrompt: string) => Promise<void> | void;
 }
 
-const StoryboardView: React.FC<StoryboardViewProps> = ({ story, profile, updatePanel }) => {
+const StoryboardView: React.FC<StoryboardViewProps> = ({ story, profile, onEditPanelImage }) => {
   const [currentPage, setCurrentPage] = useState(0);
 
   const panelCount = story.panels.length || 10;
   const spreadsNeeded = Math.ceil((panelCount + 2) / 2);
   const totalStates = 2 + spreadsNeeded;
 
-  const navigate = (dir: number) => {
-    setCurrentPage(previousPage => Math.max(0, Math.min(totalStates - 1, previousPage + dir)));
+  const navigate = (direction: number) => {
+    setCurrentPage((previousPage) => Math.max(0, Math.min(totalStates - 1, previousPage + direction)));
   };
 
   const pageLabel = currentPage === 0
@@ -95,15 +99,13 @@ const StoryboardView: React.FC<StoryboardViewProps> = ({ story, profile, updateP
                 {currentPage === 1 ? (
                   <div className="h-full flex flex-col justify-center p-12 md:p-16">
                     <Heading variant="h3" className="text-brand-primary mb-6 italic underline decoration-brand-accent decoration-4">Introduction</Heading>
-                    <Text className="text-brand-dark/80 italic border-l-4 border-brand-accent pl-6">"{story.foreword}"</Text>
+                    <Text className="text-brand-dark/80 italic border-l-4 border-brand-accent pl-6">&quot;{story.foreword}&quot;</Text>
                     <Label className="mt-8 text-brand-primary/50 text-[10px]">A WonderComic Original</Label>
                   </div>
                 ) : (
                   <ComicPanel
                     panel={story.panels[(currentPage - 1) * 2 - 1]}
-                    onUpdate={updatePanel}
-                    charDesc={story.characterDescription}
-                    profile={profile}
+                    onEditImage={(editPrompt) => onEditPanelImage(story.panels[(currentPage - 1) * 2 - 1], editPrompt)}
                   />
                 )}
               </div>
@@ -120,9 +122,7 @@ const StoryboardView: React.FC<StoryboardViewProps> = ({ story, profile, updateP
                 ) : (
                   <ComicPanel
                     panel={story.panels[(currentPage - 1) * 2]}
-                    onUpdate={updatePanel}
-                    charDesc={story.characterDescription}
-                    profile={profile}
+                    onEditImage={(editPrompt) => onEditPanelImage(story.panels[(currentPage - 1) * 2], editPrompt)}
                   />
                 )}
               </div>
@@ -137,7 +137,7 @@ const StoryboardView: React.FC<StoryboardViewProps> = ({ story, profile, updateP
                 <strong>{story.title}</strong> is ready to enjoy anytime in your library.
               </Text>
               <div className="mt-8 flex flex-col items-center gap-2">
-                <button onClick={() => navigate(-1)} className="text-brand-surface/60 font-bold uppercase text-[10px] tracking-widest hover:text-white transition-colors">Re-read Tale</button>
+                <button type="button" onClick={() => navigate(-1)} className="text-brand-surface/60 font-bold uppercase text-[10px] tracking-widest hover:text-white transition-colors">Re-read Tale</button>
                 <Link to="/gallery" className="text-brand-surface/40 font-bold uppercase text-[10px] tracking-widest hover:text-white transition-colors border-b border-brand-surface/20 pb-0.5">Back to Library</Link>
               </div>
               <div className="absolute right-0 top-0 bottom-0 w-4 bg-black/20" />
