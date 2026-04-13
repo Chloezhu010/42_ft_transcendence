@@ -187,35 +187,37 @@ def test_duplicate_request_after_deletion_is_allowed(client):
 def test_story_full_lifecycle(client):
     """
     A user creates a story, sees it in the list, fetches it by ID, then deletes it.
-    Note: stories.py does not require auth (no get_current_user dependency) —
-    this tests the raw CRUD layer end-to-end through the HTTP layer.
+    Stories routes require auth — sign up Alice and use her token throughout.
     """
+    _, alice_h = _signup(client, _ALICE)
+
     # Create
-    r = client.post("/api/stories", json=_STORY_PAYLOAD)
+    r = client.post("/api/stories", json=_STORY_PAYLOAD, headers=alice_h)
     assert r.status_code == 200, r.text
     story_id = r.json()["id"]
     assert r.json()["title"] == "Zara and the Dragon"
 
     # List — new story appears
-    listing = client.get("/api/stories").json()
+    listing = client.get("/api/stories", headers=alice_h).json()
     assert any(s["id"] == story_id for s in listing)
 
     # Get by ID
-    detail = client.get(f"/api/stories/{story_id}")
+    detail = client.get(f"/api/stories/{story_id}", headers=alice_h)
     assert detail.status_code == 200
     assert detail.json()["profile"]["name"] == "Zara"
 
     # Delete
-    r = client.delete(f"/api/stories/{story_id}")
+    r = client.delete(f"/api/stories/{story_id}", headers=alice_h)
     assert r.status_code == 204
 
     # Confirm gone
-    assert client.get(f"/api/stories/{story_id}").status_code == 404
-    assert all(s["id"] != story_id for s in client.get("/api/stories").json())
+    assert client.get(f"/api/stories/{story_id}", headers=alice_h).status_code == 404
+    assert all(s["id"] != story_id for s in client.get("/api/stories", headers=alice_h).json())
 
 
 def test_get_nonexistent_story_returns_404(client):
-    r = client.get("/api/stories/9999")
+    _, alice_h = _signup(client, _ALICE)
+    r = client.get("/api/stories/9999", headers=alice_h)
     assert r.status_code == 404
 
 

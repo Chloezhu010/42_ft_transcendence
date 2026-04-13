@@ -22,6 +22,7 @@ from models import (
 IMAGES_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "images")
 os.makedirs(IMAGES_DIR, exist_ok=True)
 
+
 # --- Helpers ---
 def save_base64_image(base64_data: str, prefix: str = "img") -> str | None:
     """Save base64 image to local images/ directory and return filename."""
@@ -205,12 +206,15 @@ async def get_story_by_id(db: aiosqlite.Connection, story_id: int, user_id: int)
 
 async def list_stories(db: aiosqlite.Connection, user_id: int) -> list[StoryListItem]:
     """Get all stories with summary info."""
-    cursor = await db.execute("""
+    cursor = await db.execute(
+        """
         SELECT id, title, cover_image_path, is_unlocked, created_at, kid_profile_id
         FROM stories
         WHERE user_id = ?
         ORDER BY created_at DESC
-    """, (user_id,))
+    """,
+        (user_id,),
+    )
     rows = await cursor.fetchall()
 
     results = []
@@ -248,7 +252,7 @@ async def delete_story(db: aiosqlite.Connection, story_id: int, user_id: int) ->
             image_paths.append(row["image_path"])
 
     # Delete from database (cascades to panels)
-    await db.execute("DELETE FROM stories WHERE id = ? AND user_id = ?", (story_id, user_id ))
+    await db.execute("DELETE FROM stories WHERE id = ? AND user_id = ?", (story_id, user_id))
     await db.commit()
 
     # Delete local image files
@@ -259,10 +263,7 @@ async def delete_story(db: aiosqlite.Connection, story_id: int, user_id: int) ->
 
 
 async def update_story_panels(
-    db: aiosqlite.Connection,
-    story_id: int, 
-    update: StoryUpdatePanels, 
-    user_id: int
+    db: aiosqlite.Connection, story_id: int, update: StoryUpdatePanels, user_id: int
 ) -> StoryResponse | None:
     """Update story and panel images."""
     cursor = await db.execute("SELECT id FROM stories WHERE id = ? AND user_id = ?", (story_id, user_id))
@@ -309,11 +310,7 @@ async def update_story_panels(
 
 
 async def update_panel_image(
-        db: aiosqlite.Connection,
-        story_id: int,
-        panel_order: int,
-        image_base64: str,
-        user_id: int
+    db: aiosqlite.Connection, story_id: int, panel_order: int, image_base64: str, user_id: int
 ) -> bool:
     """Update a single panel's image. Returns True if successful."""
     cursor = await db.execute(

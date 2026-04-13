@@ -21,9 +21,7 @@ router = APIRouter(prefix="/api", tags=["stories"])
 
 @router.post("/stories", response_model=StoryResponse)
 async def create_story(
-    story: StoryCreate,
-    db: aiosqlite.Connection = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
+    story: StoryCreate, db: aiosqlite.Connection = Depends(get_db), current_user: dict = Depends(get_current_user)
 ):
     """Create a new story with profile and panels."""
     result = await crud.create_story(db, story, current_user["id"])
@@ -33,19 +31,14 @@ async def create_story(
 
 
 @router.get("/stories", response_model=list[StoryListItem])
-async def list_stories(
-    db: aiosqlite.Connection = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
-):
+async def list_stories(db: aiosqlite.Connection = Depends(get_db), current_user: dict = Depends(get_current_user)):
     """Get all stories (summary view)."""
     return await crud.list_stories(db, current_user["id"])
 
 
 @router.get("/stories/{story_id}", response_model=StoryResponse)
 async def get_story(
-    story_id: int,
-    db: aiosqlite.Connection = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
+    story_id: int, db: aiosqlite.Connection = Depends(get_db), current_user: dict = Depends(get_current_user)
 ):
     """Get a single story with all its panels."""
     story = await crud.get_story_by_id(db, story_id, current_user["id"])
@@ -59,7 +52,7 @@ async def update_story(
     story_id: int,
     update: StoryUpdatePanels,
     db: aiosqlite.Connection = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user),
 ):
     """Update story panels."""
     result = await crud.update_story_panels(db, story_id, update, current_user["id"])
@@ -74,7 +67,7 @@ async def update_panel_image(
     panel_order: int,
     update: UpdatePanelImageRequest,
     db: aiosqlite.Connection = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user),
 ):
     """Update a single panel's image after editing."""
     success = await crud.update_panel_image(db, story_id, panel_order, update.image_base64, current_user["id"])
@@ -85,9 +78,7 @@ async def update_panel_image(
 
 @router.delete("/stories/{story_id}", status_code=204)
 async def delete_story(
-    story_id: int,
-    db: aiosqlite.Connection = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
+    story_id: int, db: aiosqlite.Connection = Depends(get_db), current_user: dict = Depends(get_current_user)
 ):
     """Delete a story and its panels."""
     deleted = await crud.delete_story(db, story_id, current_user["id"])
