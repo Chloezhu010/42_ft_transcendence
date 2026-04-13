@@ -198,12 +198,7 @@ def test_send_friend_request_creates_pending_row(client, alice, bob):
 
 
 def test_send_friend_request_returns_friend_response(client, alice, bob):
-    """
-    FAILS on current friend.py — see top-of-file NOTE.
-    The endpoint re-uses _to_friend_response on a friendships-only row
-    (no username / avatar_path / is_online). Once the CRUD returns a joined
-    row (or the router re-queries with a join), this passes.
-    """
+    """POST returns a fully-joined FriendResponse (username, status, is_requester)."""
     _, alice_h = alice
     bob_id, _ = bob
 
@@ -283,10 +278,7 @@ def test_accept_friend_request_moves_to_friends_list(client, alice, bob):
 
 
 def test_accept_friend_request_returns_friend_response(client, alice, bob):
-    """
-    FAILS on current friend.py — see top-of-file NOTE. Same bug as
-    test_send_friend_request_returns_friend_response.
-    """
+    """Accept returns a fully-joined FriendResponse reflecting the accepted state."""
     alice_id, alice_h = alice
     bob_id, bob_h = bob
 

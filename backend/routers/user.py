@@ -72,16 +72,21 @@ async def upload_avatar(file: UploadFile, current_user=Depends(get_current_user)
     ext = Path(file.filename).suffix if file.filename else ".jpg"
     relative_path = f"avatars/{current_user['id']}_{uuid.uuid4().hex}{ext}"  # store in DB
     dest = _IMAGE_DIR / relative_path  # actual file path
+    tmp = dest.with_suffix(".tmp")  # write to temp path first
 
-    # take the uploaded image from the http request, save it to disk
-    async with aiofiles.open(dest, "wb") as out:
-        size = 0
-        while chunk := await file.read(CHUNK):
-            size += len(chunk)
-            if size > MAX_SIZE:
-                dest.unlink(missing_ok=True)  # delete partial file
-                raise HTTPException(status_code=413, detail="File too large, must be under 5MB")
-            await out.write(chunk)
+    # stream upload into temp file, validate size before committing
+    try:
+        async with aiofiles.open(tmp, "wb") as out:
+            size = 0
+            while chunk := await file.read(CHUNK):
+                size += len(chunk)
+                if size > MAX_SIZE:
+                    raise HTTPException(status_code=413, detail="File too large, must be under 5MB")
+                await out.write(chunk)
+    except HTTPException:
+        tmp.unlink(missing_ok=True)  # handle is closed here — safe to delete on all platforms
+        raise
+    tmp.replace(dest)  # atomic rename: only happens if size check passed
 
     # update user's avatar_path in db
     updated_row = await update_avatar(db, current_user["id"], relative_path)

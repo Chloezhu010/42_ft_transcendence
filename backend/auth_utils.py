@@ -21,7 +21,7 @@ def _get_secret_key() -> str:
     return key
 
 
-security = HTTPBearer()  # for extracting the token from the Authorization header
+security = HTTPBearer(auto_error=False)  # auto_error=False to control the 401 response
 
 
 # --- Password helpers ---
@@ -53,7 +53,7 @@ def create_access_token(user_id: int) -> str:
 
 # --- get_current_user dependency ---
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),  # extract token from Authorization header
+    credentials: HTTPAuthorizationCredentials | None = Depends(security),  # None when Authorization header is absent
     db: aiosqlite.Connection = Depends(get_db),  # get database connection
 ):
     unauthorized = HTTPException(
@@ -61,6 +61,8 @@ async def get_current_user(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    if credentials is None:  # missing Authorization header — raise 401, not 403
+        raise unauthorized
     # decode the token and extract user ID
     try:
         payload = jwt.decode(credentials.credentials, _get_secret_key(), algorithms=[ALGORITHM])
