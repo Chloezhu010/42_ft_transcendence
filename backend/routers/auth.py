@@ -2,6 +2,7 @@
 Auth router (handle signup, login, logout)
 """
 from fastapi import APIRouter, Depends, HTTPException
+
 from auth_utils import (
     create_access_token,
     get_current_user,

@@ -21,7 +21,6 @@ from routers.auth import router as auth_router
 from routers.friend import router as friend_router
 from routers.stories import router as stories_router
 from routers.user import router as user_router
-
 from tests.conftest import _init_test_db, make_test_app
 
 # ---------------------------------------------------------------------------

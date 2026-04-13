@@ -19,7 +19,6 @@ from fastapi.testclient import TestClient
 import routers.user as user_module
 from routers.auth import router as auth_router
 from routers.user import router as user_router
-
 from tests.conftest import _init_test_db, make_test_app
 
 # ---------------------------------------------------------------------------

@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 from routers.auth import router
 from tests.conftest import _init_test_db, make_test_app
 
+
 # --- Fixtures ---
 @pytest.fixture
 def client(tmp_path):
