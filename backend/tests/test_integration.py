@@ -5,8 +5,9 @@ Each test exercises a realistic multi-step user flow that spans two or more
 routers. This catches bugs that per-router unit tests miss — e.g. a JWT minted
 by auth.py that user.py or friend.py silently rejects.
 
-Generation routes (Gemini) are NOT included here because they make real API
-calls.
+Generation routes (Gemini) are excluded from flow tests because they make real
+API calls. Auth-gating tests for generation routes are included — they return
+401 before any LLM call is made.
 
 Run:
     cd backend && uv run pytest tests/test_integration.py -v
@@ -19,6 +20,7 @@ from fastapi.testclient import TestClient
 
 from routers.auth import router as auth_router
 from routers.friend import router as friend_router
+from routers.generation import router as generation_router
 from routers.stories import router as stories_router
 from routers.user import router as user_router
 from tests.conftest import _init_test_db, make_test_app
@@ -44,13 +46,45 @@ _STORY_PAYLOAD = {
     "panels": [],
 }
 
+# Story payload with two panels — needed for PATCH panel image tests.
+_STORY_WITH_PANELS = {
+    "profile": {
+        "name": "Zara",
+        "gender": "girl",
+        "skin_tone": "medium",
+        "hair_color": "black",
+        "eye_color": "brown",
+        "favorite_color": "purple",
+    },
+    "title": "Zara and the Dragon",
+    "panels": [
+        {"panel_order": 0, "text": "Once upon a time..."},
+        {"panel_order": 1, "text": "The dragon roared."},
+    ],
+}
+
+# Minimal valid base64 PNG (1×1 white pixel) — used to exercise image-writing paths.
+_FAKE_IMAGE_B64 = (
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk"
+    "+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+)
+
 
 @pytest.fixture
 def client(tmp_path):
-    """All four non-generation routers, fresh DB per test."""
+    """All non-generation routers, fresh DB per test."""
     db_path = str(tmp_path / "test.db")
     asyncio.run(_init_test_db(db_path))
     with TestClient(make_test_app(db_path, auth_router, user_router, friend_router, stories_router)) as c:
+        yield c
+
+
+@pytest.fixture
+def gen_client(tmp_path):
+    """Auth + generation routers only. Used for auth-gate tests that must not hit Gemini."""
+    db_path = str(tmp_path / "test.db")
+    asyncio.run(_init_test_db(db_path))
+    with TestClient(make_test_app(db_path, auth_router, generation_router)) as c:
         yield c
 
 
@@ -234,6 +268,13 @@ def test_get_nonexistent_story_returns_404(client):
         ("GET", "/api/friends/"),
         ("GET", "/api/friends/pending"),
         ("POST", "/api/auth/logout"),
+        # Story routes
+        ("GET", "/api/stories"),
+        ("POST", "/api/stories"),
+        ("GET", "/api/stories/1"),
+        ("PATCH", "/api/stories/1"),
+        ("DELETE", "/api/stories/1"),
+        ("PATCH", "/api/stories/1/panels/0"),
     ],
 )
 def test_protected_routes_reject_no_token(client, method, path):
@@ -247,6 +288,8 @@ def test_protected_routes_reject_no_token(client, method, path):
     [
         ("GET", "/api/users/me"),
         ("GET", "/api/friends/"),
+        ("GET", "/api/stories"),
+        ("GET", "/api/stories/1"),
     ],
 )
 def test_protected_routes_reject_bad_token(client, method, path):
@@ -323,3 +366,161 @@ def test_friends_list_scoped_to_current_user(client):
     usernames = [f["username"] for f in alice_friends]
     assert "bob" in usernames
     assert "charlie" not in usernames
+
+
+# ---------------------------------------------------------------------------
+# Flow 7: Story PATCH endpoints
+# ---------------------------------------------------------------------------
+
+
+def test_patch_story_updates_is_unlocked(client):
+    """PATCH /api/stories/{id} can flip is_unlocked and returns the updated story."""
+    _, alice_h = _signup(client, _ALICE)
+
+    story_id = client.post("/api/stories", json=_STORY_PAYLOAD, headers=alice_h).json()["id"]
+
+    r = client.patch(
+        f"/api/stories/{story_id}",
+        json={"is_unlocked": False, "panels": []},
+        headers=alice_h,
+    )
+    assert r.status_code == 200, r.text
+    assert r.json()["is_unlocked"] is False
+
+    # Flip back
+    r2 = client.patch(
+        f"/api/stories/{story_id}",
+        json={"is_unlocked": True, "panels": []},
+        headers=alice_h,
+    )
+    assert r2.status_code == 200
+    assert r2.json()["is_unlocked"] is True
+
+
+def test_patch_story_nonexistent_returns_404(client):
+    """PATCH on a story ID that doesn't exist must return 404."""
+    _, alice_h = _signup(client, _ALICE)
+    r = client.patch("/api/stories/9999", json={"is_unlocked": True, "panels": []}, headers=alice_h)
+    assert r.status_code == 404
+
+
+def test_patch_panel_image_updates_panel(client):
+    """PATCH /api/stories/{id}/panels/{order} saves a new image and returns 204."""
+    _, alice_h = _signup(client, _ALICE)
+
+    story_id = client.post("/api/stories", json=_STORY_WITH_PANELS, headers=alice_h).json()["id"]
+
+    r = client.patch(
+        f"/api/stories/{story_id}/panels/0",
+        json={"image_base64": _FAKE_IMAGE_B64},
+        headers=alice_h,
+    )
+    assert r.status_code == 204
+
+
+def test_patch_panel_image_nonexistent_panel_returns_404(client):
+    """PATCH on a panel_order that doesn't exist in the story must return 404."""
+    _, alice_h = _signup(client, _ALICE)
+
+    story_id = client.post("/api/stories", json=_STORY_WITH_PANELS, headers=alice_h).json()["id"]
+
+    r = client.patch(
+        f"/api/stories/{story_id}/panels/99",  # panel_order=99 does not exist
+        json={"image_base64": _FAKE_IMAGE_B64},
+        headers=alice_h,
+    )
+    assert r.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# Flow 8: Story cross-user isolation
+# ---------------------------------------------------------------------------
+
+
+def test_story_list_scoped_to_current_user(client):
+    """GET /api/stories returns only the authenticated user's stories."""
+    _, alice_h = _signup(client, _ALICE)
+    _, bob_h = _signup(client, _BOB)
+
+    client.post("/api/stories", json=_STORY_PAYLOAD, headers=alice_h)
+
+    # Bob's list must be empty — he cannot see Alice's story
+    bob_stories = client.get("/api/stories", headers=bob_h).json()
+    assert bob_stories == []
+
+
+def test_cannot_get_another_users_story(client):
+    """GET /api/stories/{id} returns 404 when the story belongs to a different user."""
+    _, alice_h = _signup(client, _ALICE)
+    _, bob_h = _signup(client, _BOB)
+
+    story_id = client.post("/api/stories", json=_STORY_PAYLOAD, headers=alice_h).json()["id"]
+
+    r = client.get(f"/api/stories/{story_id}", headers=bob_h)
+    assert r.status_code == 404
+
+
+def test_cannot_patch_another_users_story(client):
+    """PATCH /api/stories/{id} returns 404 when the story belongs to a different user."""
+    _, alice_h = _signup(client, _ALICE)
+    _, bob_h = _signup(client, _BOB)
+
+    story_id = client.post("/api/stories", json=_STORY_PAYLOAD, headers=alice_h).json()["id"]
+
+    r = client.patch(
+        f"/api/stories/{story_id}",
+        json={"is_unlocked": False, "panels": []},
+        headers=bob_h,
+    )
+    assert r.status_code == 404
+
+
+def test_cannot_delete_another_users_story(client):
+    """DELETE /api/stories/{id} returns 404 when the story belongs to a different user."""
+    _, alice_h = _signup(client, _ALICE)
+    _, bob_h = _signup(client, _BOB)
+
+    story_id = client.post("/api/stories", json=_STORY_PAYLOAD, headers=alice_h).json()["id"]
+
+    r = client.delete(f"/api/stories/{story_id}", headers=bob_h)
+    assert r.status_code == 404
+
+    # Alice's story must still exist
+    assert client.get(f"/api/stories/{story_id}", headers=alice_h).status_code == 200
+
+
+# ---------------------------------------------------------------------------
+# Flow 9: Generation routes — auth gating (no Gemini calls made)
+# ---------------------------------------------------------------------------
+# get_current_user runs before any handler logic, so a missing token returns
+# 401 without touching the LLM at all.
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "/api/stories/generate",
+        "/api/generate/story-script",
+        "/api/generate/panel-image",
+        "/api/generate/edit-image",
+    ],
+)
+def test_generation_routes_reject_no_token(gen_client, path):
+    """All generation endpoints must return 401 with no Authorization header."""
+    r = gen_client.post(path)
+    assert r.status_code == 401
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "/api/stories/generate",
+        "/api/generate/story-script",
+        "/api/generate/panel-image",
+        "/api/generate/edit-image",
+    ],
+)
+def test_generation_routes_reject_bad_token(gen_client, path):
+    """All generation endpoints must return 401 with a garbage token."""
+    r = gen_client.post(path, headers={"Authorization": "Bearer not.a.real.token"})
+    assert r.status_code == 401
