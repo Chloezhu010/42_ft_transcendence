@@ -1,6 +1,7 @@
 """
 Gemini API service for story and image generation.
 """
+
 import asyncio
 import base64
 import os
@@ -25,8 +26,7 @@ ART_STYLES = {
     "Digital Pop": "Vibrant modern digital vector art with clean lines, flat bold colors, high contrast.",
 }
 DEFAULT_STYLE = (
-    "Bold black ink outlines, vibrant flat colors, clean cel-shading. "
-    "No 3D, no gradients, no text in images."
+    "Bold black ink outlines, vibrant flat colors, clean cel-shading. No 3D, no gradients, no text in images."
 )
 
 
@@ -51,10 +51,10 @@ def extract_image_from_response(response) -> str:
 
     for part in response.candidates[0].content.parts:
         if part.inline_data:
-            return base64.b64encode(part.inline_data.data).decode('utf-8')
+            return base64.b64encode(part.inline_data.data).decode("utf-8")
 
     # Log the text response if no image was generated
-    text_parts = [p.text for p in response.candidates[0].content.parts if hasattr(p, 'text') and p.text]
+    text_parts = [p.text for p in response.candidates[0].content.parts if hasattr(p, "text") and p.text]
     if text_parts:
         print(f"Gemini returned text instead of image: {text_parts}")
         raise ValueError(f"No image generated. Model response: {text_parts[0][:200]}")
@@ -74,7 +74,7 @@ async def with_retry(fn, max_retries: int = 3, base_delay: float = 2.0):
             is_rate_limit = "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg
             is_server_error = "503" in error_msg or "UNAVAILABLE" in error_msg or "overloaded" in error_msg.lower()
             if (is_rate_limit or is_server_error) and i < max_retries - 1:
-                delay = base_delay * (2 ** i) + random.random()
+                delay = base_delay * (2**i) + random.random()
                 error_type = "Rate limit" if is_rate_limit else "Server overloaded"
                 print(f"{error_type}. Retrying in {delay:.1f}s... (Attempt {i + 1}/{max_retries})")
                 await asyncio.sleep(delay)
@@ -101,16 +101,13 @@ async def generate_story_script(
         if photo_base64:
             hero_desc = f"The child in the attached photo ({gender})"
         else:
-            hero_desc = (
-                f"A {gender} child with {skin_tone} skin, "
-                f"{hair_color} hair, {eye_color} eyes"
-            )
+            hero_desc = f"A {gender} child with {skin_tone} skin, {hair_color} hair, {eye_color} eyes"
         theme = f"{archetype or 'adventure'} adventure about {dream or 'discovering something amazing'}"
 
         prompt = f"""Create a 10-panel children's comic story. Simple vocabulary, 6-10 words per panel.
 
 HERO: {hero_desc}, depicted as a 5-6 year old. Do NOT age up.
-THEME: {theme}. Favorite color: {favorite_color}. Art style: {art_style or 'classic comic'}.
+THEME: {theme}. Favorite color: {favorite_color}. Art style: {art_style or "classic comic"}.
 STRUCTURE: Panels 1-3 setup, 4-7 conflict, 8-10 resolution.
 
 In characterDescription, describe the hero + a companion with physical traits and outfits for visual consistency.

@@ -1,70 +1,186 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
-  generateAndSaveStory,
-  updatePanelImage,
-  StoryDetailResponse,
-} from '../services/backendApi';
+  generatePanelImage,
+  generateStoryScript,
+  KidProfileForGeneration,
+} from '../services/generationApi';
+import { imageSourceToPureBase64 } from '../services/imageUtils';
+import { getStory, saveStory, updatePanelImage, updateStory } from '../services/storyApi';
+import { mapApiStoryToStory, mapKidProfileToGenerationProfile } from '../services/storyMappers';
 import { KidProfile, Story, ComicPanelData } from '../types';
 
-function mapApiStory(data: StoryDetailResponse): Story {
-  return {
-    title: data.title || '',
-    foreword: data.foreword || '',
-    characterDescription: data.character_description || '',
-    coverImagePrompt: data.cover_image_prompt || '',
-    coverImageUrl: data.cover_image_url || undefined,
-    panels: data.panels.map(p => ({
-      id: String(p.id),
-      text: p.text,
-      imagePrompt: p.image_prompt || '',
-      imageUrl: p.image_url || undefined,
-      isGenerating: false,
-    })),
-  };
+interface PendingGeneration {
+  profileForApi: KidProfileForGeneration;
+  previewStory: Story;
+  previewStoryId: number;
 }
 
 export const useStoryGenerator = () => {
   const [story, setStory] = useState<Story | null>(null);
   const [savedStoryId, setSavedStoryId] = useState<number | null>(null);
+  const [pendingGeneration, setPendingGeneration] = useState<PendingGeneration | null>(null);
 
-  const generateStory = async (p: KidProfile) => {
-    // Convert camelCase to snake_case for API
-    const profileForApi = {
-      name: p.name,
-      gender: p.gender,
-      skin_tone: p.skinTone,
-      hair_color: p.hairColor,
-      eye_color: p.eyeColor,
-      favorite_color: p.favoriteColor,
-      dream: p.dream,
-      archetype: p.archetype,
-      art_style: p.artStyle,
-      photo_base64: p.photoUrl?.startsWith('data:')
-        ? p.photoUrl.split(',')[1]
-        : undefined,
+  const generateStoryPreview = async (p: KidProfile) => {
+    const profileForApi = mapKidProfileToGenerationProfile(p);
+    const script = await generateStoryScript(profileForApi);
+
+    if (!script.panels.length) {
+      throw new Error('Story generation failed: no panels returned.');
+    }
+
+    const lastPanelIndex = script.panels.length - 1;
+    const [firstImage, lastImage] = await Promise.all([
+      generatePanelImage(
+        script.panels[0].imagePrompt,
+        script.characterDescription,
+        profileForApi.art_style
+      ),
+      generatePanelImage(
+        script.panels[lastPanelIndex].imagePrompt,
+        script.characterDescription,
+        profileForApi.art_style
+      ),
+    ]);
+
+    const previewStory: Story = {
+      title: script.title,
+      foreword: script.foreword,
+      characterDescription: script.characterDescription,
+      coverImagePrompt: script.coverImagePrompt,
+      panels: script.panels.map((panel, index) => ({
+        id: panel.id || String(index + 1),
+        text: panel.text,
+        imagePrompt: panel.imagePrompt,
+        imageUrl: index === 0 ? firstImage : index === lastPanelIndex ? lastImage : undefined,
+        isGenerating: false,
+      })),
     };
 
-    // Single API call: generate script + generate images + save to DB
-    const result = await generateAndSaveStory(profileForApi);
+    const previewPanels = await Promise.all(previewStory.panels.map(async (panel, index) => ({
+      panel_order: index,
+      text: panel.text,
+      image_prompt: panel.imagePrompt,
+      image_base64: panel.imageUrl ? await imageSourceToPureBase64(panel.imageUrl) : undefined,
+    })));
 
-    setSavedStoryId(result.story.id);
-    setStory(mapApiStory(result.story));
+    const previewStoryId = await saveStory({
+      profile: {
+        name: profileForApi.name,
+        gender: profileForApi.gender,
+        skin_tone: profileForApi.skin_tone,
+        hair_color: profileForApi.hair_color,
+        eye_color: profileForApi.eye_color,
+        favorite_color: profileForApi.favorite_color,
+        dream: profileForApi.dream,
+        archetype: profileForApi.archetype,
+      },
+      title: previewStory.title,
+      foreword: previewStory.foreword,
+      character_description: previewStory.characterDescription,
+      cover_image_prompt: previewStory.coverImagePrompt,
+      panels: previewPanels,
+    });
+
+    setSavedStoryId(previewStoryId);
+    setPendingGeneration({ profileForApi, previewStory, previewStoryId });
+    setStory(previewStory);
   };
+
+  const generateFullStoryFromPreview = async () => {
+    if (!pendingGeneration) {
+      throw new Error('No preview is available. Please generate a preview first.');
+    }
+
+    const { profileForApi, previewStory, previewStoryId } = pendingGeneration;
+    const lastPanelIndex = previewStory.panels.length - 1;
+
+    const coverImagePromise = generatePanelImage(
+      previewStory.coverImagePrompt,
+      previewStory.characterDescription,
+      profileForApi.art_style
+    );
+    const panelImagePromises = previewStory.panels.map(async (panel, index) => {
+      if (index === 0 || index === lastPanelIndex) {
+        if (!panel.imageUrl) {
+          throw new Error('Preview images are missing. Please regenerate the preview.');
+        }
+        return imageSourceToPureBase64(panel.imageUrl);
+      }
+      const generatedImage = await generatePanelImage(
+        panel.imagePrompt,
+        previewStory.characterDescription,
+        profileForApi.art_style
+      );
+      return imageSourceToPureBase64(generatedImage);
+    });
+
+    const [coverImage, panelImageBase64List] = await Promise.all([
+      coverImagePromise,
+      Promise.all(panelImagePromises),
+    ]);
+    const coverImageBase64 = await imageSourceToPureBase64(coverImage);
+
+    await updateStory(previewStoryId, {
+      is_unlocked: true,
+      cover_image_base64: coverImageBase64,
+      panels: previewStory.panels.map((panel, index) => ({
+        panel_order: index,
+        text: panel.text,
+        image_prompt: panel.imagePrompt,
+        image_base64: panelImageBase64List[index],
+      })),
+    });
+
+    const savedStory = await getStory(previewStoryId);
+    setSavedStoryId(previewStoryId);
+    setStory(mapApiStoryToStory(savedStory));
+    setPendingGeneration(null);
+  };
+
+  const restorePendingPreview = useCallback((storyId: number, storyFromDb: Story, profile: KidProfile) => {
+    const profileForApi = mapKidProfileToGenerationProfile(profile);
+    setSavedStoryId(storyId);
+    setStory(storyFromDb);
+    setPendingGeneration({
+      profileForApi,
+      previewStory: storyFromDb,
+      previewStoryId: storyId,
+    });
+  }, []);
+
+  const clearPendingPreview = useCallback(() => {
+    setPendingGeneration(null);
+  }, []);
 
   const updatePanel = async (updated: ComicPanelData) => {
     if (!story) return;
 
     const panelOrder = story.panels.findIndex(p => p.id === updated.id);
 
-    setStory({
-      ...story,
-      panels: story.panels.map(p => p.id === updated.id ? updated : p)
+    setStory(previousStory => {
+      if (!previousStory) return previousStory;
+      return {
+        ...previousStory,
+        panels: previousStory.panels.map(panel =>
+          panel.id === updated.id ? updated : panel
+        ),
+      };
+    });
+
+    setPendingGeneration(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        previewStory: {
+          ...prev.previewStory,
+          panels: prev.previewStory.panels.map(p => p.id === updated.id ? updated : p),
+        },
+      };
     });
 
     if (savedStoryId && panelOrder !== -1 && updated.imageUrl) {
       try {
         await updatePanelImage(savedStoryId, panelOrder, updated.imageUrl);
-        console.log(`Panel ${panelOrder} saved to backend`);
       } catch (err) {
         console.error('Failed to save panel edit:', err);
       }
@@ -76,7 +192,11 @@ export const useStoryGenerator = () => {
     setStory,
     savedStoryId,
     setSavedStoryId,
-    generateStory,
+    generateStoryPreview,
+    generateFullStoryFromPreview,
+    restorePendingPreview,
+    clearPendingPreview,
+    hasPendingPreview: Boolean(pendingGeneration),
     updatePanel,
   };
 };

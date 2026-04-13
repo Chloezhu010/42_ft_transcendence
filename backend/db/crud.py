@@ -1,6 +1,7 @@
 """
 CRUD operations for database entities (async SQLite).
 """
+
 import base64
 import os
 import uuid
@@ -25,7 +26,6 @@ USER_ID = 1
 
 
 # --- Helpers ---
-
 def save_base64_image(base64_data: str, prefix: str = "img") -> str | None:
     """Save base64 image to local images/ directory and return filename."""
     if not base64_data:
@@ -60,18 +60,26 @@ def delete_local_image(filename: str | None) -> None:
 
 
 # --- Kid Profile CRUD ---
-
 async def create_kid_profile(db: aiosqlite.Connection, profile: KidProfileCreate) -> int:
     """Create a kid profile and return its ID."""
-    cursor = await db.execute("""
+    cursor = await db.execute(
+        """
         INSERT INTO kid_profiles (
             name, gender, skin_tone, hair_color, eye_color,
             favorite_color, dream, archetype, user_id
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """,
-        (profile.name, profile.gender, profile.skin_tone, profile.hair_color,
-         profile.eye_color, profile.favorite_color, profile.dream,
-         profile.archetype, USER_ID),
+        (
+            profile.name,
+            profile.gender,
+            profile.skin_tone,
+            profile.hair_color,
+            profile.eye_color,
+            profile.favorite_color,
+            profile.dream,
+            profile.archetype,
+            USER_ID,
+        ),
     )
     await db.commit()
     return cursor.lastrowid
@@ -98,7 +106,6 @@ async def get_kid_profile(db: aiosqlite.Connection, profile_id: int) -> KidProfi
 
 
 # --- Panel CRUD ---
-
 async def create_panels(db: aiosqlite.Connection, story_id: int, panels: list[PanelCreate]) -> None:
     """Create panels for a story."""
     for panel in panels:
@@ -106,18 +113,24 @@ async def create_panels(db: aiosqlite.Connection, story_id: int, panels: list[Pa
         if panel.image_base64:
             panel_filename = save_base64_image(panel.image_base64, f"panel_{story_id}")
 
-        await db.execute("""
+        await db.execute(
+            """
             INSERT INTO panels (story_id, panel_order, text, image_prompt, image_path)
             VALUES (?, ?, ?, ?, ?)
-        """, (story_id, panel.panel_order, panel.text, panel.image_prompt, panel_filename))
+        """,
+            (story_id, panel.panel_order, panel.text, panel.image_prompt, panel_filename),
+        )
     await db.commit()
 
 
 async def get_panels_for_story(db: aiosqlite.Connection, story_id: int) -> list[PanelResponse]:
     """Get all panels for a story."""
-    cursor = await db.execute("""
+    cursor = await db.execute(
+        """
         SELECT * FROM panels WHERE story_id = ? ORDER BY panel_order
-    """, (story_id,))
+    """,
+        (story_id,),
+    )
     rows = await cursor.fetchall()
 
     return [
@@ -133,7 +146,6 @@ async def get_panels_for_story(db: aiosqlite.Connection, story_id: int) -> list[
 
 
 # --- Story CRUD ---
-
 async def create_story(db: aiosqlite.Connection, story: StoryCreate) -> StoryResponse:
     """Create a story with profile and panels."""
     profile_id = await create_kid_profile(db, story.profile)
@@ -142,14 +154,22 @@ async def create_story(db: aiosqlite.Connection, story: StoryCreate) -> StoryRes
     if story.cover_image_base64:
         cover_filename = save_base64_image(story.cover_image_base64, "cover")
 
-    cursor = await db.execute("""
+    cursor = await db.execute(
+        """
         INSERT INTO stories (
             kid_profile_id, title, foreword, character_description,
             cover_image_prompt, cover_image_path, user_id
         ) VALUES (?, ?, ?, ?, ?, ?, ?)
     """,
-        (profile_id, story.title, story.foreword, story.character_description,
-         story.cover_image_prompt, cover_filename, USER_ID),
+        (
+            profile_id,
+            story.title,
+            story.foreword,
+            story.character_description,
+            story.cover_image_prompt,
+            cover_filename,
+            USER_ID,
+        ),
     )
     await db.commit()
 
@@ -198,29 +218,27 @@ async def list_stories(db: aiosqlite.Connection) -> list[StoryListItem]:
     results = []
     for row in rows:
         profile = await get_kid_profile(db, row["kid_profile_id"])
-        results.append(StoryListItem(
-            id=row["id"],
-            title=row["title"],
-            cover_image_url=row["cover_image_path"],
-            is_unlocked=bool(row["is_unlocked"]),
-            created_at=row["created_at"],
-            profile=profile,
-        ))
+        results.append(
+            StoryListItem(
+                id=row["id"],
+                title=row["title"],
+                cover_image_url=row["cover_image_path"],
+                is_unlocked=bool(row["is_unlocked"]),
+                created_at=row["created_at"],
+                profile=profile,
+            )
+        )
     return results
 
 
 async def delete_story(db: aiosqlite.Connection, story_id: int) -> bool:
     """Delete a story and its associated images. Returns True if deleted."""
-    cursor = await db.execute(
-        "SELECT cover_image_path FROM stories WHERE id = ?", (story_id,)
-    )
+    cursor = await db.execute("SELECT cover_image_path FROM stories WHERE id = ?", (story_id,))
     story_row = await cursor.fetchone()
     if not story_row:
         return False
 
-    panel_cursor = await db.execute(
-        "SELECT image_path FROM panels WHERE story_id = ?", (story_id,)
-    )
+    panel_cursor = await db.execute("SELECT image_path FROM panels WHERE story_id = ?", (story_id,))
     panel_rows = await panel_cursor.fetchall()
 
     # Collect all image paths for deletion
@@ -251,59 +269,75 @@ async def update_story_panels(
     if not row:
         return None
 
-    await db.execute("""
+    await db.execute(
+        """
         UPDATE stories
         SET is_unlocked = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
-    """, (update.is_unlocked, story_id))
+    """,
+        (update.is_unlocked, story_id),
+    )
 
     # Update cover image if provided
     if update.cover_image_base64:
         cover_filename = save_base64_image(update.cover_image_base64, "cover")
         if cover_filename:
-            await db.execute("""
+            await db.execute(
+                """
                 UPDATE stories SET cover_image_path = ?, updated_at = CURRENT_TIMESTAMP
                 WHERE id = ?
-            """, (cover_filename, story_id))
+            """,
+                (cover_filename, story_id),
+            )
 
     # Update panel images
     for panel in update.panels:
         if panel.image_base64:
             panel_filename = save_base64_image(panel.image_base64, f"panel_{story_id}")
-            await db.execute("""
+            await db.execute(
+                """
                 UPDATE panels
                 SET image_path = ?
                 WHERE story_id = ? AND panel_order = ?
-            """, (panel_filename, story_id, panel.panel_order))
+            """,
+                (panel_filename, story_id, panel.panel_order),
+            )
 
     await db.commit()
     return await get_story_by_id(db, story_id)
 
 
-async def update_panel_image(
-    db: aiosqlite.Connection, story_id: int, panel_order: int, image_base64: str
-) -> bool:
+async def update_panel_image(db: aiosqlite.Connection, story_id: int, panel_order: int, image_base64: str) -> bool:
     """Update a single panel's image. Returns True if successful."""
-    cursor = await db.execute("""
+    cursor = await db.execute(
+        """
         SELECT p.id FROM panels p
         WHERE p.story_id = ? AND p.panel_order = ?
-    """, (story_id, panel_order))
+    """,
+        (story_id, panel_order),
+    )
     row = await cursor.fetchone()
     if not row:
         return False
 
     panel_filename = save_base64_image(image_base64, f"panel_{story_id}")
-    await db.execute("""
+    await db.execute(
+        """
         UPDATE panels
         SET image_path = ?
         WHERE story_id = ? AND panel_order = ?
-    """, (panel_filename, story_id, panel_order))
+    """,
+        (panel_filename, story_id, panel_order),
+    )
 
-    await db.execute("""
+    await db.execute(
+        """
         UPDATE stories
         SET updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
-    """, (story_id,))
+    """,
+        (story_id,),
+    )
 
     await db.commit()
     return True

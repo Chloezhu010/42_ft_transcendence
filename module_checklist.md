@@ -23,7 +23,7 @@
 | 8 | AI | LLM system interface (Gemini story + image generation) | Major | 2 | ⚠️ Partial | Low | Core generation works; **add streaming responses** — subject explicitly requires it |
 | 9 | AI | Voice / speech integration | Minor | 1 | ❌ Not started | Low | TTS reading comic panels aloud fits naturally for a children's app; Web Speech API is built into Chrome (no extra library) |
 | 10 | DevOps | Prometheus + Grafana monitoring | Major | 2 | ❌ Not started | Medium | `prometheus-fastapi-instrumentator` gives FastAPI metrics in ~5 lines; add Prometheus + Grafana to Docker Compose |
-| 11 | DevOps | Backend as microservices | Major | 2 | ❌ Not started | ⚠️ High | Full architectural rewrite — split monolith into auth-service / story-service / ai-service; significant inter-service communication work |
+| 11 | DevOps | Backend as microservices | Major | 2 | 🚫 Dropped | ⚠️ High | Full architectural rewrite — split monolith into auth-service / story-service / ai-service; significant inter-service communication work |
 | 12 | DevOps | Health check + status page + automated backups | Minor | 1 | ⚠️ Partial | Low | `GET /health` exists; add status UI page + SQLite backup cron + recovery docs |
 
 ### Point Breakdown
@@ -34,11 +34,11 @@
 | Accessibility | Multi-language | 1 |
 | User Management | Standard auth + OAuth + User activity analytics | 4 |
 | AI | LLM interface + Voice/speech | 3 |
-| DevOps | Prometheus/Grafana + Microservices + Health check | 5 |
-| **Total proposed** | | **19** |
+| DevOps | Prometheus/Grafana + Health check | 3 |
+| **Total proposed** | | **17** |
 
 | **Minimum required** | | **14** |
-| **Buffer** | Protects against 1 Major + 1 Minor, or 5 Minors being rejected | **+5** |
+| **Buffer** | Protects against 1 Major + 2 Minors being rejected | **+3** |
 
 ### Dependencies & Implementation Order
 
@@ -50,7 +50,7 @@ Microservices (#11)      ──► do last — highest risk, can drop if time is
 ```
 
 ### Risk Note — Backend as Microservices (#11)
-This is the only high-risk module in the list. It requires splitting the entire FastAPI backend into separate services (auth, story/panel, AI/Gemini), each with its own Docker container and inter-service HTTP communication. If the team runs short on time, **drop this module** — the 4pt buffer means you still reach 16pts without it, comfortably above the 14pt minimum.
+**Dropped** — team decision. The 17pt total still sits 3pts above the 14pt minimum, providing sufficient buffer.
 
 ## Coverage Key
 
@@ -155,7 +155,7 @@ This is the only high-risk module in the list. It requires splitting the entire 
 |--------|------|-----|--------|-------------|------------------------|
 | ELK stack (Elasticsearch + Logstash + Kibana) | Major | 2 | ❌ | Nothing | Full ELK Docker Compose setup |
 | Prometheus + Grafana monitoring | Major | 2 | ❌ | Nothing | Prometheus exporters + Grafana dashboards |
-| Backend as microservices | Major | 2 | ❌ | Single FastAPI monolith | Split into separate services with API/queue communication |
+| Backend as microservices | Major | 2 | 🚫 Dropped | — | Team decision — dropped |
 | Health check + status page + automated backups | Minor | 1 | ⚠️ | `GET /health` endpoint in `main.py` (checks DB) | Add a visible status page in the UI; add automated backup script; add disaster recovery docs |
 
 ---
@@ -195,9 +195,9 @@ This is the only high-risk module in the list. It requires splitting the entire 
 | ✅ Done | Frameworks (Web) | 2 |
 | ⚠️ Partial — low effort to complete | Public API, Notification system, Design system, LLM interface, Health check | 7 |
 | ❌ Not started — medium effort | Standard user management, OAuth, User activity analytics, Multi-language, Prometheus + Grafana | 7 |
-| ❌ Not started — high effort | Backend as microservices | 2 |
+| 🚫 Dropped | Backend as microservices | — |
 | ❌ Not started — low effort | Voice/speech | 1 |
-| **Total proposed** | | **18** |
+| **Total proposed** | | **17** |
 
 | Symbol | Meaning |
 |--------|---------|
