@@ -57,8 +57,8 @@ app.mount("/images", StaticFiles(directory=str(images_dir)), name="images")
 app.include_router(auth.router)
 app.include_router(user.router)
 app.include_router(friend.router)
-app.include_router(stories.router)
 app.include_router(generation.router)
+app.include_router(stories.router)
 
 # Expose /metrics endpoint for Prometheus scraping
 # Exclude internal endpoints to avoid noise in dashboards
