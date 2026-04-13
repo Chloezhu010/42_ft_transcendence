@@ -24,7 +24,7 @@ services:
       - backend
 
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v3.3.0
     ports:
       - "9090:9090"
     volumes:
@@ -34,7 +34,7 @@ services:
       - backend
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:11.6.1
     ports:
       - "3001:3000"
     environment:
