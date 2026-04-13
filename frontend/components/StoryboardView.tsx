@@ -2,7 +2,7 @@
  * Finished storybook UI.
  * Keeps only local reading state and forwards edit requests to the page layer.
  */
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import ComicPanel from '@/components/ComicPanel';
 import StorageImage from '@/components/StorageImage';
@@ -16,7 +16,19 @@ interface StoryboardViewProps {
   onEditPanelImage: (panel: ComicPanelData, editPrompt: string) => Promise<void> | void;
 }
 
-const StoryboardView: React.FC<StoryboardViewProps> = ({ story, profile, onEditPanelImage }) => {
+function getPageLabel(currentPage: number, totalStates: number): string {
+  if (currentPage === 0) {
+    return 'Front Cover';
+  }
+
+  if (currentPage === totalStates - 1) {
+    return 'Back Cover';
+  }
+
+  return `Spread ${currentPage}`;
+}
+
+function StoryboardView({ story, profile, onEditPanelImage }: StoryboardViewProps): JSX.Element {
   const [currentPage, setCurrentPage] = useState(0);
 
   const panelCount = story.panels.length || 10;
@@ -27,11 +39,7 @@ const StoryboardView: React.FC<StoryboardViewProps> = ({ story, profile, onEditP
     setCurrentPage((previousPage) => Math.max(0, Math.min(totalStates - 1, previousPage + direction)));
   };
 
-  const pageLabel = currentPage === 0
-    ? 'Front Cover'
-    : currentPage === totalStates - 1
-      ? 'Back Cover'
-      : `Spread ${currentPage}`;
+  const pageLabel = getPageLabel(currentPage, totalStates);
 
   return (
     <div className="flex-1 flex flex-col animate-in fade-in duration-700 h-[calc(100vh-140px)] relative">
@@ -160,6 +168,6 @@ const StoryboardView: React.FC<StoryboardViewProps> = ({ story, profile, onEditP
       </div>
     </div>
   );
-};
+}
 
 export default StoryboardView;

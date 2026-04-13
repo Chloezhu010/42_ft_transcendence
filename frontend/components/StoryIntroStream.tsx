@@ -1,7 +1,6 @@
-import React from 'react';
 import { Heading, Label, Text } from '@/components/design-system/Typography';
 
-interface Props {
+interface StoryIntroStreamProps {
   /** Title text that has streamed in so far. */
   title: string;
   /** Foreword text that has streamed in so far. */
@@ -12,24 +11,38 @@ interface Props {
   isPreparingPreview: boolean;
 }
 
-const Caret: React.FC = () => (
-  <span
-    aria-hidden="true"
-    className="inline-block w-[0.12em] h-[0.9em] align-[-0.1em] ml-1 bg-brand-primary animate-[intro-caret_1s_steps(2,end)_infinite]"
-  />
-);
+function getStreamStatusLabel(isStreaming: boolean, isPreparingPreview: boolean): string {
+  if (isStreaming) {
+    return 'Drafting';
+  }
 
-const StoryIntroStream: React.FC<Props> = ({ title, foreword, isStreaming, isPreparingPreview }) => {
+  if (isPreparingPreview) {
+    return 'Painting first pages';
+  }
+
+  return 'Ready';
+}
+
+function Caret(): JSX.Element {
+  return (
+    <span
+      aria-hidden="true"
+      className="inline-block w-[0.12em] h-[0.9em] align-[-0.1em] ml-1 bg-brand-primary animate-[intro-caret_1s_steps(2,end)_infinite]"
+    />
+  );
+}
+
+function StoryIntroStream({
+  title,
+  foreword,
+  isStreaming,
+  isPreparingPreview,
+}: StoryIntroStreamProps): JSX.Element {
   const hasTitle = title.length > 0;
   const hasForeword = foreword.length > 0;
   const titleCaret = isStreaming && !hasForeword;
   const forewordCaret = isStreaming && hasForeword;
-
-  const statusLabel = isStreaming
-    ? 'Drafting'
-    : isPreparingPreview
-      ? 'Painting first pages'
-      : 'Ready';
+  const statusLabel = getStreamStatusLabel(isStreaming, isPreparingPreview);
 
   return (
     <div className="flex-1 flex items-center justify-center py-16 animate-in fade-in duration-500">
@@ -89,6 +102,6 @@ const StoryIntroStream: React.FC<Props> = ({ title, foreword, isStreaming, isPre
       `}</style>
     </div>
   );
-};
+}
 
 export default StoryIntroStream;

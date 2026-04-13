@@ -1,7 +1,7 @@
 /**
  * Frontend entrypoint. Mounts the app and global browser-only providers.
  */
-import React from 'react';
+import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from 'sonner';
@@ -14,7 +14,7 @@ if (!rootElement) {
 
 const root = ReactDOM.createRoot(rootElement);
 root.render(
-  <React.StrictMode>
+  <StrictMode>
     <BrowserRouter>
       <App />
       <Toaster
@@ -27,5 +27,5 @@ root.render(
         }}
       />
     </BrowserRouter>
-  </React.StrictMode>
+  </StrictMode>
 );

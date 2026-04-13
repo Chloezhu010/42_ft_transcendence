@@ -2,7 +2,6 @@
  * Controlled onboarding wizard UI for editing a kid profile.
  * The page owns the data; this component only renders steps and emits user intent.
  */
-import React from 'react';
 import type { KidProfile } from '@/types';
 import { SketchyButton } from '@/components/design-system/Primitives';
 import { Icons } from '@/components/design-system/Icons';
@@ -97,38 +96,40 @@ const STEP_LABELS = [
 
 const GENDERS: GenderOption[] = ['boy', 'girl', 'neutral'];
 
-const ColorGrid: React.FC<ColorGridProps> = ({ options, selected, onSelect, label }) => (
-  <div className="mb-8 animate-in fade-in slide-in-from-bottom-2 duration-500 px-4">
-    <Label className="block mb-6 text-brand-primary text-sm">{label}</Label>
-    <div className="flex flex-wrap gap-6">
-      {options.map((option) => (
-        <button
-          key={option.label}
-          type="button"
-          onClick={() => onSelect(option.label)}
-          className={`group relative w-12 h-12 rounded-full border-4 transition-all duration-300 ${
-            selected === option.label
-              ? 'border-brand-primary scale-125 z-10 shadow-soft'
-              : 'border-gray-100 hover:scale-110'
-          }`}
-          style={{ backgroundColor: option.hex }}
-          title={option.label}
-        >
-          {selected === option.label && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-2 h-2 bg-white rounded-full shadow-lg" />
-            </div>
-          )}
-          <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-brand-dark opacity-0 group-hover:opacity-100 transition-opacity uppercase whitespace-nowrap">
-            {option.label}
-          </span>
-        </button>
-      ))}
+function ColorGrid({ options, selected, onSelect, label }: ColorGridProps): JSX.Element {
+  return (
+    <div className="mb-8 animate-in fade-in slide-in-from-bottom-2 duration-500 px-4">
+      <Label className="block mb-6 text-brand-primary text-sm">{label}</Label>
+      <div className="flex flex-wrap gap-6">
+        {options.map((option) => (
+          <button
+            key={option.label}
+            type="button"
+            onClick={() => onSelect(option.label)}
+            className={`group relative w-12 h-12 rounded-full border-4 transition-all duration-300 ${
+              selected === option.label
+                ? 'border-brand-primary scale-125 z-10 shadow-soft'
+                : 'border-gray-100 hover:scale-110'
+            }`}
+            style={{ backgroundColor: option.hex }}
+            title={option.label}
+          >
+            {selected === option.label && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-2 h-2 bg-white rounded-full shadow-lg" />
+              </div>
+            )}
+            <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-brand-dark opacity-0 group-hover:opacity-100 transition-opacity uppercase whitespace-nowrap">
+              {option.label}
+            </span>
+          </button>
+        ))}
+      </div>
     </div>
-  </div>
-);
+  );
+}
 
-const KidWizard: React.FC<KidWizardProps> = ({
+function KidWizard({
   step,
   profile,
   onProfileChange,
@@ -137,7 +138,7 @@ const KidWizard: React.FC<KidWizardProps> = ({
   onPhotoSelect,
   onPhotoRemove,
   onSubmit,
-}) => {
+}: KidWizardProps): JSX.Element {
   const totalSteps = STEP_LABELS.length;
   const progressWidth = `${(step / totalSteps) * 100}%`;
   const photoPreview = profile.photoUrl || null;
@@ -375,6 +376,6 @@ const KidWizard: React.FC<KidWizardProps> = ({
       </div>
     </div>
   );
-};
+}
 
 export default KidWizard;

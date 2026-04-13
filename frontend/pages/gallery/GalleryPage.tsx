@@ -2,7 +2,6 @@
  * Gallery page container.
  * Renders loading, empty, and card-grid states from page-level data.
  */
-import React from 'react';
 import { Link } from 'react-router-dom';
 import type { StoryListItem } from '@api';
 import StorageImage from '@/components/StorageImage';
@@ -14,63 +13,65 @@ interface StoryCardProps {
   onDeleteStory: (storyId: number) => Promise<void>;
 }
 
-const StoryCard: React.FC<StoryCardProps> = ({ story, onDeleteStory }) => (
-  <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden group border-2 border-gray-100 hover:border-purple-200 transition-all hover:-translate-y-1 relative">
-    <button
-      type="button"
-      onClick={() => void onDeleteStory(story.id)}
-      className="absolute top-4 right-4 z-30 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-md opacity-0 group-hover:opacity-100 focus:opacity-100"
-      title="Delete Story"
-    >
-      🗑️
-    </button>
+function StoryCard({ story, onDeleteStory }: StoryCardProps): JSX.Element {
+  return (
+    <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden group border-2 border-gray-100 hover:border-purple-200 transition-all hover:-translate-y-1 relative">
+      <button
+        type="button"
+        onClick={() => void onDeleteStory(story.id)}
+        className="absolute top-4 right-4 z-30 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-md opacity-0 group-hover:opacity-100 focus:opacity-100"
+        title="Delete Story"
+      >
+        🗑️
+      </button>
 
-    <div className="relative aspect-[3/4] overflow-hidden bg-gray-100">
-      {story.cover_image_url ? (
-        <StorageImage
-          src={story.cover_image_url}
-          alt={getStoryDisplayTitle(story.title)}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-        />
-      ) : (
-        <div className="w-full h-full flex items-center justify-center text-gray-300 font-black text-4xl">?</div>
-      )}
-
-      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-        <Link
-          to={`/book/${story.id}`}
-          className="px-8 py-3 bg-white text-purple-900 font-black rounded-full shadow-xl transform scale-90 group-hover:scale-100 transition-all"
-        >
-          READ NOW
-        </Link>
-      </div>
-    </div>
-
-    <div className="p-5">
-      <h3 className="text-xl font-black text-gray-800 leading-tight mb-2 line-clamp-2">
-        {getStoryDisplayTitle(story.title)}
-      </h3>
-
-      <div className="flex flex-wrap gap-2">
-        <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full uppercase tracking-wide">
-          {story.profile.name}
-        </span>
-
-        {story.profile.archetype && (
-          <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-bold rounded-full uppercase tracking-wide">
-            {story.profile.archetype}
-          </span>
+      <div className="relative aspect-[3/4] overflow-hidden bg-gray-100">
+        {story.cover_image_url ? (
+          <StorageImage
+            src={story.cover_image_url}
+            alt={getStoryDisplayTitle(story.title)}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-gray-300 font-black text-4xl">?</div>
         )}
+
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+          <Link
+            to={`/book/${story.id}`}
+            className="px-8 py-3 bg-white text-purple-900 font-black rounded-full shadow-xl transform scale-90 group-hover:scale-100 transition-all"
+          >
+            READ NOW
+          </Link>
+        </div>
       </div>
 
-      <div className="mt-4 text-xs text-gray-400 font-medium">
-        {formatStoryDate(story.created_at)}
+      <div className="p-5">
+        <h3 className="text-xl font-black text-gray-800 leading-tight mb-2 line-clamp-2">
+          {getStoryDisplayTitle(story.title)}
+        </h3>
+
+        <div className="flex flex-wrap gap-2">
+          <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full uppercase tracking-wide">
+            {story.profile.name}
+          </span>
+
+          {story.profile.archetype && (
+            <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-bold rounded-full uppercase tracking-wide">
+              {story.profile.archetype}
+            </span>
+          )}
+        </div>
+
+        <div className="mt-4 text-xs text-gray-400 font-medium">
+          {formatStoryDate(story.created_at)}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+}
 
-const GalleryPage: React.FC = () => {
+function GalleryPage(): JSX.Element {
   const { isLoading, onDeleteStory, stories } = useGalleryPage();
 
   return (
@@ -98,6 +99,6 @@ const GalleryPage: React.FC = () => {
       )}
     </div>
   );
-};
+}
 
 export default GalleryPage;

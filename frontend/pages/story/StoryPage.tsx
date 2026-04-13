@@ -2,7 +2,6 @@
  * Story page container.
  * Selects the active screen and feeds pure props into presentational components.
  */
-import React from 'react';
 import KidWizard from '@/components/KidWizard';
 import MagicLoader from '@/components/MagicLoader';
 import PreviewView from '@/components/PreviewView';
@@ -12,7 +11,7 @@ import { Heading, Text } from '@/components/design-system/Typography';
 import { useStoryPage } from './useStoryPage';
 import { StoryPageView } from './story.types';
 
-const StoryPage: React.FC = () => {
+function StoryPage(): JSX.Element | null {
   const { actions, introStream, profile, story, view, wizard } = useStoryPage();
 
   if (view === StoryPageView.Onboarding) {
@@ -78,6 +77,6 @@ const StoryPage: React.FC = () => {
   }
 
   return null;
-};
+}
 
 export default StoryPage;

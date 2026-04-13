@@ -2,7 +2,6 @@
  * Image wrapper that accepts either stored filenames or direct URLs.
  * Keeps backend URL assembly out of calling components.
  */
-import React from 'react';
 import { getImageUrl } from '@/utils';
 
 interface StorageImageProps {
@@ -11,7 +10,7 @@ interface StorageImageProps {
   className?: string;
 }
 
-const StorageImage: React.FC<StorageImageProps> = ({ src, alt, className = '' }) => {
+function StorageImage({ src, alt, className = '' }: StorageImageProps): JSX.Element | null {
   const imageUrl = getImageUrl(src ?? undefined);
 
   if (!imageUrl) {
@@ -19,6 +18,6 @@ const StorageImage: React.FC<StorageImageProps> = ({ src, alt, className = '' })
   }
 
   return <img src={imageUrl} alt={alt} className={className} />;
-};
+}
 
 export default StorageImage;

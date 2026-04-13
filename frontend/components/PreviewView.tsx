@@ -2,7 +2,7 @@
  * Preview storybook UI.
  * Keeps only local page-flip state and sends all business actions upward.
  */
-import React, { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import ComicPanel from '@/components/ComicPanel';
 import type { ComicPanelData, Story } from '@/types';
@@ -23,8 +23,8 @@ interface PreviewBookFrameProps {
   currentPageLabel: string;
   onPreviousPage: () => void;
   onNextPage: () => void;
-  leftPage: React.ReactNode;
-  rightPage: React.ReactNode;
+  leftPage: ReactNode;
+  rightPage: ReactNode;
 }
 
 interface PreviewTitlePageProps {
@@ -51,7 +51,7 @@ function PreviewBookFrame({
   onNextPage,
   leftPage,
   rightPage,
-}: PreviewBookFrameProps): React.JSX.Element {
+}: PreviewBookFrameProps): JSX.Element {
   const isFirstPage = currentPage === 0;
   const isLastPage = currentPage === PREVIEW_PAGE_LABELS.length - 1;
   const previousButtonStateClass = isFirstPage ? 'opacity-0 pointer-events-none' : '';
@@ -141,7 +141,7 @@ function PreviewTitlePage({
   title,
   foreword,
   onOpenEndingSpread,
-}: PreviewTitlePageProps): React.JSX.Element {
+}: PreviewTitlePageProps): JSX.Element {
   return (
     <div className="h-full flex flex-col justify-center p-12 md:p-16">
       <Label className="text-brand-primary/50 text-[10px] mb-4">Preview</Label>
@@ -165,7 +165,7 @@ function PreviewTitlePage({
 function PreviewPanelPage({
   panel,
   onEditImage,
-}: PreviewPanelPageProps): React.JSX.Element {
+}: PreviewPanelPageProps): JSX.Element {
   return (
     <ComicPanel panel={panel} onEditImage={onEditImage} />
   );
@@ -175,7 +175,7 @@ function PreviewGeneratePage({
   middlePanelCount,
   onGenerate,
   onStartOver,
-}: PreviewGeneratePageProps): React.JSX.Element {
+}: PreviewGeneratePageProps): JSX.Element {
   return (
     <div className="h-full flex flex-col items-center justify-center p-12 text-center bg-gradient-to-br from-brand-accent/10 to-white">
       <div className="text-5xl mb-6">✨</div>
@@ -199,12 +199,12 @@ function PreviewGeneratePage({
   );
 }
 
-const PreviewView: React.FC<PreviewViewProps> = ({
+function PreviewView({
   story,
   onEditPanelImage,
   onGenerate,
   onStartOver,
-}) => {
+}: PreviewViewProps): JSX.Element | null {
   const [previewPage, setPreviewPage] = useState(0);
   const firstPanel = story.panels[0];
   const lastPanel = story.panels[story.panels.length - 1];
@@ -272,6 +272,6 @@ const PreviewView: React.FC<PreviewViewProps> = ({
       rightPage={rightPage}
     />
   );
-};
+}
 
 export default PreviewView;

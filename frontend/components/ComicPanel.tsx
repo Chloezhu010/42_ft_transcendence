@@ -2,7 +2,7 @@
  * Comic panel UI with a local edit modal.
  * Owns temporary modal state, but leaves image editing itself to the caller.
  */
-import React, { useState } from 'react';
+import { useState } from 'react';
 import type { ComicPanelData } from '@/types';
 import { getImageUrl } from '@/utils';
 import { SketchyButton } from '@/components/design-system/Primitives';
@@ -12,14 +12,24 @@ interface ComicPanelProps {
   onEditImage?: (editPrompt: string) => Promise<void> | void;
 }
 
-const ComicPanel: React.FC<ComicPanelProps> = ({ panel, onEditImage }) => {
+function resolvePanelImageUrl(imageUrl: string | undefined): string | undefined {
+  if (!imageUrl) {
+    return undefined;
+  }
+
+  if (imageUrl.startsWith('data:')) {
+    return imageUrl;
+  }
+
+  return getImageUrl(imageUrl);
+}
+
+function ComicPanel({ panel, onEditImage }: ComicPanelProps): JSX.Element {
   const [isEditing, setIsEditing] = useState(false);
   const [editPrompt, setEditPrompt] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const resolvedImageUrl = panel.imageUrl
-    ? (panel.imageUrl.startsWith('data:') ? panel.imageUrl : getImageUrl(panel.imageUrl))
-    : undefined;
+  const resolvedImageUrl = resolvePanelImageUrl(panel.imageUrl);
   const isEditable = Boolean(onEditImage && panel.imageUrl?.startsWith('data:'));
 
   const handleEdit = async () => {
@@ -118,6 +128,6 @@ const ComicPanel: React.FC<ComicPanelProps> = ({ panel, onEditImage }) => {
       )}
     </div>
   );
-};
+}
 
 export default ComicPanel;
