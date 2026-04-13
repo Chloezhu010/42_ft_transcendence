@@ -29,7 +29,7 @@ flowchart LR
 
 ## Story Generation Flow
 
-From a completed `KidWizard` to the `PreviewView`, the frontend streams the story intro as it is written, generates the first and last preview images in parallel, and persists a draft before flipping to the storybook. The streaming endpoint is the only interactive piece; everything else is classic request/response.
+From a completed `KidWizard` to the preview book, the frontend now routes work through the story page controller. `StoryPage` selects the visible screen, `useStoryPage` owns page state and transitions, and `story.workflow.ts` runs the long async steps: stream the intro, generate the first and last preview images in parallel, persist a draft, and later unlock the full story.
 
 ```mermaid
 sequenceDiagram
@@ -67,28 +67,76 @@ sequenceDiagram
     FE-->>U: switch to PreviewView
 ```
 
+## Frontend Layering
+
+The frontend is now organized around explicit boundaries: `app` declares routes, `pages` coordinate feature-level state, `components` stay UI-only, `client-api` owns browser-to-backend communication, and `utils` contains pure helpers and mappers.
+
+```mermaid
+flowchart LR
+    App["app/App.tsx<br/>route tree"]
+    StoryPage["pages/story/StoryPage.tsx<br/>screen selection"]
+    StoryHook["pages/story/useStoryPage.ts<br/>page controller"]
+    StoryWorkflow["pages/story/story.workflow.ts<br/>load + preview + full story"]
+    StoryEditor["pages/story/story.editor.ts<br/>panel edit workflow"]
+    GalleryPage["pages/gallery/GalleryPage.tsx<br/>screen selection"]
+    GalleryHook["pages/gallery/useGalleryPage.ts<br/>page controller"]
+    Components["components/*<br/>pure UI"]
+    ClientApi["client-api/*<br/>frontend to backend calls"]
+    Utils["utils/*<br/>pure helpers + mappers"]
+    Types["types/*<br/>shared frontend models"]
+    Backend["FastAPI /api"]
+
+    App --> StoryPage
+    App --> GalleryPage
+    StoryPage --> StoryHook
+    GalleryPage --> GalleryHook
+    StoryHook --> Components
+    GalleryHook --> Components
+    StoryHook --> StoryWorkflow
+    StoryHook --> StoryEditor
+    StoryHook --> Types
+    StoryWorkflow --> ClientApi
+    StoryWorkflow --> Utils
+    StoryWorkflow --> Types
+    StoryEditor --> ClientApi
+    StoryEditor --> Types
+    GalleryHook --> ClientApi
+    GalleryHook --> Types
+    ClientApi --> Backend
+```
+
+Rules enforced by structure:
+
+- `components` render props and emit user intent; they do not call backend APIs directly.
+- `pages` are the orchestration layer and are the only place where routing, toasts, and screen transitions are coordinated.
+- `client-api` owns HTTP and streaming transport details.
+- `utils` stays pure and does not depend on UI or transport.
+
 ## Frontend View States
 
-`MainPage` drives the whole experience with a five-state machine (`frontend/components/MainPage.tsx:15`). There are two entry points into the graph: a fresh visit to `/` drops the user in `ONBOARDING`, while a deep link to `/book/:id` jumps straight into `GENERATING_SCRIPT` and then branches based on whether the loaded story is a draft or fully illustrated.
+`StoryPage` and `useStoryPage` now split rendering from coordination. `StoryPage` chooses one visual screen from `StoryPageView`, while `useStoryPage` owns the transitions between onboarding, intro streaming, preview loading, and the finished storyboard. There are still two entry points: a fresh visit to `/` starts in `Onboarding`, while a deep link to `/book/:id` first enters `GeneratingStory` and then resolves to `Preview` or `Storyboard` depending on whether the saved story is still a draft.
 
 ```mermaid
 stateDiagram-v2
-    [*] --> ONBOARDING
-    ONBOARDING --> STREAMING_INTRO: wizard submit
-    STREAMING_INTRO --> PREVIEW: draft saved (+600ms hold)
-    STREAMING_INTRO --> ONBOARDING: stream error
-    PREVIEW --> GENERATING_SCRIPT: unlock full story
-    PREVIEW --> ONBOARDING: start over
-    GENERATING_SCRIPT --> STORYBOARD: images ready
-    GENERATING_SCRIPT --> PREVIEW: error / loaded draft
-    GENERATING_SCRIPT --> ONBOARDING: load error
+    [*] --> Onboarding
+    Onboarding --> StreamingIntro: wizard submit
+    StreamingIntro --> Preview: draft saved (+600 ms hold)
+    StreamingIntro --> Onboarding: stream error
+    Onboarding --> GeneratingStory: deep link /book/:id
+    Preview --> GeneratingStory: unlock full story
+    Preview --> Onboarding: start over
+    GeneratingStory --> Preview: loaded saved draft
+    GeneratingStory --> Storyboard: loaded full story
+    GeneratingStory --> Storyboard: full story saved
+    GeneratingStory --> Preview: full story error
+    GeneratingStory --> Onboarding: load error
 ```
 
 Notes:
 
-- `STREAMING_INTRO` renders `StoryIntroStream.tsx` and is held on screen for at least 600 ms after the last delta, so the typewriter text does not vanish the instant Gemini finishes.
-- `GENERATING_SCRIPT` is reused as a generic "busy" state for both full-story generation (after preview unlock) and deep-link hydration — the successor state depends on which one kicked it off.
-- `STORYBOARD` has no coded exit transition; the user leaves it by navigating away via React Router (e.g. header logo, `My Library` link), which unmounts `MainPage` entirely.
+- `StreamingIntro` renders `StoryIntroStream.tsx` and is held on screen for at least 600 ms after the last delta, so the typewriter text does not vanish the instant Gemini finishes.
+- `GeneratingStory` is intentionally reused as the single busy state for both deep-link hydration and full-story generation.
+- `Storyboard` has no in-place exit transition; navigation leaves the page through React Router and unmounts the story feature.
 
 ## Tech Stack
 
@@ -191,6 +239,6 @@ Gemini returns the story as a single JSON document, so the backend runs a tiny J
 
 ### Frontend
 
-`frontend/services/generationApi.ts::streamStoryScript` reads the NDJSON response via `ReadableStream`, splits on newlines, and dispatches each event. `intro_delta` events are funnelled through a small smoothing helper that forwards roughly two characters every 22 ms, so bursty Gemini chunks still look like a steady typewriter. The function resolves with the fully parsed script once the `script` event arrives, and rejects if the stream ends without one or emits an `error`.
+`frontend/client-api/generationApi.ts::streamStoryScript` reads the NDJSON response via `ReadableStream`, splits on newlines, and dispatches each event. `intro_delta` events are funnelled through a small smoothing helper that forwards roughly two characters every 22 ms, so bursty Gemini chunks still look like a steady typewriter. The function resolves with the fully parsed script once the `script` event arrives, and rejects if the stream ends without one or emits an `error`.
 
-`useStoryGenerator.generateStoryPreviewStreaming` (`frontend/hooks/useStoryGenerator.ts`) hides the rest: after the script lands it generates the first and last preview images in parallel, saves the draft story, and only then lets `MainPage` flip to the storybook preview. `MainPage` adds a `STREAMING_INTRO` state that renders `StoryIntroStream.tsx` — a centred card with a blinking caret while deltas are arriving and a short "preparing preview" animation afterwards. A 600 ms minimum hold keeps the intro on screen briefly after streaming completes so the user can finish reading before pages turn.
+`frontend/pages/story/story.workflow.ts::generatePreviewState` handles the async work that follows: it maps the profile into API shape, waits for the streamed script, generates the first and last preview images in parallel, and persists the preview draft. `frontend/pages/story/useStoryPage.ts` owns the screen transition into `StreamingIntro`, the 600 ms minimum hold after the last delta, and the later hand-off into `Preview` or `Storyboard`. `frontend/pages/story/StoryPage.tsx` stays thin and only selects which UI component to render: `KidWizard`, `StoryIntroStream`, `MagicLoader`, `PreviewView`, or `StoryboardView`.
