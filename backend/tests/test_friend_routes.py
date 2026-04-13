@@ -23,8 +23,8 @@ from tests.conftest import _init_test_db, make_test_app
 # Fixtures
 # ---------------------------------------------------------------------------
 
-_SIGNUP_ALICE   = {"username": "alice",   "email": "alice@example.com",   "password": "Password123!"}
-_SIGNUP_BOB     = {"username": "bob",     "email": "bob@example.com",     "password": "Password456!"}
+_SIGNUP_ALICE = {"username": "alice", "email": "alice@example.com", "password": "Password123!"}
+_SIGNUP_BOB = {"username": "bob", "email": "bob@example.com", "password": "Password456!"}
 _SIGNUP_CHARLIE = {"username": "charlie", "email": "charlie@example.com", "password": "Password789!"}
 
 
@@ -68,6 +68,7 @@ def charlie(client):
 # GET /api/friends/  — list accepted friends
 # ---------------------------------------------------------------------------
 
+
 def test_list_friends_empty(client, alice):
     _, alice_h = alice
     r = client.get("/api/friends/", headers=alice_h)
@@ -78,8 +79,8 @@ def test_list_friends_empty(client, alice):
 def test_list_friends_returns_accepted_only(client, alice, bob, charlie):
     """Only friendships in state 'accepted' appear in GET /."""
     alice_id, alice_h = alice
-    bob_id,   bob_h   = bob
-    charlie_id, _     = charlie
+    bob_id, bob_h = bob
+    charlie_id, _ = charlie
 
     # alice -> bob and accept
     assert client.post(f"/api/friends/{bob_id}", headers=alice_h).status_code == 200
@@ -101,19 +102,19 @@ def test_list_friends_returns_accepted_only(client, alice, bob, charlie):
 def test_list_friends_is_symmetric(client, alice, bob):
     """Both ends see the same friendship after acceptance."""
     alice_id, alice_h = alice
-    bob_id,   bob_h   = bob
+    bob_id, bob_h = bob
 
     client.post(f"/api/friends/{bob_id}", headers=alice_h)
     client.post(f"/api/friends/{alice_id}/accept", headers=bob_h)
 
     alice_friends = client.get("/api/friends/", headers=alice_h).json()
-    bob_friends   = client.get("/api/friends/", headers=bob_h).json()
+    bob_friends = client.get("/api/friends/", headers=bob_h).json()
 
     assert [f["username"] for f in alice_friends] == ["bob"]
-    assert [f["username"] for f in bob_friends]   == ["alice"]
+    assert [f["username"] for f in bob_friends] == ["alice"]
     # Requester flag must flip based on viewer
-    assert alice_friends[0]["is_requester"] is True   # alice sent it
-    assert bob_friends[0]["is_requester"]   is False  # bob received it
+    assert alice_friends[0]["is_requester"] is True  # alice sent it
+    assert bob_friends[0]["is_requester"] is False  # bob received it
 
 
 def test_list_friends_requires_auth(client):
@@ -125,6 +126,7 @@ def test_list_friends_requires_auth(client):
 # GET /api/friends/pending  — incoming pending requests
 # ---------------------------------------------------------------------------
 
+
 def test_list_pending_empty(client, alice):
     _, alice_h = alice
     r = client.get("/api/friends/pending", headers=alice_h)
@@ -134,8 +136,8 @@ def test_list_pending_empty(client, alice):
 
 def test_list_pending_returns_incoming_request(client, alice, bob):
     """After alice -> bob, bob's /pending contains alice."""
-    _,      alice_h = alice
-    bob_id, bob_h   = bob
+    _, alice_h = alice
+    bob_id, bob_h = bob
 
     client.post(f"/api/friends/{bob_id}", headers=alice_h)
 
@@ -151,8 +153,8 @@ def test_list_pending_returns_incoming_request(client, alice, bob):
 
 def test_list_pending_excludes_outgoing(client, alice, bob):
     """The sender of a pending request does NOT see it in /pending."""
-    _,      alice_h = alice
-    bob_id, _       = bob
+    _, alice_h = alice
+    bob_id, _ = bob
 
     client.post(f"/api/friends/{bob_id}", headers=alice_h)
 
@@ -164,7 +166,7 @@ def test_list_pending_excludes_outgoing(client, alice, bob):
 def test_list_pending_excludes_accepted(client, alice, bob):
     """Once accepted, the friendship leaves /pending."""
     alice_id, alice_h = alice
-    bob_id,   bob_h   = bob
+    bob_id, bob_h = bob
 
     client.post(f"/api/friends/{bob_id}", headers=alice_h)
     client.post(f"/api/friends/{alice_id}/accept", headers=bob_h)
@@ -181,10 +183,11 @@ def test_list_pending_requires_auth(client):
 # POST /api/friends/{user_id}  — send a friend request
 # ---------------------------------------------------------------------------
 
+
 def test_send_friend_request_creates_pending_row(client, alice, bob):
     """Smoke test: the request shows up on bob's /pending after POST."""
-    _,      alice_h = alice
-    bob_id, bob_h   = bob
+    _, alice_h = alice
+    bob_id, bob_h = bob
 
     r = client.post(f"/api/friends/{bob_id}", headers=alice_h)
     assert r.status_code == 200, r.text
@@ -201,8 +204,8 @@ def test_send_friend_request_returns_friend_response(client, alice, bob):
     (no username / avatar_path / is_online). Once the CRUD returns a joined
     row (or the router re-queries with a join), this passes.
     """
-    _,      alice_h = alice
-    bob_id, _       = bob
+    _, alice_h = alice
+    bob_id, _ = bob
 
     r = client.post(f"/api/friends/{bob_id}", headers=alice_h)
     assert r.status_code == 200, r.text
@@ -220,8 +223,8 @@ def test_send_friend_request_to_self_returns_400(client, alice):
 
 
 def test_send_friend_request_duplicate_returns_409(client, alice, bob):
-    _,      alice_h = alice
-    bob_id, _       = bob
+    _, alice_h = alice
+    bob_id, _ = bob
 
     first = client.post(f"/api/friends/{bob_id}", headers=alice_h)
     assert first.status_code == 200, first.text
@@ -232,7 +235,7 @@ def test_send_friend_request_duplicate_returns_409(client, alice, bob):
 
 def test_send_friend_request_when_already_friends_returns_409(client, alice, bob):
     alice_id, alice_h = alice
-    bob_id,   bob_h   = bob
+    bob_id, bob_h = bob
 
     client.post(f"/api/friends/{bob_id}", headers=alice_h)
     client.post(f"/api/friends/{alice_id}/accept", headers=bob_h)
@@ -265,10 +268,11 @@ def test_send_friend_request_requires_auth(client, bob):
 # POST /api/friends/{user_id}/accept  — accept a pending request
 # ---------------------------------------------------------------------------
 
+
 def test_accept_friend_request_moves_to_friends_list(client, alice, bob):
     """Smoke test: after accept, bob sees alice in GET /."""
     alice_id, alice_h = alice
-    bob_id,   bob_h   = bob
+    bob_id, bob_h = bob
 
     client.post(f"/api/friends/{bob_id}", headers=alice_h)
     r = client.post(f"/api/friends/{alice_id}/accept", headers=bob_h)
@@ -284,7 +288,7 @@ def test_accept_friend_request_returns_friend_response(client, alice, bob):
     test_send_friend_request_returns_friend_response.
     """
     alice_id, alice_h = alice
-    bob_id,   bob_h   = bob
+    bob_id, bob_h = bob
 
     client.post(f"/api/friends/{bob_id}", headers=alice_h)
     r = client.post(f"/api/friends/{alice_id}/accept", headers=bob_h)
@@ -310,8 +314,8 @@ def test_accept_own_outgoing_request_returns_409(client, alice, bob):
     request'. The string doesn't contain 'not found', so the router maps
     it to 409.
     """
-    _,      alice_h = alice
-    bob_id, _       = bob
+    _, alice_h = alice
+    bob_id, _ = bob
     client.post(f"/api/friends/{bob_id}", headers=alice_h)
     r = client.post(f"/api/friends/{bob_id}/accept", headers=alice_h)
     assert r.status_code == 409
@@ -319,7 +323,7 @@ def test_accept_own_outgoing_request_returns_409(client, alice, bob):
 
 def test_accept_already_accepted_returns_409(client, alice, bob):
     alice_id, alice_h = alice
-    bob_id,   bob_h   = bob
+    bob_id, bob_h = bob
 
     client.post(f"/api/friends/{bob_id}", headers=alice_h)
     client.post(f"/api/friends/{alice_id}/accept", headers=bob_h)
@@ -339,9 +343,10 @@ def test_accept_friend_request_requires_auth(client, alice):
 # DELETE /api/friends/{friend_id}  — remove friend / cancel request
 # ---------------------------------------------------------------------------
 
+
 def test_delete_accepted_friendship(client, alice, bob):
     alice_id, alice_h = alice
-    bob_id,   bob_h   = bob
+    bob_id, bob_h = bob
 
     client.post(f"/api/friends/{bob_id}", headers=alice_h)
     client.post(f"/api/friends/{alice_id}/accept", headers=bob_h)
@@ -352,13 +357,13 @@ def test_delete_accepted_friendship(client, alice, bob):
 
     # Both sides should now have empty friends lists
     assert client.get("/api/friends/", headers=alice_h).json() == []
-    assert client.get("/api/friends/", headers=bob_h).json()   == []
+    assert client.get("/api/friends/", headers=bob_h).json() == []
 
 
 def test_delete_cancels_pending_request(client, alice, bob):
     """DELETE also works for pending requests — the requester can cancel."""
-    _,      alice_h = alice
-    bob_id, bob_h   = bob
+    _, alice_h = alice
+    bob_id, bob_h = bob
 
     client.post(f"/api/friends/{bob_id}", headers=alice_h)
 
@@ -370,7 +375,7 @@ def test_delete_cancels_pending_request(client, alice, bob):
 def test_delete_can_be_called_by_either_side(client, alice, bob):
     """get_friendship_between is symmetric, so either user can delete."""
     alice_id, alice_h = alice
-    bob_id,   bob_h   = bob
+    bob_id, bob_h = bob
 
     client.post(f"/api/friends/{bob_id}", headers=alice_h)
     client.post(f"/api/friends/{alice_id}/accept", headers=bob_h)
@@ -382,8 +387,8 @@ def test_delete_can_be_called_by_either_side(client, alice, bob):
 
 
 def test_delete_nonexistent_friendship_returns_404(client, alice, bob):
-    _,      alice_h = alice
-    bob_id, _       = bob
+    _, alice_h = alice
+    bob_id, _ = bob
     r = client.delete(f"/api/friends/{bob_id}", headers=alice_h)
     assert r.status_code == 404
 

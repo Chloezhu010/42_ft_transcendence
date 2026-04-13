@@ -20,10 +20,12 @@ async def get_user_by_email(db: aiosqlite.Connection, email: str) -> Row | None:
     async with db.execute("SELECT * FROM users WHERE email = ?", (email,)) as cursor:
         return await cursor.fetchone()  # return the user row or None if not found
 
+
 async def get_user_by_username(db: aiosqlite.Connection, username: str) -> Row | None:
     """Fetch a user by their username. Returns None if not found."""
     async with db.execute("SELECT * FROM users WHERE username = ?", (username,)) as cursor:
         return await cursor.fetchone()  # return the user row or None if not found
+
 
 async def get_user_by_id(db: aiosqlite.Connection, user_id: int) -> Row | None:
     """Fetch a user by their ID. Returns None if not found."""

@@ -8,6 +8,7 @@ URL contract (authoritative: tests/test_friend_routes.py):
     POST   /api/friends/{user_id}/accept  accept an incoming request
     DELETE /api/friends/{friend_id}       remove friend / cancel pending
 """
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from auth_utils import get_current_user
@@ -26,6 +27,7 @@ router = APIRouter(prefix="/api/friends", tags=["friends"])
 
 # --- helpers ---------------------------------------------------------------
 
+
 def _to_friend_response(row, viewer_id: int) -> FriendResponse:
     """Convert a joined friendship+user row to a FriendResponse.
 
@@ -43,7 +45,9 @@ def _to_friend_response(row, viewer_id: int) -> FriendResponse:
         is_requester=row["requester_id"] == viewer_id,
     )
 
+
 # --- reads -----------------------------------------------------------------
+
 
 @router.get("/", response_model=list[FriendResponse])
 async def list_friends_endpoint(
@@ -64,7 +68,9 @@ async def list_pending_endpoint(
     rows = await get_pending_requests(db, current_user["id"])
     return [_to_friend_response(row, current_user["id"]) for row in rows]
 
+
 # --- writes ----------------------------------------------------------------
+
 
 @router.post("/{user_id}/accept", response_model=FriendResponse)
 async def accept_friend_request_endpoint(

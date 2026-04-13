@@ -1,6 +1,7 @@
 """
 User router (profile viewing, editing, avatar upload, public profile lookup)
 """
+
 import uuid
 from pathlib import Path
 
@@ -19,27 +20,30 @@ _DEFAULT_AVATAR = "default-avatar.png"
 MAX_SIZE = 5 * 1024 * 1024  # 5MB max file size for avatar uploads
 CHUNK = 64 * 1024  # 64KB chunk size for file uploads
 
+
 def _to_user_response(row) -> UserResponse:
     """Convert a DB user row to a UserResponse model."""
     return UserResponse(
         id=row["id"],
         email=row["email"],
         username=row["username"],
-        avatar_url=row["avatar_path"], # frontend resolves to full url via getImageUrl()
+        avatar_url=row["avatar_path"],  # frontend resolves to full url via getImageUrl()
         is_online=bool(row["is_online"]),
         created_at=row["created_at"],
     )
 
+
 @router.get("/me", response_model=UserResponse)
-async def get_my_profile(current_user = Depends(get_current_user), db = Depends(get_db)):
+async def get_my_profile(current_user=Depends(get_current_user), db=Depends(get_db)):
     """Get the authenticated user's profile."""
     row = await get_user_by_id(db, current_user["id"])
     if row is None:
         raise HTTPException(status_code=404, detail="User not found")
     return _to_user_response(row)
 
+
 @router.put("/me", response_model=UserResponse)
-async def update_my_profile(body: UserUpdateRequest, current_user = Depends(get_current_user), db = Depends(get_db)):
+async def update_my_profile(body: UserUpdateRequest, current_user=Depends(get_current_user), db=Depends(get_db)):
     """Update the authenticated user's profile (username, email)."""
     try:
         updated_row = await update_user(db, current_user["id"], body.username, body.email)
@@ -49,12 +53,13 @@ async def update_my_profile(body: UserUpdateRequest, current_user = Depends(get_
         raise HTTPException(status_code=404, detail="User not found")
     return _to_user_response(updated_row)
 
+
 @router.post("/me/avatar", response_model=UserResponse)
-async def upload_avatar(file: UploadFile, current_user = Depends(get_current_user), db = Depends(get_db)):
+async def upload_avatar(file: UploadFile, current_user=Depends(get_current_user), db=Depends(get_db)):
     """Upload a new avatar image for the authenticated user. Stored under images/avatars/."""
     if file.content_type not in _ALLOWED_TYPES:
         raise HTTPException(status_code=415, detail="Unsupported file type")
-    
+
     # grab the old avatar path before overwriting
     current = await get_user_by_id(db, current_user["id"])
     if current is None:
@@ -65,8 +70,8 @@ async def upload_avatar(file: UploadFile, current_user = Depends(get_current_use
     avatars_dir = _IMAGE_DIR / "avatars"
     avatars_dir.mkdir(parents=True, exist_ok=True)
     ext = Path(file.filename).suffix if file.filename else ".jpg"
-    relative_path = f"avatars/{current_user['id']}_{uuid.uuid4().hex}{ext}" # store in DB
-    dest = _IMAGE_DIR / relative_path # actual file path
+    relative_path = f"avatars/{current_user['id']}_{uuid.uuid4().hex}{ext}"  # store in DB
+    dest = _IMAGE_DIR / relative_path  # actual file path
 
     # take the uploaded image from the http request, save it to disk
     async with aiofiles.open(dest, "wb") as out:
@@ -74,10 +79,10 @@ async def upload_avatar(file: UploadFile, current_user = Depends(get_current_use
         while chunk := await file.read(CHUNK):
             size += len(chunk)
             if size > MAX_SIZE:
-                dest.unlink(missing_ok=True) # delete partial file
+                dest.unlink(missing_ok=True)  # delete partial file
                 raise HTTPException(status_code=413, detail="File too large, must be under 5MB")
             await out.write(chunk)
-        
+
     # update user's avatar_path in db
     updated_row = await update_avatar(db, current_user["id"], relative_path)
     if updated_row is None:
@@ -90,8 +95,9 @@ async def upload_avatar(file: UploadFile, current_user = Depends(get_current_use
 
     return _to_user_response(updated_row)
 
+
 @router.get("/{user_id}", response_model=UserResponse)
-async def get_user_profile(user_id: int, db = Depends(get_db)):
+async def get_user_profile(user_id: int, db=Depends(get_db)):
     """Get a public user profile by ID. No auth required."""
     row = await get_user_by_id(db, user_id)
     if row is None:

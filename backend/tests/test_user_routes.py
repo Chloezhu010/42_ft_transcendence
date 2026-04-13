@@ -26,7 +26,7 @@ from tests.conftest import _init_test_db, make_test_app
 # ---------------------------------------------------------------------------
 
 _SIGNUP_ALICE = {"username": "alice", "email": "alice@example.com", "password": "Password123!"}
-_SIGNUP_BOB   = {"username": "bob",   "email": "bob@example.com",   "password": "Password456!"}
+_SIGNUP_BOB = {"username": "bob", "email": "bob@example.com", "password": "Password456!"}
 
 
 @pytest.fixture
@@ -65,6 +65,7 @@ def image_dir(tmp_path, monkeypatch):
 # GET /api/users/me
 # ---------------------------------------------------------------------------
 
+
 def test_get_me_returns_profile(client, alice):
     r = client.get("/api/users/me", headers=alice)
     assert r.status_code == 200
@@ -87,6 +88,7 @@ def test_get_me_invalid_token_returns_401(client):
 def test_get_me_token_for_deleted_user_returns_401(client):
     """Token is valid JWT but references a user that doesn't exist in DB."""
     from auth_utils import create_access_token
+
     token = create_access_token(9999)
     r = client.get("/api/users/me", headers={"Authorization": f"Bearer {token}"})
     assert r.status_code == 401
@@ -95,6 +97,7 @@ def test_get_me_token_for_deleted_user_returns_401(client):
 # ---------------------------------------------------------------------------
 # PUT /api/users/me
 # ---------------------------------------------------------------------------
+
 
 def test_update_username(client, alice):
     r = client.put("/api/users/me", json={"username": "alice2", "email": None}, headers=alice)
@@ -144,9 +147,9 @@ def test_update_requires_auth(client):
 # POST /api/users/me/avatar
 # ---------------------------------------------------------------------------
 
-_JPEG  = b"\xff\xd8\xff" + b"\x00" * 64
-_PNG   = b"\x89PNG\r\n\x1a\n" + b"\x00" * 64
-_WEBP  = b"RIFF\x00\x00\x00\x00WEBP" + b"\x00" * 64
+_JPEG = b"\xff\xd8\xff" + b"\x00" * 64
+_PNG = b"\x89PNG\r\n\x1a\n" + b"\x00" * 64
+_WEBP = b"RIFF\x00\x00\x00\x00WEBP" + b"\x00" * 64
 
 
 def test_upload_avatar_jpeg(client, alice, image_dir):
@@ -265,6 +268,7 @@ def test_upload_avatar_requires_auth(client, image_dir):
 # ---------------------------------------------------------------------------
 # GET /api/users/{user_id}
 # ---------------------------------------------------------------------------
+
 
 def test_get_public_profile_found(client, alice):
     # get alice's id from /me first

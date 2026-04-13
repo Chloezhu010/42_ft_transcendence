@@ -6,7 +6,7 @@ routers. This catches bugs that per-router unit tests miss — e.g. a JWT minted
 by auth.py that user.py or friend.py silently rejects.
 
 Generation routes (Gemini) are NOT included here because they make real API
-calls. 
+calls.
 
 Run:
     cd backend && uv run pytest tests/test_integration.py -v
@@ -27,8 +27,8 @@ from tests.conftest import _init_test_db, make_test_app
 # Shared fixtures
 # ---------------------------------------------------------------------------
 
-_ALICE   = {"username": "alice",   "email": "alice@example.com",   "password": "Password123!"}
-_BOB     = {"username": "bob",     "email": "bob@example.com",     "password": "Password456!"}
+_ALICE = {"username": "alice", "email": "alice@example.com", "password": "Password123!"}
+_BOB = {"username": "bob", "email": "bob@example.com", "password": "Password456!"}
 _CHARLIE = {"username": "charlie", "email": "charlie@example.com", "password": "Password789!"}
 
 _STORY_PAYLOAD = {
@@ -50,9 +50,7 @@ def client(tmp_path):
     """All four non-generation routers, fresh DB per test."""
     db_path = str(tmp_path / "test.db")
     asyncio.run(_init_test_db(db_path))
-    with TestClient(
-        make_test_app(db_path, auth_router, user_router, friend_router, stories_router)
-    ) as c:
+    with TestClient(make_test_app(db_path, auth_router, user_router, friend_router, stories_router)) as c:
         yield c
 
 
@@ -70,6 +68,7 @@ def _signup(client, payload: dict) -> tuple[int, dict]:
 # ---------------------------------------------------------------------------
 # Flow 1: Full auth lifecycle — signup → login → logout → protected endpoint rejected
 # ---------------------------------------------------------------------------
+
 
 def test_auth_lifecycle(client):
     """
@@ -97,9 +96,11 @@ def test_auth_lifecycle(client):
     assert me_after.status_code == 200
     assert me_after.json()["is_online"] is False
 
+
 # ---------------------------------------------------------------------------
 # Flow 2: Profile update visible via public endpoint
 # ---------------------------------------------------------------------------
+
 
 def test_profile_update_visible_publicly(client):
     """
@@ -122,13 +123,14 @@ def test_profile_update_visible_publicly(client):
 # Flow 3: Full friendship state machine
 # ---------------------------------------------------------------------------
 
+
 def test_friendship_full_lifecycle(client):
     """
     send → pending → accept → friends list → delete → empty again.
     Covers the most common happy path across auth + friend routers.
     """
     alice_id, alice_h = _signup(client, _ALICE)
-    bob_id,   bob_h   = _signup(client, _BOB)
+    bob_id, bob_h = _signup(client, _BOB)
 
     # Alice sends request to Bob
     r = client.post(f"/api/friends/{bob_id}", headers=alice_h)
@@ -143,7 +145,7 @@ def test_friendship_full_lifecycle(client):
     assert r.status_code == 200, r.text
 
     # Both see each other in /friends
-    assert any(f["username"] == "bob"   for f in client.get("/api/friends/", headers=alice_h).json())
+    assert any(f["username"] == "bob" for f in client.get("/api/friends/", headers=alice_h).json())
     assert any(f["username"] == "alice" for f in client.get("/api/friends/", headers=bob_h).json())
 
     # Alice removes Bob
@@ -152,7 +154,7 @@ def test_friendship_full_lifecycle(client):
 
     # Both lists are empty again
     assert client.get("/api/friends/", headers=alice_h).json() == []
-    assert client.get("/api/friends/", headers=bob_h).json()   == []
+    assert client.get("/api/friends/", headers=bob_h).json() == []
 
 
 def test_duplicate_request_after_deletion_is_allowed(client):
@@ -161,7 +163,7 @@ def test_duplicate_request_after_deletion_is_allowed(client):
     This tests that DELETE fully cleans the row rather than soft-deleting it.
     """
     alice_id, alice_h = _signup(client, _ALICE)
-    bob_id,   bob_h   = _signup(client, _BOB)
+    bob_id, bob_h = _signup(client, _BOB)
 
     #   1. Alice sends request to Bob
     r = client.post(f"/api/friends/{bob_id}", headers=alice_h)
@@ -180,6 +182,7 @@ def test_duplicate_request_after_deletion_is_allowed(client):
 # ---------------------------------------------------------------------------
 # Flow 4: Story CRUD — create → list → get → delete
 # ---------------------------------------------------------------------------
+
 
 def test_story_full_lifecycle(client):
     """
@@ -220,23 +223,30 @@ def test_get_nonexistent_story_returns_404(client):
 # Flow 5: Auth token gates — protected routes reject missing / malformed tokens
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize("method,path", [
-    ("GET",    "/api/users/me"),
-    ("PUT",    "/api/users/me"),
-    ("GET",    "/api/friends/"),
-    ("GET",    "/api/friends/pending"),
-    ("POST",   "/api/auth/logout"),
-])
+
+@pytest.mark.parametrize(
+    "method,path",
+    [
+        ("GET", "/api/users/me"),
+        ("PUT", "/api/users/me"),
+        ("GET", "/api/friends/"),
+        ("GET", "/api/friends/pending"),
+        ("POST", "/api/auth/logout"),
+    ],
+)
 def test_protected_routes_reject_no_token(client, method, path):
     """Every route that requires auth must return 401 with no Authorization header."""
     r = client.request(method, path)
     assert r.status_code == 401
 
 
-@pytest.mark.parametrize("method,path", [
-    ("GET",    "/api/users/me"),
-    ("GET",    "/api/friends/"),
-])
+@pytest.mark.parametrize(
+    "method,path",
+    [
+        ("GET", "/api/users/me"),
+        ("GET", "/api/friends/"),
+    ],
+)
 def test_protected_routes_reject_bad_token(client, method, path):
     """Garbage token must return 401, not 500."""
     r = client.request(method, path, headers={"Authorization": "Bearer not.a.real.token"})
@@ -247,6 +257,7 @@ def test_protected_routes_reject_bad_token(client, method, path):
 # Flow 6: Cross-user isolation — one user cannot act on another's data
 # ---------------------------------------------------------------------------
 
+
 def test_cannot_delete_someone_elses_friendship(client):
     """
     Charlie has no relationship with Alice or Bob.
@@ -254,8 +265,8 @@ def test_cannot_delete_someone_elses_friendship(client):
     friendship with Alice.
     """
     alice_id, alice_h = _signup(client, _ALICE)
-    bob_id,   bob_h   = _signup(client, _BOB)
-    _,        charlie_h = _signup(client, _CHARLIE)
+    bob_id, bob_h = _signup(client, _BOB)
+    _, charlie_h = _signup(client, _CHARLIE)
 
     # Alice and Bob become friends
     client.post(f"/api/friends/{bob_id}", headers=alice_h)
@@ -275,17 +286,17 @@ def test_pending_list_scoped_to_current_user(client):
     Bob's /pending must contain only Alice's request to him — not the one
     sent to Charlie.
     """
-    _,          alice_h   = _signup(client, _ALICE)
-    bob_id,     bob_h     = _signup(client, _BOB)
+    _, alice_h = _signup(client, _ALICE)
+    bob_id, bob_h = _signup(client, _BOB)
     charlie_id, charlie_h = _signup(client, _CHARLIE)
 
-    client.post(f"/api/friends/{bob_id}",     headers=alice_h)
+    client.post(f"/api/friends/{bob_id}", headers=alice_h)
     client.post(f"/api/friends/{charlie_id}", headers=alice_h)
 
-    bob_pending     = client.get("/api/friends/pending", headers=bob_h).json()
+    bob_pending = client.get("/api/friends/pending", headers=bob_h).json()
     charlie_pending = client.get("/api/friends/pending", headers=charlie_h).json()
 
-    assert len(bob_pending)     == 1 and bob_pending[0]["username"]     == "alice"
+    assert len(bob_pending) == 1 and bob_pending[0]["username"] == "alice"
     assert len(charlie_pending) == 1 and charlie_pending[0]["username"] == "alice"
 
 
@@ -294,16 +305,16 @@ def test_friends_list_scoped_to_current_user(client):
     Alice–Bob are friends. Charlie–Bob are friends.
     Alice's /friends must not include Charlie, even though Charlie shares Bob.
     """
-    alice_id,   alice_h   = _signup(client, _ALICE)
-    bob_id,     bob_h     = _signup(client, _BOB)
+    alice_id, alice_h = _signup(client, _ALICE)
+    bob_id, bob_h = _signup(client, _BOB)
     charlie_id, charlie_h = _signup(client, _CHARLIE)
 
     # Alice ↔ Bob
-    client.post(f"/api/friends/{bob_id}",     headers=alice_h)
+    client.post(f"/api/friends/{bob_id}", headers=alice_h)
     client.post(f"/api/friends/{alice_id}/accept", headers=bob_h)
 
     # Charlie ↔ Bob
-    client.post(f"/api/friends/{bob_id}",       headers=charlie_h)
+    client.post(f"/api/friends/{bob_id}", headers=charlie_h)
     client.post(f"/api/friends/{charlie_id}/accept", headers=bob_h)
 
     alice_friends = client.get("/api/friends/", headers=alice_h).json()

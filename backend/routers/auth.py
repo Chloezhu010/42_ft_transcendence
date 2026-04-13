@@ -1,6 +1,7 @@
 """
 Auth router (handle signup, login, logout)
 """
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from auth_utils import (
@@ -23,8 +24,9 @@ from models import (
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
+
 @router.post("/signup", response_model=TokenResponse)
-async def signup(body: SignupRequest, db = Depends(get_db)):
+async def signup(body: SignupRequest, db=Depends(get_db)):
     """Signup: check email isn't taken, create user, return JWT token."""
     # Check if username or email already exists
     if await get_user_by_email(db, body.email):
@@ -37,8 +39,9 @@ async def signup(body: SignupRequest, db = Depends(get_db)):
     access_token = create_access_token(user_id)
     return TokenResponse(access_token=access_token)
 
+
 @router.post("/login", response_model=TokenResponse)
-async def login(body: LoginRequest, db = Depends(get_db)):
+async def login(body: LoginRequest, db=Depends(get_db)):
     """Login: verify password, set user online, return JWT token."""
     # Fetch user by email
     user = await get_user_by_email(db, body.email)
@@ -50,8 +53,9 @@ async def login(body: LoginRequest, db = Depends(get_db)):
     access_token = create_access_token(user["id"])
     return TokenResponse(access_token=access_token)
 
+
 @router.post("/logout")
-async def logout(current_user = Depends(get_current_user), db = Depends(get_db)):
+async def logout(current_user=Depends(get_current_user), db=Depends(get_db)):
     """Logout: validate jwt token, set offline."""
     await set_online_status(db, current_user["id"], False)
     return {"message": "Logged out successfully"}
