@@ -1,40 +1,18 @@
 import asyncio
 
-import aiosqlite
 import pytest
-from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from db.database import _create_tables, get_db
 from routers.auth import router
+from tests.conftest import _init_test_db, make_test_app
 
-# --- Test setup ---
-async def _init_test_db(db_path: str):
-    """Create schema in a temp db (mirror init_db in production)."""
-    async with aiosqlite.connect(db_path) as db:
-        await _create_tables(db)
-
-def make_test_app(db_path: str) -> FastAPI:
-    """Build a min fastapi app with only the auth router + DB override."""
-    app = FastAPI()
-    async def override_get_db():
-        db = await aiosqlite.connect(db_path)
-        db.row_factory = aiosqlite.Row
-        await db.execute("PRAGMA foreign_keys = ON")
-        try:
-            yield db
-        finally:
-            await db.close()
-    app.dependency_overrides[get_db] = override_get_db
-    app.include_router(router)
-    return app
-
+# --- Fixtures ---
 @pytest.fixture
 def client(tmp_path):
     """Fresh DB + TestClient per test function."""
     db_path = str(tmp_path / "test.db")
     asyncio.run(_init_test_db(db_path))
-    with TestClient(make_test_app(db_path)) as c:
+    with TestClient(make_test_app(db_path, router)) as c:
         yield c
 
 # --- Test cases ---
