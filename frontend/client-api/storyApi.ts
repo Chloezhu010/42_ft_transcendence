@@ -1,4 +1,7 @@
-import { apiFetch, API_BASE } from './apiClient';
+/**
+ * Typed client calls for story persistence endpoints.
+ */
+import { API_BASE, apiFetch } from './apiClient';
 
 export interface KidProfileResponse {
   id: number;

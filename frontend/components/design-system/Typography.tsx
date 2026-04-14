@@ -1,10 +1,10 @@
-import React from 'react';
+import { createElement, type ReactNode } from 'react';
 
 type Variant = 'h1' | 'h2' | 'h3' | 'h4' | 'body' | 'caption' | 'label';
 
 interface TypographyProps {
   variant?: Variant;
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 }
 
@@ -18,21 +18,41 @@ const STYLES: Record<Variant, string> = {
   label: 'font-rounded font-semibold text-lg tracking-wide uppercase',
 };
 
-export const Typography: React.FC<TypographyProps> = ({
+function getTypographyTag(variant: Variant): 'h1' | 'h2' | 'h3' | 'h4' | 'label' | 'p' {
+  if (variant.startsWith('h')) {
+    return variant;
+  }
+
+  if (variant === 'label') {
+    return 'label';
+  }
+
+  return 'p';
+}
+
+export function Typography({
   variant = 'body',
   children,
   className = '',
-}) => {
-  const Component = variant.startsWith('h') ? variant : variant === 'label' ? 'label' : 'p';
+}: TypographyProps): JSX.Element {
+  const componentTag = getTypographyTag(variant);
   const baseClasses = 'transition-colors duration-200 text-brand-dark';
 
-  return React.createElement(
-    Component,
+  return createElement(
+    componentTag,
     { className: `${STYLES[variant]} ${baseClasses} ${className}` },
     children,
   );
-};
+}
 
-export const Heading = (props: TypographyProps) => <Typography variant="h2" {...props} />;
-export const Text = (props: TypographyProps) => <Typography variant="body" {...props} />;
-export const Label = (props: TypographyProps) => <Typography variant="label" {...props} />;
+export function Heading(props: TypographyProps): JSX.Element {
+  return <Typography variant="h2" {...props} />;
+}
+
+export function Text(props: TypographyProps): JSX.Element {
+  return <Typography variant="body" {...props} />;
+}
+
+export function Label(props: TypographyProps): JSX.Element {
+  return <Typography variant="label" {...props} />;
+}

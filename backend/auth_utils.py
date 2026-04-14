@@ -1,17 +1,18 @@
-import os  # for environment variable access
-from datetime import UTC, datetime, timedelta  # for token expiration
+import os
+from datetime import UTC, datetime, timedelta
 
-import aiosqlite  # for async SQLite access
-import bcrypt  # to hash/verify pwd
-import jwt  # for encoding and decoding JWT tokens
-from fastapi import Depends, HTTPException, status  # to extract the token from the Authorization header
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer  # for token-based authentication
-from jwt.exceptions import InvalidTokenError  # for handling JWT errors
+import aiosqlite
+import bcrypt
+import jwt
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jwt.exceptions import InvalidTokenError
 
-from db.database import get_db  # to access the database connection
+from db.database import get_db
 
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_HOURS = 24
+DEFAULT_BCRYPT_ROUNDS = 12
 
 
 def _get_secret_key() -> str:
@@ -21,23 +22,37 @@ def _get_secret_key() -> str:
     return key
 
 
-security = HTTPBearer()  # for extracting the token from the Authorization header
+def _get_bcrypt_rounds() -> int:
+    """Return bcrypt rounds from env, clamped to bcrypt's valid range."""
+    configured = os.getenv("BCRYPT_ROUNDS")
+    if not configured:
+        return DEFAULT_BCRYPT_ROUNDS
+
+    try:
+        rounds = int(configured)
+    except ValueError:
+        return DEFAULT_BCRYPT_ROUNDS
+
+    return max(4, min(31, rounds))
+
+
+security = HTTPBearer()
 
 
 # --- Password helpers ---
 def hash_password(plain: str) -> str:
     """Hash a plaintext password."""
     return bcrypt.hashpw(
-        plain.encode(),  # bcrypt requires bytes input, not str
-        bcrypt.gensalt(),  # generate random salt
-    ).decode()  # decode back to string for storage
+        plain.encode(),
+        bcrypt.gensalt(rounds=_get_bcrypt_rounds()),
+    ).decode()
 
 
 def verify_password(plain: str, hashed: str) -> bool:
     """Verify a plaintext password against a hash. Returns True if they match."""
     return bcrypt.checkpw(
-        plain.encode(),  # bcrypt requires bytes input, not str
-        hashed.encode(),  # stored hash is also string, encode to bytes
+        plain.encode(),
+        hashed.encode(),
     )
 
 
@@ -45,34 +60,33 @@ def verify_password(plain: str, hashed: str) -> bool:
 def create_access_token(user_id: int) -> str:
     """Create a JWT token for the given user ID."""
     payload = {
-        "sub": str(user_id),  # subject is the user ID
-        "exp": datetime.now(UTC) + timedelta(hours=TOKEN_EXPIRE_HOURS),  # token expiration time
+        "sub": str(user_id),
+        "exp": datetime.now(UTC) + timedelta(hours=TOKEN_EXPIRE_HOURS),
     }
     return jwt.encode(payload, _get_secret_key(), algorithm=ALGORITHM)
 
 
 # --- get_current_user dependency ---
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),  # extract token from Authorization header
-    db: aiosqlite.Connection = Depends(get_db),  # get database connection
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: aiosqlite.Connection = Depends(get_db),
 ):
     unauthorized = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    # decode the token and extract user ID
     try:
         payload = jwt.decode(credentials.credentials, _get_secret_key(), algorithms=[ALGORITHM])
-        user_id: str | None = payload.get("sub")  # get user ID from token payload
+        user_id: str | None = payload.get("sub")
         if user_id is None:
             raise unauthorized
         user_id_int = int(user_id)
     except (InvalidTokenError, ValueError, TypeError):
         raise unauthorized
-    # Fetch user from DB to verify they still exist (e.g. not deleted)
+
     async with db.execute("SELECT id, username, email FROM users WHERE id = ?", (user_id_int,)) as cursor:
         user = await cursor.fetchone()
-        if user is None:  # user not found in DB
+        if user is None:
             raise unauthorized
-        return dict(user)  # return user data as dict for use in route handlers
+        return dict(user)

@@ -20,7 +20,7 @@
 | 6 | User Management | Standard user management and authentication | Major | 2 | ❌ Not started | Medium | Profile update, avatar upload, friends + online status — **requires mandatory auth blocker to be resolved first** |
 | 7 | User Management | OAuth 2.0 (42 School / GitHub / Google) | Minor | 1 | ❌ Not started | Low | **Depends on #6** — OAuth extends the auth system; 42 OAuth fits naturally for a 42 project |
 | 7b | User Management | User activity analytics and insights dashboard | Minor | 1 | ❌ Not started | Low | **Depends on #6** — per-user stats: stories generated, panels created, favourite art styles, generation history; simple charts on profile page |
-| 8 | AI | LLM system interface (Gemini story + image generation) | Major | 2 | ⚠️ Partial | Low | Core generation works; **add streaming responses** — subject explicitly requires it |
+| 8 | AI | LLM system interface (Gemini story + image generation) | Major | 2 | ✅ Done | Low | Text + image generation with retry; story-script streaming via NDJSON (`POST /api/generate/story-script/stream`) drives the live title/foreword intro |
 | 9 | AI | Voice / speech integration | Minor | 1 | ❌ Not started | Low | TTS reading comic panels aloud fits naturally for a children's app; Web Speech API is built into Chrome (no extra library) |
 | 10 | DevOps | Prometheus + Grafana monitoring | Major | 2 | ❌ Not started | Medium | `prometheus-fastapi-instrumentator` gives FastAPI metrics in ~5 lines; add Prometheus + Grafana to Docker Compose |
 | 11 | DevOps | Backend as microservices | Major | 2 | 🚫 Dropped | ⚠️ High | Full architectural rewrite — split monolith into auth-service / story-service / ai-service; significant inter-service communication work |
@@ -45,7 +45,7 @@
 ```
 Mandatory auth (blocker) ──► Standard user management (#6) ──► OAuth 2.0 (#7)
                          ──► Public API (#2)  ← benefits from user-scoped API keys
-LLM interface (#8)       ──► add streaming before claiming
+LLM interface (#8)       ──► streaming shipped — claimable now
 Microservices (#11)      ──► do last — highest risk, can drop if time is short
 ```
 
@@ -115,7 +115,7 @@ Microservices (#11)      ──► do last — highest risk, can drop if time is
 |--------|------|-----|--------|-------------|------------------------|
 | AI Opponent for games | Major | 2 | 🚫 | — | Requires a game module |
 | RAG system | Major | 2 | ❌ | Nothing | Vector store, retrieval pipeline, LLM response generation |
-| **LLM system interface** | Major | 2 | ⚠️ | `gemini_service.py`: text generation (story scripts) + image generation (panels); exponential backoff on 429; error handling | **Add streaming responses** — currently all Gemini calls are blocking; subject explicitly requires "handle streaming responses properly" |
+| **LLM system interface** | Major | 2 | ✅ | `gemini_service.py`: text generation (story scripts) + image generation (panels); exponential backoff on 429; error handling. Streaming path `generate_story_script_stream` + `POST /api/generate/story-script/stream` emits NDJSON `intro_delta`/`script`/`error` events so the frontend can render the title and foreword character-by-character. | — |
 | Recommendation system (ML) | Major | 2 | ❌ | Nothing | Collaborative/content-based filtering model |
 | Content moderation AI | Minor | 1 | ❌ | Nothing | Auto-moderation on user content |
 | Voice/speech integration | Minor | 1 | ❌ | Nothing | Speech-to-text or TTS |
@@ -192,8 +192,8 @@ Microservices (#11)      ──► do last — highest risk, can drop if time is
 
 | Status | Proposed modules | Pts |
 |--------|-----------------|-----|
-| ✅ Done | Frameworks (Web) | 2 |
-| ⚠️ Partial — low effort to complete | Public API, Notification system, Design system, LLM interface, Health check | 7 |
+| ✅ Done | Frameworks (Web), LLM interface | 4 |
+| ⚠️ Partial — low effort to complete | Public API, Notification system, Design system, Health check | 5 |
 | ❌ Not started — medium effort | Standard user management, OAuth, User activity analytics, Multi-language, Prometheus + Grafana | 7 |
 | 🚫 Dropped | Backend as microservices | — |
 | ❌ Not started — low effort | Voice/speech | 1 |

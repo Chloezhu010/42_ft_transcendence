@@ -1,6 +1,8 @@
-import { KidProfile, Story } from '../types';
-import { KidProfileForGeneration } from './generationApi';
-import { KidProfileResponse, StoryDetailResponse } from './storyApi';
+/**
+ * Pure mappers between backend DTOs and frontend story models.
+ */
+import type { KidProfile, Story } from '@/types';
+import type { KidProfileForGeneration, KidProfileResponse, StoryDetailResponse } from '@api';
 
 export function mapApiStoryToStory(data: StoryDetailResponse): Story {
   return {

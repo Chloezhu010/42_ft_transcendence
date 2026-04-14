@@ -1,8 +1,8 @@
-import React from 'react';
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
-interface SketchyButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface SketchyButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'outline';
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 const VARIANT_CLASSES: Record<NonNullable<SketchyButtonProps['variant']>, string> = {
@@ -10,13 +10,13 @@ const VARIANT_CLASSES: Record<NonNullable<SketchyButtonProps['variant']>, string
   outline: 'bg-white text-brand-primary border-brand-primary hover:bg-brand-light',
 };
 
-export const SketchyButton: React.FC<SketchyButtonProps> = ({
+function SketchyButton({
   variant = 'primary',
   children,
   className = '',
   style,
   ...props
-}) => {
+}: SketchyButtonProps): JSX.Element {
   return (
     <button
       className={`font-black text-xl px-8 py-4 border-4 transition-all hover:scale-105 active:scale-95 ${VARIANT_CLASSES[variant]} ${className}`}
@@ -26,4 +26,6 @@ export const SketchyButton: React.FC<SketchyButtonProps> = ({
       {children}
     </button>
   );
-};
+}
+
+export { SketchyButton };

@@ -44,3 +44,12 @@ npm run build
 ```
 
 If your change touches both sides, run both sets of checks.
+
+## Frontend Path Alias
+
+The frontend resolves `@/*` to `frontend/*` (wired in `tsconfig.json`, `vite.config.ts`, and `vitest.config.ts`). Prefer the alias over relative `../` imports so files can move without rewriting import paths:
+
+```ts
+import { Heading } from '@/components/design-system/Typography';
+import { useStoryGenerator } from '@/hooks/useStoryGenerator';
+```

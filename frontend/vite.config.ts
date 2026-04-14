@@ -1,5 +1,9 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   server: {
@@ -7,6 +11,18 @@ export default defineConfig({
     host: '0.0.0.0',
   },
   plugins: [react()],
+  resolve: {
+    alias: [
+      {
+        find: '@api',
+        replacement: `${__dirname}/client-api/index.ts`,
+      },
+      {
+        find: /^@\//,
+        replacement: `${__dirname}/`,
+      },
+    ],
+  },
   // Load .env from project root unless building on Vercel
   envDir: process.env.VERCEL ? '.' : '..',
 });

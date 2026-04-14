@@ -2,10 +2,6 @@
 CRUD operations for database entities (async SQLite).
 """
 
-import base64
-import os
-import uuid
-
 import aiosqlite
 
 from models import (
@@ -18,45 +14,9 @@ from models import (
     StoryResponse,
     StoryUpdatePanels,
 )
-
-IMAGES_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "images")
-os.makedirs(IMAGES_DIR, exist_ok=True)
+from services.image_storage import delete_local_image, save_base64_image
 
 USER_ID = 1
-
-
-# --- Helpers ---
-def save_base64_image(base64_data: str, prefix: str = "img") -> str | None:
-    """Save base64 image to local images/ directory and return filename."""
-    if not base64_data:
-        return None
-
-    # Remove data URL prefix if present
-    if "," in base64_data:
-        base64_data = base64_data.split(",")[1]
-
-    try:
-        image_bytes = base64.b64decode(base64_data)
-    except Exception:
-        return None
-
-    filename = f"{prefix}_{uuid.uuid4().hex[:8]}.png"
-    filepath = os.path.join(IMAGES_DIR, filename)
-    with open(filepath, "wb") as f:
-        f.write(image_bytes)
-
-    return filename
-
-
-def delete_local_image(filename: str | None) -> None:
-    """Delete a local image file."""
-    if not filename:
-        return
-    filepath = os.path.join(IMAGES_DIR, filename)
-    try:
-        os.unlink(filepath)
-    except FileNotFoundError:
-        pass
 
 
 # --- Kid Profile CRUD ---

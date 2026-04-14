@@ -17,6 +17,15 @@
       "react-dom"
     ],
     "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@api": [
+        "./client-api/index.ts"
+      ],
+      "@/*": [
+        "./*"
+      ]
+    },
     "isolatedModules": true,
     "moduleDetection": "force",
     "allowJs": true,
