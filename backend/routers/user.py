@@ -83,15 +83,19 @@ async def upload_avatar(file: UploadFile, current_user=Depends(get_current_user)
                 if size > MAX_SIZE:
                     raise HTTPException(status_code=413, detail="File too large, must be under 5MB")
                 await out.write(chunk)
-    except HTTPException:
-        tmp.unlink(missing_ok=True)  # handle is closed here — safe to delete on all platforms
+    except Exception:
+        tmp.unlink(missing_ok=True)  # covers HTTPException, OSError, etc.
         raise
     tmp.replace(dest)  # atomic rename: only happens if size check passed
 
-    # update user's avatar_path in db
-    updated_row = await update_avatar(db, current_user["id"], relative_path)
-    if updated_row is None:
-        raise HTTPException(status_code=404, detail="User not found")
+    # update user's avatar_path in db — clean up dest if anything goes wrong
+    try:
+        updated_row = await update_avatar(db, current_user["id"], relative_path)
+        if updated_row is None:
+            raise HTTPException(status_code=404, detail="User not found")
+    except Exception:
+        dest.unlink(missing_ok=True)
+        raise
 
     # delete old avatar file after DB update succeeds (if not default avatar)
     if old_path and old_path != _DEFAULT_AVATAR:

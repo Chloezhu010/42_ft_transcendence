@@ -64,10 +64,7 @@ _STORY_WITH_PANELS = {
 }
 
 # Minimal valid base64 PNG (1×1 white pixel) — used to exercise image-writing paths.
-_FAKE_IMAGE_B64 = (
-    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk"
-    "+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
-)
+_FAKE_IMAGE_B64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
 
 
 @pytest.fixture

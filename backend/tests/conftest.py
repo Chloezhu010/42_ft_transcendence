@@ -6,7 +6,7 @@ from fastapi.routing import APIRouter
 
 from db.database import _create_tables, get_db
 
-os.environ.setdefault("JWT_SECRET_KEY", "test-secret-key-that-is-long-enough-for-hs256")
+os.environ["JWT_SECRET_KEY"] = "test-secret-key-that-is-long-enough-for-hs256"
 
 
 async def _init_test_db(db_path: str) -> None:
