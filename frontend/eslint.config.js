@@ -76,7 +76,7 @@ export default defineConfig([
       patterns: [
         {
           group: ['@/client-api/*'],
-          message: 'Import backend communication through "@api" so the public boundary stays obvious and avoids the nginx /api proxy path.',
+          message: 'Import backend communication through "@client-api" so the public boundary stays obvious and avoids the nginx /api proxy path.',
         },
         {
           group: ['@/utils/*'],
@@ -111,7 +111,7 @@ export default defineConfig([
       ],
       patterns: [
         {
-          group: ['@api', '@/client-api', '@/client-api/*'],
+          group: ['@client-api', '@/client-api', '@/client-api/*'],
           message: 'Components should receive data via props instead of calling the backend directly.',
         },
         {
@@ -127,7 +127,7 @@ export default defineConfig([
     rules: restrictImports({
       paths: [
         {
-          name: '@api',
+          name: '@client-api',
           allowTypeImports: true,
           message: 'Utilities may depend on client API types, but runtime backend calls stay in client-api/.',
         },

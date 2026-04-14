@@ -4,3 +4,4 @@
 export * from './apiClient';
 export * from './storyApi';
 export * from './generationApi';
+export * from './authApi';

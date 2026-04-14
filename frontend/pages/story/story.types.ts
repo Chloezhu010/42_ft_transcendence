@@ -1,7 +1,7 @@
 /**
  * Shared types for the story page view state and generation lifecycle.
  */
-import type { KidProfileForGeneration } from '@api';
+import type { KidProfileForGeneration } from '@client-api';
 import type { Story } from '@/types';
 
 export enum StoryPageView {

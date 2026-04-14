@@ -2,7 +2,7 @@
  * Pure mappers between backend DTOs and frontend story models.
  */
 import type { KidProfile, Story } from '@/types';
-import type { KidProfileForGeneration, KidProfileResponse, StoryDetailResponse } from '@api';
+import type { KidProfileForGeneration, KidProfileResponse, StoryDetailResponse } from '@client-api';
 
 export function mapApiStoryToStory(data: StoryDetailResponse): Story {
   return {

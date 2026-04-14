@@ -19,7 +19,7 @@
     "moduleResolution": "bundler",
     "baseUrl": ".",
     "paths": {
-      "@api": [
+      "@client-api": [
         "./client-api/index.ts"
       ],
       "@/*": [

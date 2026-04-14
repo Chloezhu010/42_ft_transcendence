@@ -3,7 +3,7 @@
  * Renders loading, empty, and card-grid states from page-level data.
  */
 import { Link } from 'react-router-dom';
-import type { StoryListItem } from '@api';
+import type { StoryListItem } from '@client-api';
 import StorageImage from '@/components/StorageImage';
 import { formatStoryDate, getStoryDisplayTitle } from './gallery.helpers';
 import { useGalleryPage } from './useGalleryPage';

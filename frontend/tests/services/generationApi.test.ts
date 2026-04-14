@@ -7,7 +7,7 @@ import {
   type GeneratedStoryScript,
   type KidProfileForGeneration,
   streamStoryScript,
-} from '@api';
+} from '@client-api';
 
 const PROFILE: KidProfileForGeneration = {
   name: 'Leo',

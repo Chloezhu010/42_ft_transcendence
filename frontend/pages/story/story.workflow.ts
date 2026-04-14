@@ -11,7 +11,7 @@ import {
   streamStoryScript,
   type StoryIntroField,
   updateStory,
-} from '@api';
+} from '@client-api';
 import type { KidProfile, Story } from '@/types';
 import {
   imageSourceToPureBase64,

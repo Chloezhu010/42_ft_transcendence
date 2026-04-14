@@ -2,7 +2,7 @@
  * Story panel editing workflow.
  * Keeps image generation and persistence details out of the page controller.
  */
-import { editPanelImage, updatePanelImage } from '@api';
+import { editPanelImage, updatePanelImage } from '@client-api';
 import type { ComicPanelData, Story } from '@/types';
 
 interface EditStoryPanelImageParams {

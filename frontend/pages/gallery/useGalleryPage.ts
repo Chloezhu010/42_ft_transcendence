@@ -4,7 +4,7 @@
  */
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { deleteStory, getStories, type StoryListItem } from '@api';
+import { deleteStory, getStories, type StoryListItem } from '@client-api';
 
 interface UseGalleryPageResult {
   isLoading: boolean;
