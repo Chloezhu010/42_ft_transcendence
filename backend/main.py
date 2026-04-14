@@ -10,10 +10,11 @@ from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from config import get_config
 from db.database import get_db, init_db
-from routers import generation, stories
+from routers import auth, friend, generation, stories, user
 
 
 @asynccontextmanager
@@ -44,7 +45,7 @@ app.add_middleware(
     allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 # Serve images as static files
@@ -53,8 +54,15 @@ images_dir.mkdir(exist_ok=True)
 app.mount("/images", StaticFiles(directory=str(images_dir)), name="images")
 
 # Register routers
-app.include_router(stories.router)
+app.include_router(auth.router)
+app.include_router(user.router)
+app.include_router(friend.router)
 app.include_router(generation.router)
+app.include_router(stories.router)
+
+# Expose /metrics endpoint for Prometheus scraping
+# Exclude internal endpoints to avoid noise in dashboards
+Instrumentator(excluded_handlers=["/metrics", "/health"]).instrument(app).expose(app)
 
 
 # --- Health Check ---

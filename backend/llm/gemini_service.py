@@ -22,8 +22,16 @@ INTRO_FIELDS: tuple[str, ...] = ("title", "foreword")
 
 load_dotenv(Path(__file__).resolve().parent.parent.parent / ".env")
 
-# Initialize client with API key from environment
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY", ""))
+# Client is initialized lazily on first use so importing this module
+# in test environments (where GEMINI_API_KEY is unset) doesn't crash.
+_client: genai.Client | None = None
+
+
+def _get_client() -> genai.Client:
+    global _client
+    if _client is None:
+        _client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+    return _client
 
 
 ART_STYLES = {
@@ -138,7 +146,7 @@ async def generate_story_script(
     contents = _build_story_script_contents(prompt, profile.photo_base64)
 
     async def _generate() -> dict:
-        response = await client.aio.models.generate_content(
+        response = await _get_client().aio.models.generate_content(
             model=STORY_SCRIPT_MODEL,
             contents=contents,
             config=_STORY_SCRIPT_CONFIG,
@@ -169,7 +177,7 @@ async def generate_story_script_stream(
     prompt = _build_story_script_prompt(profile)
     contents = _build_story_script_contents(prompt, profile.photo_base64)
 
-    response_stream = await client.aio.models.generate_content_stream(
+    response_stream = await _get_client().aio.models.generate_content_stream(
         model=STORY_SCRIPT_MODEL,
         contents=contents,
         config=_STORY_SCRIPT_CONFIG,
@@ -203,7 +211,7 @@ Characters: {cast_guide}. Hero is a 5-6 year old child — do NOT age up.
 Scene: {prompt}.
 Cinematic angles, characters interact with each other/world — NEVER face the camera. Full-bleed, borderless."""
 
-        response = await client.aio.models.generate_content(
+        response = await _get_client().aio.models.generate_content(
             model="gemini-3.1-flash-image-preview",
             contents=full_prompt,
             config=types.GenerateContentConfig(
@@ -238,7 +246,7 @@ Preserve composition and style. Characters must NOT face the camera."""
             mime_type="image/png",
         )
 
-        response = await client.aio.models.generate_content(
+        response = await _get_client().aio.models.generate_content(
             model="gemini-3.1-flash-image-preview",
             contents=[image_data, full_prompt],
             config=types.GenerateContentConfig(
