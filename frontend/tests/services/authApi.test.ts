@@ -1,6 +1,19 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { getMe, getUser, login, logout, signup, updateMe, uploadAvatar } from '@api';
+import {
+  acceptFriendRequest,
+  getFriends,
+  getMe,
+  getPendingFriendRequests,
+  getUser,
+  login,
+  logout,
+  removeFriend,
+  sendFriendRequest,
+  signup,
+  updateMe,
+  uploadAvatar,
+} from '@api';
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -13,6 +26,15 @@ const USER_RESPONSE = {
   avatar_url: 'avatars/alice.png',
   is_online: true,
   created_at: '2026-04-15T12:00:00Z',
+};
+
+const FRIEND_RESPONSE = {
+  id: 2,
+  username: 'bob',
+  avatar_url: 'avatars/bob.png',
+  is_online: false,
+  friendship_status: 'pending' as const,
+  is_requester: true,
 };
 
 describe('authApi', () => {
@@ -299,5 +321,180 @@ describe('authApi', () => {
     );
 
     await expect(getUser(9999)).rejects.toThrow('User not found');
+  });
+
+  it('getFriends sends the bearer token and returns the friend list', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify([FRIEND_RESPONSE]), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+
+    const result = await getFriends('friends-token');
+
+    expect(result).toEqual([FRIEND_RESPONSE]);
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/api/friends'),
+      expect.objectContaining({
+        method: 'GET',
+        headers: expect.objectContaining({
+          Authorization: 'Bearer friends-token',
+        }),
+      })
+    );
+  });
+
+  it('getFriends surfaces backend detail when authorization fails', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ detail: 'Could not validate credentials' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+
+    await expect(getFriends('invalid-token')).rejects.toThrow('Could not validate credentials');
+  });
+
+  it('getPendingFriendRequests returns incoming pending requests', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify([FRIEND_RESPONSE]), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+
+    const result = await getPendingFriendRequests('pending-token');
+
+    expect(result).toEqual([FRIEND_RESPONSE]);
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/api/friends/pending'),
+      expect.objectContaining({
+        method: 'GET',
+        headers: expect.objectContaining({
+          Authorization: 'Bearer pending-token',
+        }),
+      })
+    );
+  });
+
+  it('getPendingFriendRequests surfaces backend detail on auth failure', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ detail: 'Could not validate credentials' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+
+    await expect(getPendingFriendRequests('invalid-token')).rejects.toThrow(
+      'Could not validate credentials'
+    );
+  });
+
+  it('sendFriendRequest posts to the user friend endpoint and returns the friendship', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify(FRIEND_RESPONSE), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+
+    const result = await sendFriendRequest('friend-token', 2);
+
+    expect(result).toEqual(FRIEND_RESPONSE);
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/api/friends/2'),
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({
+          Authorization: 'Bearer friend-token',
+        }),
+      })
+    );
+  });
+
+  it('sendFriendRequest surfaces backend detail for duplicate requests', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ detail: 'A friend request already exists' }), {
+        status: 409,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+
+    await expect(sendFriendRequest('friend-token', 2)).rejects.toThrow(
+      'A friend request already exists'
+    );
+  });
+
+  it('acceptFriendRequest posts to the accept endpoint and returns the updated friendship', async () => {
+    const acceptedFriend = {
+      ...FRIEND_RESPONSE,
+      friendship_status: 'accepted' as const,
+      is_requester: false,
+    };
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify(acceptedFriend), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+
+    const result = await acceptFriendRequest('friend-token', 2);
+
+    expect(result).toEqual(acceptedFriend);
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/api/friends/2/accept'),
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({
+          Authorization: 'Bearer friend-token',
+        }),
+      })
+    );
+  });
+
+  it('acceptFriendRequest surfaces backend detail for missing requests', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ detail: 'Friend request not found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+
+    await expect(acceptFriendRequest('friend-token', 2)).rejects.toThrow(
+      'Friend request not found'
+    );
+  });
+
+  it('removeFriend sends DELETE to the friend endpoint', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ message: 'Friend removed successfully' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+
+    await expect(removeFriend('friend-token', 2)).resolves.toBeUndefined();
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/api/friends/2'),
+      expect.objectContaining({
+        method: 'DELETE',
+        headers: expect.objectContaining({
+          Authorization: 'Bearer friend-token',
+        }),
+      })
+    );
+  });
+
+  it('removeFriend surfaces backend detail when the friendship is missing', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ detail: 'Friendship not found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+
+    await expect(removeFriend('friend-token', 999)).rejects.toThrow('Friendship not found');
   });
 });
