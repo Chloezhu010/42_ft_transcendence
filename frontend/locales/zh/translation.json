@@ -84,7 +84,8 @@
         "label": "数字流行",
         "description": "现代且大胆"
       }
-    }
+    },
+    "back": "返回"
   },
   "magicLoader": {
     "bindingTale": "绑定故事...",

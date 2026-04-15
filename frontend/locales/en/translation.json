@@ -84,7 +84,8 @@
         "label": "Digital Pop",
         "description": "Modern and bold"
       }
-    }
+    },
+    "back": "Back"
   },
   "magicLoader": {
     "bindingTale": "Binding the Tale...",

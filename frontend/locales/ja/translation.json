@@ -84,7 +84,8 @@
         "label": "デジタルポップ",
         "description": "モダンで大胆"
       }
-    }
+    },
+    "back": "戻る"
   },
   "magicLoader": {
     "bindingTale": "物語を結合中...",

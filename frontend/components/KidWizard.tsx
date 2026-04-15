@@ -331,7 +331,7 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
               onClick={() => setStep(s => s - 1)}
               className="flex items-center gap-2 px-6 py-3 font-black text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-xl uppercase tracking-widest text-sm transition-all"
             >
-              <span className="text-lg">←</span> Back
+              <span className="text-lg">←</span> {t('kidWizard.back')}
             </button>
           ) : <div className="w-24" />}
 

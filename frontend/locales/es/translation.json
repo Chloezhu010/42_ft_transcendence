@@ -84,7 +84,8 @@
         "label": "Pop Digital",
         "description": "Moderno y atrevido"
       }
-    }
+    },
+    "back": "Atrás"
   },
   "magicLoader": {
     "bindingTale": "Vinculando la Historia...",

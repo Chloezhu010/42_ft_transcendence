@@ -84,7 +84,8 @@
         "label": "Pop Numérique",
         "description": "Moderne et audacieux"
       }
-    }
+    },
+    "back": "Retour"
   },
   "magicLoader": {
     "bindingTale": "Lier l'Histoire...",
