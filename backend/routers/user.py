@@ -42,7 +42,7 @@ async def get_my_profile(current_user=Depends(get_current_user), db=Depends(get_
     return _to_user_response(row)
 
 
-@router.put("/me", response_model=UserResponse)
+@router.patch("/me", response_model=UserResponse)
 async def update_my_profile(body: UserUpdateRequest, current_user=Depends(get_current_user), db=Depends(get_db)):
     """Update the authenticated user's profile (username, email)."""
     try:

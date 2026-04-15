@@ -95,24 +95,24 @@ def test_get_me_token_for_deleted_user_returns_401(client):
 
 
 # ---------------------------------------------------------------------------
-# PUT /api/users/me
+# PATCH /api/users/me
 # ---------------------------------------------------------------------------
 
 
 def test_update_username(client, alice):
-    r = client.put("/api/users/me", json={"username": "alice2", "email": None}, headers=alice)
+    r = client.patch("/api/users/me", json={"username": "alice2", "email": None}, headers=alice)
     assert r.status_code == 200
     assert r.json()["username"] == "alice2"
 
 
 def test_update_email(client, alice):
-    r = client.put("/api/users/me", json={"username": None, "email": "new@example.com"}, headers=alice)
+    r = client.patch("/api/users/me", json={"username": None, "email": "new@example.com"}, headers=alice)
     assert r.status_code == 200
     assert r.json()["email"] == "new@example.com"
 
 
 def test_update_both_fields(client, alice):
-    r = client.put("/api/users/me", json={"username": "updated", "email": "updated@example.com"}, headers=alice)
+    r = client.patch("/api/users/me", json={"username": "updated", "email": "updated@example.com"}, headers=alice)
     assert r.status_code == 200
     data = r.json()
     assert data["username"] == "updated"
@@ -121,25 +121,25 @@ def test_update_both_fields(client, alice):
 
 def test_update_no_fields_returns_current_profile(client, alice):
     """Sending null for both fields is a no-op — returns the unchanged profile."""
-    r = client.put("/api/users/me", json={"username": None, "email": None}, headers=alice)
+    r = client.patch("/api/users/me", json={"username": None, "email": None}, headers=alice)
     assert r.status_code == 200
     assert r.json()["username"] == "alice"
 
 
 def test_update_duplicate_username_returns_409(client, alice, bob):
-    r = client.put("/api/users/me", json={"username": "bob", "email": None}, headers=alice)
+    r = client.patch("/api/users/me", json={"username": "bob", "email": None}, headers=alice)
     assert r.status_code == 409
     assert "username" in r.json()["detail"].lower()
 
 
 def test_update_duplicate_email_returns_409(client, alice, bob):
-    r = client.put("/api/users/me", json={"username": None, "email": "bob@example.com"}, headers=alice)
+    r = client.patch("/api/users/me", json={"username": None, "email": "bob@example.com"}, headers=alice)
     assert r.status_code == 409
     assert "email" in r.json()["detail"].lower()
 
 
 def test_update_requires_auth(client):
-    r = client.put("/api/users/me", json={"username": "hacker", "email": None})
+    r = client.patch("/api/users/me", json={"username": "hacker", "email": None})
     assert r.status_code == 401
 
 

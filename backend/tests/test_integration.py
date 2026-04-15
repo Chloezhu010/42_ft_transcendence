@@ -135,12 +135,12 @@ def test_auth_lifecycle(client):
 
 def test_profile_update_visible_publicly(client):
     """
-    Alice updates her username via PUT /api/users/me.
+    Alice updates her username via PATCH /api/users/me.
     The change is immediately visible on the unauthenticated GET /api/users/{id}.
     """
     alice_id, alice_h = _signup(client, _ALICE)
 
-    r = client.put("/api/users/me", json={"username": "alice_updated", "email": _ALICE["email"]}, headers=alice_h)
+    r = client.patch("/api/users/me", json={"username": "alice_updated", "email": _ALICE["email"]}, headers=alice_h)
     assert r.status_code == 200, r.text
     assert r.json()["username"] == "alice_updated"
 
@@ -261,7 +261,7 @@ def test_get_nonexistent_story_returns_404(client):
     "method,path",
     [
         ("GET", "/api/users/me"),
-        ("PUT", "/api/users/me"),
+        ("PATCH", "/api/users/me"),
         ("GET", "/api/friends/"),
         ("GET", "/api/friends/pending"),
         ("POST", "/api/auth/logout"),
