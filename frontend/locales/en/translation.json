@@ -66,7 +66,25 @@
         "description": "Makes magic real."
       }
     },
-    "dreamPlaceholder": "e.g. To explore a planet made of candy..."
+    "dreamPlaceholder": "e.g. To explore a planet made of candy...",
+    "artStyles": {
+      "classic": {
+        "label": "Classic Comic",
+        "description": "Bold lines, vibrant colors"
+      },
+      "watercolor": {
+        "label": "Watercolor",
+        "description": "Soft, dreamy aesthetic"
+      },
+      "pencil": {
+        "label": "Pencil Sketch",
+        "description": "Hand-drawn charm"
+      },
+      "digital": {
+        "label": "Digital Pop",
+        "description": "Modern and bold"
+      }
+    }
   },
   "magicLoader": {
     "bindingTale": "Binding the Tale...",

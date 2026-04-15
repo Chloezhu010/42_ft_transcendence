@@ -66,7 +66,25 @@
         "description": "让魔法成真。"
       }
     },
-    "dreamPlaceholder": "例如：探索一个充满糖果的星球..."
+    "dreamPlaceholder": "例如：探索一个充满糖果的星球...",
+    "artStyles": {
+      "classic": {
+        "label": "经典漫画",
+        "description": "粗线条，鲜艳的色彩"
+      },
+      "watercolor": {
+        "label": "水彩",
+        "description": "柔和，梦幻般的美感"
+      },
+      "pencil": {
+        "label": "铅笔素描",
+        "description": "手绘的魅力"
+      },
+      "digital": {
+        "label": "数字流行",
+        "description": "现代且大胆"
+      }
+    }
   },
   "magicLoader": {
     "bindingTale": "绑定故事...",

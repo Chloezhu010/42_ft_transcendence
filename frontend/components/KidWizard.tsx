@@ -310,8 +310,8 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
                     className={`p-6 rounded-3xl border-4 text-center transition-all hover:-translate-y-1 ${profile.artStyle === style.label ? 'border-brand-primary bg-brand-light shadow-soft' : 'border-brand-primary/10 bg-white hover:border-brand-primary/30'}`}
                   >
                     <div className="text-4xl mb-2">{style.icon}</div>
-                    <div className="font-semibold text-lg text-brand-primary">{style.label}</div>
-                    <div className="text-xs text-brand-muted font-semibold">{style.description}</div>
+                    <div className="font-semibold text-lg text-brand-primary">{t(`kidWizard.artStyles.${style.id}.label`)}</div>
+                    <div className="text-xs text-brand-muted font-semibold">{t(`kidWizard.artStyles.${style.id}.description`)}</div>
                   </button>
                 ))}
               </div>

@@ -66,7 +66,25 @@
         "description": "魔法を現実にする。"
       }
     },
-    "dreamPlaceholder": "例：キャンディでできた惑星を探検する..."
+    "dreamPlaceholder": "例：キャンディでできた惑星を探検する...",
+    "artStyles": {
+      "classic": {
+        "label": "クラシックコミック",
+        "description": "太い線、鮮やかな色"
+      },
+      "watercolor": {
+        "label": "水彩画",
+        "description": "柔らかく夢のような美しさ"
+      },
+      "pencil": {
+        "label": "鉛筆スケッチ",
+        "description": "手描きの魅力"
+      },
+      "digital": {
+        "label": "デジタルポップ",
+        "description": "モダンで大胆"
+      }
+    }
   },
   "magicLoader": {
     "bindingTale": "物語を結合中...",

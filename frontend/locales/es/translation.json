@@ -66,7 +66,25 @@
         "description": "Hace la magia real."
       }
     },
-    "dreamPlaceholder": "p.ej. Explorar un planeta hecho de caramelo..."
+    "dreamPlaceholder": "p.ej. Explorar un planeta hecho de caramelo...",
+    "artStyles": {
+      "classic": {
+        "label": "Cómic Clásico",
+        "description": "Líneas gruesas, colores vibrantes"
+      },
+      "watercolor": {
+        "label": "Acuarela",
+        "description": "Estética suave y de ensueño"
+      },
+      "pencil": {
+        "label": "Boceto a Lápiz",
+        "description": "El encanto de lo dibujado a mano"
+      },
+      "digital": {
+        "label": "Pop Digital",
+        "description": "Moderno y atrevido"
+      }
+    }
   },
   "magicLoader": {
     "bindingTale": "Vinculando la Historia...",

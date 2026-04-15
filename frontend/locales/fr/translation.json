@@ -66,7 +66,25 @@
         "description": "Rend la magie réelle."
       }
     },
-    "dreamPlaceholder": "p.ex. Explorer une planète faite de bonbons..."
+    "dreamPlaceholder": "p.ex. Explorer une planète faite de bonbons...",
+    "artStyles": {
+      "classic": {
+        "label": "Bande Dessinée Classique",
+        "description": "Lignes nettes et couleurs vives"
+      },
+      "watercolor": {
+        "label": "Aquarelle",
+        "description": "Esthétique douce et rêveuse"
+      },
+      "pencil": {
+        "label": "Croquis au Crayon",
+        "description": "Le charme du dessin à la main"
+      },
+      "digital": {
+        "label": "Pop Numérique",
+        "description": "Moderne et audacieux"
+      }
+    }
   },
   "magicLoader": {
     "bindingTale": "Lier l'Histoire...",
