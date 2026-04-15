@@ -92,11 +92,10 @@
     "paintingInteractions": "Peindre les interactions cinématiques et construire l'héritage de votre héros"
   },
   "mainPage": {
-    "yourChilds": "La",
+    "yourChilds": "Sa Propre",
     "legend": "Légende",
     "transformStories": "Transformez les histoires du soir en expériences de bandes dessinées cinématiques.",
     "startAdventure": "Commencez Votre Aventure",
-    "viewLibrary": "Voir la Bibliothèque",
-    "heroSuffix": "de Votre Enfant"
+    "viewLibrary": "Voir la Bibliothèque"
   }
 }

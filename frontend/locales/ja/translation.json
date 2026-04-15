@@ -26,7 +26,7 @@
     "photoOptional": "写真（オプション）",
     "uploadPhoto": "写真をアップロード",
     "roleArchetype": "役割とアーキタイプ",
-    "grandDream": "壮大な夢",
+    "grandDream": "大いなる夢",
     "stylePalette": "あなたのスタイルと色合い",
     "artStyle": "アートスタイル",
     "favoriteColor": "好きな色",
@@ -92,11 +92,10 @@
     "paintingInteractions": "映画的なインタラクションを描き、あなたのヒーローの遺産を構築する"
   },
   "mainPage": {
-    "yourChilds": "あなたの子供の",
-    "legend": "伝説",
+    "yourChilds": "君だけの",
+    "legend": "英雄伝",
     "transformStories": "就寝時のストーリーを映画的なコミックブックの経験に変えます。",
     "startAdventure": "冒険を開始",
-    "viewLibrary": "ライブラリを表示",
-    "heroSuffix": ""
+    "viewLibrary": "ライブラリを表示"
   }
 }
