@@ -128,7 +128,7 @@ const MainPage: React.FC = () => {
         <div className="animate-in fade-in slide-in-from-top-4 duration-700">
           <div className="text-center mb-10">
             <Heading variant="h1" className="mb-4 text-brand-dark">
-              {t('mainPage.yourChilds')} <span className="text-brand-primary underline decoration-brand-accent decoration-8">{t('mainPage.legend')}</span>
+              {t('mainPage.yourChilds')} <span className="text-brand-primary underline decoration-brand-accent decoration-8">{t('mainPage.legend')}</span> {t('mainPage.heroSuffix', { defaultValue: '' })}
             </Heading>
             <Text className="text-brand-muted italic">{t('mainPage.transformStories')}</Text>
           </div>

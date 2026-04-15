@@ -31,7 +31,42 @@
     "artStyle": "艺术风格",
     "favoriteColor": "最喜欢的颜色",
     "continue": "继续",
-    "createStory": "创建我的故事 ✨"
+    "createStory": "创建我的故事 ✨",
+    "steps": {
+      "hero": "英雄",
+      "look": "外貌",
+      "role": "角色",
+      "dream": "梦想",
+      "style": "风格"
+    },
+    "genders": {
+      "boy": "男孩",
+      "girl": "女孩",
+      "neutral": "中性"
+    },
+    "heroNamePlaceholder": "英雄的名字...",
+    "skinTone": "肤色",
+    "hairColor": "发色",
+    "eyeColor": "瞳孔颜色",
+    "archetypes": {
+      "explorer": {
+        "label": "勇敢的探险家",
+        "description": "寻求冒险。"
+      },
+      "inventor": {
+        "label": "发明家",
+        "description": "解决问题。"
+      },
+      "guardian": {
+        "label": "守护者",
+        "description": "保护他人。"
+      },
+      "dreamer": {
+        "label": "梦想家",
+        "description": "让魔法成真。"
+      }
+    },
+    "dreamPlaceholder": "例如：探索一个充满糖果的星球..."
   },
   "magicLoader": {
     "bindingTale": "绑定故事...",
@@ -39,9 +74,10 @@
   },
   "mainPage": {
     "yourChilds": "您孩子的",
-    "legend": "传说",
+    "legend": "传奇",
     "transformStories": "将睡前故事转变为电影漫画体验。",
     "startAdventure": "开始您的冒险",
-    "viewLibrary": "查看图书馆"
+    "viewLibrary": "查看图书馆",
+    "heroSuffix": ""
   }
 }

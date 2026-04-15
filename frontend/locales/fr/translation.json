@@ -31,17 +31,53 @@
     "artStyle": "Style Artistique",
     "favoriteColor": "Couleur Préférée",
     "continue": "Continuer",
-    "createStory": "Créer Mon Histoire ✨"
+    "createStory": "Créer Mon Histoire ✨",
+    "steps": {
+      "hero": "Héros",
+      "look": "Allure",
+      "role": "Rôle",
+      "dream": "Rêve",
+      "style": "Style"
+    },
+    "genders": {
+      "boy": "Garçon",
+      "girl": "Fille",
+      "neutral": "Neutre"
+    },
+    "heroNamePlaceholder": "Nom du Héros...",
+    "skinTone": "Couleur de peau",
+    "hairColor": "Couleur des cheveux",
+    "eyeColor": "Couleur des yeux",
+    "archetypes": {
+      "explorer": {
+        "label": "Explorateur Courageux",
+        "description": "Cherche l'aventure."
+      },
+      "inventor": {
+        "label": "Inventeur",
+        "description": "Résout les problèmes."
+      },
+      "guardian": {
+        "label": "Gardien",
+        "description": "Protège les autres."
+      },
+      "dreamer": {
+        "label": "Rêveur",
+        "description": "Rend la magie réelle."
+      }
+    },
+    "dreamPlaceholder": "p.ex. Explorer une planète faite de bonbons..."
   },
   "magicLoader": {
     "bindingTale": "Lier l'Histoire...",
     "paintingInteractions": "Peindre les interactions cinématiques et construire l'héritage de votre héros"
   },
   "mainPage": {
-    "yourChilds": "De Votre Enfant",
+    "yourChilds": "La",
     "legend": "Légende",
     "transformStories": "Transformez les histoires du soir en expériences de bandes dessinées cinématiques.",
     "startAdventure": "Commencez Votre Aventure",
-    "viewLibrary": "Voir la Bibliothèque"
+    "viewLibrary": "Voir la Bibliothèque",
+    "heroSuffix": "de Votre Enfant"
   }
 }

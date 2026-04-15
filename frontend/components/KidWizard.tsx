@@ -170,7 +170,7 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
                     ? 'text-yellow-600'
                     : 'text-gray-400'
               }`}>
-                {label}
+                {t(`kidWizard.steps.${label.toLowerCase()}`)}
               </span>
             </div>
           ))}
@@ -184,7 +184,7 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
             <Heading className="mb-8 text-brand-dark">{t('kidWizard.heroQuestion')}</Heading>
             <SketchyInput
               autoFocus
-              placeholder="Hero's name..."
+              placeholder={t('kidWizard.heroNamePlaceholder')}
               value={profile.name}
               onChange={e => setProfile(previous => ({ ...previous, name: e.target.value }))}
               className="mb-8"
@@ -198,7 +198,7 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
                   className="flex-1 py-4 capitalize text-xl rounded-2xl"
                   style={{ borderRadius: '16px' }}
                 >
-                  {gender}
+                  {t(`kidWizard.genders.${gender}`)}
                 </SketchyButton>
               ))}
             </div>
@@ -208,9 +208,9 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
         {step === 2 && (
           <div className="animate-in fade-in duration-500 flex-1 overflow-y-auto">
             <Heading className="mb-10 text-brand-dark">{t('kidWizard.appearance')}</Heading>
-            <ColorGrid label="Skin Tone" options={SKIN_TONES} selected={profile.skinTone} onSelect={value => setProfile(previous => ({ ...previous, skinTone: value }))} />
-            <ColorGrid label="Hair Color" options={HAIR_COLORS} selected={profile.hairColor} onSelect={value => setProfile(previous => ({ ...previous, hairColor: value }))} />
-            <ColorGrid label="Eye Color" options={EYE_COLORS} selected={profile.eyeColor} onSelect={value => setProfile(previous => ({ ...previous, eyeColor: value }))} />
+            <ColorGrid label={t('kidWizard.skinTone')} options={SKIN_TONES} selected={profile.skinTone} onSelect={value => setProfile(previous => ({ ...previous, skinTone: value }))} />
+            <ColorGrid label={t('kidWizard.hairColor')} options={HAIR_COLORS} selected={profile.hairColor} onSelect={value => setProfile(previous => ({ ...previous, hairColor: value }))} />
+            <ColorGrid label={t('kidWizard.eyeColor')} options={EYE_COLORS} selected={profile.eyeColor} onSelect={value => setProfile(previous => ({ ...previous, eyeColor: value }))} />
 
             <div className="mb-8 mt-10 pt-8 border-t border-brand-light px-4">
               <Label className="block mb-6 text-brand-primary text-sm">{t('kidWizard.photoOptional')}</Label>
@@ -275,8 +275,8 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
                       color={profile.archetype === arc.label ? '#9D6BCF' : '#7D6391'}
                     />
                   </div>
-                  <div className="font-semibold text-lg text-brand-primary">{arc.label}</div>
-                  <div className="text-xs text-brand-muted font-semibold">{arc.description}</div>
+                  <div className="font-semibold text-lg text-brand-primary">{t(`kidWizard.archetypes.${arc.id}.label`)}</div>
+                  <div className="text-xs text-brand-muted font-semibold">{t(`kidWizard.archetypes.${arc.id}.description`)}</div>
                 </button>
               ))}
             </div>
@@ -288,7 +288,7 @@ const KidWizard: React.FC<Props> = ({ onSubmit }) => {
             <Heading className="mb-6 text-brand-dark">{t('kidWizard.grandDream')}</Heading>
             <SketchyTextarea
               autoFocus
-              placeholder="e.g. To explore a planet made of candy..."
+              placeholder={t('kidWizard.dreamPlaceholder')}
               value={profile.dream}
               onChange={e => setProfile(previous => ({ ...previous, dream: e.target.value }))}
               className="min-h-[120px]"

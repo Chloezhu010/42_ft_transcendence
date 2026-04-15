@@ -31,7 +31,42 @@
     "artStyle": "Art Style",
     "favoriteColor": "Favorite Color",
     "continue": "Continue",
-    "createStory": "Create My Story ✨"
+    "createStory": "Create My Story ✨",
+    "steps": {
+      "hero": "Hero",
+      "look": "Look",
+      "role": "Role",
+      "dream": "Dream",
+      "style": "Style"
+    },
+    "genders": {
+      "boy": "Boy",
+      "girl": "Girl",
+      "neutral": "Neutral"
+    },
+    "heroNamePlaceholder": "Hero's name...",
+    "skinTone": "Skin Tone",
+    "hairColor": "Hair Color",
+    "eyeColor": "Eye Color",
+    "archetypes": {
+      "explorer": {
+        "label": "Brave Explorer",
+        "description": "Seeking adventure."
+      },
+      "inventor": {
+        "label": "Inventor",
+        "description": "Solves problems."
+      },
+      "guardian": {
+        "label": "Guardian",
+        "description": "Protects others."
+      },
+      "dreamer": {
+        "label": "Dreamer",
+        "description": "Makes magic real."
+      }
+    },
+    "dreamPlaceholder": "e.g. To explore a planet made of candy..."
   },
   "magicLoader": {
     "bindingTale": "Binding the Tale...",
@@ -42,6 +77,7 @@
     "legend": "Legend",
     "transformStories": "Transform bedtime stories into cinematic comic book experiences.",
     "startAdventure": "Start Your Adventure",
-    "viewLibrary": "View Library"
+    "viewLibrary": "View Library",
+    "heroSuffix": ""
   }
 }

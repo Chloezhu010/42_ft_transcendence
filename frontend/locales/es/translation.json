@@ -31,17 +31,53 @@
     "artStyle": "Estilo Artístico",
     "favoriteColor": "Color Favorito",
     "continue": "Continuar",
-    "createStory": "Crear Mi Historia ✨"
+    "createStory": "Crear Mi Historia ✨",
+    "steps": {
+      "hero": "Héroe",
+      "look": "Aspecto",
+      "role": "Rol",
+      "dream": "Sueño",
+      "style": "Estilo"
+    },
+    "genders": {
+      "boy": "Niño",
+      "girl": "Niña",
+      "neutral": "Neutral"
+    },
+    "heroNamePlaceholder": "Nombre del héroe...",
+    "skinTone": "Tono de piel",
+    "hairColor": "Color de cabello",
+    "eyeColor": "Color de ojos",
+    "archetypes": {
+      "explorer": {
+        "label": "Explorador Valiente",
+        "description": "Busca aventuras."
+      },
+      "inventor": {
+        "label": "Inventor",
+        "description": "Resuelve problemas."
+      },
+      "guardian": {
+        "label": "Guardián",
+        "description": "Protege a los demás."
+      },
+      "dreamer": {
+        "label": "Soñador",
+        "description": "Hace la magia real."
+      }
+    },
+    "dreamPlaceholder": "p.ej. Explorar un planeta hecho de caramelo..."
   },
   "magicLoader": {
     "bindingTale": "Vinculando la Historia...",
     "paintingInteractions": "Pintando interacciones cinematográficas y construyendo el legado de tu héroe"
   },
   "mainPage": {
-    "yourChilds": "De Tu Hijo",
+    "yourChilds": "La",
     "legend": "Leyenda",
     "transformStories": "Transforma las historias de antes de dormir en experiencias de cómics cinematográficos.",
     "startAdventure": "Comienza Tu Aventura",
-    "viewLibrary": "Ver Biblioteca"
+    "viewLibrary": "Ver Biblioteca",
+    "heroSuffix": "de Tu Hijo"
   }
 }

@@ -31,17 +31,53 @@
     "artStyle": "アートスタイル",
     "favoriteColor": "好きな色",
     "continue": "続行",
-    "createStory": "私のストーリーを作成✨"
+    "createStory": "私のストーリーを作成✨",
+    "steps": {
+      "hero": "ヒーロー",
+      "look": "外見",
+      "role": "役割",
+      "dream": "夢",
+      "style": "スタイル"
+    },
+    "genders": {
+      "boy": "男の子",
+      "girl": "女の子",
+      "neutral": "中立"
+    },
+    "heroNamePlaceholder": "ヒーローの名前...",
+    "skinTone": "肌の色",
+    "hairColor": "髪の色",
+    "eyeColor": "目の色",
+    "archetypes": {
+      "explorer": {
+        "label": "勇敢な探検家",
+        "description": "冒険を求める。"
+      },
+      "inventor": {
+        "label": "発明家",
+        "description": "問題を解決する。"
+      },
+      "guardian": {
+        "label": "ガーディアン",
+        "description": "他人を守る。"
+      },
+      "dreamer": {
+        "label": "夢想家",
+        "description": "魔法を現実にする。"
+      }
+    },
+    "dreamPlaceholder": "例：キャンディでできた惑星を探検する..."
   },
   "magicLoader": {
     "bindingTale": "物語を結合中...",
     "paintingInteractions": "映画的なインタラクションを描き、あなたのヒーローの遺産を構築する"
   },
   "mainPage": {
-    "yourChilds": "お子さんの",
+    "yourChilds": "あなたの子供の",
     "legend": "伝説",
     "transformStories": "就寝時のストーリーを映画的なコミックブックの経験に変えます。",
     "startAdventure": "冒険を開始",
-    "viewLibrary": "ライブラリを表示"
+    "viewLibrary": "ライブラリを表示",
+    "heroSuffix": ""
   }
 }
