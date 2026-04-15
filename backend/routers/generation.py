@@ -10,6 +10,7 @@ import aiosqlite
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 
+from auth_utils import get_current_user
 from config import safe_error_detail
 from db import crud
 from db.database import get_db
@@ -49,6 +50,7 @@ router = APIRouter(prefix="/api", tags=["generation"])
 async def generate_and_save_story(
     request: GenerateAndSaveStoryRequest,
     db: aiosqlite.Connection = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     """Generate story script + images and save to DB."""
     # 1. Generate story script via Gemini
@@ -102,7 +104,7 @@ async def generate_and_save_story(
                 for idx, p in enumerate(all_panels)
             ],
         )
-        saved = await crud.create_story(db, story_data)
+        saved = await crud.create_story(db, story_data, current_user["id"])
     except Exception as e:
         print(f"Story save error: {e}")
         traceback.print_exc()
@@ -114,6 +116,7 @@ async def generate_and_save_story(
 @router.post("/generate/story-script", response_model=GenerateStoryScriptResponse)
 async def generate_story_script(
     request: GenerateStoryScriptRequest,
+    current_user: dict = Depends(get_current_user),
 ):
     """Generate a story script using Gemini AI."""
     try:
@@ -170,6 +173,7 @@ async def generate_story_script_stream_endpoint(
 @router.post("/generate/panel-image", response_model=GeneratePanelImageResponse)
 async def generate_panel_image_endpoint(
     request: GeneratePanelImageRequest,
+    current_user: dict = Depends(get_current_user),
 ):
     """Generate a comic panel image using Gemini AI."""
     try:
@@ -188,6 +192,7 @@ async def generate_panel_image_endpoint(
 @router.post("/generate/edit-image", response_model=EditPanelImageResponse)
 async def edit_panel_image_endpoint(
     request: EditPanelImageRequest,
+    current_user: dict = Depends(get_current_user),
 ):
     """Edit an existing comic panel image using Gemini AI."""
     try:

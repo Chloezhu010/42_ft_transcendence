@@ -36,7 +36,7 @@ def _get_bcrypt_rounds() -> int:
     return max(4, min(31, rounds))
 
 
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)
 
 
 # --- Password helpers ---
@@ -68,7 +68,7 @@ def create_access_token(user_id: int) -> str:
 
 # --- get_current_user dependency ---
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    credentials: HTTPAuthorizationCredentials | None = Depends(security),
     db: aiosqlite.Connection = Depends(get_db),
 ):
     unauthorized = HTTPException(
@@ -76,6 +76,8 @@ async def get_current_user(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    if credentials is None:
+        raise unauthorized
     try:
         payload = jwt.decode(credentials.credentials, _get_secret_key(), algorithms=[ALGORITHM])
         user_id: str | None = payload.get("sub")
