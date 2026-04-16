@@ -1,33 +1,190 @@
-import React, { useState } from 'react';
+/**
+ * Finished storybook UI.
+ * Keeps only local reading state and forwards edit requests to the page layer.
+ */
+import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import ComicPanel from './ComicPanel';
-import StorageImage from './StorageImage';
-import { SketchyButton } from './design-system/Primitives';
-import { Heading, Label, Text } from './design-system/Typography';
-import { ComicPanelData, KidProfile, Story } from '../types';
+import ComicPanel from '@/components/ComicPanel';
+import StorageImage from '@/components/StorageImage';
+import { SketchyButton } from '@/components/design-system/Primitives';
+import { Heading, Label, Text } from '@/components/design-system/Typography';
+import type { ComicPanelData, KidProfile, Story } from '@/types';
 
 interface StoryboardViewProps {
   story: Story;
   profile: KidProfile | null;
-  updatePanel: (panel: ComicPanelData) => void | Promise<void>;
+  onEditPanelImage: (panel: ComicPanelData, editPrompt: string) => Promise<void> | void;
 }
 
-const StoryboardView: React.FC<StoryboardViewProps> = ({ story, profile, updatePanel }) => {
+interface StoryboardNavButtonProps {
+  direction: 'previous' | 'next';
+  disabled: boolean;
+  onClick: () => void;
+}
+
+interface StoryboardSpreadLayoutProps {
+  leftPage: ReactNode;
+  rightPage: ReactNode;
+}
+
+interface StoryboardProgressProps {
+  currentPage: number;
+  totalStates: number;
+  pageLabel: string;
+}
+
+const HIDDEN_NAVIGATION_CLASS = 'opacity-0 pointer-events-none';
+const ROUNDED_BUTTON_STYLE = { borderRadius: '9999px' };
+
+function getPageLabel(currentPage: number, totalStates: number): string {
+  if (currentPage === 0) {
+    return 'Front Cover';
+  }
+
+  if (currentPage === totalStates - 1) {
+    return 'Back Cover';
+  }
+
+  return `Spread ${currentPage}`;
+}
+
+function getSpreadPanelIndexes(currentPage: number): {
+  leftPanelIndex: number;
+  rightPanelIndex: number;
+} {
+  return {
+    leftPanelIndex: (currentPage - 1) * 2 - 1,
+    rightPanelIndex: (currentPage - 1) * 2,
+  };
+}
+
+function getBookFrameClassName(isCoverPage: boolean): string {
+  const pageWidthClass = isCoverPage ? 'w-[350px] md:w-[450px]' : 'w-full max-w-[900px]';
+  const pageAspectClass = isCoverPage ? 'aspect-[3/4]' : 'aspect-[3/2]';
+
+  return `book-flip relative transition-all duration-500 flex items-center justify-center shadow-2xl ${pageWidthClass} ${pageAspectClass}`;
+}
+
+function getProgressMarkerClassName(isActive: boolean): string {
+  if (isActive) {
+    return 'h-1.5 rounded-full transition-all duration-300 bg-brand-primary w-6';
+  }
+
+  return 'h-1.5 rounded-full transition-all duration-300 bg-brand-light w-1.5 border border-brand-secondary/10';
+}
+
+function StoryboardNavButton({
+  direction,
+  disabled,
+  onClick,
+}: StoryboardNavButtonProps): JSX.Element {
+  const positionClass = direction === 'previous' ? 'left-0' : 'right-0';
+  const arrow = direction === 'previous' ? '←' : '→';
+  const hiddenStateClass = disabled ? HIDDEN_NAVIGATION_CLASS : '';
+
+  return (
+    <SketchyButton
+      variant="outline"
+      onClick={onClick}
+      disabled={disabled}
+      className={`absolute ${positionClass} top-1/2 -translate-y-1/2 z-40 w-16 h-16 flex items-center justify-center text-2xl !p-0 rounded-full ${hiddenStateClass}`}
+      style={ROUNDED_BUTTON_STYLE}
+    >
+      {arrow}
+    </SketchyButton>
+  );
+}
+
+function StoryboardSpreadLayout({
+  leftPage,
+  rightPage,
+}: StoryboardSpreadLayoutProps): JSX.Element {
+  return (
+    <div className="flex w-full h-full rounded-3xl shadow-[0_30px_70px_rgba(0,0,0,0.2)] bg-white overflow-hidden relative border-4 border-brand-secondary/5">
+      <div className="absolute left-1/2 top-0 bottom-0 w-[4px] bg-black/10 z-30 -translate-x-1/2" />
+
+      <div className="flex-1 relative border-r border-gray-100 overflow-hidden bg-white">
+        <div className="absolute inset-0 z-20 page-shadow-left pointer-events-none" />
+        {leftPage}
+      </div>
+
+      <div className="flex-1 relative overflow-hidden bg-white">
+        <div className="absolute inset-0 z-20 page-shadow-right pointer-events-none" />
+        {rightPage}
+      </div>
+    </div>
+  );
+}
+
+function StoryboardProgress({
+  currentPage,
+  totalStates,
+  pageLabel,
+}: StoryboardProgressProps): JSX.Element {
+  return (
+    <div className="absolute bottom-4 left-0 right-0 flex justify-center items-center pointer-events-none z-50">
+      <div className="bg-white/95 backdrop-blur-md px-6 py-2 rounded-full shadow-2xl flex items-center space-x-4 border-2 border-brand-secondary/20">
+        <span className="text-[10px] font-bold text-brand-primary uppercase tracking-widest">
+          {pageLabel}
+        </span>
+        <div className="flex space-x-1.5">
+          {Array.from({ length: totalStates }, (_, index) => (
+            <div key={index} className={getProgressMarkerClassName(index === currentPage)} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StoryboardView({ story, profile, onEditPanelImage }: StoryboardViewProps): JSX.Element {
   const [currentPage, setCurrentPage] = useState(0);
 
-  const panelCount = story.panels.length || 10;
-  const spreadsNeeded = Math.ceil((panelCount + 2) / 2);
+  const displayedPanelCount = story.panels.length || 10;
+  const spreadsNeeded = Math.ceil((displayedPanelCount + 2) / 2);
   const totalStates = 2 + spreadsNeeded;
+  const isFrontCover = currentPage === 0;
+  const isBackCover = currentPage === totalStates - 1;
+  const isIntroductionSpread = currentPage === 1;
+  const isFinalSpread = currentPage === totalStates - 2;
+  const isCoverPage = isFrontCover || isBackCover;
+  const { leftPanelIndex, rightPanelIndex } = getSpreadPanelIndexes(currentPage);
+  const leftPanel = story.panels[leftPanelIndex]!;
+  const rightPanel = story.panels[rightPanelIndex]!;
 
-  const navigate = (dir: number) => {
-    setCurrentPage(previousPage => Math.max(0, Math.min(totalStates - 1, previousPage + dir)));
+  const navigate = (direction: number) => {
+    setCurrentPage((previousPage) => Math.max(0, Math.min(totalStates - 1, previousPage + direction)));
   };
 
-  const pageLabel = currentPage === 0
-    ? 'Front Cover'
-    : currentPage === totalStates - 1
-      ? 'Back Cover'
-      : `Spread ${currentPage}`;
+  const pageLabel = getPageLabel(currentPage, totalStates);
+  const bookFrameClassName = getBookFrameClassName(isCoverPage);
+
+  const leftSpreadPage = isIntroductionSpread ? (
+    <div className="h-full flex flex-col justify-center p-12 md:p-16">
+      <Heading variant="h3" className="text-brand-primary mb-6 italic underline decoration-brand-accent decoration-4">Introduction</Heading>
+      <Text className="text-brand-dark/80 italic border-l-4 border-brand-accent pl-6">&quot;{story.foreword}&quot;</Text>
+      <Label className="mt-8 text-brand-primary/50 text-[10px]">A WonderComic Original</Label>
+    </div>
+  ) : (
+    <ComicPanel
+      panel={leftPanel}
+      onEditImage={(editPrompt) => onEditPanelImage(leftPanel, editPrompt)}
+    />
+  );
+
+  const rightSpreadPage = isFinalSpread ? (
+    <div className="h-full flex flex-col items-center justify-center bg-brand-accent p-12 text-brand-dark text-center border-8 border-brand-primary shadow-inner">
+      <div className="text-7xl mb-6 drop-shadow-lg">✨</div>
+      <Heading variant="h3" className="mb-4 uppercase text-brand-dark">THE END</Heading>
+      <Text className="font-bold italic text-brand-dark/70">May your dreams be as bold as your story, {profile?.name}.</Text>
+      <SketchyButton onClick={() => navigate(1)} className="mt-8 px-8 py-3 text-sm rounded-full">Close Book</SketchyButton>
+    </div>
+  ) : (
+    <ComicPanel
+      panel={rightPanel}
+      onEditImage={(editPrompt) => onEditPanelImage(rightPanel, editPrompt)}
+    />
+  );
 
   return (
     <div className="flex-1 flex flex-col animate-in fade-in duration-700 h-[calc(100vh-140px)] relative">
@@ -37,35 +194,12 @@ const StoryboardView: React.FC<StoryboardViewProps> = ({ story, profile, updateP
         </Link>
       </div>
 
-      <SketchyButton
-        variant="outline"
-        onClick={() => navigate(-1)}
-        disabled={currentPage === 0}
-        className={`absolute left-0 top-1/2 -translate-y-1/2 z-40 w-16 h-16 flex items-center justify-center text-2xl !p-0 rounded-full ${currentPage === 0 ? 'opacity-0 pointer-events-none' : ''}`}
-        style={{ borderRadius: '9999px' }}
-      >
-        ←
-      </SketchyButton>
-
-      <SketchyButton
-        variant="outline"
-        onClick={() => navigate(1)}
-        disabled={currentPage === totalStates - 1}
-        className={`absolute right-0 top-1/2 -translate-y-1/2 z-40 w-16 h-16 flex items-center justify-center text-2xl !p-0 rounded-full ${currentPage === totalStates - 1 ? 'opacity-0 pointer-events-none' : ''}`}
-        style={{ borderRadius: '9999px' }}
-      >
-        →
-      </SketchyButton>
+      <StoryboardNavButton direction="previous" disabled={isFrontCover} onClick={() => navigate(-1)} />
+      <StoryboardNavButton direction="next" disabled={isBackCover} onClick={() => navigate(1)} />
 
       <div className="flex-1 flex items-center justify-center perspective-[2000px] py-8">
-        <div
-          key={currentPage}
-          className={`book-flip relative transition-all duration-500 flex items-center justify-center shadow-2xl
-            ${currentPage === 0 || currentPage === totalStates - 1 ? 'w-[350px] md:w-[450px]' : 'w-full max-w-[900px]'}
-            ${currentPage === 0 || currentPage === totalStates - 1 ? 'aspect-[3/4]' : 'aspect-[3/2]'}
-          `}
-        >
-          {currentPage === 0 && (
+        <div key={currentPage} className={bookFrameClassName}>
+          {isFrontCover && (
             <div className="w-full h-full bg-brand-primary rounded-r-3xl shadow-[20px_20px_60px_rgba(0,0,0,0.3)] overflow-hidden border-y-8 border-r-8 border-brand-secondary relative">
               {story.coverImageUrl ? (
                 <StorageImage src={story.coverImageUrl} alt={story.title || 'Cover'} className="w-full h-full object-cover" />
@@ -86,50 +220,11 @@ const StoryboardView: React.FC<StoryboardViewProps> = ({ story, profile, updateP
             </div>
           )}
 
-          {currentPage > 0 && currentPage < totalStates - 1 && (
-            <div className="flex w-full h-full rounded-3xl shadow-[0_30px_70px_rgba(0,0,0,0.2)] bg-white overflow-hidden relative border-4 border-brand-secondary/5">
-              <div className="absolute left-1/2 top-0 bottom-0 w-[4px] bg-black/10 z-30 -translate-x-1/2" />
-
-              <div className="flex-1 relative border-r border-gray-100 overflow-hidden bg-white">
-                <div className="absolute inset-0 z-20 page-shadow-left pointer-events-none" />
-                {currentPage === 1 ? (
-                  <div className="h-full flex flex-col justify-center p-12 md:p-16">
-                    <Heading variant="h3" className="text-brand-primary mb-6 italic underline decoration-brand-accent decoration-4">Introduction</Heading>
-                    <Text className="text-brand-dark/80 italic border-l-4 border-brand-accent pl-6">"{story.foreword}"</Text>
-                    <Label className="mt-8 text-brand-primary/50 text-[10px]">A WonderComic Original</Label>
-                  </div>
-                ) : (
-                  <ComicPanel
-                    panel={story.panels[(currentPage - 1) * 2 - 1]}
-                    onUpdate={updatePanel}
-                    charDesc={story.characterDescription}
-                    profile={profile}
-                  />
-                )}
-              </div>
-
-              <div className="flex-1 relative overflow-hidden bg-white">
-                <div className="absolute inset-0 z-20 page-shadow-right pointer-events-none" />
-                {currentPage === totalStates - 2 ? (
-                  <div className="h-full flex flex-col items-center justify-center bg-brand-accent p-12 text-brand-dark text-center border-8 border-brand-primary shadow-inner">
-                    <div className="text-7xl mb-6 drop-shadow-lg">✨</div>
-                    <Heading variant="h3" className="mb-4 uppercase text-brand-dark">THE END</Heading>
-                    <Text className="font-bold italic text-brand-dark/70">May your dreams be as bold as your story, {profile?.name}.</Text>
-                    <SketchyButton onClick={() => navigate(1)} className="mt-8 px-8 py-3 text-sm rounded-full">Close Book</SketchyButton>
-                  </div>
-                ) : (
-                  <ComicPanel
-                    panel={story.panels[(currentPage - 1) * 2]}
-                    onUpdate={updatePanel}
-                    charDesc={story.characterDescription}
-                    profile={profile}
-                  />
-                )}
-              </div>
-            </div>
+          {!isFrontCover && !isBackCover && (
+            <StoryboardSpreadLayout leftPage={leftSpreadPage} rightPage={rightSpreadPage} />
           )}
 
-          {currentPage === totalStates - 1 && (
+          {isBackCover && (
             <div className="w-full h-full bg-brand-secondary rounded-l-3xl shadow-[-20px_20px_60px_rgba(0,0,0,0.3)] overflow-hidden border-y-8 border-l-8 border-brand-dark flex flex-col items-center justify-center p-12 text-center relative">
               <div className="text-7xl mb-8">✨</div>
               <Heading variant="h3" className="text-white mb-4">Your Story is Complete</Heading>
@@ -137,7 +232,7 @@ const StoryboardView: React.FC<StoryboardViewProps> = ({ story, profile, updateP
                 <strong>{story.title}</strong> is ready to enjoy anytime in your library.
               </Text>
               <div className="mt-8 flex flex-col items-center gap-2">
-                <button onClick={() => navigate(-1)} className="text-brand-surface/60 font-bold uppercase text-[10px] tracking-widest hover:text-white transition-colors">Re-read Tale</button>
+                <button type="button" onClick={() => navigate(-1)} className="text-brand-surface/60 font-bold uppercase text-[10px] tracking-widest hover:text-white transition-colors">Re-read Tale</button>
                 <Link to="/gallery" className="text-brand-surface/40 font-bold uppercase text-[10px] tracking-widest hover:text-white transition-colors border-b border-brand-surface/20 pb-0.5">Back to Library</Link>
               </div>
               <div className="absolute right-0 top-0 bottom-0 w-4 bg-black/20" />
@@ -146,20 +241,9 @@ const StoryboardView: React.FC<StoryboardViewProps> = ({ story, profile, updateP
         </div>
       </div>
 
-      <div className="absolute bottom-4 left-0 right-0 flex justify-center items-center pointer-events-none z-50">
-        <div className="bg-white/95 backdrop-blur-md px-6 py-2 rounded-full shadow-2xl flex items-center space-x-4 border-2 border-brand-secondary/20">
-          <span className="text-[10px] font-bold text-brand-primary uppercase tracking-widest">
-            {pageLabel}
-          </span>
-          <div className="flex space-x-1.5">
-            {[...Array(totalStates)].map((_, index) => (
-              <div key={index} className={`h-1.5 rounded-full transition-all duration-300 ${index === currentPage ? 'bg-brand-primary w-6' : 'bg-brand-light w-1.5 border border-brand-secondary/10'}`} />
-            ))}
-          </div>
-        </div>
-      </div>
+      <StoryboardProgress currentPage={currentPage} totalStates={totalStates} pageLabel={pageLabel} />
     </div>
   );
-};
+}
 
 export default StoryboardView;

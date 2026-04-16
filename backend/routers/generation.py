@@ -2,10 +2,13 @@
 AI generation API routes (story scripts, panel images).
 """
 
+import json
 import traceback
+from collections.abc import AsyncIterator
 
 import aiosqlite
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 
 from config import safe_error_detail
 from db import crud
@@ -18,6 +21,9 @@ from llm.gemini_service import (
 )
 from llm.gemini_service import (
     generate_story_script as gen_script,
+)
+from llm.gemini_service import (
+    generate_story_script_stream as gen_script_stream,
 )
 from models import (
     EditPanelImageRequest,
@@ -32,6 +38,10 @@ from models import (
     StoryCreate,
 )
 
+# NDJSON = newline-delimited JSON. Each line is a standalone JSON object, which
+# makes it straightforward for the frontend to parse events incrementally.
+NDJSON_MEDIA_TYPE = "application/x-ndjson"
+
 router = APIRouter(prefix="/api", tags=["generation"])
 
 
@@ -43,18 +53,7 @@ async def generate_and_save_story(
     """Generate story script + images and save to DB."""
     # 1. Generate story script via Gemini
     try:
-        result = await gen_script(
-            name=request.profile.name,
-            gender=request.profile.gender,
-            skin_tone=request.profile.skin_tone,
-            hair_color=request.profile.hair_color,
-            eye_color=request.profile.eye_color,
-            favorite_color=request.profile.favorite_color,
-            dream=request.profile.dream,
-            archetype=request.profile.archetype,
-            art_style=request.profile.art_style,
-            photo_base64=request.profile.photo_base64,
-        )
+        result = await gen_script(profile=request.profile)
     except Exception as e:
         print(f"Story script generation error: {e}")
         traceback.print_exc()
@@ -118,23 +117,54 @@ async def generate_story_script(
 ):
     """Generate a story script using Gemini AI."""
     try:
-        result = await gen_script(
-            name=request.profile.name,
-            gender=request.profile.gender,
-            skin_tone=request.profile.skin_tone,
-            hair_color=request.profile.hair_color,
-            eye_color=request.profile.eye_color,
-            favorite_color=request.profile.favorite_color,
-            dream=request.profile.dream,
-            archetype=request.profile.archetype,
-            art_style=request.profile.art_style,
-            photo_base64=request.profile.photo_base64,
-        )
+        result = await gen_script(profile=request.profile)
         return result
     except Exception as e:
         print(f"Story script generation error: {e}")
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=safe_error_detail(e, "Story generation failed"))
+
+
+async def _stream_story_script_events(
+    request: GenerateStoryScriptRequest,
+) -> AsyncIterator[bytes]:
+    """Yield NDJSON lines for the streaming story-script endpoint.
+
+    Errors are surfaced as a final ``{"type": "error", ...}`` event rather
+    than an HTTP failure, because headers are already on the wire by the time
+    Gemini might reject a request mid-stream.
+    """
+    try:
+        async for event in gen_script_stream(profile=request.profile):
+            yield (json.dumps(event) + "\n").encode("utf-8")
+    except Exception as err:
+        print(f"Streaming story script error: {err}")
+        traceback.print_exc()
+        error_event = {
+            "type": "error",
+            "message": safe_error_detail(err, "Story generation failed"),
+        }
+        yield (json.dumps(error_event) + "\n").encode("utf-8")
+
+
+@router.post("/generate/story-script/stream")
+async def generate_story_script_stream_endpoint(
+    request: GenerateStoryScriptRequest,
+) -> StreamingResponse:
+    """Stream story-script generation as NDJSON events.
+
+    The response is a sequence of newline-delimited JSON objects. Each line
+    is one of:
+
+    * ``{"type": "intro_delta", "field": "title" | "foreword", "delta": "..."}``
+    * ``{"type": "script", "script": <GenerateStoryScriptResponse>}``
+    * ``{"type": "error", "message": "..."}``
+    """
+    return StreamingResponse(
+        _stream_story_script_events(request),
+        media_type=NDJSON_MEDIA_TYPE,
+        headers={"X-Accel-Buffering": "no"},
+    )
 
 
 @router.post("/generate/panel-image", response_model=GeneratePanelImageResponse)

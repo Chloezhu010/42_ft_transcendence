@@ -1,3 +1,6 @@
+/**
+ * Shared frontend domain types used across pages and components.
+ */
 export interface KidProfile {
   name: string;
   gender: 'boy' | 'girl' | 'neutral';
