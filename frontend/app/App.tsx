@@ -5,9 +5,11 @@
 import { Route, Routes } from 'react-router-dom';
 import { GalleryPage } from '@/pages/gallery';
 import { StoryPage } from '@/pages/story';
+import { LoginPage } from '@/pages/auth';
+import { SignupPage } from '@/pages/auth';
 import AppLayout from './AppLayout';
 
-function App(): JSX.Element {
+export function App(): JSX.Element {
   return (
     <div className="min-h-screen selection:bg-brand-accent selection:text-brand-dark bg-brand-light flex flex-col font-sans">
       <Routes>
@@ -15,10 +17,10 @@ function App(): JSX.Element {
           <Route path="/" element={<StoryPage />} />
           <Route path="/book/:id" element={<StoryPage />} />
           <Route path="/gallery" element={<GalleryPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
         </Route>
       </Routes>
     </div>
   );
 }
-
-export default App;

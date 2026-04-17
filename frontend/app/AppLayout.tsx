@@ -2,8 +2,16 @@
  * Shared application shell around all pages.
  */
 import { Link, Outlet } from 'react-router-dom';
+// import { useAuth } from '@/app/auth';
 
 function AppLayout(): JSX.Element {
+  // const { currentUser, isLoadingSession } = useAuth();
+  // const authDebugText = isLoadingSession
+  //   ? 'Loading session...'
+  //   : currentUser
+  //     ? `Logged in as ${currentUser.username}`
+  //     : 'Not logged in';
+
   return (
     <div className="flex flex-col min-h-screen">
       <header className="py-3 px-6 bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b-4 border-brand-primary/10 shadow-sm">
@@ -11,12 +19,15 @@ function AppLayout(): JSX.Element {
           <Link to="/" className="flex items-center">
             <img src="/logo-highres.png" alt="WonderComic logo" className="h-14 w-auto object-contain" />
           </Link>
-          <Link
-            to="/gallery"
-            className="text-sm font-bold text-brand-muted hover:text-brand-primary transition-colors px-4 py-2 rounded-full hover:bg-brand-light"
-          >
-            My Library
-          </Link>
+          <div className="flex items-center gap-4">
+            {/* <div className="text-sm text-brand-muted">{authDebugText}</div> */}
+            <Link
+              to="/gallery"
+              className="text-sm font-bold text-brand-muted hover:text-brand-primary transition-colors px-4 py-2 rounded-full hover:bg-brand-light"
+            >
+              My Library
+            </Link>
+          </div>
         </div>
       </header>
 
