@@ -153,6 +153,7 @@ async def _stream_story_script_events(
 @router.post("/generate/story-script/stream")
 async def generate_story_script_stream_endpoint(
     request: GenerateStoryScriptRequest,
+    current_user: dict = Depends(get_current_user),
 ) -> StreamingResponse:
     """Stream story-script generation as NDJSON events.
 
