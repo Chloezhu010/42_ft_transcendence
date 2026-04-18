@@ -15,7 +15,7 @@ function HeroSection(): JSX.Element {
       >
         <img
           src="/hero_image.png"
-          alt="WonderComic story world"
+          alt="Funova story world"
           className="w-full h-full object-cover object-center opacity-90"
         />
         <div className="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-brand-light via-brand-light/50 to-transparent" />

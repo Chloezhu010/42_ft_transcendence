@@ -30,7 +30,7 @@ function AppLayout(): JSX.Element {
       <header className="py-3 px-6 bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b-4 border-brand-primary/10 shadow-sm">
         <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-3">
           <Link to="/" className="flex items-center">
-            <img src="/logo-highres.png" alt="WonderComic logo" className="h-14 w-auto object-contain" />
+            <img src="/logo-highres.png" alt="Funova logo" className="h-14 w-auto object-contain" />
           </Link>
 
           <nav className="flex items-center gap-2 text-sm font-bold">
@@ -59,7 +59,7 @@ function AppLayout(): JSX.Element {
       <footer className="border-t border-brand-primary/10 bg-white/92 px-6 py-8">
         <div className="mx-auto flex max-w-7xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div className="max-w-xl">
-            <div className="font-rounded text-2xl text-brand-primary">WonderComic</div>
+            <div className="font-rounded text-2xl text-brand-primary">Funova</div>
             <p className="mt-2 text-sm leading-6 text-brand-muted">
               A student-built AI comic book generator for the 42 ft_transcendence project.
             </p>

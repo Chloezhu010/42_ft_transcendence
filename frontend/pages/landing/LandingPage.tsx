@@ -11,7 +11,7 @@ function LandingPage(): JSX.Element {
     <div className="flex flex-col w-full min-h-screen font-sans text-brand-dark bg-brand-light selection:bg-brand-accent">
       <nav className="flex justify-between items-center px-6 py-4 md:px-12 max-w-7xl mx-auto w-full z-50">
         <Link to="/" className="cursor-pointer flex items-center">
-          <img src="/logo-highres.png" alt="WonderComic logo" className="h-28 w-auto object-contain" />
+          <img src="/logo-highres.png" alt="Funova logo" className="h-28 w-auto object-contain" />
         </Link>
 
         <div className="hidden md:flex items-center gap-8 text-xl font-bold text-brand-dark">

@@ -25,7 +25,7 @@ function FeaturesSection(): JSX.Element {
   return (
     <section className="py-20 px-6 max-w-7xl mx-auto">
       <div className="text-center mb-16">
-        <h2 className="font-semibold text-4xl md:text-5xl text-brand-primary mb-4">Why WonderComic?</h2>
+        <h2 className="font-semibold text-4xl md:text-5xl text-brand-primary mb-4">Why Funova?</h2>
         <div className="h-2 w-32 bg-brand-accent mx-auto rounded-full shadow-sm" />
       </div>
 

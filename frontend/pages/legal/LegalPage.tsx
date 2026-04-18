@@ -19,7 +19,7 @@ function LegalPage({ documentKey }: LegalPageProps): JSX.Element {
       <header className="py-4 px-6 bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b-4 border-brand-primary/10 shadow-sm">
         <div className="max-w-4xl mx-auto flex justify-between items-center">
           <Link to="/" className="flex items-center">
-            <img src="/logo-highres.png" alt="WonderComic logo" className="h-12 w-auto object-contain" />
+            <img src="/logo-highres.png" alt="Funova logo" className="h-12 w-auto object-contain" />
           </Link>
           <Link to="/" className="text-brand-primary hover:text-brand-primary/80 font-bold transition-colors">
             ← Back to Home
@@ -97,7 +97,7 @@ function LegalPage({ documentKey }: LegalPageProps): JSX.Element {
             <h2 className="text-2xl font-bold text-brand-primary mb-4">Maintainer Contact</h2>
             <p>
               Questions, deletion requests, or reports about the current deployment should be sent through the
-              WonderComic repository issue tracker.
+              Funova repository issue tracker.
             </p>
             <a
               href={legalRepositoryIssuesUrl}

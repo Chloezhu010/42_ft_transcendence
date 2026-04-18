@@ -33,7 +33,7 @@ export const legalRepositoryIssuesUrl = REPOSITORY_ISSUES_URL;
 export const legalDocuments: Record<LegalDocumentKey, LegalDocumentContent> = {
   privacy: {
     title: 'Privacy Policy',
-    description: 'How WonderComic handles story inputs, generated books, and optional image data in the current project build.',
+    description: 'How Funova handles story inputs, generated books, and optional image data in the current project build.',
     updatedAt: 'April 18, 2026',
     sections: [
       {
@@ -42,7 +42,7 @@ export const legalDocuments: Record<LegalDocumentKey, LegalDocumentContent> = {
         blocks: [
           {
             paragraphs: [
-              'WonderComic is a student-built web application created for the 42 ft_transcendence project. It turns a child hero profile into an AI-generated comic book with a preview flow, editable panels, and a saved gallery.',
+              'Funova is a student-built web application created for the 42 ft_transcendence project. It turns a child hero profile into an AI-generated comic book with a preview flow, editable panels, and a saved gallery.',
               'This Privacy Policy explains what information the current build handles, how that information is used, and what practical limits apply to this project deployment.',
             ],
           },
@@ -54,7 +54,7 @@ export const legalDocuments: Record<LegalDocumentKey, LegalDocumentContent> = {
         blocks: [
           {
             heading: '2.1 Story Input Data',
-            paragraphs: ['When you create a story, WonderComic may process the information you enter into the creation flow, including:'],
+            paragraphs: ['When you create a story, Funova may process the information you enter into the creation flow, including:'],
             bullets: [
               'Character profile details such as the hero name, appearance traits, favorite color, archetype, and free-form dream prompt.',
               'Optional uploaded reference images when a user wants the generated character art to resemble a provided child photo.',
@@ -90,7 +90,7 @@ export const legalDocuments: Record<LegalDocumentKey, LegalDocumentContent> = {
             ],
           },
           {
-            note: 'WonderComic is not intended to sell personal data, serve ads, or build unrelated marketing profiles. The current build uses story data to run the requested comic-generation flow.',
+            note: 'Funova is not intended to sell personal data, serve ads, or build unrelated marketing profiles. The current build uses story data to run the requested comic-generation flow.',
           },
         ],
       },
@@ -99,7 +99,7 @@ export const legalDocuments: Record<LegalDocumentKey, LegalDocumentContent> = {
         title: '4. Third-Party Services and Storage',
         blocks: [
           {
-            paragraphs: ['WonderComic relies on supporting services to run the current deployment. Those services may process the minimum data needed for their role.'],
+            paragraphs: ['Funova relies on supporting services to run the current deployment. Those services may process the minimum data needed for their role.'],
             cards: [
               {
                 title: 'AI Generation Provider',
@@ -145,7 +145,7 @@ export const legalDocuments: Record<LegalDocumentKey, LegalDocumentContent> = {
         title: '6. Children and Uploaded Content',
         blocks: [
           {
-            paragraphs: ['WonderComic is designed for family-friendly story generation, but users remain responsible for what they submit.'],
+            paragraphs: ['Funova is designed for family-friendly story generation, but users remain responsible for what they submit.'],
             bullets: [
               'Only upload information or images you are authorized to share.',
               'Do not submit sensitive information that is not needed for the comic-generation flow.',
@@ -172,7 +172,7 @@ export const legalDocuments: Record<LegalDocumentKey, LegalDocumentContent> = {
         blocks: [
           {
             paragraphs: [
-              'Questions about this policy, deletion requests, or reports about improper content can be sent to the WonderComic maintainers through the repository issue tracker.',
+              'Questions about this policy, deletion requests, or reports about improper content can be sent to the Funova maintainers through the repository issue tracker.',
             ],
           },
         ],
@@ -181,7 +181,7 @@ export const legalDocuments: Record<LegalDocumentKey, LegalDocumentContent> = {
   },
   terms: {
     title: 'Terms of Service',
-    description: 'The rules for using WonderComic, including acceptable inputs, AI-output limits, and project-delivery expectations.',
+    description: 'The rules for using Funova, including acceptable inputs, AI-output limits, and project-delivery expectations.',
     updatedAt: 'April 18, 2026',
     sections: [
       {
@@ -190,7 +190,7 @@ export const legalDocuments: Record<LegalDocumentKey, LegalDocumentContent> = {
         blocks: [
           {
             paragraphs: [
-              'By accessing WonderComic, you agree to use the site according to these Terms of Service and the related Privacy Policy.',
+              'By accessing Funova, you agree to use the site according to these Terms of Service and the related Privacy Policy.',
               'If you do not agree with these terms, do not use the current project deployment.',
             ],
           },
@@ -202,7 +202,7 @@ export const legalDocuments: Record<LegalDocumentKey, LegalDocumentContent> = {
         blocks: [
           {
             paragraphs: [
-              'WonderComic is a project web application that generates comic-style stories from user-provided character and story inputs.',
+              'Funova is a project web application that generates comic-style stories from user-provided character and story inputs.',
               'The current build is intended for demos, evaluation, and normal creative use within the limits of the deployed environment. It does not promise production-grade continuity or commercial service guarantees.',
             ],
           },
@@ -213,7 +213,7 @@ export const legalDocuments: Record<LegalDocumentKey, LegalDocumentContent> = {
         title: '3. Acceptable Use',
         blocks: [
           {
-            paragraphs: ['By using WonderComic, you agree not to submit or request content that is:'],
+            paragraphs: ['By using Funova, you agree not to submit or request content that is:'],
             bullets: [
               'Illegal, abusive, hateful, or exploitative.',
               'Infringing on another party\'s copyright, trademark, or privacy rights.',
@@ -240,11 +240,11 @@ export const legalDocuments: Record<LegalDocumentKey, LegalDocumentContent> = {
         title: '5. AI-Generated Content Limits',
         blocks: [
           {
-            paragraphs: ['WonderComic relies on generative AI, which means the output can vary and may require human review.'],
+            paragraphs: ['Funova relies on generative AI, which means the output can vary and may require human review.'],
             bullets: [
               'Generated text and images may contain mistakes, inconsistencies, or artistic surprises.',
               'A preview or finished book may require human review before it is shared with others.',
-              'WonderComic does not guarantee exact likeness, factual accuracy, or uninterrupted generation quality.',
+              'Funova does not guarantee exact likeness, factual accuracy, or uninterrupted generation quality.',
             ],
           },
         ],
@@ -268,7 +268,7 @@ export const legalDocuments: Record<LegalDocumentKey, LegalDocumentContent> = {
           {
             paragraphs: ['To the extent allowed by law:'],
             bullets: [
-              'WonderComic is provided on an as-is basis for project use, without warranties of uninterrupted service or perfect output.',
+              'Funova is provided on an as-is basis for project use, without warranties of uninterrupted service or perfect output.',
               'The maintainers are not liable for indirect loss, subjective dissatisfaction with AI output, or temporary unavailability of the service.',
               'Users remain responsible for reviewing generated content before relying on it or sharing it more broadly.',
             ],
@@ -292,7 +292,7 @@ export const legalDocuments: Record<LegalDocumentKey, LegalDocumentContent> = {
         blocks: [
           {
             paragraphs: [
-              'Questions about these terms should be sent through the WonderComic repository issue tracker so the maintainers can respond in the same project context.',
+              'Questions about these terms should be sent through the Funova repository issue tracker so the maintainers can respond in the same project context.',
             ],
           },
         ],
