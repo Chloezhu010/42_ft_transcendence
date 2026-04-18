@@ -38,6 +38,6 @@ describe('App public routes', () => {
     renderApp('/privacy');
 
     expect(screen.getByRole('heading', { name: /privacy policy/i })).toBeInTheDocument();
-    expect(screen.getByText(/how wondercomic handles story inputs/i)).toBeInTheDocument();
+    expect(screen.getByText(/how funova handles story inputs/i)).toBeInTheDocument();
   });
 });
