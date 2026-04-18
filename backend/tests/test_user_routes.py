@@ -138,6 +138,16 @@ def test_update_duplicate_email_returns_409(client, alice, bob):
     assert "email" in r.json()["detail"].lower()
 
 
+def test_update_invalid_email_returns_422(client, alice):
+    r = client.patch("/api/users/me", json={"username": None, "email": "not-an-email"}, headers=alice)
+    assert r.status_code == 422
+
+
+def test_update_empty_username_returns_422(client, alice):
+    r = client.patch("/api/users/me", json={"username": "", "email": None}, headers=alice)
+    assert r.status_code == 422
+
+
 def test_update_requires_auth(client):
     r = client.patch("/api/users/me", json={"username": "hacker", "email": None})
     assert r.status_code == 401

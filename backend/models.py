@@ -56,8 +56,8 @@ class PublicUserResponse(BaseModel):
 class UserUpdateRequest(BaseModel):
     """Request body for updating user profile."""
 
-    username: str | None = None
-    email: str | None = None
+    username: str | None = Field(default=None, min_length=1, max_length=50)
+    email: EmailStr | None = None
 
 
 # --- Friendship Models ---
