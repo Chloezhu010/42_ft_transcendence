@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-primary: #9d6bcf;
+  --color-brand-secondary: #be93e4;
+  --color-brand-accent: #ffe066;
+  --color-brand-dark: #4a2b6a;
+  --color-brand-muted: #7d6391;
+  --color-brand-light: #f3e8ff;
+  --color-brand-surface: #ffffff;
+
+  --font-sans: "Quicksand", sans-serif;
+  --shadow-soft: 0 8px 24px rgba(157, 107, 207, 0.2);
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-brand-surface);
+    color: var(--color-brand-dark);
+    letter-spacing: 0.02em;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: "Fredoka", sans-serif;
+    letter-spacing: 0.01em;
+  }
+
+  ::selection {
+    background-color: var(--color-brand-accent);
+    color: var(--color-brand-dark);
+  }
+}
+
+@layer utilities {
+  .font-rounded {
+    font-family: "Fredoka", sans-serif;
+    letter-spacing: 0.01em;
+  }
+
+  .border-6 {
+    border-width: 6px;
+  }
+
+  .animate-in {
+    animation-name: enter;
+    animation-duration: 0.45s;
+    animation-fill-mode: both;
+    animation-timing-function: ease-out;
+  }
+
+  .fade-in {
+    --enter-opacity: 0;
+  }
+
+  .slide-in-from-top-4 {
+    --enter-translate-y: -1rem;
+  }
+
+  .slide-in-from-bottom-2 {
+    --enter-translate-y: 0.5rem;
+  }
+
+  .slide-in-from-bottom-4 {
+    --enter-translate-y: 1rem;
+  }
+
+  .zoom-in {
+    --enter-scale: 0.96;
+  }
+
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+}
+
+@keyframes enter {
+  from {
+    opacity: var(--enter-opacity, 1);
+    transform: translate3d(0, var(--enter-translate-y, 0), 0) scale(var(--enter-scale, 1));
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
