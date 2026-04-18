@@ -98,7 +98,7 @@ describe('AuthProvider', () => {
 
   it('clears storage when restoring with an invalid token fails', async () => {
     localStorage.setItem('auth.accessToken', 'bad-token');
-    mockGetMe.mockRejectedValue(new Error('Could not validate credentials'));
+    mockGetMe.mockRejectedValue(Object.assign(new Error('Could not validate credentials'), { status: 401 }));
 
     renderWithProvider();
 
@@ -112,6 +112,24 @@ describe('AuthProvider', () => {
 
     expect(localStorage.getItem('auth.accessToken')).toBeNull();
     expect(screen.getByTestId('token')).toHaveTextContent('no-token');
+  });
+
+  it('preserves storage when restoring fails with a transient backend error', async () => {
+    localStorage.setItem('auth.accessToken', 'saved-token');
+    mockGetMe.mockRejectedValue(Object.assign(new Error('Backend unavailable'), { status: 503 }));
+
+    renderWithProvider();
+
+    await waitFor(() => {
+      expect(mockGetMe).toHaveBeenCalledWith('saved-token');
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('status')).toHaveTextContent('logged-out');
+    });
+
+    expect(localStorage.getItem('auth.accessToken')).toBe('saved-token');
+    expect(screen.getByTestId('token')).toHaveTextContent('saved-token');
   });
 
   it('login saves the token and loads the current user', async () => {

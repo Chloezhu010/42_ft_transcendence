@@ -30,6 +30,8 @@ export interface FriendResponse {
   is_requester: boolean;
 }
 
+type ApiRequestError = Error & { status: number };
+
 async function getErrorMessage(response: Response, fallback: string): Promise<string> {
     try {
         const data = await response.json() as { detail?: string };
@@ -40,6 +42,12 @@ async function getErrorMessage(response: Response, fallback: string): Promise<st
         // Ignore JSON parsing errors and use fallback message
     }
     return fallback;
+}
+
+async function buildApiError(response: Response, fallback: string): Promise<ApiRequestError> {
+    const error = new Error(await getErrorMessage(response, fallback)) as ApiRequestError;
+    error.status = response.status;
+    return error;
 }
 
 /**
@@ -54,7 +62,7 @@ export async function signup(email: string, username: string, password: string):
         body: JSON.stringify({ email, username, password }),
     });
     if (!response.ok) {
-        throw new Error(await getErrorMessage(response, 'Signup failed'));
+        throw await buildApiError(response, 'Signup failed');
     }
     return (await response.json()) as TokenResponse;
 }
@@ -68,7 +76,7 @@ export async function login(email: string, password: string): Promise<TokenRespo
         body: JSON.stringify({ email, password }),
     });
     if (!response.ok) {
-        throw new Error(await getErrorMessage(response, 'Login failed'));
+        throw await buildApiError(response, 'Login failed');
     }
     return (await response.json()) as TokenResponse;
 }
@@ -81,7 +89,7 @@ export async function logout(accessToken: string): Promise<void> {
         }
     });
     if (!response.ok) {
-        throw new Error(await getErrorMessage(response, 'Logout failed'));
+        throw await buildApiError(response, 'Logout failed');
     }
 }
 
@@ -96,7 +104,7 @@ export async function getMe(accessToken: string): Promise<UserResponse> {
         }
     });
     if (!response.ok) {
-        throw new Error(await getErrorMessage(response, 'Failed to fetch user info'));
+        throw await buildApiError(response, 'Failed to fetch user info');
     }
     return (await response.json()) as UserResponse;
 }
@@ -111,7 +119,7 @@ export async function updateMe(accessToken: string, params: { username?: string;
         body: JSON.stringify(params),
     });
     if (!response.ok) {
-        throw new Error(await getErrorMessage(response, 'Failed to update user info'));
+        throw await buildApiError(response, 'Failed to update user info');
     }
     return (await response.json()) as UserResponse;
 }
@@ -128,7 +136,7 @@ export async function uploadAvatar(accessToken: string, file: File): Promise<Use
         body: formData,
     });
     if (!response.ok) {
-        throw new Error(await getErrorMessage(response, 'Failed to upload avatar'));
+        throw await buildApiError(response, 'Failed to upload avatar');
     }
     return (await response.json()) as UserResponse;
 }
@@ -138,7 +146,7 @@ export async function getUser(userId: number): Promise<PublicUserResponse> {
         method: 'GET',
     });
     if (!response.ok) {
-        throw new Error(await getErrorMessage(response, 'Failed to fetch user info'));
+        throw await buildApiError(response, 'Failed to fetch user info');
     }
     return (await response.json()) as PublicUserResponse;
 }
@@ -154,7 +162,7 @@ export async function getFriends(accessToken: string): Promise<FriendResponse[]>
         }
     });
     if (!response.ok) {
-        throw new Error(await getErrorMessage(response, 'Failed to fetch friends'));
+        throw await buildApiError(response, 'Failed to fetch friends');
     }
     return (await response.json()) as FriendResponse[];
 }
@@ -167,7 +175,7 @@ export async function getPendingFriendRequests(accessToken: string): Promise<Fri
         }
     });
     if (!response.ok) {
-        throw new Error(await getErrorMessage(response, 'Failed to fetch pending friends'));
+        throw await buildApiError(response, 'Failed to fetch pending friends');
     }
     return (await response.json()) as FriendResponse[];
 }
@@ -180,7 +188,7 @@ export async function sendFriendRequest(accessToken: string, userId: number): Pr
         }
     });
     if (!response.ok) {
-        throw new Error(await getErrorMessage(response, 'Failed to send friend request'));
+        throw await buildApiError(response, 'Failed to send friend request');
     }
     return (await response.json()) as FriendResponse;
 }
@@ -193,7 +201,7 @@ export async function acceptFriendRequest(accessToken: string, userId: number): 
         }
     });
     if (!response.ok) {
-        throw new Error(await getErrorMessage(response, 'Failed to accept friend request'));
+        throw await buildApiError(response, 'Failed to accept friend request');
     }
     return (await response.json()) as FriendResponse;
 }
@@ -206,6 +214,6 @@ export async function removeFriend(accessToken: string, friendId: number): Promi
         }
     });
     if (!response.ok) {
-        throw new Error(await getErrorMessage(response, 'Failed to remove friend'));
+        throw await buildApiError(response, 'Failed to remove friend');
     }
 }

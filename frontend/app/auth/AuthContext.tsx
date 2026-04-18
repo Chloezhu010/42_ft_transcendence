@@ -8,6 +8,10 @@ export const AuthContext = createContext<AuthContextValue | undefined>(undefined
 
 const AUTH_TOKEN_STORAGE_KEY = `auth.accessToken`;
 
+function isUnauthorizedError(error: unknown): boolean {
+    return error instanceof Error && (error as Error & { status?: number }).status === 401;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }): JSX.Element {
     const [accessToken, setAccessToken] = useState<string | null>(null);
     const [currentUser, setCurrentUser] = useState<UserResponse | null>(null);
@@ -39,7 +43,9 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
             const user = await getMe(accessToken);
             setCurrentUser(user);
         } catch (error) {
-            clearAuthState();
+            if (isUnauthorizedError(error)) {
+                clearAuthState();
+            }
             throw error;
         }
     }
@@ -108,10 +114,11 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
                 const user = await getMe(storedToken);
                 if (!isMounted) return;
                 setCurrentUser(user);
-            } catch {
-                // token is invalid/ expired/ network failed, clear auth state to log out the user
+            } catch (error) {
                 if (!isMounted) return;
-                clearAuthState();
+                if (isUnauthorizedError(error)) {
+                    clearAuthState();
+                }
             } finally {
                 if (isMounted) setIsLoadingSession(false);
             }
