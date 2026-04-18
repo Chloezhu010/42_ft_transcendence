@@ -163,7 +163,7 @@ function StoryboardView({ story, profile, onEditPanelImage }: StoryboardViewProp
     <div className="h-full flex flex-col justify-center p-12 md:p-16">
       <Heading variant="h3" className="text-brand-primary mb-6 italic underline decoration-brand-accent decoration-4">Introduction</Heading>
       <Text className="text-brand-dark/80 italic border-l-4 border-brand-accent pl-6">&quot;{story.foreword}&quot;</Text>
-      <Label className="mt-8 text-brand-primary/50 text-[10px]">A WonderComic Original</Label>
+      <Label className="mt-8 text-brand-primary/50 text-[10px]">A Funova Original</Label>
     </div>
   ) : (
     <ComicPanel

@@ -7,6 +7,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { App } from '@/app';
 import { AuthProvider } from '@/app/auth';
+import './styles.css';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

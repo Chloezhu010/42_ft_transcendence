@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 
 import type { UserResponse } from '@api';
 import { SketchyButton } from '@/components/design-system/Primitives';
@@ -31,6 +31,13 @@ export function AuthFormPage({
     onSubmit,
 }: AuthFormPageProps): JSX.Element {
     const navigate = useNavigate();
+    const location = useLocation();
+    const redirectTo =
+        (location.state as { from?: { pathname?: string; search?: string; hash?: string } } | null)
+            ?.from;
+    const redirectPath = redirectTo
+        ? `${redirectTo.pathname ?? '/'}${redirectTo.search ?? ''}${redirectTo.hash ?? ''}`
+        : '/';
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -41,7 +48,7 @@ export function AuthFormPage({
 
         try {
             await onSubmit();
-            navigate('/');
+            navigate(redirectPath, { replace: true });
         } catch (error) {
             setError(error instanceof Error ? error.message : 'Authentication failed');
         } finally {
@@ -58,7 +65,7 @@ export function AuthFormPage({
     }
 
     if (currentUser) {
-        return <Navigate to="/" replace />;
+        return <Navigate to={redirectPath} replace />;
     }
 
     return (
@@ -81,7 +88,11 @@ export function AuthFormPage({
                 </form>
                 <p className="mt-6 text-center text-sm text-brand-muted">
                     {footerText}{' '}
-                    <Link to={footerLinkTo} className="font-bold text-brand-primary hover:underline">
+                    <Link
+                        to={footerLinkTo}
+                        state={redirectTo ? { from: redirectTo } : undefined}
+                        className="font-bold text-brand-primary hover:underline"
+                    >
                         {footerLinkLabel}
                     </Link>
                 </p>
