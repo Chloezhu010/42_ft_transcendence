@@ -3,6 +3,7 @@
  * Renders loading, empty, and card-grid states from page-level data.
  */
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import type { StoryListItem } from '@api';
 import StorageImage from '@/components/StorageImage';
 import { formatStoryDate, getStoryDisplayTitle } from './gallery.helpers';
@@ -14,6 +15,8 @@ interface StoryCardProps {
 }
 
 function StoryCard({ story, onDeleteStory }: StoryCardProps): JSX.Element {
+  const { t } = useTranslation();
+
   return (
     <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden group border-2 border-gray-100 hover:border-purple-200 transition-all hover:-translate-y-1 relative">
       <button
@@ -41,7 +44,7 @@ function StoryCard({ story, onDeleteStory }: StoryCardProps): JSX.Element {
             to={`/book/${story.id}`}
             className="px-8 py-3 bg-white text-purple-900 font-black rounded-full shadow-xl transform scale-90 group-hover:scale-100 transition-all"
           >
-            READ NOW
+            {t('galleryPage.readNow')}
           </Link>
         </div>
       </div>
@@ -72,12 +75,13 @@ function StoryCard({ story, onDeleteStory }: StoryCardProps): JSX.Element {
 }
 
 function GalleryPage(): JSX.Element {
+  const { t } = useTranslation();
   const { isLoading, onDeleteStory, stories } = useGalleryPage();
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 animate-in fade-in duration-700">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-4xl font-black text-gray-800">My Saved Books</h2>
+        <h2 className="text-4xl font-black text-gray-800">{t('galleryPage.mySavedBooks')}</h2>
       </div>
 
       {isLoading ? (
@@ -92,7 +96,7 @@ function GalleryPage(): JSX.Element {
 
           {stories.length === 0 && (
             <div className="col-span-full text-center py-20 text-gray-400">
-              <p className="text-xl font-medium italic">No stories found yet.</p>
+              <p className="text-xl font-medium italic">{t('galleryPage.noStoriesFound')}</p>
             </div>
           )}
         </div>

@@ -1,0 +1,101 @@
+{
+  "app": {
+    "myLibrary": "مكتبتي"
+  },
+  "comicPanel": {
+    "paintingScene": "رسم المشهد...",
+    "magicRevision": "تعديل سحري",
+    "requestChange": "اطلب تغييراً لهذا المشهد المحدد.",
+    "magicFailed": "أوبس! فشل السحر. حاول مرة أخرى.",
+    "awaitingVision": "في انتظار الرؤية",
+    "editScene": "تعديل المشهد",
+    "editPlaceholder": "مثال: أضف روبوت صغير فضولي ينظر إلى الخريطة...",
+    "close": "إغلاق",
+    "applyMagic": "تطبيق السحر ✨"
+  },
+  "galleryPage": {
+    "mySavedBooks": "كتبي المحفوظة",
+    "noStoriesFound": "لم يتم العثور على قصص بعد.",
+    "readNow": "اقرأ الآن",
+    "untitledMasterpiece": "تحفة فنية بدون عنوان",
+    "deleteStory": "هل أنت متأكد أنك تريد حذف هذه القصة؟ لا يمكن التراجع عن هذا."
+  },
+  "kidWizard": {
+    "heroQuestion": "من هو البطل؟",
+    "appearance": "المظهر",
+    "photoOptional": "صورة (اختياري)",
+    "uploadPhoto": "رفع صورة",
+    "roleArchetype": "الدور والنموذج الأصلي",
+    "grandDream": "الحلم الكبير",
+    "stylePalette": "لأسلوب والألوان",
+    "artStyle": "الأسلوب الفني",
+    "favoriteColor": "اللون المفضل",
+    "continue": "متابعة",
+    "createStory": "أنشئ قصتي ✨",
+    "steps": {
+      "hero": "بطل",
+      "look": "مظهر",
+      "role": "دور",
+      "dream": "حلم",
+      "style": "أسلوب"
+    },
+    "genders": {
+      "boy": "ولد",
+      "girl": "فتاة",
+      "neutral": "محايد"
+    },
+    "heroNamePlaceholder": "اسم البطل...",
+    "skinTone": "لون البشرة",
+    "hairColor": "لون الشعر",
+    "eyeColor": "لون العين",
+    "archetypes": {
+      "explorer": {
+        "label": "مستكشف شجاع",
+        "description": "يبحث عن المغامرة."
+      },
+      "inventor": {
+        "label": "مخترع",
+        "description": "يحل المشاكل."
+      },
+      "guardian": {
+        "label": "حارس",
+        "description": "يحمي الآخرين."
+      },
+      "dreamer": {
+        "label": "حالم",
+        "description": "يجعل السحر حقيقياً."
+      }
+    },
+    "dreamPlaceholder": "مثال: لاستكشاف كوكب مصنوع من الحلوى...",
+    "artStyles": {
+      "classic": {
+        "label": "رسوم متحركة كلاسيكية",
+        "description": "خطوط عريضة، ألوان زاهية"
+      },
+      "watercolor": {
+        "label": "ألوان مائية",
+        "description": "جمالية ناعمة وحالمة"
+      },
+      "pencil": {
+        "label": "رسم بقلم الرصاص",
+        "description": "سحر الرسم اليدوي"
+      },
+      "digital": {
+        "label": "فن البوب الرقمي",
+        "description": "حديث وجريء"
+      }
+    },
+    "back": "رجوع"
+  },
+  "magicLoader": {
+    "bindingTale": "ربط الحكاية...",
+    "paintingInteractions": "رسم تفاعلات سينمائية وبناء إرث بطلك"
+  },
+  "mainPage": {
+    "yourChilds": "أسطورة",
+    "legend": "طفلك",
+    "transformStories": "حوّل قصص ما قبل النوم إلى تجارب كتب مصورة سينمائية.",
+    "startAdventure": "ابدأ مغامرتك",
+    "viewLibrary": "عرض المكتبة"
+  }
+}

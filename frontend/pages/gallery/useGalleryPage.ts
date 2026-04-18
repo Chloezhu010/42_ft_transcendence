@@ -3,6 +3,7 @@
  * Owns loading, deletion, and the small amount of page state behind the gallery UI.
  */
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { deleteStory, getStories, type StoryListItem } from '@api';
 
@@ -13,6 +14,7 @@ interface UseGalleryPageResult {
 }
 
 export function useGalleryPage(): UseGalleryPageResult {
+  const { t } = useTranslation();
   const [stories, setStories] = useState<StoryListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -36,7 +38,7 @@ export function useGalleryPage(): UseGalleryPageResult {
   }, [loadStories]);
 
   const handleDeleteStory = useCallback(async (storyId: number) => {
-    const shouldDelete = window.confirm('Are you sure you want to delete this story? This cannot be undone.');
+    const shouldDelete = window.confirm(t('galleryPage.deleteStory'));
     if (!shouldDelete) {
       return;
     }

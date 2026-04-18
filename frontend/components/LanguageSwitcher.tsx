@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const languages = [
@@ -6,11 +6,17 @@ const languages = [
   { code: 'fr', label: 'Français' },
   { code: 'es', label: 'Español' },
   { code: 'zh', label: '中文' },
-  { code: 'ja', label: '日本語' }
+  { code: 'ja', label: '日本語' },
+  { code: 'ar', label: 'العربية' }
 ];
 
 const LanguageSwitcher: React.FC = () => {
   const { i18n } = useTranslation();
+
+  useEffect(() => {
+    document.documentElement.dir = i18n.dir();
+    document.documentElement.lang = i18n.language;
+  }, [i18n.language, i18n.dir]);
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     i18n.changeLanguage(e.target.value);

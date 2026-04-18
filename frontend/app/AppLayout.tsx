@@ -2,21 +2,30 @@
  * Shared application shell around all pages.
  */
 import { Link, Outlet } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Toaster } from 'sonner';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 function AppLayout(): JSX.Element {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col min-h-screen">
+      <Toaster position="top-center" />
       <header className="py-3 px-6 bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b-4 border-brand-primary/10 shadow-sm">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link to="/" className="flex items-center">
-            <img src="/logo-highres.png" alt="WonderComic logo" className="h-14 w-auto object-contain" />
+            <img src="/logo-highres.png" alt="WonderComic logo" className="h-14 w-auto object-contain pe-4" />
           </Link>
-          <Link
-            to="/gallery"
-            className="text-sm font-bold text-brand-muted hover:text-brand-primary transition-colors px-4 py-2 rounded-full hover:bg-brand-light"
-          >
-            My Library
-          </Link>
+          <div className="flex items-center gap-4">
+            <LanguageSwitcher />
+            <Link
+              to="/gallery"
+              className="text-sm font-bold text-brand-muted hover:text-brand-primary transition-colors px-4 py-2 rounded-full hover:bg-brand-light"
+            >
+              {t('app.myLibrary')}
+            </Link>
+          </div>
         </div>
       </header>
 

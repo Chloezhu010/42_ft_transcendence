@@ -18,7 +18,7 @@
     "noStoriesFound": "还没有找到任何故事。",
     "readNow": "现在阅读",
     "untitledMasterpiece": "无标题杰作",
-    "deleteStory": "您确定要删除此故事吗？这无法撤消。"
+    "deleteStory": "您确定要删除此故事吗？这将无法撤消。"
   },
   "kidWizard": {
     "heroQuestion": "谁是英雄？",
@@ -70,7 +70,7 @@
     "artStyles": {
       "classic": {
         "label": "经典漫画",
-        "description": "粗线条，鲜艳的色彩"
+        "description": "粗线条，色彩鲜艳"
       },
       "watercolor": {
         "label": "水彩",
@@ -82,17 +82,17 @@
       },
       "digital": {
         "label": "数字流行",
-        "description": "现代且大胆"
+        "description": "摩登大胆"
       }
     },
     "back": "返回"
   },
   "magicLoader": {
     "bindingTale": "绑定故事...",
-    "paintingInteractions": "绘制电影互动并构建您英雄的遗产"
+    "paintingInteractions": "绘制电影互动并构建您的英雄财富"
   },
   "mainPage": {
-    "yourChilds": "专属",
+    "yourChilds": "宝贝专属",
     "legend": "传奇",
     "transformStories": "将睡前故事转变为电影漫画体验。",
     "startAdventure": "开始您的冒险",
