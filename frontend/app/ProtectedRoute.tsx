@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/app/auth';
 
 /**
@@ -6,6 +6,7 @@ import { useAuth } from '@/app/auth';
  */
 export default function ProtectedRoute(): JSX.Element {
     const { currentUser, isLoadingSession } = useAuth();
+    const location = useLocation();
 
     if (isLoadingSession) {
         return (
@@ -15,7 +16,7 @@ export default function ProtectedRoute(): JSX.Element {
         );
     }
     if (!currentUser) {
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/login" replace state={{ from: location }} />;
     }
 
     return <Outlet />;
