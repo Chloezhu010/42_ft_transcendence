@@ -2,6 +2,7 @@
 FastAPI main application with CORS and API routes.
 """
 
+import shutil
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -51,6 +52,20 @@ app.add_middleware(
 # Serve images as static files
 images_dir = Path(__file__).parent / "images"
 images_dir.mkdir(exist_ok=True)
+
+# Seed immutable default assets into the images volume on startup.
+# The named `backend_images` volume shadows this subpath of the repo bind-mount,
+# so files committed under backend/images/ aren't visible inside the container.
+# Keep seed copies under backend/seed/ (outside the shadowed path) and restore
+# them idempotently here — safe across fresh volumes and existing ones.
+seed_dir = Path(__file__).parent / "seed"
+if seed_dir.is_dir():
+    for seed_file in seed_dir.iterdir():
+        if seed_file.is_file():
+            target = images_dir / seed_file.name
+            if not target.exists():
+                shutil.copy(seed_file, target)
+
 app.mount("/images", StaticFiles(directory=str(images_dir)), name="images")
 
 # Register routers

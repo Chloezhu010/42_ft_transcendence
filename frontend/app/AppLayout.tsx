@@ -2,15 +2,11 @@
  * Shared application shell around all pages.
  */
 import { Link, Outlet } from 'react-router-dom';
-// import { useAuth } from '@/app/auth';
+import { useAuth } from '@/app/auth';
+import StorageImage from '@/components/StorageImage';
 
 function AppLayout(): JSX.Element {
-  // const { currentUser, isLoadingSession } = useAuth();
-  // const authDebugText = isLoadingSession
-  //   ? 'Loading session...'
-  //   : currentUser
-  //     ? `Logged in as ${currentUser.username}`
-  //     : 'Not logged in';
+  const { currentUser } = useAuth();
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -27,6 +23,25 @@ function AppLayout(): JSX.Element {
             >
               My Library
             </Link>
+            {currentUser && (
+              <Link
+                to="/profile"
+                aria-label="Your profile"
+                className="w-10 h-10 rounded-full overflow-hidden border-2 border-brand-primary/20 bg-brand-light hover:border-brand-primary transition-colors"
+              >
+                {currentUser.avatar_url ? (
+                  <StorageImage
+                    src={currentUser.avatar_url}
+                    alt={currentUser.username}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="flex items-center justify-center w-full h-full text-sm font-bold text-brand-primary">
+                    {currentUser.username.charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </Link>
+            )}
           </div>
         </div>
       </header>

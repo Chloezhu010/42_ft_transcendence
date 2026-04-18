@@ -46,8 +46,8 @@ class UserResponse(BaseModel):
 class UserUpdateRequest(BaseModel):
     """Request body for updating user profile."""
 
-    username: str | None
-    email: str | None
+    username: str | None = None
+    email: str | None = None
 
 
 # --- Friendship Models ---

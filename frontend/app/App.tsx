@@ -7,6 +7,7 @@ import { GalleryPage } from '@/pages/gallery';
 import { StoryPage } from '@/pages/story';
 import { LoginPage } from '@/pages/auth';
 import { SignupPage } from '@/pages/auth';
+import { ProfilePage } from '@/pages/profile';
 import AppLayout from './AppLayout';
 import ProtectedRoute from './ProtectedRoute';
 
@@ -23,6 +24,7 @@ export function App(): JSX.Element {
             <Route path="/" element={<StoryPage />} />
             <Route path="/book/:id" element={<StoryPage />} />
             <Route path="/gallery" element={<GalleryPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Route>
         {/* Catch-all route for 404s: redirect to home */}
