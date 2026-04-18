@@ -8,10 +8,12 @@ export const API_BASE_URL = BACKEND_BASE_URL;
 export const API_BASE = `${BACKEND_BASE_URL}/api`;
 
 export async function apiFetch(url: string, options: RequestInit = {}): Promise<Response> {
+  const isFormData = options.body instanceof FormData;
+
   return fetch(url, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
+      ...(isFormData ? {}: { 'Content-Type': 'application/json'}),
       ...options.headers,
     },
   });

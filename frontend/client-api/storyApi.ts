@@ -75,9 +75,10 @@ export interface SaveStoryParams {
 /**
  * Save a complete story to the backend.
  */
-export async function saveStory(params: SaveStoryParams): Promise<number> {
+export async function saveStory(accessToken: string, params: SaveStoryParams): Promise<number> {
   const response = await apiFetch(`${API_BASE}/stories`, {
     method: 'POST',
+    headers: { Authorization: `Bearer ${accessToken}` },
     body: JSON.stringify(params),
   });
 
@@ -103,9 +104,10 @@ export interface UpdateStoryParams {
 /**
  * Update story panels.
  */
-export async function updateStory(storyId: number, params: UpdateStoryParams): Promise<void> {
+export async function updateStory(accessToken: string, storyId: number, params: UpdateStoryParams): Promise<void> {
   const response = await apiFetch(`${API_BASE}/stories/${storyId}`, {
     method: 'PATCH',
+    headers: { Authorization: `Bearer ${accessToken}` },
     body: JSON.stringify(params),
   });
 
@@ -118,12 +120,14 @@ export async function updateStory(storyId: number, params: UpdateStoryParams): P
  * Update a single panel's image after editing.
  */
 export async function updatePanelImage(
+  accessToken: string,
   storyId: number,
   panelOrder: number,
   imageBase64: string
 ): Promise<void> {
   const response = await apiFetch(`${API_BASE}/stories/${storyId}/panels/${panelOrder}`, {
     method: 'PATCH',
+    headers: { Authorization: `Bearer ${accessToken}` },
     body: JSON.stringify({ image_base64: imageBase64 }),
   });
 
@@ -133,10 +137,12 @@ export async function updatePanelImage(
 }
 
 /**
- * Get list of all saved stories.
+ * Get list of all saved stories for the authenticated user.
  */
-export async function getStories(): Promise<StoryListItem[]> {
-  const response = await apiFetch(`${API_BASE}/stories`);
+export async function getStories(accessToken: string): Promise<StoryListItem[]> {
+  const response = await apiFetch(`${API_BASE}/stories`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
 
   if (!response.ok) {
     throw new Error(`Failed to fetch stories: ${response.statusText}`);
@@ -148,8 +154,10 @@ export async function getStories(): Promise<StoryListItem[]> {
 /**
  * Get a single story with all its panels.
  */
-export async function getStory(storyId: number): Promise<StoryDetailResponse> {
-  const response = await apiFetch(`${API_BASE}/stories/${storyId}`);
+export async function getStory(accessToken: string, storyId: number): Promise<StoryDetailResponse> {
+  const response = await apiFetch(`${API_BASE}/stories/${storyId}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
 
   if (!response.ok) {
     throw new Error(`Failed to fetch story: ${response.statusText}`);
@@ -161,9 +169,10 @@ export async function getStory(storyId: number): Promise<StoryDetailResponse> {
 /**
  * Delete a story.
  */
-export async function deleteStory(storyId: number): Promise<void> {
+export async function deleteStory(accessToken: string, storyId: number): Promise<void> {
   const response = await apiFetch(`${API_BASE}/stories/${storyId}`, {
     method: 'DELETE',
+    headers: { Authorization: `Bearer ${accessToken}` },
   });
 
   if (!response.ok) {

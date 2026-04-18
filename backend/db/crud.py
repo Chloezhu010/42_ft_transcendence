@@ -16,11 +16,9 @@ from models import (
 )
 from services.image_storage import delete_local_image, save_base64_image
 
-USER_ID = 1
-
 
 # --- Kid Profile CRUD ---
-async def create_kid_profile(db: aiosqlite.Connection, profile: KidProfileCreate) -> int:
+async def create_kid_profile(db: aiosqlite.Connection, profile: KidProfileCreate, user_id: int) -> int:
     """Create a kid profile and return its ID."""
     cursor = await db.execute(
         """
@@ -38,7 +36,7 @@ async def create_kid_profile(db: aiosqlite.Connection, profile: KidProfileCreate
             profile.favorite_color,
             profile.dream,
             profile.archetype,
-            USER_ID,
+            user_id,
         ),
     )
     await db.commit()
@@ -106,9 +104,9 @@ async def get_panels_for_story(db: aiosqlite.Connection, story_id: int) -> list[
 
 
 # --- Story CRUD ---
-async def create_story(db: aiosqlite.Connection, story: StoryCreate) -> StoryResponse:
+async def create_story(db: aiosqlite.Connection, story: StoryCreate, user_id: int) -> StoryResponse:
     """Create a story with profile and panels."""
-    profile_id = await create_kid_profile(db, story.profile)
+    profile_id = await create_kid_profile(db, story.profile, user_id)
 
     cover_filename = None
     if story.cover_image_base64:
@@ -128,7 +126,7 @@ async def create_story(db: aiosqlite.Connection, story: StoryCreate) -> StoryRes
             story.character_description,
             story.cover_image_prompt,
             cover_filename,
-            USER_ID,
+            user_id,
         ),
     )
     await db.commit()
@@ -137,12 +135,12 @@ async def create_story(db: aiosqlite.Connection, story: StoryCreate) -> StoryRes
 
     await create_panels(db, story_id, story.panels)
 
-    return await get_story_by_id(db, story_id)
+    return await get_story_by_id(db, story_id, user_id)
 
 
-async def get_story_by_id(db: aiosqlite.Connection, story_id: int) -> StoryResponse | None:
+async def get_story_by_id(db: aiosqlite.Connection, story_id: int, user_id: int) -> StoryResponse | None:
     """Get a complete story with profile and panels."""
-    cursor = await db.execute("SELECT * FROM stories WHERE id = ?", (story_id,))
+    cursor = await db.execute("SELECT * FROM stories WHERE id = ? AND user_id = ?", (story_id, user_id))
     row = await cursor.fetchone()
 
     if not row:
@@ -166,13 +164,17 @@ async def get_story_by_id(db: aiosqlite.Connection, story_id: int) -> StoryRespo
     )
 
 
-async def list_stories(db: aiosqlite.Connection) -> list[StoryListItem]:
+async def list_stories(db: aiosqlite.Connection, user_id: int) -> list[StoryListItem]:
     """Get all stories with summary info."""
-    cursor = await db.execute("""
+    cursor = await db.execute(
+        """
         SELECT id, title, cover_image_path, is_unlocked, created_at, kid_profile_id
         FROM stories
+        WHERE user_id = ?
         ORDER BY created_at DESC
-    """)
+    """,
+        (user_id,),
+    )
     rows = await cursor.fetchall()
 
     results = []
@@ -191,9 +193,9 @@ async def list_stories(db: aiosqlite.Connection) -> list[StoryListItem]:
     return results
 
 
-async def delete_story(db: aiosqlite.Connection, story_id: int) -> bool:
+async def delete_story(db: aiosqlite.Connection, story_id: int, user_id: int) -> bool:
     """Delete a story and its associated images. Returns True if deleted."""
-    cursor = await db.execute("SELECT cover_image_path FROM stories WHERE id = ?", (story_id,))
+    cursor = await db.execute("SELECT cover_image_path FROM stories WHERE id = ? AND user_id = ?", (story_id, user_id))
     story_row = await cursor.fetchone()
     if not story_row:
         return False
@@ -210,7 +212,7 @@ async def delete_story(db: aiosqlite.Connection, story_id: int) -> bool:
             image_paths.append(row["image_path"])
 
     # Delete from database (cascades to panels)
-    await db.execute("DELETE FROM stories WHERE id = ?", (story_id,))
+    await db.execute("DELETE FROM stories WHERE id = ? AND user_id = ?", (story_id, user_id))
     await db.commit()
 
     # Delete local image files
@@ -221,10 +223,10 @@ async def delete_story(db: aiosqlite.Connection, story_id: int) -> bool:
 
 
 async def update_story_panels(
-    db: aiosqlite.Connection, story_id: int, update: StoryUpdatePanels
+    db: aiosqlite.Connection, story_id: int, update: StoryUpdatePanels, user_id: int
 ) -> StoryResponse | None:
     """Update story and panel images."""
-    cursor = await db.execute("SELECT id FROM stories WHERE id = ?", (story_id,))
+    cursor = await db.execute("SELECT id FROM stories WHERE id = ? AND user_id = ?", (story_id, user_id))
     row = await cursor.fetchone()
     if not row:
         return None
@@ -264,17 +266,20 @@ async def update_story_panels(
             )
 
     await db.commit()
-    return await get_story_by_id(db, story_id)
+    return await get_story_by_id(db, story_id, user_id)
 
 
-async def update_panel_image(db: aiosqlite.Connection, story_id: int, panel_order: int, image_base64: str) -> bool:
+async def update_panel_image(
+    db: aiosqlite.Connection, story_id: int, panel_order: int, image_base64: str, user_id: int
+) -> bool:
     """Update a single panel's image. Returns True if successful."""
     cursor = await db.execute(
         """
         SELECT p.id FROM panels p
-        WHERE p.story_id = ? AND p.panel_order = ?
+        JOIN stories s ON p.story_id = s.id
+        WHERE p.story_id = ? AND p.panel_order = ? AND s.user_id = ?
     """,
-        (story_id, panel_order),
+        (story_id, panel_order, user_id),
     )
     row = await cursor.fetchone()
     if not row:

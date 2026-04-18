@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { App } from '@/app';
+import { AuthProvider } from '@/app/auth';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -16,16 +17,18 @@ const root = ReactDOM.createRoot(rootElement);
 root.render(
   <StrictMode>
     <BrowserRouter>
-      <App />
-      <Toaster
-        position="top-center"
-        richColors
-        toastOptions={{
-          style: {
-            fontFamily: 'Quicksand, sans-serif',
-          },
-        }}
-      />
+      <AuthProvider>
+        <App />
+        <Toaster
+          position="top-center"
+          richColors
+          toastOptions={{
+            style: {
+              fontFamily: 'Quicksand, sans-serif',
+            },
+          }}
+        />
+      </AuthProvider>
     </BrowserRouter>
   </StrictMode>
 );

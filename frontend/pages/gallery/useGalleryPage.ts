@@ -5,6 +5,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { deleteStory, getStories, type StoryListItem } from '@api';
+import { useAuth } from '@/app/auth';
 
 interface UseGalleryPageResult {
   isLoading: boolean;
@@ -13,14 +14,16 @@ interface UseGalleryPageResult {
 }
 
 export function useGalleryPage(): UseGalleryPageResult {
+  const { accessToken } = useAuth();
   const [stories, setStories] = useState<StoryListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const loadStories = useCallback(async () => {
+    if (!accessToken) return;
     setIsLoading(true);
 
     try {
-      const nextStories = await getStories();
+      const nextStories = await getStories(accessToken);
       setStories(nextStories);
     } catch (error) {
       console.error('Failed to load stories:', error);
@@ -29,26 +32,27 @@ export function useGalleryPage(): UseGalleryPageResult {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [accessToken]);
 
   useEffect(() => {
     void loadStories();
   }, [loadStories]);
 
   const handleDeleteStory = useCallback(async (storyId: number) => {
+    if (!accessToken) return;
     const shouldDelete = window.confirm('Are you sure you want to delete this story? This cannot be undone.');
     if (!shouldDelete) {
       return;
     }
 
     try {
-      await deleteStory(storyId);
+      await deleteStory(accessToken, storyId);
       setStories((previousStories) => previousStories.filter((story) => story.id !== storyId));
     } catch (error) {
       console.error('Failed to delete story:', error);
       toast.error('Failed to delete story.');
     }
-  }, []);
+  }, [accessToken]);
 
   return {
     isLoading,

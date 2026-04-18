@@ -6,6 +6,7 @@ import { editPanelImage, updatePanelImage } from '@api';
 import type { ComicPanelData, Story } from '@/types';
 
 interface EditStoryPanelImageParams {
+  accessToken: string;
   panel: ComicPanelData;
   story: Story;
   artStyle?: string;
@@ -14,6 +15,7 @@ interface EditStoryPanelImageParams {
 }
 
 export async function editStoryPanelImage({
+  accessToken,
   artStyle,
   editPrompt,
   panel,
@@ -21,6 +23,7 @@ export async function editStoryPanelImage({
   story,
 }: EditStoryPanelImageParams): Promise<ComicPanelData> {
   const updatedImageUrl = await editPanelImage(
+    accessToken,
     panel.imageUrl!,
     editPrompt,
     panel.imagePrompt,
@@ -34,7 +37,7 @@ export async function editStoryPanelImage({
 
   const panelOrder = story.panels.findIndex((storyPanel) => storyPanel.id === panel.id);
   if (savedStoryId && panelOrder >= 0) {
-    await updatePanelImage(savedStoryId, panelOrder, updatedImageUrl);
+    await updatePanelImage(accessToken, savedStoryId, panelOrder, updatedImageUrl);
   }
 
   return updatedPanel;
