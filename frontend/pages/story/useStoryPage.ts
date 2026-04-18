@@ -117,7 +117,7 @@ export function useStoryPage(): UseStoryPageResult {
 
     if (!storyId) {
       toast.error('Invalid story id.');
-      navigate('/', { replace: true });
+      navigate('/create', { replace: true });
       return;
     }
 
