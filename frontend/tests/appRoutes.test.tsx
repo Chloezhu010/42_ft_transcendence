@@ -6,11 +6,14 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from '@/app';
+import { AuthProvider } from '@/app/auth';
 
 function renderApp(initialEntry: string): void {
   render(
     <MemoryRouter initialEntries={[initialEntry]}>
-      <App />
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </MemoryRouter>,
   );
 }

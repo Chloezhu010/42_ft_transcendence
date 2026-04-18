@@ -21,6 +21,7 @@ import {
 } from '@/utils';
 import { isPreviewDraft } from './story.helpers';
 import { StoryPageView, type PendingGeneration } from './story.types';
+import { a } from 'framer-motion/client';
 
 interface LoadedStoryState {
   nextProfile: KidProfile;
@@ -33,8 +34,8 @@ interface GeneratedPreviewState {
   nextPendingGeneration: PendingGeneration;
 }
 
-export async function loadStoryState(storyId: number): Promise<LoadedStoryState> {
-  const savedStory = await getStory(storyId);
+export async function loadStoryState(accessToken: string, storyId: number): Promise<LoadedStoryState> {
+  const savedStory = await getStory(accessToken, storyId);
   const nextStory = mapApiStoryToStory(savedStory);
   const nextProfile = mapApiProfileToKidProfile(savedStory.profile);
   const profileForApi = mapKidProfileToGenerationProfile(nextProfile);
@@ -61,6 +62,7 @@ export async function loadStoryState(storyId: number): Promise<LoadedStoryState>
 }
 
 async function buildPreviewStory(
+  accessToken: string,
   profileForApi: PendingGeneration['profileForApi'],
   script: Awaited<ReturnType<typeof streamStoryScript>>,
 ): Promise<Story> {
@@ -71,11 +73,13 @@ async function buildPreviewStory(
   const lastPanelIndex = script.panels.length - 1;
   const [firstImage, lastImage] = await Promise.all([
     generatePanelImage(
+      accessToken,
       script.panels[0].imagePrompt,
       script.characterDescription,
       profileForApi.art_style,
     ),
     generatePanelImage(
+      accessToken,
       script.panels[lastPanelIndex].imagePrompt,
       script.characterDescription,
       profileForApi.art_style,
@@ -98,6 +102,7 @@ async function buildPreviewStory(
 }
 
 async function persistPreviewStory(
+  accessToken: string,
   profileForApi: PendingGeneration['profileForApi'],
   previewStory: Story,
 ): Promise<number> {
@@ -110,7 +115,7 @@ async function persistPreviewStory(
     })),
   );
 
-  return saveStory({
+  return saveStory(accessToken, {
     profile: {
       name: profileForApi.name,
       gender: profileForApi.gender,
@@ -130,13 +135,14 @@ async function persistPreviewStory(
 }
 
 export async function generatePreviewState(
+  accessToken: string,
   profile: KidProfile,
   onIntroDelta: (field: StoryIntroField, delta: string) => void,
 ): Promise<GeneratedPreviewState> {
   const profileForApi = mapKidProfileToGenerationProfile(profile);
-  const script = await streamStoryScript(profileForApi, { onIntroDelta });
-  const previewStory = await buildPreviewStory(profileForApi, script);
-  const previewStoryId = await persistPreviewStory(profileForApi, previewStory);
+  const script = await streamStoryScript(accessToken, profileForApi, { onIntroDelta });
+  const previewStory = await buildPreviewStory(accessToken, profileForApi, script);
+  const previewStoryId = await persistPreviewStory(accessToken, profileForApi, previewStory);
 
   return {
     nextPendingGeneration: {
@@ -147,11 +153,12 @@ export async function generatePreviewState(
   };
 }
 
-export async function generateFullStoryState(pendingGeneration: PendingGeneration): Promise<Story> {
+export async function generateFullStoryState(accessToken: string, pendingGeneration: PendingGeneration): Promise<Story> {
   const { previewStory, previewStoryId, profileForApi } = pendingGeneration;
   const lastPanelIndex = previewStory.panels.length - 1;
 
   const coverImagePromise = generatePanelImage(
+    accessToken,
     previewStory.coverImagePrompt,
     previewStory.characterDescription,
     profileForApi.art_style,
@@ -166,6 +173,7 @@ export async function generateFullStoryState(pendingGeneration: PendingGeneratio
     }
 
     const generatedImage = await generatePanelImage(
+      accessToken,
       panel.imagePrompt,
       previewStory.characterDescription,
       profileForApi.art_style,
@@ -179,7 +187,7 @@ export async function generateFullStoryState(pendingGeneration: PendingGeneratio
     Promise.all(panelImagePromises),
   ]);
 
-  await updateStory(previewStoryId, {
+  await updateStory(accessToken, previewStoryId, {
     is_unlocked: true,
     cover_image_base64: await imageSourceToPureBase64(coverImage),
     panels: previewStory.panels.map((panel, index) => ({
@@ -190,5 +198,5 @@ export async function generateFullStoryState(pendingGeneration: PendingGeneratio
     })),
   });
 
-  return mapApiStoryToStory(await getStory(previewStoryId));
+  return mapApiStoryToStory(await getStory(accessToken, previewStoryId));
 }

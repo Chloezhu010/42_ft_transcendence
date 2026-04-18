@@ -35,10 +35,12 @@ export interface GeneratedStoryScript {
  * Generate a story script using Gemini AI.
  */
 export async function generateStoryScript(
+  accessToken: string,
   profile: KidProfileForGeneration
 ): Promise<GeneratedStoryScript> {
   const response = await apiFetch(`${API_BASE}/generate/story-script`, {
     method: 'POST',
+    headers: { Authorization: `Bearer ${accessToken}` },
     body: JSON.stringify({ profile }),
   });
 
@@ -98,11 +100,13 @@ type StoryStreamEvent =
  * event, the returned promise rejects.
  */
 export async function streamStoryScript(
+  accessToken: string,
   profile: KidProfileForGeneration,
   callbacks: StreamStoryScriptCallbacks = {}
 ): Promise<GeneratedStoryScript> {
   const response = await apiFetch(`${API_BASE}/generate/story-script/stream`, {
     method: 'POST',
+    headers: { Authorization: `Bearer ${accessToken}` },
     body: JSON.stringify({ profile }),
     signal: callbacks.signal,
   });
@@ -169,12 +173,14 @@ export async function streamStoryScript(
  * Generate a comic panel image using Gemini AI.
  */
 export async function generatePanelImage(
+  accessToken: string,
   prompt: string,
   castGuide: string,
   artStyle?: string
 ): Promise<string> {
   const response = await apiFetch(`${API_BASE}/generate/panel-image`, {
     method: 'POST',
+    headers: { Authorization: `Bearer ${accessToken}` },
     body: JSON.stringify({
       prompt,
       cast_guide: castGuide,
@@ -195,6 +201,7 @@ export async function generatePanelImage(
  * Edit an existing comic panel image using Gemini AI.
  */
 export async function editPanelImage(
+  accessToken: string,
   imageSource: string,
   editPrompt: string,
   originalPrompt: string,
@@ -205,6 +212,7 @@ export async function editPanelImage(
 
   const response = await apiFetch(`${API_BASE}/generate/edit-image`, {
     method: 'POST',
+    headers: { Authorization: `Bearer ${accessToken}` },
     body: JSON.stringify({
       image_base64: pureBase64,
       original_prompt: originalPrompt,

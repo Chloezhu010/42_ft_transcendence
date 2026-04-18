@@ -2,6 +2,8 @@
  * Shared application shell around all pages.
  */
 import { Link, Outlet, useLocation } from 'react-router-dom';
+import { useAuth } from '@/app/auth';
+import StorageImage from '@/components/StorageImage';
 
 function isMarketingRoute(pathname: string): boolean {
   return pathname === '/' || pathname === '/privacy' || pathname === '/terms';
@@ -17,6 +19,7 @@ function getMainClassName(pathname: string): string {
 
 function AppLayout(): JSX.Element {
   const location = useLocation();
+  const { currentUser } = useAuth();
 
   if (isMarketingRoute(location.pathname)) {
     return <Outlet />;
@@ -33,7 +36,7 @@ function AppLayout(): JSX.Element {
             <img src="/logo-highres.png" alt="Funova logo" className="h-14 w-auto object-contain" />
           </Link>
 
-          <nav className="flex items-center gap-2 text-sm font-bold">
+          <div className="flex items-center gap-2 text-sm font-bold">
             {showCreateLink ? (
               <Link
                 to="/create"
@@ -48,7 +51,26 @@ function AppLayout(): JSX.Element {
             >
               My Library
             </Link>
-          </nav>
+            {currentUser ? (
+              <Link
+                to="/profile"
+                aria-label="Your profile"
+                className="w-10 h-10 rounded-full overflow-hidden border-2 border-brand-primary/20 bg-brand-light hover:border-brand-primary transition-colors"
+              >
+                {currentUser.avatar_url ? (
+                  <StorageImage
+                    src={currentUser.avatar_url}
+                    alt={currentUser.username}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="flex items-center justify-center w-full h-full text-sm font-bold text-brand-primary">
+                    {currentUser.username.charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </Link>
+            ) : null}
+          </div>
         </div>
       </header>
 
