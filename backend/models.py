@@ -43,6 +43,16 @@ class UserResponse(BaseModel):
     created_at: datetime
 
 
+class PublicUserResponse(BaseModel):
+    """User data safe to expose from public profile endpoints."""
+
+    id: int
+    username: str
+    avatar_url: str | None
+    is_online: bool
+    created_at: datetime
+
+
 class UserUpdateRequest(BaseModel):
     """Request body for updating user profile."""
 

@@ -13,6 +13,14 @@ export interface UserResponse {
   created_at: string;
 }
 
+export interface PublicUserResponse {
+  id: number;
+  username: string;
+  avatar_url: string | null;
+  is_online: boolean;
+  created_at: string;
+}
+
 export interface FriendResponse {
   id: number;
   username: string;
@@ -125,14 +133,14 @@ export async function uploadAvatar(accessToken: string, file: File): Promise<Use
     return (await response.json()) as UserResponse;
 }
 
-export async function getUser(userId: number): Promise<UserResponse> {
+export async function getUser(userId: number): Promise<PublicUserResponse> {
     const response = await apiFetch(`${API_BASE}/users/${userId}`, {
         method: 'GET',
     });
     if (!response.ok) {
         throw new Error(await getErrorMessage(response, 'Failed to fetch user info'));
     }
-    return (await response.json()) as UserResponse;
+    return (await response.json()) as PublicUserResponse;
 }
 
 /**

@@ -299,6 +299,7 @@ def test_get_public_profile_found(client, alice):
     r = client.get(f"/api/users/{user_id}")
     assert r.status_code == 200
     assert r.json()["username"] == "alice"
+    assert "email" not in r.json()
 
 
 def test_get_public_profile_requires_no_auth(client, alice):

@@ -11,7 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from auth_utils import get_current_user
 from db.crud_users import get_user_by_id, update_avatar, update_user
 from db.database import get_db
-from models import UserResponse, UserUpdateRequest
+from models import PublicUserResponse, UserResponse, UserUpdateRequest
 
 router = APIRouter(prefix="/api/users", tags=["users"])
 _IMAGE_DIR = Path(__file__).parent.parent / "images"
@@ -30,6 +30,17 @@ def _to_user_response(row) -> UserResponse:
         email=row["email"],
         username=row["username"],
         avatar_url=row["avatar_path"],  # frontend resolves to full url via getImageUrl()
+        is_online=bool(row["is_online"]),
+        created_at=row["created_at"],
+    )
+
+
+def _to_public_user_response(row) -> PublicUserResponse:
+    """Convert a DB user row to a public-safe profile model."""
+    return PublicUserResponse(
+        id=row["id"],
+        username=row["username"],
+        avatar_url=row["avatar_path"],
         is_online=bool(row["is_online"]),
         created_at=row["created_at"],
     )
@@ -131,10 +142,10 @@ async def upload_avatar(file: UploadFile, current_user=Depends(get_current_user)
     return _to_user_response(updated_row)
 
 
-@router.get("/{user_id}", response_model=UserResponse)
+@router.get("/{user_id}", response_model=PublicUserResponse)
 async def get_user_profile(user_id: int, db=Depends(get_db)):
     """Get a public user profile by ID. No auth required."""
     row = await get_user_by_id(db, user_id)
     if row is None:
         raise HTTPException(status_code=404, detail="User not found")
-    return _to_user_response(row)
+    return _to_public_user_response(row)

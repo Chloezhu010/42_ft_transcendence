@@ -28,6 +28,14 @@ const USER_RESPONSE = {
   created_at: '2026-04-15T12:00:00Z',
 };
 
+const PUBLIC_USER_RESPONSE = {
+  id: 1,
+  username: 'alice',
+  avatar_url: 'avatars/alice.png',
+  is_online: true,
+  created_at: '2026-04-15T12:00:00Z',
+};
+
 const FRIEND_RESPONSE = {
   id: 2,
   username: 'bob',
@@ -295,7 +303,7 @@ describe('authApi', () => {
 
   it('getUser fetches a public profile by user id', async () => {
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(JSON.stringify(USER_RESPONSE), {
+      new Response(JSON.stringify(PUBLIC_USER_RESPONSE), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       })
@@ -303,7 +311,7 @@ describe('authApi', () => {
 
     const result = await getUser(42);
 
-    expect(result).toEqual(USER_RESPONSE);
+    expect(result).toEqual(PUBLIC_USER_RESPONSE);
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining('/api/users/42'),
       expect.objectContaining({
