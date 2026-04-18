@@ -33,6 +33,21 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
         setCurrentUser(null);
     }
 
+    async function loadCurrentUser(token: string): Promise<UserResponse> {
+        return await getMe(token);
+    }
+
+    async function establishSession(token: string): Promise<void> {
+        saveToken(token);
+        try {
+            const user = await loadCurrentUser(token);
+            setCurrentUser(user);
+        } catch (error) {
+            clearAuthState();
+            throw error;
+        }
+    }
+
     // Actions
     async function refreshMe(): Promise<void> {
         if (!accessToken) {
@@ -40,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
             return;
         }
         try {
-            const user = await getMe(accessToken);
+            const user = await loadCurrentUser(accessToken);
             setCurrentUser(user);
         } catch (error) {
             if (isUnauthorizedError(error)) {
@@ -51,35 +66,13 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
     }
 
     async function login(email: string, password: string): Promise<void> {
-        // Call the API to get the token
         const response = await apiLogin(email, password);
-        const token = response.access_token;
-        // Save the token
-        saveToken(token);
-        // Fetch the user data
-        try {
-            const user = await getMe(token);
-            setCurrentUser(user);
-        } catch (error) {
-            clearAuthState();
-            throw error;
-        }
+        await establishSession(response.access_token);
     }
 
     async function signup(email: string, username: string, password: string): Promise<void> {
-        // Call the API to get the token
         const response = await apiSignup(email, username, password);
-        const token = response.access_token;
-        // Save the token
-        saveToken(token);
-        // Fetch the user data
-        try {
-            const user = await getMe(token);
-            setCurrentUser(user);
-        } catch (error) {
-            clearAuthState();
-            throw error;
-        }
+        await establishSession(response.access_token);
     }
 
     async function logout(): Promise<void> {
@@ -111,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
             // if token exists, set it in state and try to fetch user data
             setAccessToken(storedToken);
             try {
-                const user = await getMe(storedToken);
+                const user = await loadCurrentUser(storedToken);
                 if (!isMounted) return;
                 setCurrentUser(user);
             } catch (error) {

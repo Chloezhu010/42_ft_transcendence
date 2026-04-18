@@ -19,7 +19,7 @@ vi.mock('@api', () => ({
 }));
 
 function TestConsumer(): JSX.Element {
-  const { currentUser, isLoadingSession, accessToken, login, logout } = useAuth();
+  const { currentUser, isLoadingSession, accessToken, login, logout, signup } = useAuth();
 
   const statusText = isLoadingSession
     ? 'loading'
@@ -34,6 +34,10 @@ function TestConsumer(): JSX.Element {
 
       <button onClick={() => void login('alice@example.com', 'Password123!')}>
         Login
+      </button>
+
+      <button onClick={() => void signup('alice@example.com', 'alice', 'Password123!')}>
+        Signup
       </button>
 
       <button onClick={() => void logout()}>
@@ -169,6 +173,45 @@ describe('AuthProvider', () => {
 
     expect(localStorage.getItem('auth.accessToken')).toBe('fresh-token');
     expect(screen.getByTestId('token')).toHaveTextContent('fresh-token');
+  });
+
+  it('signup saves the token and loads the current user', async () => {
+    mockSignup.mockResolvedValue({
+      access_token: 'signup-token',
+      token_type: 'bearer',
+    });
+
+    mockGetMe.mockResolvedValue({
+      id: 1,
+      email: 'alice@example.com',
+      username: 'alice',
+      avatar_url: null,
+      is_online: true,
+      created_at: '2026-04-17T10:00:00Z',
+    });
+
+    renderWithProvider();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('status')).toHaveTextContent('logged-out');
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Signup' }));
+
+    await waitFor(() => {
+      expect(mockSignup).toHaveBeenCalledWith('alice@example.com', 'alice', 'Password123!');
+    });
+
+    await waitFor(() => {
+      expect(mockGetMe).toHaveBeenCalledWith('signup-token');
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('status')).toHaveTextContent('logged-in:alice');
+    });
+
+    expect(localStorage.getItem('auth.accessToken')).toBe('signup-token');
+    expect(screen.getByTestId('token')).toHaveTextContent('signup-token');
   });
 
   it('logout clears auth state even if the API call succeeds', async () => {
