@@ -3,5 +3,7 @@
  */
 export * from './apiClient';
 export * from './authApi';
+export * from './userApi';
+export * from './friendApi';
 export * from './storyApi';
 export * from './generationApi';

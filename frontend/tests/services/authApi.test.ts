@@ -93,6 +93,31 @@ describe('authApi', () => {
     );
   });
 
+  it('signup formats structured validation errors from FastAPI', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          detail: [
+            {
+              loc: ['body', 'email'],
+              msg: 'value is not a valid email address',
+              type: 'value_error',
+            },
+          ],
+        }),
+        {
+          status: 422,
+          headers: { 'Content-Type': 'application/json' },
+          statusText: 'Unprocessable Entity',
+        }
+      )
+    );
+
+    await expect(signup('not-an-email', 'alice', 'password123')).rejects.toThrow(
+      'body.email: value is not a valid email address'
+    );
+  });
+
   it('login sends credentials and returns the auth token', async () => {
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       new Response(
