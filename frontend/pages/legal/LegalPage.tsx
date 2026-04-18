@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import MarketingFooter from '@/pages/landing/MarketingFooter';
 import {
   legalDocuments,
-  legalRepositoryIssuesUrl,
+  legalTermsIssuesUrl,
   type LegalDocumentKey,
 } from './legal.content';
 
@@ -12,7 +12,7 @@ interface LegalPageProps {
 
 function LegalPage({ documentKey }: LegalPageProps): JSX.Element {
   const document = legalDocuments[documentKey];
-  const contactButtonLabel = documentKey === 'privacy' ? 'Contact About Privacy' : 'Contact About Terms';
+  const showPublicTermsLink = documentKey === 'terms';
 
   return (
     <div className="min-h-screen bg-brand-light">
@@ -95,18 +95,28 @@ function LegalPage({ documentKey }: LegalPageProps): JSX.Element {
 
           <section>
             <h2 className="text-2xl font-bold text-brand-primary mb-4">Maintainer Contact</h2>
-            <p>
-              Questions, deletion requests, or reports about the current deployment should be sent through the
-              Funova repository issue tracker.
-            </p>
-            <a
-              href={legalRepositoryIssuesUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block mt-4 px-6 py-2 bg-brand-primary text-white font-bold rounded-full hover:bg-brand-primary/90 transition-colors"
-            >
-              {contactButtonLabel}
-            </a>
+            {showPublicTermsLink ? (
+              <>
+                <p>
+                  Questions about the terms can be sent through the Funova repository issue tracker when they do not
+                  include personal data.
+                </p>
+                <a
+                  href={legalTermsIssuesUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block mt-4 px-6 py-2 bg-brand-primary text-white font-bold rounded-full hover:bg-brand-primary/90 transition-colors"
+                >
+                  Contact About Terms
+                </a>
+              </>
+            ) : (
+              <p className="rounded-2xl border-2 border-brand-primary/10 bg-white p-4 leading-relaxed">
+                Privacy and deletion requests should not be filed in the public repository issue tracker. If you need
+                help with a privacy-specific request, contact the deployment owner through a private channel outside the
+                app and do not include personal details in public issue reports.
+              </p>
+            )}
           </section>
         </div>
       </main>

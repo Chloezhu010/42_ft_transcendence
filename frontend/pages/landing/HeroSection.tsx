@@ -1,6 +1,6 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { SketchyButton } from '@/components/design-system/Primitives';
+import { getSketchyButtonClassName } from '@/components/design-system/Primitives';
 
 function HeroSection(): JSX.Element {
   const { scrollY } = useScroll();
@@ -48,13 +48,19 @@ function HeroSection(): JSX.Element {
             </p>
 
             <div className="flex flex-col md:flex-row gap-4 justify-center md:justify-start">
-              <Link to="/create">
-                <SketchyButton className="px-8 py-4 text-2xl shadow-xl">Create a Story</SketchyButton>
+              <Link
+                to="/create"
+                className={`inline-flex items-center justify-center ${getSketchyButtonClassName('primary', 'px-8 py-4 text-2xl shadow-xl')}`}
+                style={{ borderRadius: '32px' }}
+              >
+                Create a Story
               </Link>
-              <Link to="/gallery">
-                <SketchyButton variant="outline" className="px-8 py-4 text-2xl bg-white/80 backdrop-blur-sm">
-                  View Gallery
-                </SketchyButton>
+              <Link
+                to="/gallery"
+                className={`inline-flex items-center justify-center ${getSketchyButtonClassName('outline', 'px-8 py-4 text-2xl bg-white/80 backdrop-blur-sm')}`}
+                style={{ borderRadius: '32px' }}
+              >
+                View Gallery
               </Link>
             </div>
           </motion.div>

@@ -28,7 +28,7 @@ interface LegalDocumentContent {
 
 const REPOSITORY_ISSUES_URL = 'https://github.com/Chloezhu010/42_ft_transcendence/issues';
 
-export const legalRepositoryIssuesUrl = REPOSITORY_ISSUES_URL;
+export const legalTermsIssuesUrl = REPOSITORY_ISSUES_URL;
 
 export const legalDocuments: Record<LegalDocumentKey, LegalDocumentContent> = {
   privacy: {
@@ -161,7 +161,8 @@ export const legalDocuments: Record<LegalDocumentKey, LegalDocumentContent> = {
           {
             paragraphs: [
               'The project is designed to run behind HTTPS and uses a containerized deployment. Even so, no web application can promise perfect security.',
-              'If you believe a privacy issue exists in the current build, contact the maintainers directly through the project repository instead of posting sensitive details publicly.',
+              'If you believe a privacy issue exists in the current build, do not post child names, story IDs, uploaded images, or other personal details in the public repository issue tracker.',
+              'Privacy concerns that require personal context should be sent to the deployment owner through a private support channel outside the public repository.',
             ],
           },
         ],
@@ -172,7 +173,8 @@ export const legalDocuments: Record<LegalDocumentKey, LegalDocumentContent> = {
         blocks: [
           {
             paragraphs: [
-              'Questions about this policy, deletion requests, or reports about improper content can be sent to the Funova maintainers through the repository issue tracker.',
+              'Privacy questions, deletion requests, and sensitive content reports should be handled through a private contact path controlled by the deployment owner.',
+              'Funova does not provide a public in-app form for those requests because the repository issue tracker is public and should not receive personal details.',
             ],
           },
         ],
@@ -292,7 +294,7 @@ export const legalDocuments: Record<LegalDocumentKey, LegalDocumentContent> = {
         blocks: [
           {
             paragraphs: [
-              'Questions about these terms should be sent through the Funova repository issue tracker so the maintainers can respond in the same project context.',
+              'Questions about these terms can be sent through the Funova repository issue tracker because those requests do not require personal details.',
             ],
           },
         ],

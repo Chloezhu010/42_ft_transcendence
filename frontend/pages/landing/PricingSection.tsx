@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SketchyButton, SketchyCard } from '@/components/design-system/Primitives';
+import { getSketchyButtonClassName, SketchyCard } from '@/components/design-system/Primitives';
 
 function PricingSection(): JSX.Element {
   return (
@@ -27,10 +27,12 @@ function PricingSection(): JSX.Element {
             <li className="flex items-center gap-2">✨ Editable comic panels</li>
           </ul>
 
-          <Link to="/create" className="block">
-            <SketchyButton variant="outline" className="w-full py-4 text-xl rounded-2xl" style={{ borderRadius: '16px' }}>
-              Start Creating
-            </SketchyButton>
+          <Link
+            to="/create"
+            className={`flex w-full items-center justify-center ${getSketchyButtonClassName('outline', 'py-4 text-xl rounded-2xl')}`}
+            style={{ borderRadius: '16px' }}
+          >
+            Start Creating
           </Link>
         </SketchyCard>
 
@@ -56,10 +58,12 @@ function PricingSection(): JSX.Element {
             <li className="flex items-center gap-2">🚀 Review the final storyboard</li>
           </ul>
 
-          <Link to="/gallery" className="block">
-            <SketchyButton className="w-full py-4 text-xl rounded-2xl" style={{ borderRadius: '16px' }}>
-              Open Library
-            </SketchyButton>
+          <Link
+            to="/gallery"
+            className={`flex w-full items-center justify-center ${getSketchyButtonClassName('primary', 'py-4 text-xl rounded-2xl')}`}
+            style={{ borderRadius: '16px' }}
+          >
+            Open Library
           </Link>
         </SketchyCard>
       </div>
