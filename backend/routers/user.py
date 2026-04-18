@@ -19,6 +19,8 @@ _ALLOWED_TYPES = {"image/jpeg", "image/jpg", "image/png", "image/webp"}
 _DEFAULT_AVATAR = "default-avatar.png"
 MAX_SIZE = 5 * 1024 * 1024  # 5MB max file size for avatar uploads
 CHUNK = 64 * 1024  # 64KB chunk size for file uploads
+_IMAGE_SIGNATURE_BYTES = 12
+_CONTENT_TYPE_ALIASES = {"image/jpg": "image/jpeg"}
 
 
 def _to_user_response(row) -> UserResponse:
@@ -31,6 +33,17 @@ def _to_user_response(row) -> UserResponse:
         is_online=bool(row["is_online"]),
         created_at=row["created_at"],
     )
+
+
+def _detect_image_type(header: bytes) -> tuple[str, str] | None:
+    """Infer image MIME type and safe file extension from the uploaded bytes."""
+    if header.startswith(b"\xff\xd8\xff"):
+        return ("image/jpeg", ".jpg")
+    if header.startswith(b"\x89PNG\r\n\x1a\n"):
+        return ("image/png", ".png")
+    if header.startswith(b"RIFF") and header[8:12] == b"WEBP":
+        return ("image/webp", ".webp")
+    return None
 
 
 @router.get("/me", response_model=UserResponse)
@@ -69,23 +82,36 @@ async def upload_avatar(file: UploadFile, current_user=Depends(get_current_user)
     # save new file
     avatars_dir = _IMAGE_DIR / "avatars"
     avatars_dir.mkdir(parents=True, exist_ok=True)
-    ext = Path(file.filename).suffix if file.filename else ".jpg"
-    relative_path = f"avatars/{current_user['id']}_{uuid.uuid4().hex}{ext}"  # store in DB
-    dest = _IMAGE_DIR / relative_path  # actual file path
-    tmp = dest.with_suffix(".tmp")  # write to temp path first
+    file_stem = f"{current_user['id']}_{uuid.uuid4().hex}"
+    tmp = avatars_dir / f"{file_stem}.tmp"
 
     # stream upload into temp file, validate size before committing
     try:
         async with aiofiles.open(tmp, "wb") as out:
             size = 0
+            header = bytearray()
             while chunk := await file.read(CHUNK):
+                if len(header) < _IMAGE_SIGNATURE_BYTES:
+                    header.extend(chunk[: _IMAGE_SIGNATURE_BYTES - len(header)])
                 size += len(chunk)
                 if size > MAX_SIZE:
                     raise HTTPException(status_code=413, detail="File too large, must be under 5MB")
                 await out.write(chunk)
+
+        detected_image = _detect_image_type(bytes(header))
+        if detected_image is None:
+            raise HTTPException(status_code=415, detail="Unsupported file type")
+
+        detected_content_type, ext = detected_image
+        declared_content_type = _CONTENT_TYPE_ALIASES.get(file.content_type, file.content_type)
+        if declared_content_type != detected_content_type:
+            raise HTTPException(status_code=415, detail="Uploaded content does not match file type")
     except Exception:
         tmp.unlink(missing_ok=True)  # covers HTTPException, OSError, etc.
         raise
+
+    relative_path = f"avatars/{file_stem}{ext}"  # store in DB
+    dest = _IMAGE_DIR / relative_path  # actual file path
     tmp.replace(dest)  # atomic rename: only happens if size check passed
 
     # update user's avatar_path in db — clean up dest if anything goes wrong

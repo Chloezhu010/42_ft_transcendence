@@ -174,6 +174,20 @@ def test_upload_avatar_png(client, alice, image_dir):
     assert r.status_code == 200
 
 
+def test_upload_avatar_ignores_client_filename_extension(client, alice, image_dir):
+    r = client.post(
+        "/api/users/me/avatar",
+        files={"file": ("avatar.html", io.BytesIO(_PNG), "image/png")},
+        headers=alice,
+    )
+    assert r.status_code == 200
+    avatar_url = r.json()["avatar_url"]
+    assert avatar_url is not None
+    assert avatar_url.endswith(".png")
+    assert not avatar_url.endswith(".html")
+    assert (image_dir / avatar_url).exists()
+
+
 def test_upload_avatar_webp(client, alice, image_dir):
     r = client.post(
         "/api/users/me/avatar",
@@ -181,6 +195,15 @@ def test_upload_avatar_webp(client, alice, image_dir):
         headers=alice,
     )
     assert r.status_code == 200
+
+
+def test_upload_avatar_rejects_non_image_content_with_image_content_type(client, alice, image_dir):
+    r = client.post(
+        "/api/users/me/avatar",
+        files={"file": ("avatar.html", io.BytesIO(b"<html>not an image</html>"), "image/png")},
+        headers=alice,
+    )
+    assert r.status_code == 415
 
 
 def test_upload_avatar_wrong_type_returns_415(client, alice, image_dir):
