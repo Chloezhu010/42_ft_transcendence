@@ -12,11 +12,13 @@ const languages = [
 
 const LanguageSwitcher: React.FC = () => {
   const { i18n } = useTranslation();
+  const language = i18n.resolvedLanguage || i18n.language;
+  const direction = i18n.dir(language);
 
   useEffect(() => {
-    document.documentElement.dir = i18n.dir();
-    document.documentElement.lang = i18n.language;
-  }, [i18n.language, i18n.dir]);
+    document.documentElement.dir = direction;
+    document.documentElement.lang = language;
+  }, [direction, language]);
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     i18n.changeLanguage(e.target.value);
@@ -25,7 +27,7 @@ const LanguageSwitcher: React.FC = () => {
   return (
     <div className="language-switcher">
       <select 
-        value={i18n.resolvedLanguage || 'en'} 
+        value={language || 'en'} 
         onChange={handleLanguageChange}
         style={{
           padding: '4px 8px',
