@@ -92,8 +92,7 @@
     "paintingInteractions": "رسم تفاعلات سينمائية وبناء إرث بطلك"
   },
   "mainPage": {
-    "yourChilds": "أسطورة",
-    "legend": "طفلك",
+    "title": "<accent>أسطورة</accent> طفلك",
     "transformStories": "حوّل قصص ما قبل النوم إلى تجارب كتب مصورة سينمائية.",
     "startAdventure": "ابدأ مغامرتك",
     "viewLibrary": "عرض المكتبة"

@@ -92,8 +92,7 @@
     "paintingInteractions": "绘制电影互动并构建您的英雄财富"
   },
   "mainPage": {
-    "yourChilds": "宝贝专属",
-    "legend": "传奇",
+    "title": "宝贝专属<accent>传奇</accent>",
     "transformStories": "将睡前故事转变为电影漫画体验。",
     "startAdventure": "开始您的冒险",
     "viewLibrary": "查看图书馆"

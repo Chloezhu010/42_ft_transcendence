@@ -92,8 +92,7 @@
     "paintingInteractions": "映画的なインタラクションを描き、あなたのヒーローの遺産を構築する"
   },
   "mainPage": {
-    "yourChilds": "君だけの",
-    "legend": "英雄伝",
+    "title": "君だけの<accent>英雄伝</accent>",
     "transformStories": "就寝時のストーリーを映画的なコミックブックの経験に変えます。",
     "startAdventure": "冒険を開始",
     "viewLibrary": "ライブラリを表示"

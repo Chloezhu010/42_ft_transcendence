@@ -92,8 +92,7 @@
     "paintingInteractions": "Painting cinematic interactions & building your hero's legacy"
   },
   "mainPage": {
-    "yourChilds": "Your Child's",
-    "legend": "Legend",
+    "title": "Your Child's <accent>Legend</accent>",
     "transformStories": "Transform bedtime stories into cinematic comic book experiences.",
     "startAdventure": "Start Your Adventure",
     "viewLibrary": "View Library"

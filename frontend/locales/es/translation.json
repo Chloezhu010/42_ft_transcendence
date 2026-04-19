@@ -92,8 +92,7 @@
     "paintingInteractions": "Pintando interacciones cinematográficas y construyendo el legado de tu héroe"
   },
   "mainPage": {
-    "yourChilds": "Su Propia",
-    "legend": "Leyenda",
+    "title": "Su Propia <accent>Leyenda</accent>",
     "transformStories": "Transforma las historias de antes de dormir en experiencias de cómics cinematográficos.",
     "startAdventure": "Comienza Tu Aventura",
     "viewLibrary": "Ver Biblioteca"
