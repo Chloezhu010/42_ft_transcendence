@@ -16,6 +16,8 @@ interface StoryCardProps {
 
 function StoryCard({ story, onDeleteStory }: StoryCardProps): JSX.Element {
   const { t } = useTranslation();
+  const fallbackTitle = t('galleryPage.untitledMasterpiece');
+  const displayTitle = getStoryDisplayTitle(story.title, fallbackTitle);
 
   return (
     <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden group border-2 border-gray-100 hover:border-purple-200 transition-all hover:-translate-y-1 relative">
@@ -32,7 +34,7 @@ function StoryCard({ story, onDeleteStory }: StoryCardProps): JSX.Element {
         {story.cover_image_url ? (
           <StorageImage
             src={story.cover_image_url}
-            alt={getStoryDisplayTitle(story.title)}
+            alt={displayTitle}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
         ) : (
@@ -51,7 +53,7 @@ function StoryCard({ story, onDeleteStory }: StoryCardProps): JSX.Element {
 
       <div className="p-5">
         <h3 className="text-xl font-black text-gray-800 leading-tight mb-2 line-clamp-2">
-          {getStoryDisplayTitle(story.title)}
+          {displayTitle}
         </h3>
 
         <div className="flex flex-wrap gap-2">
