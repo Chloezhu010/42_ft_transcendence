@@ -50,7 +50,7 @@ export function useGalleryPage(): UseGalleryPageResult {
       console.error('Failed to delete story:', error);
       toast.error('Failed to delete story.');
     }
-  }, []);
+  }, [t]);
 
   return {
     isLoading,
