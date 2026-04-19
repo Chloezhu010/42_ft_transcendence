@@ -177,12 +177,9 @@ function WizardProgress({ currentStep, steps }: WizardProgressProps): JSX.Elemen
   return (
     <div className="mb-6">
       <div className="flex justify-between items-center">
-        {steps.map(({ step, label, icon }) => {
+        {steps.map(({ step, translationKey, icon }) => {
           const stepState = getWizardStepState(step, currentStep);
           const stepIcon = stepState === 'complete' ? '✓' : icon;
-
-          // Convert label to lowercase for translation key matching (e.g., 'Hero' -> 'hero')
-          const translationKey = label.toLowerCase();
 
           return (
             <div key={step} className={getWizardStepContainerClassName(stepState)}>
