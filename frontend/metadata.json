@@ -1,10 +1,10 @@
 {
-  "name": "funova - Personalized Kids Adventures",
-  "short_name": "funova",
+  "name": "Funova - AI Comic Book Generator",
+  "short_name": "Funova",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FFFDF5",
-  "theme_color": "#6366F1",
+  "background_color": "#F3E8FF",
+  "theme_color": "#9D6BCF",
   "icons": [
     {
       "src": "/vite.svg",

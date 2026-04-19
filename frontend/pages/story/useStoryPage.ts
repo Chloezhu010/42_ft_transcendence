@@ -7,6 +7,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useAuth } from '@/app/auth';
 import type { ComicPanelData, KidProfile, Story } from '@/types';
 import {
   appendIntroDelta,
@@ -51,6 +52,7 @@ interface UseStoryPageResult {
 export function useStoryPage(): UseStoryPageResult {
   const { id: rawStoryId } = useParams<{ id?: string }>();
   const navigate = useNavigate();
+  const { accessToken } = useAuth();
   const introHoldTimerRef = useRef<number | null>(null);
 
   const [view, setView] = useState<StoryPageView>(StoryPageView.Onboarding);
@@ -86,6 +88,7 @@ export function useStoryPage(): UseStoryPageResult {
   }, [cancelIntroHoldTimer, resetWizard]);
 
   const loadSavedStory = useCallback(async (storyId: number) => {
+    if (!accessToken) return;
     setView(StoryPageView.GeneratingStory);
 
     try {
@@ -94,7 +97,7 @@ export function useStoryPage(): UseStoryPageResult {
         nextProfile,
         nextStory,
         nextView,
-      } = await loadStoryState(storyId);
+      } = await loadStoryState(accessToken, storyId);
 
       setProfile(nextProfile);
       setSavedStoryId(storyId);
@@ -106,7 +109,7 @@ export function useStoryPage(): UseStoryPageResult {
       toast.error('Failed to load story.');
       resetToOnboarding();
     }
-  }, [resetToOnboarding]);
+  }, [accessToken, resetToOnboarding]);
 
   useEffect(() => {
     const storyId = parseStoryId(rawStoryId);
@@ -117,7 +120,7 @@ export function useStoryPage(): UseStoryPageResult {
 
     if (!storyId) {
       toast.error('Invalid story id.');
-      navigate('/', { replace: true });
+      navigate('/create', { replace: true });
       return;
     }
 
@@ -152,6 +155,7 @@ export function useStoryPage(): UseStoryPageResult {
   }, []);
 
   const handleWizardSubmit = useCallback(async () => {
+    if (!accessToken) return;
     const nextProfile = draftProfile;
 
     setProfile(nextProfile);
@@ -166,6 +170,7 @@ export function useStoryPage(): UseStoryPageResult {
 
     try {
       const { nextPendingGeneration } = await generatePreviewState(
+        accessToken,
         nextProfile,
         (field, delta) => {
           lastDeltaAt = Date.now();
@@ -200,9 +205,10 @@ export function useStoryPage(): UseStoryPageResult {
       toast.error(message);
       setView(StoryPageView.Onboarding);
     }
-  }, [cancelIntroHoldTimer, draftProfile, handleIntroDelta]);
+  }, [accessToken, cancelIntroHoldTimer, draftProfile, handleIntroDelta]);
 
   const handleGenerateFullStory = useCallback(async () => {
+    if (!accessToken) return;
     if (!pendingGeneration) {
       toast.error('Preview expired. Please generate again.');
       resetToOnboarding();
@@ -212,7 +218,7 @@ export function useStoryPage(): UseStoryPageResult {
     setView(StoryPageView.GeneratingStory);
 
     try {
-      const updatedStory = await generateFullStoryState(pendingGeneration);
+      const updatedStory = await generateFullStoryState(accessToken, pendingGeneration);
       setStory(updatedStory);
       setPendingGeneration(null);
       setSavedStoryId(pendingGeneration.previewStoryId);
@@ -222,19 +228,21 @@ export function useStoryPage(): UseStoryPageResult {
       toast.error(message);
       setView(StoryPageView.Preview);
     }
-  }, [pendingGeneration, resetToOnboarding]);
+  }, [accessToken, pendingGeneration, resetToOnboarding]);
 
   const handleStartOver = useCallback(() => {
     resetToOnboarding();
   }, [resetToOnboarding]);
 
   const handlePanelImageEdit = useCallback(async (panel: ComicPanelData, editPrompt: string) => {
+    if (!accessToken) return;
     if (!story?.characterDescription || !panel.imageUrl) {
       return;
     }
 
     try {
       const updatedPanel = await editStoryPanelImage({
+        accessToken,
         artStyle: profile?.artStyle,
         editPrompt,
         panel,
@@ -260,7 +268,7 @@ export function useStoryPage(): UseStoryPageResult {
       toast.error('Failed to update the panel image.');
       throw error;
     }
-  }, [profile, savedStoryId, story]);
+  }, [accessToken, profile, savedStoryId, story]);
 
   return {
     view,
