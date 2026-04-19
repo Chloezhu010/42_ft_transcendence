@@ -25,18 +25,12 @@ const LanguageSwitcher: React.FC = () => {
   };
 
   return (
-    <div className="language-switcher">
-      <select 
-        value={language || 'en'} 
+    <div className="relative">
+      <select
+        aria-label="Select language"
+        value={language || 'en'}
         onChange={handleLanguageChange}
-        style={{
-          padding: '4px 8px',
-          borderRadius: '4px',
-          background: 'rgba(0,0,0,0.5)',
-          color: 'white',
-          border: '1px solid #ccc',
-          cursor: 'pointer'
-        }}
+        className="appearance-none rounded-full border border-brand-primary/20 bg-brand-light/70 px-4 py-2 pr-9 text-sm font-bold text-brand-primary shadow-sm transition-colors hover:border-brand-primary/40 hover:bg-white focus:outline-none focus:ring-2 focus:ring-brand-accent"
       >
         {languages.map((lng) => (
           <option key={lng.code} value={lng.code}>
@@ -44,6 +38,12 @@ const LanguageSwitcher: React.FC = () => {
           </option>
         ))}
       </select>
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-brand-muted"
+      >
+        ▾
+      </span>
     </div>
   );
 };
