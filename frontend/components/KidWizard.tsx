@@ -425,7 +425,7 @@ function WizardFooter({
         onClick={onContinue}
         className="flex items-center gap-2 px-8 py-4 font-black rounded-2xl shadow-lg transition-all bg-yellow-400 text-purple-900 hover:-translate-y-1 hover:shadow-xl"
       >
-        {isLastStep ? <>{t('kidWizard.createStory')} ✨</> : <>{t('kidWizard.continue')} <span className="text-lg">→</span></>}
+        {isLastStep ? <>{t('kidWizard.createStory')}</> : <>{t('kidWizard.continue')} <span className="text-lg">→</span></>}
       </button>
     </div>
   );
