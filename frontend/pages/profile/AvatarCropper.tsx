@@ -3,7 +3,7 @@
  * Lets the user pick a file, zoom, and emit a 512x512 JPEG File ready for upload.
  * Uses only <canvas> + pointer events — no external crop library.
  */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { SketchyButton } from '@/components/design-system/Primitives';
 
 const OUTPUT_SIZE = 512; // final square size sent to backend
@@ -18,16 +18,14 @@ interface AvatarCropperProps {
 }
 
 export function AvatarCropper({ file, onCancel, onCropComplete }: AvatarCropperProps): JSX.Element {
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
   const imgRef = useRef<HTMLImageElement | null>(null);
+  const imageUrl = useMemo(() => URL.createObjectURL(file), [file]);
 
-  // Load file into an object URL on mount; revoke on unmount to avoid leaks.
+  // Revoke the object URL when the selected file changes or the cropper unmounts.
   useEffect(() => {
-    const url = URL.createObjectURL(file);
-    setImageUrl(url);
-    return () => URL.revokeObjectURL(url);
-  }, [file]);
+    return () => URL.revokeObjectURL(imageUrl);
+  }, [imageUrl]);
 
   // Render the center-cropped square at OUTPUT_SIZE and emit as a File.
   function handleConfirm(): void {
@@ -63,20 +61,18 @@ export function AvatarCropper({ file, onCancel, onCropComplete }: AvatarCropperP
         className="relative overflow-hidden rounded-full border-4 border-brand-primary/20 bg-brand-light"
         style={{ width: VIEW_SIZE, height: VIEW_SIZE }}
       >
-        {imageUrl && (
-          <img
-            ref={imgRef}
-            src={imageUrl}
-            alt="Avatar preview"
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              transform: `scale(${zoom})`,
-              transformOrigin: 'center',
-            }}
-          />
-        )}
+        <img
+          ref={imgRef}
+          src={imageUrl}
+          alt="Avatar preview"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            transform: `scale(${zoom})`,
+            transformOrigin: 'center',
+          }}
+        />
       </div>
       <label className="flex items-center gap-3 text-sm text-brand-muted">
         Zoom

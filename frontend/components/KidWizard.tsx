@@ -2,6 +2,7 @@
  * Controlled onboarding wizard UI for editing a kid profile.
  * The page owns the data; this component only renders steps and emits user intent.
  */
+import { useTranslation } from 'react-i18next';
 import type { ChangeEvent } from 'react';
 import type { KidProfile } from '@/types';
 import { SketchyButton } from '@/components/design-system/Primitives';
@@ -172,10 +173,11 @@ function ColorGrid({ options, selected, onSelect, label }: ColorGridProps): JSX.
 }
 
 function WizardProgress({ currentStep, steps }: WizardProgressProps): JSX.Element {
+  const { t } = useTranslation();
   return (
     <div className="mb-6">
       <div className="flex justify-between items-center">
-        {steps.map(({ step, label, icon }) => {
+        {steps.map(({ step, translationKey, icon }) => {
           const stepState = getWizardStepState(step, currentStep);
           const stepIcon = stepState === 'complete' ? '✓' : icon;
 
@@ -185,7 +187,7 @@ function WizardProgress({ currentStep, steps }: WizardProgressProps): JSX.Elemen
                 {stepIcon}
               </div>
               <span className={getWizardStepLabelClassName(stepState)}>
-                {label}
+                {t(`kidWizard.steps.${translationKey}` as const)}
               </span>
             </div>
           );
@@ -199,12 +201,13 @@ function HeroStepSection({
   profile,
   onUpdateProfileField,
 }: HeroStepSectionProps): JSX.Element {
+  const { t } = useTranslation();
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex-1 flex flex-col justify-center">
-      <Heading className="mb-8 text-brand-dark">Who is the Hero?</Heading>
+      <Heading className="mb-8 text-brand-dark">{t('kidWizard.heroQuestion')}</Heading>
       <SketchyInput
         autoFocus
-        placeholder="Hero's name..."
+        placeholder={t('kidWizard.heroNamePlaceholder')}
         value={profile.name}
         onChange={(event) => onUpdateProfileField('name', event.target.value)}
         className="mb-8"
@@ -218,7 +221,7 @@ function HeroStepSection({
             className="flex-1 py-4 capitalize text-xl rounded-2xl"
             style={GENDER_BUTTON_STYLE}
           >
-            {gender}
+            {t(`kidWizard.genders.${gender}` as const)}
           </SketchyButton>
         ))}
       </div>
@@ -233,6 +236,8 @@ function AppearanceStepSection({
   onPhotoSelect,
   onPhotoRemove,
 }: AppearanceStepSectionProps): JSX.Element {
+  const { t } = useTranslation();
+
   const handlePhotoInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
@@ -244,32 +249,32 @@ function AppearanceStepSection({
 
   return (
     <div className="animate-in fade-in duration-500 flex-1 overflow-y-auto">
-      <Heading className="mb-10 text-brand-dark">Appearance</Heading>
+      <Heading className="mb-10 text-brand-dark">{t('kidWizard.appearance')}</Heading>
       <ColorGrid
-        label="Skin Tone"
+        label={t('kidWizard.skinTone')}
         options={SKIN_TONES}
         selected={profile.skinTone}
         onSelect={(value) => onUpdateProfileField('skinTone', value)}
       />
       <ColorGrid
-        label="Hair Color"
+        label={t('kidWizard.hairColor')}
         options={HAIR_COLORS}
         selected={profile.hairColor}
         onSelect={(value) => onUpdateProfileField('hairColor', value)}
       />
       <ColorGrid
-        label="Eye Color"
+        label={t('kidWizard.eyeColor')}
         options={EYE_COLORS}
         selected={profile.eyeColor}
         onSelect={(value) => onUpdateProfileField('eyeColor', value)}
       />
 
       <div className="mb-8 mt-10 pt-8 border-t border-brand-light px-4">
-        <Label className="block mb-6 text-brand-primary text-sm">Photo (Optional)</Label>
+        <Label className="block mb-6 text-brand-primary text-sm">{t('kidWizard.photoOptional')}</Label>
         <div className="flex gap-4">
           <label className="flex-1 flex flex-col items-center justify-center p-8 rounded-3xl border-4 border-dashed border-brand-primary/20 cursor-pointer hover:border-brand-primary transition-colors bg-brand-light/30 hover:bg-brand-light">
             <span className="text-4xl mb-2">📸</span>
-            <span className="text-sm font-semibold text-brand-primary uppercase">Upload Photo</span>
+            <span className="text-sm font-semibold text-brand-primary uppercase">{t('kidWizard.uploadPhoto')}</span>
             <input
               type="file"
               accept="image/*"
@@ -300,9 +305,11 @@ function ArchetypeStepSection({
   profile,
   onUpdateProfileField,
 }: ArchetypeStepSectionProps): JSX.Element {
+  const { t } = useTranslation();
+
   return (
     <div className="animate-in fade-in duration-500 flex-1">
-      <Heading className="mb-8 text-brand-dark">Role & Archetype</Heading>
+      <Heading className="mb-8 text-brand-dark">{t('kidWizard.roleArchetype')}</Heading>
       <div className="grid grid-cols-2 gap-4">
         {ARCHETYPES.map((archetype) => {
           const isSelected = profile.archetype === archetype.label;
@@ -318,8 +325,8 @@ function ArchetypeStepSection({
               <div className="mb-2">
                 <archetype.Icon className="w-10 h-10" color={iconColor} />
               </div>
-              <div className="font-semibold text-lg text-brand-primary">{archetype.label}</div>
-              <div className="text-xs text-brand-muted font-semibold">{archetype.description}</div>
+              <div className="font-semibold text-lg text-brand-primary">{t(`kidWizard.archetypes.${archetype.id}.label` as const)}</div>
+              <div className="text-xs text-brand-muted font-semibold">{t(`kidWizard.archetypes.${archetype.id}.description` as const)}</div>
             </button>
           );
         })}
@@ -332,12 +339,13 @@ function DreamStepSection({
   profile,
   onUpdateProfileField,
 }: DreamStepSectionProps): JSX.Element {
+  const { t } = useTranslation();
   return (
     <div className="animate-in fade-in duration-500 flex-1 flex flex-col justify-center">
-      <Heading className="mb-6 text-brand-dark">The Grand Dream</Heading>
+      <Heading className="mb-6 text-brand-dark">{t('kidWizard.grandDream')}</Heading>
       <SketchyTextarea
         autoFocus
-        placeholder="e.g. To explore a planet made of candy..."
+        placeholder={t('kidWizard.dreamPlaceholder')}
         value={profile.dream}
         onChange={(event) => onUpdateProfileField('dream', event.target.value)}
         className="min-h-[120px]"
@@ -350,12 +358,14 @@ function StyleStepSection({
   profile,
   onUpdateProfileField,
 }: StyleStepSectionProps): JSX.Element {
+  const { t } = useTranslation();
+
   return (
     <div className="animate-in fade-in duration-500 flex-1">
-      <Heading className="mb-10 text-brand-dark">Your Style & Palette</Heading>
+      <Heading className="mb-10 text-brand-dark">{t('kidWizard.stylePalette')}</Heading>
 
       <div className="mb-12">
-        <Label className="block mb-6 text-brand-primary text-sm">Art Style</Label>
+        <Label className="block mb-6 text-brand-primary text-sm">{t('kidWizard.artStyle')}</Label>
         <div className="grid grid-cols-2 gap-4">
           {ART_STYLES.map((style) => {
             const isSelected = profile.artStyle === style.label;
@@ -368,8 +378,8 @@ function StyleStepSection({
                 className={getSelectionCardClassName(isSelected, 'text-center')}
               >
                 <div className="text-4xl mb-2">{style.icon}</div>
-                <div className="font-semibold text-lg text-brand-primary">{style.label}</div>
-                <div className="text-xs text-brand-muted font-semibold">{style.description}</div>
+                <div className="font-semibold text-lg text-brand-primary">{t(`kidWizard.artStyles.${style.id}.label` as const)}</div>
+                <div className="text-xs text-brand-muted font-semibold">{t(`kidWizard.artStyles.${style.id}.description` as const)}</div>
               </button>
             );
           })}
@@ -377,7 +387,7 @@ function StyleStepSection({
       </div>
 
       <div className="border-t border-brand-light pt-10">
-        <Label className="block mb-6 text-brand-primary text-sm">Favorite Color</Label>
+        <Label className="block mb-6 text-brand-primary text-sm">{t('kidWizard.favoriteColor')}</Label>
         <ColorGrid
           label=""
           options={FAVORITE_COLORS}
@@ -395,6 +405,7 @@ function WizardFooter({
   onPreviousStep,
   onContinue,
 }: WizardFooterProps): JSX.Element {
+  const { t } = useTranslation();
   const isLastStep = step === totalSteps;
 
   return (
@@ -405,7 +416,7 @@ function WizardFooter({
           onClick={onPreviousStep}
           className="flex items-center gap-2 px-6 py-3 font-black text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-xl uppercase tracking-widest text-sm transition-all"
         >
-          <span className="text-lg">←</span> Back
+          <span className="text-lg">←</span> {t('kidWizard.back')}
         </button>
       ) : <div className="w-24" />}
 
@@ -414,7 +425,7 @@ function WizardFooter({
         onClick={onContinue}
         className="flex items-center gap-2 px-8 py-4 font-black rounded-2xl shadow-lg transition-all bg-yellow-400 text-purple-900 hover:-translate-y-1 hover:shadow-xl"
       >
-        {isLastStep ? <>Create My Story ✨</> : <>Continue <span className="text-lg">→</span></>}
+        {isLastStep ? <>{t('kidWizard.createStory')}</> : <>{t('kidWizard.continue')} <span className="text-lg">→</span></>}
       </button>
     </div>
   );

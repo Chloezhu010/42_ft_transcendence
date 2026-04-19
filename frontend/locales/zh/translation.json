@@ -1,0 +1,100 @@
+{
+  "app": {
+    "myLibrary": "我的图书馆"
+  },
+  "comicPanel": {
+    "paintingScene": "绘制场景...",
+    "magicRevision": "魔法修订",
+    "requestChange": "为这一特定场景请求更改。",
+    "magicFailed": "哎呀！魔法失败了。请重试。",
+    "awaitingVision": "等待愿景",
+    "editScene": "编辑场景",
+    "editPlaceholder": "例如 添加一个好奇的小机器人查看地图...",
+    "close": "关闭",
+    "applyMagic": "应用魔法 ✨"
+  },
+  "galleryPage": {
+    "mySavedBooks": "我保存的书籍",
+    "noStoriesFound": "还没有找到任何故事。",
+    "readNow": "现在阅读",
+    "untitledMasterpiece": "无标题杰作",
+    "deleteStory": "您确定要删除此故事吗？这将无法撤消。"
+  },
+  "kidWizard": {
+    "heroQuestion": "谁是英雄？",
+    "appearance": "外观",
+    "photoOptional": "照片（可选）",
+    "uploadPhoto": "上传照片",
+    "roleArchetype": "角色原型",
+    "grandDream": "伟大的梦想",
+    "stylePalette": "风格和调色板",
+    "artStyle": "艺术风格",
+    "favoriteColor": "最喜欢的颜色",
+    "continue": "继续",
+    "createStory": "创建我的故事 ✨",
+    "steps": {
+      "hero": "英雄",
+      "look": "外貌",
+      "role": "角色",
+      "dream": "梦想",
+      "style": "风格"
+    },
+    "genders": {
+      "boy": "男孩",
+      "girl": "女孩",
+      "neutral": "中性"
+    },
+    "heroNamePlaceholder": "英雄的名字...",
+    "skinTone": "肤色",
+    "hairColor": "发色",
+    "eyeColor": "瞳孔颜色",
+    "archetypes": {
+      "explorer": {
+        "label": "勇敢的探险家",
+        "description": "寻求冒险。"
+      },
+      "inventor": {
+        "label": "发明家",
+        "description": "解决问题。"
+      },
+      "guardian": {
+        "label": "守护者",
+        "description": "保护他人。"
+      },
+      "dreamer": {
+        "label": "梦想家",
+        "description": "让魔法成真。"
+      }
+    },
+    "dreamPlaceholder": "例如：探索一个充满糖果的星球...",
+    "artStyles": {
+      "classic": {
+        "label": "经典漫画",
+        "description": "粗线条，色彩鲜艳"
+      },
+      "watercolor": {
+        "label": "水彩",
+        "description": "柔和，梦幻般的美感"
+      },
+      "pencil": {
+        "label": "铅笔素描",
+        "description": "手绘的魅力"
+      },
+      "digital": {
+        "label": "数字流行",
+        "description": "摩登大胆"
+      }
+    },
+    "back": "返回"
+  },
+  "magicLoader": {
+    "bindingTale": "绑定故事...",
+    "paintingInteractions": "绘制电影互动并构建您的英雄财富"
+  },
+  "mainPage": {
+    "title": "宝贝专属<accent>传奇</accent>",
+    "transformStories": "将睡前故事转变为电影漫画体验。",
+    "startAdventure": "开始您的冒险",
+    "viewLibrary": "查看图书馆"
+  }
+}

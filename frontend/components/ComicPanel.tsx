@@ -3,6 +3,7 @@
  * Owns temporary modal state, but leaves image editing itself to the caller.
  */
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ComicPanelData } from '@/types';
 import { getImageUrl } from '@/utils';
 import { SketchyButton } from '@/components/design-system/Primitives';
@@ -25,6 +26,7 @@ function resolvePanelImageUrl(imageUrl: string | undefined): string | undefined 
 }
 
 function ComicPanel({ panel, onEditImage }: ComicPanelProps): JSX.Element {
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [editPrompt, setEditPrompt] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -57,7 +59,7 @@ function ComicPanel({ panel, onEditImage }: ComicPanelProps): JSX.Element {
           <div className="absolute inset-0 flex flex-col items-center justify-center space-y-4">
             <div className="w-10 h-10 border-4 border-brand-surface border-t-brand-primary rounded-full animate-spin" />
             <p className="text-[10px] font-black text-brand-primary uppercase tracking-widest animate-pulse">
-              Painting Scene...
+              {t('comicPanel.paintingScene')}
             </p>
           </div>
         ) : resolvedImageUrl ? (
@@ -68,7 +70,7 @@ function ComicPanel({ panel, onEditImage }: ComicPanelProps): JSX.Element {
                 type="button"
                 onClick={() => setIsEditing(true)}
                 className="absolute top-3 right-3 bg-white/40 backdrop-blur-md p-2.5 rounded-full shadow-md opacity-0 group-hover:opacity-100 hover:bg-white/90 transition-all duration-200 text-lg border border-white/50 z-40"
-                title="Edit Scene"
+                title={t('comicPanel.editScene')}
               >
                 🪄
               </button>
@@ -76,7 +78,7 @@ function ComicPanel({ panel, onEditImage }: ComicPanelProps): JSX.Element {
           </>
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-200 font-black uppercase text-xs tracking-widest">
-            Awaiting Vision
+            {t('comicPanel.awaitingVision')}
           </div>
         )}
       </div>
@@ -90,12 +92,12 @@ function ComicPanel({ panel, onEditImage }: ComicPanelProps): JSX.Element {
       {isEditing && (
         <div className="fixed inset-0 bg-brand-dark/80 z-[100] flex items-center justify-center p-4 backdrop-blur-md">
           <div className="bg-white rounded-[2.5rem] p-10 w-full max-w-lg shadow-2xl border-6 border-brand-accent animate-in zoom-in duration-300">
-            <h3 className="text-3xl font-black text-brand-primary mb-2">Magic Revision</h3>
-            <p className="text-base text-gray-400 mb-6 font-medium italic">Request a change for this specific scene.</p>
+            <h3 className="text-3xl font-black text-brand-primary mb-2">{t('comicPanel.magicRevision')}</h3>
+            <p className="text-base text-gray-400 mb-6 font-medium italic">{t('comicPanel.requestChange')}</p>
             <textarea
               className="w-full border-2 border-brand-surface rounded-2xl p-6 mb-8 text-lg font-bold focus:border-brand-accent focus:outline-none bg-brand-surface resize-none shadow-inner"
               rows={3}
-              placeholder="e.g. Add a curious little robot looking at the map..."
+              placeholder={t('comicPanel.editPlaceholder')}
               value={editPrompt}
               onChange={(event) => setEditPrompt(event.target.value)}
               disabled={isProcessing}
@@ -108,7 +110,7 @@ function ComicPanel({ panel, onEditImage }: ComicPanelProps): JSX.Element {
                 disabled={isProcessing}
                 style={{ borderRadius: '1rem' }}
               >
-                Close
+                {t('comicPanel.close')}
               </SketchyButton>
               <SketchyButton
                 onClick={() => void handleEdit()}
@@ -119,7 +121,7 @@ function ComicPanel({ panel, onEditImage }: ComicPanelProps): JSX.Element {
                 {isProcessing ? (
                   <div className="w-6 h-6 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto" />
                 ) : (
-                  'Apply Magic ✨'
+                  t('comicPanel.applyMagic')
                 )}
               </SketchyButton>
             </div>

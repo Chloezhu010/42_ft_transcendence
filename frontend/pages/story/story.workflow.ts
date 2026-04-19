@@ -21,7 +21,6 @@ import {
 } from '@/utils';
 import { isPreviewDraft } from './story.helpers';
 import { StoryPageView, type PendingGeneration } from './story.types';
-import { a } from 'framer-motion/client';
 
 interface LoadedStoryState {
   nextProfile: KidProfile;

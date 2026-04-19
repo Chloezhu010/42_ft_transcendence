@@ -1,4 +1,7 @@
+import { useTranslation } from 'react-i18next';
+
 function MagicLoader(): JSX.Element {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col items-center justify-center py-40 text-center animate-in fade-in duration-700">
       <div className="relative mb-16">
@@ -19,8 +22,8 @@ function MagicLoader(): JSX.Element {
           </div>
         </div>
       </div>
-      <h3 className="text-4xl font-black text-brand-primary mb-4 tracking-tighter uppercase">Binding the Tale...</h3>
-      <p className="text-lg text-brand-dark/60 font-bold max-w-md mx-auto uppercase tracking-widest leading-relaxed">Painting cinematic interactions & building your hero's legacy</p>
+      <h3 className="text-4xl font-black text-brand-primary mb-4 tracking-tighter uppercase">{t('magicLoader.bindingTale')}</h3>
+      <p className="text-lg text-brand-dark/60 font-bold max-w-md mx-auto uppercase tracking-widest leading-relaxed">{t('magicLoader.paintingInteractions')}</p>
       <style>{`
         @keyframes ink { 0% { transform: translateX(-100%); } 50% { transform: translateX(0%); } 100% { transform: translateX(100%); } }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
