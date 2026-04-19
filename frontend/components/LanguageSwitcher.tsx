@@ -1,29 +1,21 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { defaultLanguage, supportedLanguages } from '@/i18n.languages';
 
-const languages = [
-  { code: 'en', label: 'English' },
-  { code: 'fr', label: 'Français' },
-  { code: 'es', label: 'Español' },
-  { code: 'zh', label: '中文' },
-  { code: 'ja', label: '日本語' },
-  { code: 'ar', label: 'العربية' }
-];
+function getLanguageLabel(languageCode: string): string {
+  return (
+    supportedLanguages.find((language) => language.code === languageCode)?.label
+    || supportedLanguages.find((language) => language.code === defaultLanguage)?.label
+    || 'English'
+  );
+}
 
-const LanguageSwitcher: React.FC = () => {
+function LanguageSwitcher(): JSX.Element {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const language = i18n.resolvedLanguage || i18n.language;
-  const direction = i18n.dir(language);
-  const currentLanguageLabel = useMemo(() => {
-    return languages.find((lng) => lng.code === language)?.label || 'English';
-  }, [language]);
-
-  useEffect(() => {
-    document.documentElement.dir = direction;
-    document.documentElement.lang = language;
-  }, [direction, language]);
+  const language = i18n.resolvedLanguage || i18n.language || defaultLanguage;
+  const currentLanguageLabel = getLanguageLabel(language);
 
   useEffect(() => {
     function handlePointerDown(event: MouseEvent): void {
@@ -80,23 +72,23 @@ const LanguageSwitcher: React.FC = () => {
           aria-label="Language options"
           className="absolute right-0 top-[calc(100%+0.5rem)] z-50 min-w-full overflow-hidden rounded-[1.35rem] border border-brand-primary/15 bg-white/95 p-2 shadow-[0_16px_40px_rgba(74,43,106,0.16)] backdrop-blur-md"
         >
-          {languages.map((lng) => {
-            const isActive = lng.code === language;
+          {supportedLanguages.map((supportedLanguage) => {
+            const isActive = supportedLanguage.code === language;
 
             return (
               <button
-                key={lng.code}
+                key={supportedLanguage.code}
                 type="button"
                 role="menuitemradio"
                 aria-checked={isActive}
-                onClick={() => handleLanguageChange(lng.code)}
+                onClick={() => handleLanguageChange(supportedLanguage.code)}
                 className={`flex w-full items-center justify-between rounded-2xl px-3 py-2 text-left text-sm font-bold transition-colors ${
                   isActive
                     ? 'bg-brand-light text-brand-primary'
                     : 'text-brand-dark hover:bg-brand-light/70'
                 }`}
               >
-                <span>{lng.label}</span>
+                <span>{supportedLanguage.label}</span>
                 {isActive ? <span className="text-brand-muted">•</span> : null}
               </button>
             );
@@ -105,6 +97,6 @@ const LanguageSwitcher: React.FC = () => {
       ) : null}
     </div>
   );
-};
+}
 
 export default LanguageSwitcher;
