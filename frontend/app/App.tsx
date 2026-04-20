@@ -10,6 +10,7 @@ import { LandingPage } from '@/pages/landing';
 import { LegalPage } from '@/pages/legal';
 import { ProfilePage } from '@/pages/profile';
 import { StoryPage } from '@/pages/story';
+import { FriendsPage } from '@/pages/friends';
 import AppLayout from './AppLayout';
 import ProtectedRoute from './ProtectedRoute';
 
@@ -37,6 +38,7 @@ export function App(): JSX.Element {
             <Route path="/book/:id" element={<StoryPage />} />
             <Route path="/gallery" element={<GalleryPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/friends" element={<FriendsPage />} />
           </Route>
         </Route>
         <Route path="/login" element={<LoginPage />} />

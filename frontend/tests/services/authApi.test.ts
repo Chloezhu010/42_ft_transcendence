@@ -8,6 +8,7 @@ import {
   getUser,
   login,
   logout,
+  searchUsers,
   removeFriend,
   sendFriendRequest,
   signup,
@@ -354,6 +355,48 @@ describe('authApi', () => {
     );
 
     await expect(getUser(9999)).rejects.toThrow('User not found');
+  });
+
+  it('searchUsers sends the bearer token, encodes the query, and returns public users', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify([PUBLIC_USER_RESPONSE]), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+
+    const result = await searchUsers('search-token', 'alice & bob');
+
+    expect(result).toEqual([PUBLIC_USER_RESPONSE]);
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/api/users/search?q=alice%20%26%20bob'),
+      expect.objectContaining({
+        method: 'GET',
+        headers: expect.objectContaining({
+          Authorization: 'Bearer search-token',
+        }),
+      })
+    );
+  });
+
+  it('searchUsers surfaces backend detail when the request fails', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ detail: 'Could not validate credentials' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+
+    await expect(searchUsers('invalid-token', 'alice')).rejects.toThrow(
+      'Could not validate credentials'
+    );
+  });
+
+  it('searchUsers returns an empty list without calling fetch for blank queries', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch');
+
+    await expect(searchUsers('search-token', '   ')).resolves.toEqual([]);
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('getFriends sends the bearer token and returns the friend list', async () => {
