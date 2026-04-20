@@ -26,6 +26,7 @@ from llm.gemini_service import (
 from llm.gemini_service import (
     generate_story_script_stream as gen_script_stream,
 )
+from metrics import story_funnel_total
 from models import (
     EditPanelImageRequest,
     EditPanelImageResponse,
@@ -53,10 +54,13 @@ async def generate_and_save_story(
     current_user: dict = Depends(get_current_user),
 ):
     """Generate story script + images and save to DB."""
+    story_funnel_total.labels(stage="pipeline", status="started").inc()
+
     # 1. Generate story script via Gemini
     try:
         result = await gen_script(profile=request.profile)
     except Exception as e:
+        story_funnel_total.labels(stage="pipeline_script", status="failed").inc()
         print(f"Story script generation error: {e}")
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=safe_error_detail(e, "Story generation failed"))
@@ -81,6 +85,7 @@ async def generate_and_save_story(
                 style=art_style,
             )
     except Exception as e:
+        story_funnel_total.labels(stage="pipeline_images", status="failed").inc()
         print(f"Image generation error: {e}")
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=safe_error_detail(e, "Image generation failed"))
@@ -106,10 +111,12 @@ async def generate_and_save_story(
         )
         saved = await crud.create_story(db, story_data, current_user["id"])
     except Exception as e:
+        story_funnel_total.labels(stage="pipeline_save", status="failed").inc()
         print(f"Story save error: {e}")
         traceback.print_exc()
         raise HTTPException(status_code=500, detail="Failed to save story")
 
+    story_funnel_total.labels(stage="pipeline", status="completed").inc()
     return GenerateAndSaveStoryResponse(story=saved)
 
 
@@ -119,10 +126,13 @@ async def generate_story_script(
     current_user: dict = Depends(get_current_user),
 ):
     """Generate a story script using Gemini AI."""
+    story_funnel_total.labels(stage="script_sync", status="started").inc()
     try:
         result = await gen_script(profile=request.profile)
+        story_funnel_total.labels(stage="script_sync", status="completed").inc()
         return result
     except Exception as e:
+        story_funnel_total.labels(stage="script_sync", status="failed").inc()
         print(f"Story script generation error: {e}")
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=safe_error_detail(e, "Story generation failed"))
@@ -137,10 +147,13 @@ async def _stream_story_script_events(
     than an HTTP failure, because headers are already on the wire by the time
     Gemini might reject a request mid-stream.
     """
+    story_funnel_total.labels(stage="script_stream", status="started").inc()
     try:
         async for event in gen_script_stream(profile=request.profile):
             yield (json.dumps(event) + "\n").encode("utf-8")
+        story_funnel_total.labels(stage="script_stream", status="completed").inc()
     except Exception as err:
+        story_funnel_total.labels(stage="script_stream", status="failed").inc()
         print(f"Streaming story script error: {err}")
         traceback.print_exc()
         error_event = {

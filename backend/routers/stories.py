@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from auth_utils import get_current_user
 from db import crud
 from db.database import get_db
+from metrics import story_funnel_total
 from models import (
     StoryCreate,
     StoryListItem,
@@ -24,9 +25,12 @@ async def create_story(
     story: StoryCreate, db: aiosqlite.Connection = Depends(get_db), current_user: dict = Depends(get_current_user)
 ):
     """Create a new story with profile and panels."""
+    story_funnel_total.labels(stage="save", status="started").inc()
     result = await crud.create_story(db, story, current_user["id"])
     if not result:
+        story_funnel_total.labels(stage="save", status="failed").inc()
         raise HTTPException(status_code=500, detail="Failed to create story")
+    story_funnel_total.labels(stage="save", status="completed").inc()
     return result
 
 
