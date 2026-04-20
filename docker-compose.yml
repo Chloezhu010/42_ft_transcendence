@@ -1,37 +1,52 @@
 services:
-  nginx:
-    build: ./nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    depends_on:
-      - frontend
-      - backend
-
   backend:
     build: ./backend
-    expose:
-      - "8000"
+    ports:
+      - "8000:8000"
     volumes:
       - ./backend:/app
       - backend_images:/app/images
     environment:
       - PYTHONUNBUFFERED=1
       - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - FRONTEND_URL=${FRONTEND_URL:-https://localhost}
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
 
   frontend:
     build: ./frontend
-    expose:
-      - "3000"
+    ports:
+      - "3000:3000"
     volumes:
       - ./frontend:/app
       - /app/node_modules
     environment:
-      - VITE_API_BASE_URL=
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:8000}
     depends_on:
       - backend
+
+  node_exporter:
+    image: prom/node-exporter:v1.9.1
+    expose:
+      - "9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--path.rootfs=/rootfs"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    expose:
+      - "9093"
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager_data:/alertmanager
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
 
   prometheus:
     image: prom/prometheus:v3.3.0
@@ -39,6 +54,7 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./alerts.rules.yml:/etc/prometheus/alerts.rules.yml:ro
       - prometheus_data:/prometheus
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
@@ -47,6 +63,8 @@ services:
       - "--storage.tsdb.retention.size=1GB"
     depends_on:
       - backend
+      - node_exporter
+      - alertmanager
 
   grafana:
     image: grafana/grafana:11.6.1
@@ -62,5 +80,6 @@ services:
 
 volumes:
   backend_images:
-  grafana_data:
+  alertmanager_data:
   prometheus_data:
+  grafana_data:
