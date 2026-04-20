@@ -33,6 +33,31 @@ async def get_user_by_id(db: aiosqlite.Connection, user_id: int) -> Row | None:
         return await cursor.fetchone()  # return the user row or None if not found
 
 
+async def search_users_by_username(
+    db: aiosqlite.Connection, query: str, current_user_id: int, limit: int = 10
+) -> list[Row]:
+    """Search users by username fragment, excluding the current user. Returns a list of user rows."""
+    normalized_query = query.strip()
+    if not normalized_query:
+        return []
+    safe_limit = max(1, min(limit, 20))
+    escaped_query = (
+        normalized_query.replace("\\", "\\\\")
+        .replace("%", "\\%")
+        .replace("_", "\\_")
+    )
+    like_pattern = f"%{escaped_query}%"
+    async with db.execute(
+        """
+        SELECT * FROM users
+        WHERE id != ? AND username LIKE ? ESCAPE '\\' COLLATE NOCASE
+        ORDER BY username COLLATE NOCASE ASC, id ASC
+        LIMIT ?
+        """,
+        (current_user_id, like_pattern, safe_limit),
+    ) as cursor:
+        return await cursor.fetchall()
+    
 # --- User profile management ---
 async def update_user(
     db: aiosqlite.Connection, user_id: int, username: str | None = None, email: str | None = None
