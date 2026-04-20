@@ -224,9 +224,7 @@ async def generate_story_script_stream(
 
         result = GenerateStoryScriptResponse.model_validate_json(raw_json)
         yield {"type": "script", "script": result.model_dump()}
-        gemini_request_duration_seconds.labels(operation="script_stream").observe(
-            time.perf_counter() - start
-        )
+        gemini_request_duration_seconds.labels(operation="script_stream").observe(time.perf_counter() - start)
     except Exception:
         gemini_failures_total.labels(operation="script_stream").inc()
         raise
@@ -254,9 +252,7 @@ Cinematic angles, characters interact with each other/world — NEVER face the c
     start = time.perf_counter()
     try:
         result = await with_retry(_generate)
-        gemini_request_duration_seconds.labels(operation="panel_image").observe(
-            time.perf_counter() - start
-        )
+        gemini_request_duration_seconds.labels(operation="panel_image").observe(time.perf_counter() - start)
         return result
     except Exception:
         gemini_failures_total.labels(operation="panel_image").inc()
