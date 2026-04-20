@@ -1,25 +1,36 @@
 services:
+  nginx:
+    build: ./nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - frontend
+      - backend
+      - grafana
+
   backend:
     build: ./backend
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     volumes:
       - ./backend:/app
       - backend_images:/app/images
     environment:
       - PYTHONUNBUFFERED=1
       - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+      - FRONTEND_URL=${FRONTEND_URL:-https://localhost}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
 
   frontend:
     build: ./frontend
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     volumes:
       - ./frontend:/app
       - /app/node_modules
     environment:
-      - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:8000}
+      - VITE_API_BASE_URL=
     depends_on:
       - backend
 
@@ -68,10 +79,12 @@ services:
 
   grafana:
     image: grafana/grafana:11.6.1
-    ports:
-      - "3001:3000"
+    expose:
+      - "3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+      - GF_SERVER_ROOT_URL=https://localhost/grafana/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
     volumes:
       - grafana_data:/var/lib/grafana
       - ./backend/grafana/provisioning:/etc/grafana/provisioning
