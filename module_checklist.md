@@ -91,7 +91,7 @@ Microservices (#11)      ──► do last — highest risk, can drop if time is
 | Complete accessibility (WCAG 2.1 AA) | Major | 2 | ❌ | Nothing audited | Screen reader support, keyboard navigation, ARIA labels, contrast ratios |
 | Multiple languages (i18n, 3 languages) | Minor | 1 | ❌ | Nothing | i18n library (e.g. `i18next`), 3 full translations, language switcher |
 | RTL language support | Minor | 1 | ❌ | Nothing | RTL layout mirroring, at least 1 RTL language |
-| Additional browser support (2+ browsers) | Minor | 1 | ❌ | Nothing tested | Test + fix in Firefox, Safari, or Edge |
+| Additional browser support (2+ browsers) | Minor | 1 | ✅ | Playwright E2E cross-browser testing for Chrome, Firefox, and Safari (WebKit) in CI | Done |
 
 ---
 
