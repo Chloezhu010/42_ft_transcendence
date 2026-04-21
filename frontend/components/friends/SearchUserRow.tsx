@@ -39,20 +39,26 @@ export function SearchUserRow({ user, onSendRequest }: SearchUserRowProps): JSX.
                     </span>
                 )}
 
-                {user.relationship === 'pending' && (
+                {user.relationship === 'pending_in' && (
                     <span className="rounded-full bg-yellow-100 px-3 py-1 text-sm font-semibold text-yellow-800">
-                        {user.isIncomingRequest ? 'Respond in Pending' : 'Pending'}
+                        Respond in Pending
+                    </span>
+                )}
+
+                {user.relationship === 'pending_out' && (
+                    <span className="rounded-full bg-yellow-100 px-3 py-1 text-sm font-semibold text-yellow-800">
+                        Pending
                     </span>
                 )}
 
                 {user.relationship === 'none' && (
                     <button
                         type="button"
-                        disabled={!onSendRequest}
+                        disabled={!onSendRequest || user.isSending}
                         onClick={() => onSendRequest?.(user.id)}
                         className="rounded-full bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
                     >
-                        Add Friend
+                        {user.isSending ? 'Sending...' : 'Add Friend'}
                     </button>
                 )}
             </div>

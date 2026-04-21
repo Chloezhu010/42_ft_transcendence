@@ -3,7 +3,6 @@
  * Displays pending requests, read-only user discovery, and current friends.
  * Data flows through useFriendsPage; this file stays focused on layout.
  */
-import StorageImage from '@/components/StorageImage';
 import { useFriendsPage } from './useFriendsPage';
 import { FriendRow } from '@/components/friends/FriendRow';
 import { PendingRequestRow } from '@/components/friends/PendingRequestRow';
@@ -12,10 +11,11 @@ import { SearchUserRow } from '@/components/friends/SearchUserRow';
 export function FriendsPage(): JSX.Element {
   const {
     friends,
-    pending,
+    pendingIncoming,
     searchResults,
     searchQuery,
     setSearchQuery,
+    sendRequest,
     isLoading,
     isSearching,
     error,
@@ -33,10 +33,6 @@ export function FriendsPage(): JSX.Element {
 
   function handleRemove(friendId: number): void {
     console.log('remove friend', friendId);
-  }
-
-  function handleSendRequest(userId: number): void {
-    console.log('send friend request', userId);
   }
 
   if (isLoading) {
@@ -68,11 +64,11 @@ export function FriendsPage(): JSX.Element {
 
         <section className="space-y-3">
           <h2 className="text-2xl font-semibold text-brand-dark">Pending</h2>
-          {pending.length === 0 ? (
+          {pendingIncoming.length === 0 ? (
             <p className="text-brand-muted">No pending friend requests yet.</p>
           ) : (
             <ul className="space-y-2">
-                {pending.map((req) => (
+                {pendingIncoming.map((req) => (
                     <li key={req.id}>
                         <PendingRequestRow
                             request={req}
@@ -117,7 +113,7 @@ export function FriendsPage(): JSX.Element {
             <ul className="space-y-2">
                 {searchResults.map((user) => (
                     <li key={user.id}>
-                        <SearchUserRow user={user} onSendRequest={handleSendRequest} />
+                        <SearchUserRow user={user} onSendRequest={sendRequest} />
                     </li>
                 ))}
             </ul>
