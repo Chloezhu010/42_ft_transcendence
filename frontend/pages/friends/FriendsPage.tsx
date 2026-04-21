@@ -1,14 +1,27 @@
 /**
  * Friends page.
- * Step 2a scaffold only: renders static sections with empty-state placeholders.
- * Data flows through useFriendsPage; no API work happens here yet.
+ * Displays pending requests, read-only user discovery, and current friends.
+ * Data flows through useFriendsPage; this file stays focused on layout.
  */
+import StorageImage from '@/components/StorageImage';
 import { useFriendsPage } from './useFriendsPage';
 import { FriendRow } from '@/components/friends/FriendRow';
 import { PendingRequestRow } from '@/components/friends/PendingRequestRow';
+import { SearchUserRow } from '@/components/friends/SearchUserRow';
 
 export function FriendsPage(): JSX.Element {
-  const { friends, pending, searchResults, isLoading, error } = useFriendsPage();
+  const {
+    friends,
+    pending,
+    searchResults,
+    searchQuery,
+    setSearchQuery,
+    isLoading,
+    isSearching,
+    error,
+  } = useFriendsPage();
+
+  const trimmedSearchQuery = searchQuery.trim();
 
   function handleAccept(userId: number): void {
     console.log('accept request', userId);
@@ -70,8 +83,40 @@ export function FriendsPage(): JSX.Element {
 
         <section className="space-y-3">
           <h2 className="text-2xl font-semibold text-brand-dark">Discover</h2>
-          {searchResults.length === 0 ? (
-            <p className="text-brand-muted">Search results will appear here.</p>
+          <div className="space-y-2">
+            <label htmlFor="friend-search" className="block text-sm font-bold text-brand-muted">
+              Search users
+            </label>
+            <input
+              id="friend-search"
+              type="text"
+              value={searchQuery}
+              onChange={event => setSearchQuery(event.target.value)}
+              placeholder="Search by username"
+              className="w-full rounded-xl border border-brand-primary/20 bg-white px-4 py-3 text-brand-dark outline-none transition-colors focus:border-brand-primary"
+            />
+          </div>
+
+          {trimmedSearchQuery === '' ? (
+            <p className="text-brand-muted">Type a username to discover other users.</p>
+          ) : null}
+
+          {isSearching ? (
+            <p className="text-brand-muted">Searching…</p>
+          ) : null}
+
+          {!isSearching && trimmedSearchQuery !== '' && searchResults.length === 0 ? (
+            <p className="text-brand-muted">No users found.</p>
+          ) : null}
+
+          {!isSearching && searchResults.length > 0 ? (
+            <ul className="space-y-2">
+                {searchResults.map((user) => (
+                    <li key={user.id}>
+                        <SearchUserRow user={user} />
+                    </li>
+                ))}
+            </ul>
           ) : null}
         </section>
 
