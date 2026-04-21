@@ -14,26 +14,13 @@ from typing import Any
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-from prometheus_client import Counter, Histogram
 
 from llm.streaming import StoryIntroStreamer
+from metrics import gemini_failures_total, gemini_request_duration_seconds
 from models import GenerateStoryScriptResponse, KidProfileCreate
 
 STORY_SCRIPT_MODEL = "gemini-3-flash-preview"
 INTRO_FIELDS: tuple[str, ...] = ("title", "foreword")
-
-gemini_request_duration_seconds = Histogram(
-    "gemini_request_duration_seconds",
-    "Duration of Gemini API calls in seconds",
-    labelnames=["operation"],
-    buckets=[1, 2, 5, 10, 20, 30, 60, 120],
-)
-
-gemini_failures_total = Counter(
-    "gemini_failures_total",
-    "Total number of failed Gemini API calls",
-    labelnames=["operation"],
-)
 
 load_dotenv(Path(__file__).resolve().parent.parent.parent / ".env")
 
