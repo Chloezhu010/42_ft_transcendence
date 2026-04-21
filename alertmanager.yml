@@ -2,11 +2,14 @@ global:
   resolve_timeout: 5m
 
 route:
-  receiver: "null"
+  receiver: "backend-webhook"
   group_by: ["alertname", "severity"]
   group_wait: 30s
   group_interval: 5m
   repeat_interval: 12h
 
 receivers:
-  - name: "null"
+  - name: "backend-webhook"
+    webhook_configs:
+      - url: "http://backend:8000/api/monitoring/alerts"
+        send_resolved: true
