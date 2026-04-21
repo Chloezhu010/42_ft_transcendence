@@ -11,7 +11,7 @@ export interface FriendResponse {
 }
 
 export async function getFriends(accessToken: string): Promise<FriendResponse[]> {
-    const response = await apiFetch(`${API_BASE}/friends`, {
+    const response = await apiFetch(`${API_BASE}/friends/`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${accessToken}`,
