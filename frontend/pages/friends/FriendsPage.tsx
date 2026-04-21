@@ -10,6 +10,18 @@ import { PendingRequestRow } from '@/components/friends/PendingRequestRow';
 export function FriendsPage(): JSX.Element {
   const { friends, pending, searchResults, isLoading, error } = useFriendsPage();
 
+  function handleAccept(userId: number): void {
+    console.log('accept request', userId);
+  }
+
+  function handleDecline(userId: number): void {
+    console.log('decline request', userId);
+  }
+
+  function handleRemove(friendId: number): void {
+    console.log('remove friend', friendId);
+  }
+
   if (isLoading) {
     return (
         <div className="flex flex-1 items-center justify-center">
@@ -45,7 +57,11 @@ export function FriendsPage(): JSX.Element {
             <ul className="space-y-2">
                 {pending.map((req) => (
                     <li key={req.id}>
-                        <PendingRequestRow key={req.id} request={req} />
+                        <PendingRequestRow
+                            request={req}
+                            onAccept={handleAccept}
+                            onDecline={handleDecline}
+                        />
                     </li>
                 ))}
             </ul>
@@ -67,7 +83,7 @@ export function FriendsPage(): JSX.Element {
             <ul className="space-y-2">
                 {friends.map((friend) => (
                     <li key={friend.id}>
-                        <FriendRow key={friend.id} friend={friend} />
+                        <FriendRow friend={friend} onRemove={handleRemove} />
                     </li>
                 ))}
             </ul>

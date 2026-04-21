@@ -14,7 +14,8 @@ interface UseFriendsPageResult {
     error: string | null;
 }
 
-const USE_MOCK_DATA = false; // Toggle to true to test with mock data in useFriendsPage
+// Mock data for testing UI without backend integration
+const USE_MOCK_DATA = true; // Toggle to true to test with mock data in useFriendsPage
 const MOCK_FRIENDS: FriendResponse[] = [
     {
         id: 101,
