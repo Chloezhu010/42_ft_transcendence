@@ -3,9 +3,10 @@
  * Owns the state of the friends list, incoming friend requests, and the
  * handlers to accept/decline requests and remove friends.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/app/auth";
 import { getFriends, getPendingFriendRequests, FriendResponse, PublicUserResponse, searchUsers } from "@api";
+import { SearchUserResult } from "./friends.types";
 
 // ----------------------------------------------------
 // Mock toggle and data for testing UI without backend
@@ -40,6 +41,16 @@ const MOCK_PENDING: FriendResponse[] = [
     },
 ]
 
+// Pool of users returned by mock search.
+const MOCK_DISCOVERABLE_USERS: PublicUserResponse[] = [
+    { id: 101, username: "Alice",   avatar_url: null, is_online: true  }, // friend
+    { id: 102, username: "Bob",     avatar_url: null, is_online: false }, // friend
+    { id: 201, username: "Charlie", avatar_url: null, is_online: true  }, // pending
+    { id: 301, username: "Dana",    avatar_url: null, is_online: true  }, // stranger
+    { id: 302, username: "Eli",     avatar_url: null, is_online: false }, // stranger
+    { id: 303, username: "Fatima",  avatar_url: null, is_online: true  }, // stranger
+]
+
 // ----------------------------------------------------
 // Constants
 // ----------------------------------------------------
@@ -51,7 +62,7 @@ const SEARCH_DEBOUNCE_MS = 300;
 interface UseFriendsPageResult {
     friends: FriendResponse[];
     pending: FriendResponse[];
-    searchResults: PublicUserResponse[];
+    searchResults: SearchUserResult[];
     searchQuery: string;
     setSearchQuery: (value: string) => void;
     isLoading: boolean;
@@ -64,16 +75,28 @@ interface UseFriendsPageResult {
 // ----------------------------------------------------
 export function useFriendsPage(): UseFriendsPageResult {
     const { accessToken } = useAuth();
-    const [friends, setFriends] = useState<FriendResponse[]>([]);
-    const [pending, setPending] = useState<FriendResponse[]>([]);
+    const [friends, setFriends] = useState<FriendResponse[]>(USE_MOCK_DATA ? MOCK_FRIENDS : []);
+    const [pending, setPending] = useState<FriendResponse[]>(USE_MOCK_DATA ? MOCK_PENDING : []);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<PublicUserResponse[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
+    // Memoized sets for quick lookup of friend and pending IDs
+    const friendsIds = useMemo(() => new Set(friends.map(f => f.id)), [friends]);
+    const pendingIds = useMemo(() => new Set(pending.map(p => p.id)), [pending]);
+    
+    const decoratedResults = useMemo<SearchUserResult[]>(() => searchResults.map(u => ({
+        ...u,
+        relationship: friendsIds.has(u.id) ? 'friend' : pendingIds.has(u.id) ? 'pending' : 'none',
+        isIncomingRequest: pending.find(p => p.id === u.id)?.is_requester === false,
+    })),
+    [searchResults, friendsIds, pendingIds, pending]);
+
     // Initial load effect: fetch friends and pending requests
     useEffect(() => {
+        if (USE_MOCK_DATA) return; // keep the seeded mock state, skip network
         if (!accessToken) return;
         const fetchFriendsData = async () => {
             setIsLoading(true);
@@ -99,13 +122,26 @@ export function useFriendsPage(): UseFriendsPageResult {
 
     // Debounced search effect: fetch search results when query changes
     useEffect(() => {
-        if (!accessToken) {
+        const trimmed = searchQuery.trim();
+        if (!trimmed) {
             setSearchResults([]);
             setIsSearching(false);
             return;
         }
-        const trimmed = searchQuery.trim();
-        if (!trimmed) {
+
+        // Mock mode: filter the discoverable pool locally, no network call.
+        if (USE_MOCK_DATA) {
+            const needle = trimmed.toLowerCase();
+            setSearchResults(
+                MOCK_DISCOVERABLE_USERS.filter(u =>
+                    u.username.toLowerCase().includes(needle)
+                )
+            );
+            setIsSearching(false);
+            return;
+        }
+
+        if (!accessToken) {
             setSearchResults([]);
             setIsSearching(false);
             return;
@@ -132,7 +168,7 @@ export function useFriendsPage(): UseFriendsPageResult {
         return {
             friends: MOCK_FRIENDS,
             pending: MOCK_PENDING,
-            searchResults: searchResults,
+            searchResults: decoratedResults,
             searchQuery: searchQuery,
             setSearchQuery: setSearchQuery,
             isSearching: false,
@@ -144,7 +180,7 @@ export function useFriendsPage(): UseFriendsPageResult {
     return {
         friends: friends,
         pending: pending,
-        searchResults: searchResults,
+        searchResults: decoratedResults,
         searchQuery: searchQuery,
         setSearchQuery: setSearchQuery,
         isLoading: isLoading,

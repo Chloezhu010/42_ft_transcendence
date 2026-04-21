@@ -35,6 +35,10 @@ export function FriendsPage(): JSX.Element {
     console.log('remove friend', friendId);
   }
 
+  function handleSendRequest(userId: number): void {
+    console.log('send friend request', userId);
+  }
+
   if (isLoading) {
     return (
         <div className="flex flex-1 items-center justify-center">
@@ -113,7 +117,7 @@ export function FriendsPage(): JSX.Element {
             <ul className="space-y-2">
                 {searchResults.map((user) => (
                     <li key={user.id}>
-                        <SearchUserRow user={user} />
+                        <SearchUserRow user={user} onSendRequest={handleSendRequest} />
                     </li>
                 ))}
             </ul>
