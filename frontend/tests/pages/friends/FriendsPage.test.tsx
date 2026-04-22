@@ -95,8 +95,12 @@ describe('FriendsPage', () => {
       expect(mockSendFriendRequest).toHaveBeenCalledWith('friends-token', 1);
     });
 
-    expect(screen.getByText('Pending')).toBeInTheDocument();
-    expect(screen.getByText('Respond in Pending')).toBeInTheDocument();
+    const discoverSection = screen.getByRole('heading', { name: 'Discover' }).closest('section');
+    expect(discoverSection).not.toBeNull();
+
+    const discoverQueries = within(discoverSection as HTMLElement);
+    expect(discoverQueries.getByText('Pending')).toBeInTheDocument();
+    expect(discoverQueries.getByText('Respond in Pending')).toBeInTheDocument();
 
     const pendingSection = screen.getByRole('heading', { name: 'Pending' }).closest('section');
     expect(pendingSection).not.toBeNull();

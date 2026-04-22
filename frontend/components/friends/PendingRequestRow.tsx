@@ -8,6 +8,7 @@ interface PendingRequestRowProps {
   request: FriendResponse;
   onAccept?: (userId: number) => void;
   onDecline?: (userId: number) => void;
+  isActing?: boolean;
 }
 
 export function PendingRequestRow({ request, onAccept, onDecline }: PendingRequestRowProps): JSX.Element {

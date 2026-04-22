@@ -7,6 +7,7 @@ import StorageImage from '@/components/StorageImage';
 interface FriendRowProps {
   friend: FriendResponse;
   onRemove?: (friendId: number) => void;
+  isRemoving?: boolean;
 }
 
 export function FriendRow({ friend, onRemove }: FriendRowProps): JSX.Element {

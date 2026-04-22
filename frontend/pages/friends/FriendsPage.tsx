@@ -16,6 +16,10 @@ export function FriendsPage(): JSX.Element {
     searchQuery,
     setSearchQuery,
     sendRequest,
+    acceptRequest,
+    declineRequest,
+    removeFriend,
+    pendingActionIds,
     isLoading,
     isSearching,
     error,
@@ -24,15 +28,15 @@ export function FriendsPage(): JSX.Element {
   const trimmedSearchQuery = searchQuery.trim();
 
   function handleAccept(userId: number): void {
-    console.log('accept request', userId);
+    void acceptRequest(userId);
   }
 
   function handleDecline(userId: number): void {
-    console.log('decline request', userId);
+    void declineRequest(userId);
   }
 
   function handleRemove(friendId: number): void {
-    console.log('remove friend', friendId);
+    void removeFriend(friendId);
   }
 
   if (isLoading) {
@@ -74,6 +78,7 @@ export function FriendsPage(): JSX.Element {
                             request={req}
                             onAccept={handleAccept}
                             onDecline={handleDecline}
+                            isActing={pendingActionIds.has(req.id)}
                         />
                     </li>
                 ))}
@@ -128,7 +133,11 @@ export function FriendsPage(): JSX.Element {
             <ul className="space-y-2">
                 {friends.map((friend) => (
                     <li key={friend.id}>
-                        <FriendRow friend={friend} onRemove={handleRemove} />
+                        <FriendRow
+                            friend={friend}
+                            onRemove={handleRemove}
+                            isRemoving={pendingActionIds.has(friend.id)}
+                        />
                     </li>
                 ))}
             </ul>

@@ -5,7 +5,16 @@
  */
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useAuth } from "@/app/auth";
-import { getFriends, getPendingFriendRequests, sendFriendRequest, FriendResponse, PublicUserResponse, searchUsers } from "@api";
+import {
+    getFriends,
+    getPendingFriendRequests,
+    sendFriendRequest,
+    acceptFriendRequest,
+    removeFriend as removeFriendApi,
+    FriendResponse,
+    PublicUserResponse,
+    searchUsers,
+} from "@api";
 import { SearchUserResult } from "./friends.types";
 
 // ----------------------------------------------------
@@ -66,7 +75,18 @@ interface UseFriendsPageResult {
     searchQuery: string;
     setSearchQuery: (value: string) => void;
     sendRequest: (userId: number) => void;
+    // Accepts an incoming pending request from userId.
+    // Moves the row from pendingIncoming → friends on success; rolls back on error.
+    acceptRequest: (userId: number) => void;
+    // Declines (removes) an incoming pending request from userId.
+    // Drops the row from pendingIncoming on success; rolls back on error.
+    declineRequest: (userId: number) => void;
+    // Removes an accepted friend by friendId.
+    // Drops the row from friends on success; rolls back on error.
+    removeFriend: (friendId: number) => void;
     sendingIds: Set<number>;
+    // Tracks ids for which acceptRequest / declineRequest / removeFriend is inflight.
+    pendingActionIds: Set<number>;
     isLoading: boolean;
     isSearching: boolean;
     error: string | null;
@@ -84,6 +104,9 @@ export function useFriendsPage(): UseFriendsPageResult {
     const [searchResults, setSearchResults] = useState<PublicUserResponse[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [sendingIds, setSendingIds] = useState<Set<number>>(new Set());
+    // Separate inflight set for accept / decline / remove so sendingIds stays
+    // scoped to outgoing send-request actions only.
+    const [pendingActionIds, setPendingActionIds] = useState<Set<number>>(new Set());
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -204,6 +227,97 @@ export function useFriendsPage(): UseFriendsPageResult {
         }
     }, [accessToken, searchResults]);
 
+    // Accept an incoming pending friend request from `userId`
+    const acceptRequest = useCallback(async (userId: number) => {
+        // find the target row in pendingIncoming
+        const target = pendingIncoming.find(r => r.id === userId);
+        if (!target) return;
+        // mark inflight
+        setPendingActionIds(prev => new Set(prev).add(userId));
+        // snapshot, optimistic mutation: remove from pending, add provisional to friends
+        const optimistic: FriendResponse = {
+            ...target,
+            friendship_status: 'accepted',
+        };
+        setPendingIncoming(prev => prev.filter(r => r.id !== userId));
+        setFriends(prev => [...prev, optimistic]);
+        // api call and reconcile
+        try {
+            if (!USE_MOCK_DATA) {
+                if (!accessToken) throw new Error('No session');
+                const confirmed = await acceptFriendRequest(accessToken, userId);
+                setFriends(prev => prev.map(f => f.id === userId ? confirmed : f));
+            }
+        } catch {
+            // rollback on failure: remove from friends, restore to pending, set error
+            setFriends(prev => prev.filter(f => f.id !== userId));
+            setPendingIncoming(prev => [...prev, target]);
+            setError('Could not accept friend request.');
+        } finally {
+            // clear inflight flag
+            setPendingActionIds(prev => {
+                const next = new Set(prev);
+                next.delete(userId);
+                return next;
+            });
+        }
+    }, [accessToken, pendingIncoming]);
+
+    // Decline (reject) an incoming pending friend request from `userId`
+    const declineRequest = useCallback(async (userId: number) => {
+        // find the target row in pendingIncoming
+        const target = pendingIncoming.find(r => r.id === userId);
+        if (!target) return;
+        // mark inflight
+        setPendingActionIds(prev => new Set(prev).add(userId));
+        // snapshot, optimistic mutation: remove from pending
+        setPendingIncoming(prev => prev.filter(r => r.id !== userId));
+        // api call and reconcile
+        try {
+            if (!USE_MOCK_DATA) {
+                if (!accessToken) throw new Error('No session');
+                await removeFriendApi(accessToken, userId);
+            }
+        } catch {
+            // rollback on failure: restore to pending, set error
+            setPendingIncoming(prev => [...prev, target]);
+            setError('Could not decline friend request.');
+        } finally {
+            // clear inflight flag
+            setPendingActionIds(prev => {
+                const next = new Set(prev);
+                next.delete(userId);
+                return next;
+            });
+        }
+    }, [accessToken, pendingIncoming]);
+
+    // Remove an accepted friend by `friendId`
+    const removeFriend = useCallback(async (friendId: number) => {
+        // find the target row in friends
+        const target = friends.find(f => f.id === friendId);
+        if (!target) return;
+        // mark inflight
+        setPendingActionIds(prev => new Set(prev).add(friendId));
+        setFriends(prev => prev.filter(f => f.id !== friendId));
+        // api call and reconcile
+        try {
+            if (!USE_MOCK_DATA) {
+                if (!accessToken) throw new Error('No session');
+                await removeFriendApi(accessToken, friendId);
+            }
+        } catch {
+            setFriends(prev => [...prev, target]);
+            setError('Could not remove friend.');
+        } finally {
+            setPendingActionIds(prev => {
+                const next = new Set(prev);
+                next.delete(friendId);
+                return next;
+            });
+        }
+    }, [accessToken, friends]);
+
     // Mock override for testing UI without backend
     if (USE_MOCK_DATA) {
         return {
@@ -213,7 +327,11 @@ export function useFriendsPage(): UseFriendsPageResult {
             searchQuery: searchQuery,
             setSearchQuery: setSearchQuery,
             sendRequest: () => {},
+            acceptRequest: () => {},
+            declineRequest: () => {},
+            removeFriend: () => {},
             sendingIds: new Set(),
+            pendingActionIds: new Set(),
             isSearching: false,
             isLoading: false,
             error: null,
@@ -227,7 +345,11 @@ export function useFriendsPage(): UseFriendsPageResult {
         searchQuery: searchQuery,
         setSearchQuery: setSearchQuery,
         sendRequest: sendRequest,
+        acceptRequest: acceptRequest,
+        declineRequest: declineRequest,
+        removeFriend: removeFriend,
         sendingIds: sendingIds,
+        pendingActionIds: pendingActionIds,
         isLoading: isLoading,
         isSearching: isSearching,
         error: error,
