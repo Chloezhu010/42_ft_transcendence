@@ -8,12 +8,14 @@ const {
   mockUseAuth,
   mockGetFriends,
   mockGetPendingFriendRequests,
+  mockGetOutgoingFriendRequests,
   mockSearchUsers,
   mockSendFriendRequest,
 } = vi.hoisted(() => ({
   mockUseAuth: vi.fn(),
   mockGetFriends: vi.fn(),
   mockGetPendingFriendRequests: vi.fn(),
+  mockGetOutgoingFriendRequests: vi.fn(),
   mockSearchUsers: vi.fn(),
   mockSendFriendRequest: vi.fn(),
 }));
@@ -25,6 +27,7 @@ vi.mock('@/app/auth', () => ({
 vi.mock('@api', () => ({
   getFriends: mockGetFriends,
   getPendingFriendRequests: mockGetPendingFriendRequests,
+  getOutgoingFriendRequests: mockGetOutgoingFriendRequests,
   searchUsers: mockSearchUsers,
   sendFriendRequest: mockSendFriendRequest,
 }));
@@ -48,6 +51,7 @@ describe('FriendsPage', () => {
         is_requester: false,
       },
     ]);
+    mockGetOutgoingFriendRequests.mockResolvedValue([]);
     mockSearchUsers.mockResolvedValue([
       {
         id: 1,
@@ -99,7 +103,7 @@ describe('FriendsPage', () => {
     expect(discoverSection).not.toBeNull();
 
     const discoverQueries = within(discoverSection as HTMLElement);
-    expect(discoverQueries.getByText('Pending')).toBeInTheDocument();
+    expect(discoverQueries.getByText('Request Sent')).toBeInTheDocument();
     expect(discoverQueries.getByText('Respond in Pending')).toBeInTheDocument();
 
     const pendingSection = screen.getByRole('heading', { name: 'Pending' }).closest('section');

@@ -4,6 +4,7 @@ Friend router (handle friend requests, etc.)
 URL contract (authoritative: tests/test_friend_routes.py):
     GET    /api/friends/                  list accepted friends
     GET    /api/friends/pending           list *incoming* pending requests
+    GET    /api/friends/outgoing          list *outgoing* pending requests
     POST   /api/friends/{user_id}         send a friend request
     POST   /api/friends/{user_id}/accept  accept an incoming request
     DELETE /api/friends/{friend_id}       remove friend / cancel pending
@@ -16,6 +17,7 @@ from db.crud_users import (
     accept_friend_request,
     get_friend_view,
     get_friends,
+    get_outgoing_pending_requests,
     get_pending_requests,
     remove_friend,
     send_friend_request,
@@ -66,6 +68,16 @@ async def list_pending_endpoint(
 ) -> list[FriendResponse]:
     """Get incoming pending friend requests for the authenticated user."""
     rows = await get_pending_requests(db, current_user["id"])
+    return [_to_friend_response(row, current_user["id"]) for row in rows]
+
+
+@router.get("/outgoing", response_model=list[FriendResponse])
+async def list_outgoing_pending_endpoint(
+    current_user=Depends(get_current_user),
+    db=Depends(get_db),
+) -> list[FriendResponse]:
+    """Get outgoing pending friend requests for the authenticated user."""
+    rows = await get_outgoing_pending_requests(db, current_user["id"])
     return [_to_friend_response(row, current_user["id"]) for row in rows]
 
 

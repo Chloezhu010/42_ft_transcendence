@@ -8,6 +8,7 @@ from db.crud_users import (
     create_user,
     get_friends,
     get_friendship_between,
+    get_outgoing_pending_requests,
     get_pending_requests,
     get_user_by_email,
     get_user_by_id,
@@ -560,3 +561,52 @@ async def test_get_pending_requests_returns_empty_list_when_none(db):
     pending_requests = await get_pending_requests(db, alice_id)
 
     assert pending_requests == []
+
+
+# --- get_outgoing_pending_requests ---
+
+
+@pytest.mark.asyncio
+async def test_get_outgoing_pending_requests_returns_sent_requests(db):
+    alice_id, bob_id, charlie_id = await create_sample_users(db)
+    await send_friend_request(db, alice_id, bob_id)
+    await send_friend_request(db, alice_id, charlie_id)
+
+    outgoing = await get_outgoing_pending_requests(db, alice_id)
+
+    assert len(outgoing) == 2
+    addressee_ids = {row["id"] for row in outgoing}
+    assert addressee_ids == {bob_id, charlie_id}
+    assert all(row["status"] == "pending" for row in outgoing)
+    assert all(row["requester_id"] == alice_id for row in outgoing)
+
+
+@pytest.mark.asyncio
+async def test_get_outgoing_pending_requests_excludes_incoming(db):
+    """A request sent *to* alice must not appear in her outgoing list."""
+    alice_id, bob_id, _ = await create_sample_users(db)
+    await send_friend_request(db, bob_id, alice_id)
+
+    outgoing = await get_outgoing_pending_requests(db, alice_id)
+
+    assert outgoing == []
+
+
+@pytest.mark.asyncio
+async def test_get_outgoing_pending_requests_excludes_accepted(db):
+    alice_id, bob_id, _ = await create_sample_users(db)
+    await send_friend_request(db, alice_id, bob_id)
+    await accept_friend_request(db, bob_id, alice_id)
+
+    outgoing = await get_outgoing_pending_requests(db, alice_id)
+
+    assert outgoing == []
+
+
+@pytest.mark.asyncio
+async def test_get_outgoing_pending_requests_returns_empty_list_when_none(db):
+    alice_id = await create_user(db, "alice", "alice@example.com", "password123")
+
+    outgoing = await get_outgoing_pending_requests(db, alice_id)
+
+    assert outgoing == []

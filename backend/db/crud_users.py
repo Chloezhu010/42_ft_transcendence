@@ -264,3 +264,26 @@ async def get_pending_requests(db, user_id: int) -> list[Row]:
         (user_id,),
     ) as cursor:
         return await cursor.fetchall()  # return a list of pending friend requests
+
+
+async def get_outgoing_pending_requests(db, user_id: int) -> list[Row]:
+    """Get a list of pending *outgoing* friend requests for the given user id.
+
+    Returns rows shaped for FriendResponse: the viewer is always the requester,
+    so the "other user" (u.*) is the addressee. requester_id is included so the
+    router's is_requester check stays consistent with the other friend reads.
+    """
+    async with db.execute(
+        """
+        SELECT
+            u.id, u.username, u.avatar_path, u.is_online,
+            f.id AS friendship_id, f.requester_id, f.status, f.created_at
+        FROM friendships f
+        JOIN users u
+            ON f.addressee_id = u.id
+        WHERE f.requester_id = ? AND f.status = 'pending'
+        ORDER BY f.created_at DESC
+        """,
+        (user_id,),
+    ) as cursor:
+        return await cursor.fetchall()

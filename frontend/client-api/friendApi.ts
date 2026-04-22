@@ -36,6 +36,19 @@ export async function getPendingFriendRequests(accessToken: string): Promise<Fri
     return (await response.json()) as FriendResponse[];
 }
 
+export async function getOutgoingFriendRequests(accessToken: string): Promise<FriendResponse[]> {
+    const response = await apiFetch(`${API_BASE}/friends/outgoing`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        }
+    });
+    if (!response.ok) {
+        throw await buildApiError(response, 'Failed to fetch outgoing friend requests');
+    }
+    return (await response.json()) as FriendResponse[];
+}
+
 export async function sendFriendRequest(accessToken: string, userId: number): Promise<FriendResponse> {
     const response = await apiFetch(`${API_BASE}/friends/${userId}`, {
         method: 'POST',

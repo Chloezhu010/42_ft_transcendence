@@ -4,6 +4,7 @@ import {
   acceptFriendRequest,
   getFriends,
   getMe,
+  getOutgoingFriendRequests,
   getPendingFriendRequests,
   getUser,
   login,
@@ -463,6 +464,42 @@ describe('authApi', () => {
     );
 
     await expect(getPendingFriendRequests('invalid-token')).rejects.toThrow(
+      'Could not validate credentials'
+    );
+  });
+
+  it('getOutgoingFriendRequests sends the bearer token and returns outgoing pending requests', async () => {
+    const outgoingFriend = { ...FRIEND_RESPONSE, is_requester: true };
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify([outgoingFriend]), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+
+    const result = await getOutgoingFriendRequests('outgoing-token');
+
+    expect(result).toEqual([outgoingFriend]);
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/api/friends/outgoing'),
+      expect.objectContaining({
+        method: 'GET',
+        headers: expect.objectContaining({
+          Authorization: 'Bearer outgoing-token',
+        }),
+      })
+    );
+  });
+
+  it('getOutgoingFriendRequests surfaces backend detail on auth failure', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ detail: 'Could not validate credentials' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+
+    await expect(getOutgoingFriendRequests('invalid-token')).rejects.toThrow(
       'Could not validate credentials'
     );
   });

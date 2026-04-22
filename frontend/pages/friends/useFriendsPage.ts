@@ -8,6 +8,7 @@ import { useAuth } from "@/app/auth";
 import {
     getFriends,
     getPendingFriendRequests,
+    getOutgoingFriendRequests,
     sendFriendRequest,
     acceptFriendRequest,
     removeFriend as removeFriendApi,
@@ -134,13 +135,15 @@ export function useFriendsPage(): UseFriendsPageResult {
             setError(null);
 
             try {
-                const [friendsData, pendingData] = await Promise.all([
+                const [friendsData, pendingIncomingData, pendingOutgoingData] = await Promise.all([
                     getFriends(accessToken),
-                    getPendingFriendRequests(accessToken)
+                    getPendingFriendRequests(accessToken),
+                    getOutgoingFriendRequests(accessToken),
                 ]);
 
                 setFriends(friendsData);
-                setPendingIncoming(pendingData);
+                setPendingIncoming(pendingIncomingData);
+                setPendingOutgoing(pendingOutgoingData);
             } catch (err) {
                 setError("Failed to fetch friends data.");
             } finally {
@@ -196,6 +199,12 @@ export function useFriendsPage(): UseFriendsPageResult {
     const sendRequest = useCallback(async (userId: number) => {
         const target = searchResults.find(u => u.id === userId);
         if (!target) return;
+        if (sendingIds.has(userId)) return;
+        if (pendingOutgoingIds.has(userId)) return;
+        if (friendsIds.has(userId)) return;
+        if (pendingIncomingIds.has(userId)) return;
+
+        setError(null);
 
         // mark inflight
         setSendingIds(prev => new Set(prev).add(userId));
@@ -216,7 +225,11 @@ export function useFriendsPage(): UseFriendsPageResult {
         } catch (err) {
             // rollback on failure
             setPendingOutgoing(prev => prev.filter(p => p.id !== userId));
-            setError('Could not send friend request.');
+            if (typeof err === 'object' && err !== null && 'status' in err && err.status === 409) {
+                setError('Friend request already exists.');
+            } else {
+                setError('Could not send friend request.');
+            }
         } finally {
             // clear inflight flag
             setSendingIds(prev => {
@@ -225,7 +238,7 @@ export function useFriendsPage(): UseFriendsPageResult {
                 return next;
             });
         }
-    }, [accessToken, searchResults]);
+    }, [accessToken, friendsIds, pendingIncomingIds, pendingOutgoingIds, searchResults, sendingIds]);
 
     // Accept an incoming pending friend request from `userId`
     const acceptRequest = useCallback(async (userId: number) => {

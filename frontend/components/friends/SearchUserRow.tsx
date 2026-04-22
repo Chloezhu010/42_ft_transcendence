@@ -46,9 +46,13 @@ export function SearchUserRow({ user, onSendRequest }: SearchUserRowProps): JSX.
                 )}
 
                 {user.relationship === 'pending_out' && (
-                    <span className="rounded-full bg-yellow-100 px-3 py-1 text-sm font-semibold text-yellow-800">
-                        Pending
-                    </span>
+                    <button
+                        type="button"
+                        disabled
+                        className="rounded-full bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-500 cursor-not-allowed"
+                    >
+                        Request Sent
+                    </button>
                 )}
 
                 {user.relationship === 'none' && (

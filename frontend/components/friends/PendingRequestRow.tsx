@@ -11,7 +11,12 @@ interface PendingRequestRowProps {
   isActing?: boolean;
 }
 
-export function PendingRequestRow({ request, onAccept, onDecline }: PendingRequestRowProps): JSX.Element {
+export function PendingRequestRow({
+  request,
+  onAccept,
+  onDecline,
+  isActing = false,
+}: PendingRequestRowProps): JSX.Element {
   const avatarFallback = request.username.charAt(0).toUpperCase();
   const onlineLabel = request.is_online ? 'Online' : 'Offline';
 
@@ -39,8 +44,9 @@ export function PendingRequestRow({ request, onAccept, onDecline }: PendingReque
           {onDecline ? (
             <button
               type="button"
+              disabled={isActing}
               onClick={() => onDecline(request.id)}
-              className="rounded-full border border-brand-primary/15 px-4 py-2 text-sm font-semibold text-brand-muted transition-colors hover:border-brand-primary/25 hover:text-brand-dark"
+              className="rounded-full border border-brand-primary/15 px-4 py-2 text-sm font-semibold text-brand-muted transition-colors hover:border-brand-primary/25 hover:text-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
             >
               Decline
             </button>
@@ -48,10 +54,11 @@ export function PendingRequestRow({ request, onAccept, onDecline }: PendingReque
           {onAccept ? (
             <button
               type="button"
+              disabled={isActing}
               onClick={() => onAccept(request.id)}
-              className="rounded-full bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+              className="rounded-full bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Accept
+              {isActing ? 'Working...' : 'Accept'}
             </button>
           ) : null}
         </div>

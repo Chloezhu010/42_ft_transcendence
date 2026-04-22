@@ -27,14 +27,18 @@ const {
     mockUseAuth,
     mockGetFriends,
     mockGetPending,
+    mockGetOutgoing,
     mockAcceptFriendRequest,
     mockRemoveFriend,
+    mockSearchUsers,
 } = vi.hoisted(() => ({
     mockUseAuth: vi.fn(),
     mockGetFriends: vi.fn(),
     mockGetPending: vi.fn(),
+    mockGetOutgoing: vi.fn(),
     mockAcceptFriendRequest: vi.fn(),
     mockRemoveFriend: vi.fn(),
+    mockSearchUsers: vi.fn(),
 }));
 
 // Mock the auth hook — keeps tests independent of auth state.
@@ -48,13 +52,14 @@ vi.mock('@/app/auth', () => ({
 vi.mock('@api', () => ({
     getFriends: mockGetFriends,
     getPendingFriendRequests: mockGetPending,
+    getOutgoingFriendRequests: mockGetOutgoing,
     acceptFriendRequest: mockAcceptFriendRequest,
     // removeFriend is intentionally shared: both declineRequest and removeFriend
     // call DELETE /friends/:id (removeFriendApi), which maps to this mock.
     removeFriend: mockRemoveFriend,
     // These are used by other parts of the hook; stub them as no-ops so they
     // don't throw on the initial render / search effects.
-    searchUsers: vi.fn().mockResolvedValue([]),
+    searchUsers: mockSearchUsers,
     sendFriendRequest: vi.fn(),
 }));
 
@@ -79,6 +84,15 @@ const bob: FriendResponse = {
     avatar_url: null,
     is_online: false,
     friendship_status: 'accepted',
+    is_requester: true,
+};
+
+const cara: FriendResponse = {
+    id: 3,
+    username: 'cara',
+    avatar_url: null,
+    is_online: true,
+    friendship_status: 'pending',
     is_requester: true,
 };
 
@@ -120,6 +134,44 @@ beforeEach(() => {
     // Default initial state: one accepted friend (bob), one incoming request (alice).
     mockGetFriends.mockResolvedValue([bob]);
     mockGetPending.mockResolvedValue([alice]);
+    mockGetOutgoing.mockResolvedValue([]);
+    mockSearchUsers.mockResolvedValue([]);
+});
+
+describe('initial load', () => {
+    it('hydrates outgoing pending requests into search result relationships', async () => {
+        mockGetOutgoing.mockResolvedValue([cara]);
+        mockSearchUsers.mockResolvedValue([
+            {
+                id: cara.id,
+                username: cara.username,
+                avatar_url: cara.avatar_url,
+                is_online: cara.is_online,
+                created_at: '2026-04-22T00:00:00Z',
+            },
+        ]);
+
+        const { result } = renderHook(() => useFriendsPage());
+
+        await waitFor(() => {
+            expect(result.current.friends).toContainEqual(bob);
+            expect(result.current.pendingIncoming).toContainEqual(alice);
+        });
+
+        await act(async () => {
+            result.current.setSearchQuery('cara');
+        });
+
+        await waitFor(() => {
+            expect(result.current.searchResults).toContainEqual(
+                expect.objectContaining({
+                    id: cara.id,
+                    relationship: 'pending_out',
+                    isSending: false,
+                })
+            );
+        });
+    });
 });
 
 // ===========================================================================
