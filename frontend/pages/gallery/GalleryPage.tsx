@@ -3,17 +3,18 @@
  * Renders loading, empty, and card-grid states from page-level data.
  */
 import { Link } from 'react-router-dom';
-import type { StoryListItem } from '@api';
+import type { StoryListItem, StoryVisibility } from '@api';
 import StorageImage from '@/components/StorageImage';
-import { formatStoryDate, getStoryDisplayTitle } from './gallery.helpers';
+import { formatStoryDate, getStoryDisplayTitle, getVisibilityLabel } from './gallery.helpers';
 import { useGalleryPage } from './useGalleryPage';
 
 interface StoryCardProps {
   story: StoryListItem;
   onDeleteStory: (storyId: number) => Promise<void>;
+  onUpdateVisibility: (storyId: number, visibility: StoryVisibility) => Promise<void>;
 }
 
-function StoryCard({ story, onDeleteStory }: StoryCardProps): JSX.Element {
+function StoryCard({ story, onDeleteStory, onUpdateVisibility }: StoryCardProps): JSX.Element {
   return (
     <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden group border-2 border-gray-100 hover:border-purple-200 transition-all hover:-translate-y-1 relative">
       <button
@@ -51,6 +52,21 @@ function StoryCard({ story, onDeleteStory }: StoryCardProps): JSX.Element {
           {getStoryDisplayTitle(story.title)}
         </h3>
 
+        <div className="mb-4">
+          <label className="block text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-2">
+            Sharing
+          </label>
+          <select
+            aria-label={`Sharing for ${getStoryDisplayTitle(story.title)}`}
+            value={story.visibility}
+            onChange={(event) => void onUpdateVisibility(story.id, event.target.value as StoryVisibility)}
+            className="w-full rounded-xl border border-purple-200 bg-purple-50 px-3 py-2 text-sm font-semibold text-purple-900 outline-none focus:border-purple-400"
+          >
+            <option value="private">{getVisibilityLabel('private')}</option>
+            <option value="shared_with_friends">{getVisibilityLabel('shared_with_friends')}</option>
+          </select>
+        </div>
+
         <div className="flex flex-wrap gap-2">
           <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full uppercase tracking-wide">
             {story.profile.name}
@@ -72,7 +88,7 @@ function StoryCard({ story, onDeleteStory }: StoryCardProps): JSX.Element {
 }
 
 function GalleryPage(): JSX.Element {
-  const { isLoading, onDeleteStory, stories } = useGalleryPage();
+  const { isLoading, onDeleteStory, onUpdateVisibility, stories } = useGalleryPage();
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 animate-in fade-in duration-700">
@@ -87,7 +103,12 @@ function GalleryPage(): JSX.Element {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {stories.map((story) => (
-            <StoryCard key={story.id} story={story} onDeleteStory={onDeleteStory} />
+            <StoryCard
+              key={story.id}
+              story={story}
+              onDeleteStory={onDeleteStory}
+              onUpdateVisibility={onUpdateVisibility}
+            />
           ))}
 
           {stories.length === 0 && (
