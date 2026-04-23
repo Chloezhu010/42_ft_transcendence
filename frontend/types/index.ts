@@ -1,3 +1,5 @@
+import type { StoryVisibility } from '@api';
+
 /**
  * Shared frontend domain types used across pages and components.
  */
@@ -28,5 +30,6 @@ export interface Story {
   characterDescription: string;
   coverImagePrompt: string;
   coverImageUrl?: string;
+  visibility: StoryVisibility;
   panels: ComicPanelData[];
 }
