@@ -13,6 +13,7 @@ from models import (
     StoryListItem,
     StoryResponse,
     StoryUpdatePanels,
+    StoryVisibility,
 )
 from services.image_storage import delete_local_image, save_base64_image
 
@@ -104,6 +105,24 @@ async def get_panels_for_story(db: aiosqlite.Connection, story_id: int) -> list[
 
 
 # --- Story CRUD ---
+def _build_story_response(row, profile: KidProfileResponse, panels: list[PanelResponse]) -> StoryResponse:
+    """Map a story row plus related entities into the response model."""
+    return StoryResponse(
+        id=row["id"],
+        title=row["title"],
+        foreword=row["foreword"],
+        character_description=row["character_description"],
+        cover_image_prompt=row["cover_image_prompt"],
+        cover_image_url=row["cover_image_path"],
+        visibility=row["visibility"],
+        is_unlocked=bool(row["is_unlocked"]),
+        created_at=row["created_at"],
+        updated_at=row["updated_at"],
+        profile=profile,
+        panels=panels,
+    )
+
+
 async def create_story(db: aiosqlite.Connection, story: StoryCreate, user_id: int) -> StoryResponse:
     """Create a story with profile and panels."""
     profile_id = await create_kid_profile(db, story.profile, user_id)
@@ -149,26 +168,14 @@ async def get_story_by_id(db: aiosqlite.Connection, story_id: int, user_id: int)
     profile = await get_kid_profile(db, row["kid_profile_id"])
     panels = await get_panels_for_story(db, story_id)
 
-    return StoryResponse(
-        id=row["id"],
-        title=row["title"],
-        foreword=row["foreword"],
-        character_description=row["character_description"],
-        cover_image_prompt=row["cover_image_prompt"],
-        cover_image_url=row["cover_image_path"],
-        is_unlocked=bool(row["is_unlocked"]),
-        created_at=row["created_at"],
-        updated_at=row["updated_at"],
-        profile=profile,
-        panels=panels,
-    )
+    return _build_story_response(row, profile, panels)
 
 
 async def list_stories(db: aiosqlite.Connection, user_id: int) -> list[StoryListItem]:
     """Get all stories with summary info."""
     cursor = await db.execute(
         """
-        SELECT id, title, cover_image_path, is_unlocked, created_at, kid_profile_id
+        SELECT id, title, cover_image_path, visibility, is_unlocked, created_at, kid_profile_id
         FROM stories
         WHERE user_id = ?
         ORDER BY created_at DESC
@@ -185,6 +192,7 @@ async def list_stories(db: aiosqlite.Connection, user_id: int) -> list[StoryList
                 id=row["id"],
                 title=row["title"],
                 cover_image_url=row["cover_image_path"],
+                visibility=row["visibility"],
                 is_unlocked=bool(row["is_unlocked"]),
                 created_at=row["created_at"],
                 profile=profile,
@@ -306,3 +314,71 @@ async def update_panel_image(
 
     await db.commit()
     return True
+
+
+async def update_story_visibility(
+    db: aiosqlite.Connection, story_id: int, user_id: int, visibility: StoryVisibility
+) -> StoryResponse | None:
+    """Update the sharing visibility of an owned story."""
+    cursor = await db.execute("SELECT id FROM stories WHERE id = ? AND user_id = ?", (story_id, user_id))
+    if await cursor.fetchone() is None:
+        return None
+
+    await db.execute(
+        """
+        UPDATE stories
+        SET visibility = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE id = ? AND user_id = ?
+        """,
+        (visibility, story_id, user_id),
+    )
+    await db.commit()
+    return await get_story_by_id(db, story_id, user_id)
+
+
+async def list_shared_stories_for_friend(db: aiosqlite.Connection, owner_user_id: int) -> list[StoryListItem]:
+    """List all friend-shared stories for a given owner."""
+    cursor = await db.execute(
+        """
+        SELECT id, title, cover_image_path, visibility, is_unlocked, created_at, kid_profile_id
+        FROM stories
+        WHERE user_id = ? AND visibility = 'shared_with_friends'
+        ORDER BY created_at DESC
+        """,
+        (owner_user_id,),
+    )
+    rows = await cursor.fetchall()
+
+    results = []
+    for row in rows:
+        profile = await get_kid_profile(db, row["kid_profile_id"])
+        results.append(
+            StoryListItem(
+                id=row["id"],
+                title=row["title"],
+                cover_image_url=row["cover_image_path"],
+                visibility=row["visibility"],
+                is_unlocked=bool(row["is_unlocked"]),
+                created_at=row["created_at"],
+                profile=profile,
+            )
+        )
+    return results
+
+
+async def get_shared_story_by_id(db: aiosqlite.Connection, story_id: int, owner_user_id: int) -> StoryResponse | None:
+    """Get one story shared by a given owner."""
+    cursor = await db.execute(
+        """
+        SELECT * FROM stories
+        WHERE id = ? AND user_id = ? AND visibility = 'shared_with_friends'
+        """,
+        (story_id, owner_user_id),
+    )
+    row = await cursor.fetchone()
+    if not row:
+        return None
+
+    profile = await get_kid_profile(db, row["kid_profile_id"])
+    panels = await get_panels_for_story(db, story_id)
+    return _build_story_response(row, profile, panels)

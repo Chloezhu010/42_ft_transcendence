@@ -137,6 +137,12 @@ async def get_friendship_between(db, user_id: int, other_user_id: int) -> Row | 
         return await cursor.fetchone()  # return the friendship row or None if not found
 
 
+async def has_accepted_friendship(db, user_id: int, other_user_id: int) -> bool:
+    """Return True when the two users have an accepted friendship."""
+    friendship = await get_friendship_between(db, user_id, other_user_id)
+    return friendship is not None and friendship["status"] == "accepted"
+
+
 async def get_friend_view(db, viewer_id: int, other_user_id: int) -> Row | None:
     """Return a joined friendship+user row shaped for FriendResponse.
 
