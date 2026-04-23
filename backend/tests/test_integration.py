@@ -227,6 +227,7 @@ def test_story_full_lifecycle(client):
     assert r.status_code == 200, r.text
     story_id = r.json()["id"]
     assert r.json()["title"] == "Zara and the Dragon"
+    assert r.json()["visibility"] == "private"
 
     # List — new story appears
     listing = client.get("/api/stories", headers=alice_h).json()
@@ -270,8 +271,11 @@ def test_get_nonexistent_story_returns_404(client):
         ("POST", "/api/stories"),
         ("GET", "/api/stories/1"),
         ("PATCH", "/api/stories/1"),
+        ("PATCH", "/api/stories/1/visibility"),
         ("DELETE", "/api/stories/1"),
         ("PATCH", "/api/stories/1/panels/0"),
+        ("GET", "/api/friends/1/stories"),
+        ("GET", "/api/friends/1/stories/1"),
     ],
 )
 def test_protected_routes_reject_no_token(client, method, path):
@@ -394,6 +398,24 @@ def test_patch_story_updates_is_unlocked(client):
     assert r2.json()["is_unlocked"] is True
 
 
+def test_owner_can_update_story_visibility(client):
+    """PATCH /api/stories/{id}/visibility updates the story sharing state."""
+    _, alice_h = _signup(client, _ALICE)
+    story_id = client.post("/api/stories", json=_STORY_PAYLOAD, headers=alice_h).json()["id"]
+
+    r = client.patch(
+        f"/api/stories/{story_id}/visibility",
+        json={"visibility": "shared_with_friends"},
+        headers=alice_h,
+    )
+    assert r.status_code == 200, r.text
+    assert r.json()["visibility"] == "shared_with_friends"
+
+    listing = client.get("/api/stories", headers=alice_h)
+    assert listing.status_code == 200
+    assert listing.json()[0]["visibility"] == "shared_with_friends"
+
+
 def test_patch_story_nonexistent_returns_404(client):
     """PATCH on a story ID that doesn't exist must return 404."""
     _, alice_h = _signup(client, _ALICE)
@@ -484,6 +506,87 @@ def test_cannot_delete_another_users_story(client):
 
     # Alice's story must still exist
     assert client.get(f"/api/stories/{story_id}", headers=alice_h).status_code == 200
+
+
+def test_accepted_friend_can_list_and_open_shared_story(client):
+    """Accepted friends can browse only stories shared with friends."""
+    alice_id, alice_h = _signup(client, _ALICE)
+    bob_id, bob_h = _signup(client, _BOB)
+
+    client.post(f"/api/friends/{bob_id}", headers=alice_h)
+    client.post(f"/api/friends/{alice_id}/accept", headers=bob_h)
+
+    story_id = client.post("/api/stories", json=_STORY_PAYLOAD, headers=alice_h).json()["id"]
+    client.patch(
+        f"/api/stories/{story_id}/visibility",
+        json={"visibility": "shared_with_friends"},
+        headers=alice_h,
+    )
+
+    listing = client.get(f"/api/friends/{alice_id}/stories", headers=bob_h)
+    assert listing.status_code == 200
+    assert [story["id"] for story in listing.json()] == [story_id]
+
+    detail = client.get(f"/api/friends/{alice_id}/stories/{story_id}", headers=bob_h)
+    assert detail.status_code == 200
+    assert detail.json()["visibility"] == "shared_with_friends"
+
+
+def test_non_friend_cannot_list_shared_library(client):
+    """Only accepted friends can browse a user's shared library."""
+    alice_id, alice_h = _signup(client, _ALICE)
+    _, bob_h = _signup(client, _BOB)
+
+    story_id = client.post("/api/stories", json=_STORY_PAYLOAD, headers=alice_h).json()["id"]
+    client.patch(
+        f"/api/stories/{story_id}/visibility",
+        json={"visibility": "shared_with_friends"},
+        headers=alice_h,
+    )
+
+    listing = client.get(f"/api/friends/{alice_id}/stories", headers=bob_h)
+    assert listing.status_code == 404
+
+
+def test_accepted_friend_cannot_see_private_story(client):
+    """Friend library hides private stories from accepted friends."""
+    alice_id, alice_h = _signup(client, _ALICE)
+    bob_id, bob_h = _signup(client, _BOB)
+
+    client.post(f"/api/friends/{bob_id}", headers=alice_h)
+    client.post(f"/api/friends/{alice_id}/accept", headers=bob_h)
+
+    story_id = client.post("/api/stories", json=_STORY_PAYLOAD, headers=alice_h).json()["id"]
+
+    listing = client.get(f"/api/friends/{alice_id}/stories", headers=bob_h)
+    assert listing.status_code == 200
+    assert listing.json() == []
+
+    detail = client.get(f"/api/friends/{alice_id}/stories/{story_id}", headers=bob_h)
+    assert detail.status_code == 404
+
+
+def test_unfriending_immediately_removes_shared_story_access(client):
+    """Removing the friendship cuts off access to previously shared stories."""
+    alice_id, alice_h = _signup(client, _ALICE)
+    bob_id, bob_h = _signup(client, _BOB)
+
+    client.post(f"/api/friends/{bob_id}", headers=alice_h)
+    client.post(f"/api/friends/{alice_id}/accept", headers=bob_h)
+
+    story_id = client.post("/api/stories", json=_STORY_PAYLOAD, headers=alice_h).json()["id"]
+    client.patch(
+        f"/api/stories/{story_id}/visibility",
+        json={"visibility": "shared_with_friends"},
+        headers=alice_h,
+    )
+
+    assert client.get(f"/api/friends/{alice_id}/stories", headers=bob_h).status_code == 200
+
+    remove = client.delete(f"/api/friends/{alice_id}", headers=bob_h)
+    assert remove.status_code == 200
+
+    assert client.get(f"/api/friends/{alice_id}/stories", headers=bob_h).status_code == 404
 
 
 # ---------------------------------------------------------------------------
