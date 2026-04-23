@@ -41,11 +41,7 @@ async def search_users_by_username(
     if not normalized_query:
         return []
     safe_limit = max(1, min(limit, 20))
-    escaped_query = (
-        normalized_query.replace("\\", "\\\\")
-        .replace("%", "\\%")
-        .replace("_", "\\_")
-    )
+    escaped_query = normalized_query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
     like_pattern = f"%{escaped_query}%"
     async with db.execute(
         """
@@ -57,7 +53,8 @@ async def search_users_by_username(
         (current_user_id, like_pattern, safe_limit),
     ) as cursor:
         return await cursor.fetchall()
-    
+
+
 # --- User profile management ---
 async def update_user(
     db: aiosqlite.Connection, user_id: int, username: str | None = None, email: str | None = None

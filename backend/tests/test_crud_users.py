@@ -175,6 +175,7 @@ async def test_search_users_by_username_clamps_limit(db):
     floored = await search_users_by_username(db, "user", current_user_id=searcher_id, limit=0)
     assert len(floored) == 1
 
+
 @pytest.mark.asyncio
 async def test_search_users_by_username_escapes_like_wildcards(db):
     searcher_id = await create_user(db, "searcher", "s@example.com", "password123")
