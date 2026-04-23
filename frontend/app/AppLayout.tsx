@@ -2,8 +2,10 @@
  * Shared application shell around all pages.
  */
 import { Link, Outlet, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/app/auth';
 import StorageImage from '@/components/StorageImage';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 function isMarketingRoute(pathname: string): boolean {
   return pathname === '/' || pathname === '/privacy' || pathname === '/terms';
@@ -18,6 +20,7 @@ function getMainClassName(pathname: string): string {
 }
 
 function AppLayout(): JSX.Element {
+  const { t } = useTranslation();
   const location = useLocation();
   const { currentUser } = useAuth();
 
@@ -37,6 +40,7 @@ function AppLayout(): JSX.Element {
           </Link>
 
           <div className="flex items-center gap-2 text-sm font-bold">
+            <LanguageSwitcher />
             {showCreateLink ? (
               <Link
                 to="/create"
@@ -49,7 +53,7 @@ function AppLayout(): JSX.Element {
               to="/gallery"
               className="text-brand-muted hover:text-brand-primary transition-colors px-4 py-2 rounded-full hover:bg-brand-light"
             >
-              My Library
+              {t('app.myLibrary')}
             </Link>
             <Link
               to="/friends"

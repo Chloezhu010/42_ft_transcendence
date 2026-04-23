@@ -1,0 +1,100 @@
+{
+  "app": {
+    "myLibrary": "Ma Bibliothèque"
+  },
+  "comicPanel": {
+    "paintingScene": "Peindre une Scène...",
+    "magicRevision": "Révision Magique",
+    "requestChange": "Demander une modification pour cette scène spécifique.",
+    "magicFailed": "Oups! La magie a échoué. Réessayez.",
+    "awaitingVision": "En attente de Vision",
+    "editScene": "Modifier la Scène",
+    "editPlaceholder": "p.ex. Ajouter un petit robot curieux regardant la carte...",
+    "close": "Fermer",
+    "applyMagic": "Appliquer la Magie ✨"
+  },
+  "galleryPage": {
+    "mySavedBooks": "Mes Livres Sauvegardés",
+    "noStoriesFound": "Aucune histoire trouvée pour le moment.",
+    "readNow": "LIRE MAINTENANT",
+    "untitledMasterpiece": "Chef-d'œuvre sans titre",
+    "deleteStory": "Êtes-vous sûr de vouloir supprimer cette histoire? Cela ne peut pas être annulé."
+  },
+  "kidWizard": {
+    "heroQuestion": "Qui est le Héros?",
+    "appearance": "Apparence",
+    "photoOptional": "Photo (Optionnel)",
+    "uploadPhoto": "Télécharger une Photo",
+    "roleArchetype": "Rôle et Archétype",
+    "grandDream": "Le Grand Rêve",
+    "stylePalette": "Votre Style et Palette",
+    "artStyle": "Style Artistique",
+    "favoriteColor": "Couleur Préférée",
+    "continue": "Continuer",
+    "createStory": "Créer Mon Histoire ✨",
+    "steps": {
+      "hero": "Héros",
+      "look": "Allure",
+      "role": "Rôle",
+      "dream": "Rêve",
+      "style": "Style"
+    },
+    "genders": {
+      "boy": "Garçon",
+      "girl": "Fille",
+      "neutral": "Neutre"
+    },
+    "heroNamePlaceholder": "Nom du Héros...",
+    "skinTone": "Couleur de peau",
+    "hairColor": "Couleur des cheveux",
+    "eyeColor": "Couleur des yeux",
+    "archetypes": {
+      "explorer": {
+        "label": "Explorateur Courageux",
+        "description": "Cherche l'aventure."
+      },
+      "inventor": {
+        "label": "Inventeur",
+        "description": "Résout les problèmes."
+      },
+      "guardian": {
+        "label": "Gardien",
+        "description": "Protège les autres."
+      },
+      "dreamer": {
+        "label": "Rêveur",
+        "description": "Rend la magie réelle."
+      }
+    },
+    "dreamPlaceholder": "p.ex. Explorer une planète faite de bonbons...",
+    "artStyles": {
+      "classic": {
+        "label": "Bande Dessinée Classique",
+        "description": "Lignes nettes et couleurs vives"
+      },
+      "watercolor": {
+        "label": "Aquarelle",
+        "description": "Esthétique douce et rêveuse"
+      },
+      "pencil": {
+        "label": "Croquis au Crayon",
+        "description": "Le charme du dessin à la main"
+      },
+      "digital": {
+        "label": "Pop Numérique",
+        "description": "Moderne et audacieux"
+      }
+    },
+    "back": "Retour"
+  },
+  "magicLoader": {
+    "bindingTale": "Lier l'Histoire...",
+    "paintingInteractions": "Peindre les interactions cinématiques et construire l'héritage de votre héros"
+  },
+  "mainPage": {
+    "title": "Sa Propre <accent>Légende</accent>",
+    "transformStories": "Transformez les histoires du soir en expériences de bandes dessinées cinématiques.",
+    "startAdventure": "Commencez Votre Aventure",
+    "viewLibrary": "Voir la Bibliothèque"
+  }
+}

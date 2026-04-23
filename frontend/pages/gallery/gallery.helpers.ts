@@ -3,8 +3,8 @@ import type { StoryVisibility } from '@api';
 /**
  * Small pure helpers for gallery display text.
  */
-export function getStoryDisplayTitle(title: string | null): string {
-  return title || 'Untitled Masterpiece';
+export function getStoryDisplayTitle(title: string | null, fallbackTitle: string): string {
+  return title || fallbackTitle;
 }
 
 export function formatStoryDate(createdAt: string): string {

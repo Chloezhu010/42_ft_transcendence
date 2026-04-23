@@ -1,0 +1,100 @@
+{
+  "app": {
+    "myLibrary": "私のライブラリ"
+  },
+  "comicPanel": {
+    "paintingScene": "シーンを描画中...",
+    "magicRevision": "魔法の修正",
+    "requestChange": "この特定のシーンの変更をリクエストします。",
+    "magicFailed": "あぁ！魔法が失敗しました。もう一度試してください。",
+    "awaitingVision": "ビジョンを待っています",
+    "editScene": "シーンを編集",
+    "editPlaceholder": "例 好奇心旺盛な小さなロボットが地図を見ています...",
+    "close": "閉じる",
+    "applyMagic": "魔法を適用✨"
+  },
+  "galleryPage": {
+    "mySavedBooks": "保存された書籍",
+    "noStoriesFound": "まだストーリーが見つかりません。",
+    "readNow": "今読む",
+    "untitledMasterpiece": "無題の傑作",
+    "deleteStory": "このストーリーを削除してもよろしいですか？これは元に戻すことはできません。"
+  },
+  "kidWizard": {
+    "heroQuestion": "ヒーローは誰ですか？",
+    "appearance": "外観",
+    "photoOptional": "写真（オプション）",
+    "uploadPhoto": "写真をアップロード",
+    "roleArchetype": "役割とアーキタイプ",
+    "grandDream": "大いなる夢",
+    "stylePalette": "あなたのスタイルと色合い",
+    "artStyle": "アートスタイル",
+    "favoriteColor": "好きな色",
+    "continue": "続行",
+    "createStory": "私のストーリーを作成✨",
+    "steps": {
+      "hero": "ヒーロー",
+      "look": "外見",
+      "role": "役割",
+      "dream": "夢",
+      "style": "スタイル"
+    },
+    "genders": {
+      "boy": "男の子",
+      "girl": "女の子",
+      "neutral": "中立"
+    },
+    "heroNamePlaceholder": "ヒーローの名前...",
+    "skinTone": "肌の色",
+    "hairColor": "髪の色",
+    "eyeColor": "目の色",
+    "archetypes": {
+      "explorer": {
+        "label": "勇敢な探検家",
+        "description": "冒険を求める。"
+      },
+      "inventor": {
+        "label": "発明家",
+        "description": "問題を解決する。"
+      },
+      "guardian": {
+        "label": "ガーディアン",
+        "description": "他人を守る。"
+      },
+      "dreamer": {
+        "label": "夢想家",
+        "description": "魔法を現実にする。"
+      }
+    },
+    "dreamPlaceholder": "例：キャンディでできた惑星を探検する...",
+    "artStyles": {
+      "classic": {
+        "label": "クラシックコミック",
+        "description": "太い線、鮮やかな色"
+      },
+      "watercolor": {
+        "label": "水彩画",
+        "description": "柔らかく夢のような美しさ"
+      },
+      "pencil": {
+        "label": "鉛筆スケッチ",
+        "description": "手描きの魅力"
+      },
+      "digital": {
+        "label": "デジタルポップ",
+        "description": "モダンで大胆"
+      }
+    },
+    "back": "戻る"
+  },
+  "magicLoader": {
+    "bindingTale": "物語を結合中...",
+    "paintingInteractions": "映画的なインタラクションを描き、あなたのヒーローの遺産を構築する"
+  },
+  "mainPage": {
+    "title": "君だけの<accent>英雄伝</accent>",
+    "transformStories": "就寝時のストーリーを映画的なコミックブックの経験に変えます。",
+    "startAdventure": "冒険を開始",
+    "viewLibrary": "ライブラリを表示"
+  }
+}

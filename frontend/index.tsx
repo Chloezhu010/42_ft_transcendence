@@ -1,21 +1,19 @@
-/**
- * Frontend entrypoint. Mounts the app and global browser-only providers.
- */
 import { StrictMode } from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+import './i18n';
 import { Toaster } from 'sonner';
 import { App } from '@/app';
 import { AuthProvider } from '@/app/auth';
 import './styles.css';
 
 const rootElement = document.getElementById('root');
+
 if (!rootElement) {
-  throw new Error("Could not find root element to mount to");
+  throw new Error('Root element with id "root" was not found.');
 }
 
-const root = ReactDOM.createRoot(rootElement);
-root.render(
+createRoot(rootElement).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
@@ -31,5 +29,5 @@ root.render(
         />
       </AuthProvider>
     </BrowserRouter>
-  </StrictMode>
+  </StrictMode>,
 );

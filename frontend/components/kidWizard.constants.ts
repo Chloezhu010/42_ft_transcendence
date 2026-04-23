@@ -6,9 +6,11 @@ export interface ColorOption {
   hex: string;
 }
 
+export type WizardStepTranslationKey = 'hero' | 'look' | 'role' | 'dream' | 'style';
+
 export interface WizardStepDefinition {
   step: number;
-  label: string;
+  translationKey: WizardStepTranslationKey;
   icon: string;
 }
 
@@ -75,11 +77,11 @@ export const ART_STYLES = [
 ] as const;
 
 export const STEP_LABELS: WizardStepDefinition[] = [
-  { step: 1, label: 'Hero', icon: '🦸' },
-  { step: 2, label: 'Look', icon: '👤' },
-  { step: 3, label: 'Role', icon: '🎭' },
-  { step: 4, label: 'Dream', icon: '💭' },
-  { step: 5, label: 'Style', icon: '🎨' },
+  { step: 1, translationKey: 'hero', icon: '🦸' },
+  { step: 2, translationKey: 'look', icon: '👤' },
+  { step: 3, translationKey: 'role', icon: '🎭' },
+  { step: 4, translationKey: 'dream', icon: '💭' },
+  { step: 5, translationKey: 'style', icon: '🎨' },
 ];
 
 export const GENDERS: GenderOption[] = ['boy', 'girl', 'neutral'];

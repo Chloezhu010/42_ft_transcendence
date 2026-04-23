@@ -19,15 +19,17 @@ const STYLES: Record<Variant, string> = {
 };
 
 function getTypographyTag(variant: Variant): 'h1' | 'h2' | 'h3' | 'h4' | 'label' | 'p' {
-  if (variant.startsWith('h')) {
-    return variant;
+  switch (variant) {
+    case 'h1':
+    case 'h2':
+    case 'h3':
+    case 'h4':
+      return variant;
+    case 'label':
+      return 'label';
+    default:
+      return 'p';
   }
-
-  if (variant === 'label') {
-    return 'label';
-  }
-
-  return 'p';
 }
 
 export function Typography({

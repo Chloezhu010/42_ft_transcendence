@@ -4,6 +4,7 @@
  */
 import { Link } from 'react-router-dom';
 import type { StoryListItem, StoryVisibility } from '@api';
+import { useTranslation } from 'react-i18next';
 import StorageImage from '@/components/StorageImage';
 import { formatStoryDate, getStoryDisplayTitle, getVisibilityLabel } from './gallery.helpers';
 import { useGalleryPage } from './useGalleryPage';
@@ -15,6 +16,9 @@ interface StoryCardProps {
 }
 
 function StoryCard({ story, onDeleteStory, onUpdateVisibility }: StoryCardProps): JSX.Element {
+  const { t } = useTranslation();
+  const fallbackTitle = t('galleryPage.untitledMasterpiece');
+  const displayTitle = getStoryDisplayTitle(story.title, fallbackTitle);
   return (
     <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden group border-2 border-gray-100 hover:border-purple-200 transition-all hover:-translate-y-1 relative">
       <button
@@ -30,7 +34,7 @@ function StoryCard({ story, onDeleteStory, onUpdateVisibility }: StoryCardProps)
         {story.cover_image_url ? (
           <StorageImage
             src={story.cover_image_url}
-            alt={getStoryDisplayTitle(story.title)}
+            alt={displayTitle}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
         ) : (
@@ -42,14 +46,14 @@ function StoryCard({ story, onDeleteStory, onUpdateVisibility }: StoryCardProps)
             to={`/book/${story.id}`}
             className="px-8 py-3 bg-white text-purple-900 font-black rounded-full shadow-xl transform scale-90 group-hover:scale-100 transition-all"
           >
-            READ NOW
+            {t('galleryPage.readNow')}
           </Link>
         </div>
       </div>
 
       <div className="p-5">
         <h3 className="text-xl font-black text-gray-800 leading-tight mb-2 line-clamp-2">
-          {getStoryDisplayTitle(story.title)}
+          {displayTitle}
         </h3>
 
         <div className="mb-4">
@@ -89,11 +93,12 @@ function StoryCard({ story, onDeleteStory, onUpdateVisibility }: StoryCardProps)
 
 function GalleryPage(): JSX.Element {
   const { isLoading, onDeleteStory, onUpdateVisibility, stories } = useGalleryPage();
+  const { t } = useTranslation();
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 animate-in fade-in duration-700">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-4xl font-black text-gray-800">My Saved Books</h2>
+        <h2 className="text-4xl font-black text-gray-800">{t('galleryPage.mySavedBooks')}</h2>
       </div>
 
       {isLoading ? (
@@ -113,7 +118,7 @@ function GalleryPage(): JSX.Element {
 
           {stories.length === 0 && (
             <div className="col-span-full text-center py-20 text-gray-400">
-              <p className="text-xl font-medium italic">No stories found yet.</p>
+              <p className="text-xl font-medium italic">{t('galleryPage.noStoriesFound')}</p>
             </div>
           )}
         </div>

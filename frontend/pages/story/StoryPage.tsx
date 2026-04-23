@@ -2,6 +2,7 @@
  * Story page container.
  * Selects the active screen and feeds pure props into presentational components.
  */
+import { Trans, useTranslation } from 'react-i18next';
 import KidWizard from '@/components/KidWizard';
 import MagicLoader from '@/components/MagicLoader';
 import PreviewView from '@/components/PreviewView';
@@ -13,16 +14,22 @@ import { StoryPageView } from './story.types';
 
 function StoryPage(): JSX.Element | null {
   const { access, actions, introStream, profile, story, view, wizard } = useStoryPage();
+  const { t } = useTranslation();
 
   if (view === StoryPageView.Onboarding) {
     return (
       <div className="animate-in fade-in slide-in-from-top-4 duration-700">
         <div className="text-center mb-10">
           <Heading variant="h1" className="mb-4 text-brand-dark">
-            Your Child&apos;s <span className="text-brand-primary underline decoration-brand-accent decoration-8">Legend</span>
+            <Trans
+              i18nKey="mainPage.title"
+              components={{
+                accent: <span className="text-brand-primary underline decoration-brand-accent decoration-8" />
+              }}
+            />
           </Heading>
           <Text className="text-brand-muted italic">
-            Transform bedtime stories into cinematic comic book experiences.
+            {t('mainPage.transformStories')}
           </Text>
         </div>
 

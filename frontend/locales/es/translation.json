@@ -1,0 +1,100 @@
+{
+  "app": {
+    "myLibrary": "Mi Biblioteca"
+  },
+  "comicPanel": {
+    "paintingScene": "Pintando Escena...",
+    "magicRevision": "Revisión Mágica",
+    "requestChange": "Solicitar un cambio para esta escena específica.",
+    "magicFailed": "¡Oops! La magia falló. Inténtalo de nuevo.",
+    "awaitingVision": "Esperando Visión",
+    "editScene": "Editar Escena",
+    "editPlaceholder": "p.ej. Añadir un pequeño robot curioso mirando el mapa...",
+    "close": "Cerrar",
+    "applyMagic": "Aplicar Magia ✨"
+  },
+  "galleryPage": {
+    "mySavedBooks": "Mis Libros Guardados",
+    "noStoriesFound": "Ninguna historia encontrada aún.",
+    "readNow": "LEER AHORA",
+    "untitledMasterpiece": "Obra Maestra sin Título",
+    "deleteStory": "¿Está seguro de que desea eliminar esta historia? Esto no se puede deshacer."
+  },
+  "kidWizard": {
+    "heroQuestion": "¿Quién es el Héroe?",
+    "appearance": "Apariencia",
+    "photoOptional": "Foto (Opcional)",
+    "uploadPhoto": "Subir Foto",
+    "roleArchetype": "Rol y Arquetipo",
+    "grandDream": "El Gran Sueño",
+    "stylePalette": "Tu Estilo y Paleta",
+    "artStyle": "Estilo Artístico",
+    "favoriteColor": "Color Favorito",
+    "continue": "Continuar",
+    "createStory": "Crear Mi Historia ✨",
+    "steps": {
+      "hero": "Héroe",
+      "look": "Aspecto",
+      "role": "Rol",
+      "dream": "Sueño",
+      "style": "Estilo"
+    },
+    "genders": {
+      "boy": "Niño",
+      "girl": "Niña",
+      "neutral": "Neutral"
+    },
+    "heroNamePlaceholder": "Nombre del héroe...",
+    "skinTone": "Tono de piel",
+    "hairColor": "Color de cabello",
+    "eyeColor": "Color de ojos",
+    "archetypes": {
+      "explorer": {
+        "label": "Explorador Valiente",
+        "description": "Busca aventuras."
+      },
+      "inventor": {
+        "label": "Inventor",
+        "description": "Resuelve problemas."
+      },
+      "guardian": {
+        "label": "Guardián",
+        "description": "Protege a los demás."
+      },
+      "dreamer": {
+        "label": "Soñador",
+        "description": "Hace la magia real."
+      }
+    },
+    "dreamPlaceholder": "p.ej. Explorar un planeta hecho de caramelo...",
+    "artStyles": {
+      "classic": {
+        "label": "Cómic Clásico",
+        "description": "Líneas gruesas, colores vibrantes"
+      },
+      "watercolor": {
+        "label": "Acuarela",
+        "description": "Estética suave y de ensueño"
+      },
+      "pencil": {
+        "label": "Boceto a Lápiz",
+        "description": "El encanto de lo dibujado a mano"
+      },
+      "digital": {
+        "label": "Pop Digital",
+        "description": "Moderno y atrevido"
+      }
+    },
+    "back": "Atrás"
+  },
+  "magicLoader": {
+    "bindingTale": "Vinculando la Historia...",
+    "paintingInteractions": "Pintando interacciones cinematográficas y construyendo el legado de tu héroe"
+  },
+  "mainPage": {
+    "title": "Su Propia <accent>Leyenda</accent>",
+    "transformStories": "Transforma las historias de antes de dormir en experiencias de cómics cinematográficos.",
+    "startAdventure": "Comienza Tu Aventura",
+    "viewLibrary": "Ver Biblioteca"
+  }
+}
