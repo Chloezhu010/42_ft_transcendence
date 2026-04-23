@@ -12,7 +12,7 @@ import { useStoryPage } from './useStoryPage';
 import { StoryPageView } from './story.types';
 
 function StoryPage(): JSX.Element | null {
-  const { actions, introStream, profile, story, view, wizard } = useStoryPage();
+  const { access, actions, introStream, profile, story, view, wizard } = useStoryPage();
 
   if (view === StoryPageView.Onboarding) {
     return (
@@ -62,6 +62,8 @@ function StoryPage(): JSX.Element | null {
         onEditPanelImage={actions.onEditPanelImage}
         onGenerate={actions.onGenerateFullStory}
         onStartOver={actions.onStartOver}
+        isReadOnly={access.isReadOnly}
+        ownerUserId={access.ownerUserId}
       />
     );
   }
@@ -72,6 +74,8 @@ function StoryPage(): JSX.Element | null {
         story={story}
         profile={profile}
         onEditPanelImage={actions.onEditPanelImage}
+        isReadOnly={access.isReadOnly}
+        ownerUserId={access.ownerUserId}
       />
     );
   }

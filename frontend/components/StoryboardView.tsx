@@ -14,6 +14,8 @@ interface StoryboardViewProps {
   story: Story;
   profile: KidProfile | null;
   onEditPanelImage: (panel: ComicPanelData, editPrompt: string) => Promise<void> | void;
+  isReadOnly?: boolean;
+  ownerUserId?: number | null;
 }
 
 interface StoryboardNavButtonProps {
@@ -137,8 +139,15 @@ function StoryboardProgress({
   );
 }
 
-function StoryboardView({ story, profile, onEditPanelImage }: StoryboardViewProps): JSX.Element {
+function StoryboardView({
+  story,
+  profile,
+  onEditPanelImage,
+  isReadOnly = false,
+  ownerUserId = null,
+}: StoryboardViewProps): JSX.Element {
   const [currentPage, setCurrentPage] = useState(0);
+  const backHref = ownerUserId ? `/friends/${ownerUserId}/library` : '/gallery';
 
   const displayedPanelCount = story.panels.length || 10;
   const spreadsNeeded = Math.ceil((displayedPanelCount + 2) / 2);
@@ -168,7 +177,7 @@ function StoryboardView({ story, profile, onEditPanelImage }: StoryboardViewProp
   ) : (
     <ComicPanel
       panel={leftPanel}
-      onEditImage={(editPrompt) => onEditPanelImage(leftPanel, editPrompt)}
+      onEditImage={isReadOnly ? undefined : (editPrompt) => onEditPanelImage(leftPanel, editPrompt)}
     />
   );
 
@@ -182,17 +191,25 @@ function StoryboardView({ story, profile, onEditPanelImage }: StoryboardViewProp
   ) : (
     <ComicPanel
       panel={rightPanel}
-      onEditImage={(editPrompt) => onEditPanelImage(rightPanel, editPrompt)}
+      onEditImage={isReadOnly ? undefined : (editPrompt) => onEditPanelImage(rightPanel, editPrompt)}
     />
   );
 
   return (
     <div className="flex-1 flex flex-col animate-in fade-in duration-700 h-[calc(100vh-140px)] relative">
       <div className="absolute top-4 left-4 z-30">
-        <Link to="/gallery" className="text-sm font-bold text-brand-muted hover:text-brand-primary flex items-center gap-2 transition-colors bg-white/80 backdrop-blur-sm py-3 px-6 rounded-full shadow-soft border-2 border-brand-primary/10">
+        <Link to={backHref} className="text-sm font-bold text-brand-muted hover:text-brand-primary flex items-center gap-2 transition-colors bg-white/80 backdrop-blur-sm py-3 px-6 rounded-full shadow-soft border-2 border-brand-primary/10">
           <span>←</span> Back to Library
         </Link>
       </div>
+
+      {isReadOnly ? (
+        <div className="absolute top-4 right-4 z-30">
+          <div className="bg-white/90 backdrop-blur-sm py-2 px-4 rounded-full shadow-soft border border-brand-secondary/20">
+            <Label className="text-brand-primary uppercase tracking-widest">Read Only</Label>
+          </div>
+        </div>
+      ) : null}
 
       <StoryboardNavButton direction="previous" disabled={isFrontCover} onClick={() => navigate(-1)} />
       <StoryboardNavButton direction="next" disabled={isBackCover} onClick={() => navigate(1)} />
@@ -229,7 +246,7 @@ function StoryboardView({ story, profile, onEditPanelImage }: StoryboardViewProp
               <div className="text-7xl mb-8">✨</div>
               <Heading variant="h3" className="text-white mb-4">Your Story is Complete</Heading>
               <Text className="text-brand-surface mb-10 italic">
-                <strong>{story.title}</strong> is ready to enjoy anytime in your library.
+                <strong>{story.title}</strong> is ready to enjoy anytime{isReadOnly ? ' in this shared library.' : ' in your library.'}
               </Text>
               <div className="mt-8 flex flex-col items-center gap-2">
                 <button type="button" onClick={() => navigate(-1)} className="text-brand-surface/60 font-bold uppercase text-[10px] tracking-widest hover:text-white transition-colors">Re-read Tale</button>

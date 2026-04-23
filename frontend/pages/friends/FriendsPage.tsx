@@ -3,12 +3,14 @@
  * Displays pending requests, read-only user discovery, and current friends.
  * Data flows through useFriendsPage; this file stays focused on layout.
  */
+import { useNavigate } from 'react-router-dom';
 import { useFriendsPage } from './useFriendsPage';
 import { FriendRow } from '@/components/friends/FriendRow';
 import { PendingRequestRow } from '@/components/friends/PendingRequestRow';
 import { SearchUserRow } from '@/components/friends/SearchUserRow';
 
 export function FriendsPage(): JSX.Element {
+  const navigate = useNavigate();
   const {
     friends,
     pendingIncoming,
@@ -39,6 +41,10 @@ export function FriendsPage(): JSX.Element {
 
   function handleRemove(friendId: number): void {
     void removeFriend(friendId);
+  }
+
+  function handleOpenLibrary(friendId: number): void {
+    navigate(`/friends/${friendId}/library`);
   }
 
   if (isLoading) {
@@ -152,6 +158,7 @@ export function FriendsPage(): JSX.Element {
                     <li key={friend.id}>
                         <FriendRow
                             friend={friend}
+                            onOpenLibrary={handleOpenLibrary}
                             onRemove={handleRemove}
                             isRemoving={pendingActionIds.has(friend.id)}
                         />

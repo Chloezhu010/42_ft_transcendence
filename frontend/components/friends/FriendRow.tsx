@@ -6,11 +6,12 @@ import StorageImage from '@/components/StorageImage';
 
 interface FriendRowProps {
   friend: FriendResponse;
+  onOpenLibrary?: (friendId: number) => void;
   onRemove?: (friendId: number) => void;
   isRemoving?: boolean;
 }
 
-export function FriendRow({ friend, onRemove, isRemoving = false }: FriendRowProps): JSX.Element {
+export function FriendRow({ friend, onOpenLibrary, onRemove, isRemoving = false }: FriendRowProps): JSX.Element {
   const avatarFallback = friend.username.charAt(0).toUpperCase();
   const onlineLabel = friend.is_online ? 'Online' : 'Offline';
 
@@ -28,10 +29,24 @@ export function FriendRow({ friend, onRemove, isRemoving = false }: FriendRowPro
         )}
       </div>
 
-      <div className="min-w-0">
+      <button
+        type="button"
+        onClick={() => onOpenLibrary?.(friend.id)}
+        className="min-w-0 text-left transition-colors hover:text-brand-primary"
+      >
         <p className="truncate text-lg font-semibold text-brand-dark">{friend.username}</p>
         <p className="text-sm text-brand-muted">{onlineLabel}</p>
-      </div>
+      </button>
+
+      {onOpenLibrary ? (
+        <button
+          type="button"
+          onClick={() => onOpenLibrary(friend.id)}
+          className="rounded-full border border-brand-primary/20 px-4 py-2 text-sm font-semibold text-brand-primary transition-colors hover:border-brand-primary hover:bg-white"
+        >
+          View Library
+        </button>
+      ) : null}
 
       {onRemove ? (
         <button

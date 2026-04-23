@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { FriendsPage } from '@/pages/friends';
@@ -79,7 +80,11 @@ describe('FriendsPage', () => {
   });
 
   it('keeps sent requests out of the incoming pending section', async () => {
-    render(<FriendsPage />);
+    render(
+      <MemoryRouter>
+        <FriendsPage />
+      </MemoryRouter>,
+    );
 
     await waitFor(() => {
       expect(mockGetPendingFriendRequests).toHaveBeenCalledWith('friends-token');
@@ -112,5 +117,50 @@ describe('FriendsPage', () => {
     const pendingQueries = within(pendingSection as HTMLElement);
     expect(pendingQueries.getByText('bob')).toBeInTheDocument();
     expect(pendingQueries.queryByText('alice')).not.toBeInTheDocument();
+  });
+
+  it('navigates to a friend library when clicking an accepted friend row action', async () => {
+    mockGetFriends.mockResolvedValue([
+      {
+        id: 7,
+        username: 'dora',
+        avatar_url: null,
+        is_online: true,
+        friendship_status: 'accepted',
+        is_requester: true,
+      },
+    ]);
+
+    function LocationProbe(): JSX.Element {
+      const location = useLocation();
+      return <div data-testid="location">{location.pathname}</div>;
+    }
+
+    render(
+      <MemoryRouter initialEntries={['/friends']}>
+        <Routes>
+          <Route
+            path="/friends"
+            element={(
+              <>
+                <FriendsPage />
+                <LocationProbe />
+              </>
+            )}
+          />
+          <Route path="/friends/:userId/library" element={<LocationProbe />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(mockGetFriends).toHaveBeenCalledWith('friends-token');
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'View Library' }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('location')).toHaveTextContent('/friends/7/library');
+    });
   });
 });

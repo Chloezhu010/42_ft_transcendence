@@ -5,6 +5,7 @@
 import { useEffect } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { LoginPage, SignupPage } from '@/pages/auth';
+import { FriendLibraryPage } from '@/pages/friend-library';
 import { GalleryPage } from '@/pages/gallery';
 import { LandingPage } from '@/pages/landing';
 import { LegalPage } from '@/pages/legal';
@@ -39,6 +40,8 @@ export function App(): JSX.Element {
             <Route path="/gallery" element={<GalleryPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/friends" element={<FriendsPage />} />
+            <Route path="/friends/:userId/library" element={<FriendLibraryPage />} />
+            <Route path="/friends/:userId/library/:id" element={<StoryPage />} />
           </Route>
         </Route>
         <Route path="/login" element={<LoginPage />} />
