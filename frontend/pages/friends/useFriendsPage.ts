@@ -5,6 +5,7 @@
  */
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useAuth } from "@/app/auth";
+import type { FriendResponse, PublicUserResponse } from "@api";
 import {
     getFriends,
     getPendingFriendRequests,
@@ -12,11 +13,9 @@ import {
     sendFriendRequest,
     acceptFriendRequest,
     removeFriend as removeFriendApi,
-    FriendResponse,
-    PublicUserResponse,
     searchUsers,
 } from "@api";
-import { SearchUserResult } from "./friends.types";
+import type { SearchUserResult } from "@/components/friends/friends.types";
 
 // ----------------------------------------------------
 // Mock toggle and data for testing UI without backend

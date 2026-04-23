@@ -61,7 +61,7 @@ function StoryCard({ story, onDeleteStory, onUpdateVisibility }: StoryCardProps)
             Sharing
           </label>
           <select
-            aria-label={`Sharing for ${getStoryDisplayTitle(story.title)}`}
+            aria-label={`Sharing for ${getStoryDisplayTitle(story.title, fallbackTitle)}`}
             value={story.visibility}
             onChange={(event) => void onUpdateVisibility(story.id, event.target.value as StoryVisibility)}
             className="w-full rounded-xl border border-purple-200 bg-purple-50 px-3 py-2 text-sm font-semibold text-purple-900 outline-none focus:border-purple-400"

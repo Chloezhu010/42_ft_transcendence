@@ -250,7 +250,7 @@ function StoryboardView({
               </Text>
               <div className="mt-8 flex flex-col items-center gap-2">
                 <button type="button" onClick={() => navigate(-1)} className="text-brand-surface/60 font-bold uppercase text-[10px] tracking-widest hover:text-white transition-colors">Re-read Tale</button>
-                <Link to="/gallery" className="text-brand-surface/40 font-bold uppercase text-[10px] tracking-widest hover:text-white transition-colors border-b border-brand-surface/20 pb-0.5">Back to Library</Link>
+                <Link to={backHref} className="text-brand-surface/40 font-bold uppercase text-[10px] tracking-widest hover:text-white transition-colors border-b border-brand-surface/20 pb-0.5">Back to Library</Link>
               </div>
               <div className="absolute right-0 top-0 bottom-0 w-4 bg-black/20" />
             </div>

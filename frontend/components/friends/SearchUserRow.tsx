@@ -2,7 +2,7 @@
  * Render a single search result user with relationship-aware action.
  */
 import StorageImage from '@/components/StorageImage';
-import type { SearchUserResult } from '@/pages/friends/friends.types';
+import type { SearchUserResult } from '@/components/friends/friends.types';
 
 interface SearchUserRowProps {
     user: SearchUserResult;

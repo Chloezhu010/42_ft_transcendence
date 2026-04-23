@@ -1,11 +1,11 @@
 /**
  * Render a single incoming pending friend request
  */
-import type { FriendResponse } from '@api';
+import type { FriendUser } from '@/components/friends/friends.types';
 import StorageImage from '@/components/StorageImage';
 
 interface PendingRequestRowProps {
-  request: FriendResponse;
+  request: FriendUser;
   onAccept?: (userId: number) => void;
   onDecline?: (userId: number) => void;
   isActing?: boolean;

@@ -60,7 +60,11 @@ export function useGalleryPage(): UseGalleryPageResult {
   const handleUpdateVisibility = useCallback(async (storyId: number, visibility: StoryVisibility) => {
     if (!accessToken) return;
 
-    const previousStories = stories;
+    const previousStory = stories.find((story) => story.id === storyId);
+    if (!previousStory) {
+      return;
+    }
+
     setStories((currentStories) => currentStories.map((story) => (
       story.id === storyId ? { ...story, visibility } : story
     )));
@@ -72,7 +76,9 @@ export function useGalleryPage(): UseGalleryPageResult {
       )));
     } catch (error) {
       console.error('Failed to update story visibility:', error);
-      setStories(previousStories);
+      setStories((currentStories) => currentStories.map((story) => (
+        story.id === storyId ? { ...story, visibility: previousStory.visibility } : story
+      )));
       toast.error('Failed to update story sharing.');
     }
   }, [accessToken, stories]);

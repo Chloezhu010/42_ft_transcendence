@@ -1,11 +1,11 @@
 /**
  * Render a single accepted friend
  */
-import type { FriendResponse } from '@api';
+import type { FriendUser } from '@/components/friends/friends.types';
 import StorageImage from '@/components/StorageImage';
 
 interface FriendRowProps {
-  friend: FriendResponse;
+  friend: FriendUser;
   onOpenLibrary?: (friendId: number) => void;
   onRemove?: (friendId: number) => void;
   isRemoving?: boolean;

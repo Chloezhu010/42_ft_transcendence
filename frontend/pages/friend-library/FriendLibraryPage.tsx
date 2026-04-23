@@ -3,12 +3,15 @@
  * Shows comics shared by a single accepted friend and links into read-only story viewing.
  */
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import StorageImage from '@/components/StorageImage';
 import { formatStoryDate, getStoryDisplayTitle } from '@/pages/gallery/gallery.helpers';
 import { useFriendLibraryPage } from './useFriendLibraryPage';
 
 export function FriendLibraryPage(): JSX.Element {
+  const { t } = useTranslation();
   const { errorMessage, friend, friendUserId, isLoading, stories } = useFriendLibraryPage();
+  const fallbackTitle = t('galleryPage.untitledMasterpiece');
 
   if (isLoading) {
     return (
@@ -61,7 +64,7 @@ export function FriendLibraryPage(): JSX.Element {
                 {story.cover_image_url ? (
                   <StorageImage
                     src={story.cover_image_url}
-                    alt={getStoryDisplayTitle(story.title)}
+                    alt={getStoryDisplayTitle(story.title, fallbackTitle)}
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -71,7 +74,7 @@ export function FriendLibraryPage(): JSX.Element {
 
               <div className="p-5">
                 <h2 className="text-xl font-black text-gray-800 leading-tight mb-2 line-clamp-2">
-                  {getStoryDisplayTitle(story.title)}
+                  {getStoryDisplayTitle(story.title, fallbackTitle)}
                 </h2>
                 <div className="flex flex-wrap gap-2 mb-4">
                   <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full uppercase tracking-wide">
