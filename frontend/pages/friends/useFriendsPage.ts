@@ -90,7 +90,9 @@ interface UseFriendsPageResult {
     pendingActionIds: Set<number>;
     isLoading: boolean;
     isSearching: boolean;
-    error: string | null;
+    loadError: string | null;
+    actionError: string | null;
+    clearActionError: () => void;
 }
 
 // ----------------------------------------------------
@@ -109,7 +111,8 @@ export function useFriendsPage(): UseFriendsPageResult {
     // scoped to outgoing send-request actions only.
     const [pendingActionIds, setPendingActionIds] = useState<Set<number>>(new Set());
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
+    const [loadError, setLoadError] = useState<string | null>(null);
+    const [actionError, setActionError] = useState<string | null>(null);
 
     // Memoized sets for quick lookup of friend and pending IDs
     const friendsIds = useMemo(() => new Set(friends.map(f => f.id)), [friends]);
@@ -132,7 +135,7 @@ export function useFriendsPage(): UseFriendsPageResult {
         if (!accessToken) return;
         const fetchFriendsData = async () => {
             setIsLoading(true);
-            setError(null);
+            setLoadError(null);
 
             try {
                 const [friendsData, pendingIncomingData, pendingOutgoingData] = await Promise.all([
@@ -144,8 +147,8 @@ export function useFriendsPage(): UseFriendsPageResult {
                 setFriends(friendsData);
                 setPendingIncoming(pendingIncomingData);
                 setPendingOutgoing(pendingOutgoingData);
-            } catch (err) {
-                setError("Failed to fetch friends data.");
+            } catch {
+                setLoadError("Failed to fetch friends data.");
             } finally {
                 setIsLoading(false);
             }
@@ -204,7 +207,7 @@ export function useFriendsPage(): UseFriendsPageResult {
         if (friendsIds.has(userId)) return;
         if (pendingIncomingIds.has(userId)) return;
 
-        setError(null);
+        setActionError(null);
 
         // mark inflight
         setSendingIds(prev => new Set(prev).add(userId));
@@ -226,9 +229,9 @@ export function useFriendsPage(): UseFriendsPageResult {
             // rollback on failure
             setPendingOutgoing(prev => prev.filter(p => p.id !== userId));
             if (typeof err === 'object' && err !== null && 'status' in err && err.status === 409) {
-                setError('Friend request already exists.');
+                setActionError('Friend request already exists.');
             } else {
-                setError('Could not send friend request.');
+                setActionError('Could not send friend request.');
             }
         } finally {
             // clear inflight flag
@@ -245,6 +248,7 @@ export function useFriendsPage(): UseFriendsPageResult {
         // find the target row in pendingIncoming
         const target = pendingIncoming.find(r => r.id === userId);
         if (!target) return;
+        setActionError(null);
         // mark inflight
         setPendingActionIds(prev => new Set(prev).add(userId));
         // snapshot, optimistic mutation: remove from pending, add provisional to friends
@@ -265,7 +269,7 @@ export function useFriendsPage(): UseFriendsPageResult {
             // rollback on failure: remove from friends, restore to pending, set error
             setFriends(prev => prev.filter(f => f.id !== userId));
             setPendingIncoming(prev => [...prev, target]);
-            setError('Could not accept friend request.');
+            setActionError('Could not accept friend request.');
         } finally {
             // clear inflight flag
             setPendingActionIds(prev => {
@@ -281,6 +285,7 @@ export function useFriendsPage(): UseFriendsPageResult {
         // find the target row in pendingIncoming
         const target = pendingIncoming.find(r => r.id === userId);
         if (!target) return;
+        setActionError(null);
         // mark inflight
         setPendingActionIds(prev => new Set(prev).add(userId));
         // snapshot, optimistic mutation: remove from pending
@@ -294,7 +299,7 @@ export function useFriendsPage(): UseFriendsPageResult {
         } catch {
             // rollback on failure: restore to pending, set error
             setPendingIncoming(prev => [...prev, target]);
-            setError('Could not decline friend request.');
+            setActionError('Could not decline friend request.');
         } finally {
             // clear inflight flag
             setPendingActionIds(prev => {
@@ -310,6 +315,7 @@ export function useFriendsPage(): UseFriendsPageResult {
         // find the target row in friends
         const target = friends.find(f => f.id === friendId);
         if (!target) return;
+        setActionError(null);
         // mark inflight
         setPendingActionIds(prev => new Set(prev).add(friendId));
         setFriends(prev => prev.filter(f => f.id !== friendId));
@@ -321,7 +327,7 @@ export function useFriendsPage(): UseFriendsPageResult {
             }
         } catch {
             setFriends(prev => [...prev, target]);
-            setError('Could not remove friend.');
+            setActionError('Could not remove friend.');
         } finally {
             setPendingActionIds(prev => {
                 const next = new Set(prev);
@@ -330,6 +336,10 @@ export function useFriendsPage(): UseFriendsPageResult {
             });
         }
     }, [accessToken, friends]);
+
+    const clearActionError = useCallback((): void => {
+        setActionError(null);
+    }, []);
 
     // Mock override for testing UI without backend
     if (USE_MOCK_DATA) {
@@ -347,7 +357,9 @@ export function useFriendsPage(): UseFriendsPageResult {
             pendingActionIds: new Set(),
             isSearching: false,
             isLoading: false,
-            error: null,
+            loadError: null,
+            actionError: null,
+            clearActionError: () => {},
         };
     }
 
@@ -365,6 +377,8 @@ export function useFriendsPage(): UseFriendsPageResult {
         pendingActionIds: pendingActionIds,
         isLoading: isLoading,
         isSearching: isSearching,
-        error: error,
+        loadError: loadError,
+        actionError: actionError,
+        clearActionError: clearActionError,
     }
 }

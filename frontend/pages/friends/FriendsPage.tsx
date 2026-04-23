@@ -22,7 +22,9 @@ export function FriendsPage(): JSX.Element {
     pendingActionIds,
     isLoading,
     isSearching,
-    error,
+    loadError,
+    actionError,
+    clearActionError,
   } = useFriendsPage();
 
   const trimmedSearchQuery = searchQuery.trim();
@@ -47,12 +49,12 @@ export function FriendsPage(): JSX.Element {
     );
   }
 
-  if (error) {
+  if (loadError) {
     return (
       <div className="flex flex-1 items-center justify-center py-12">
         <div className="w-full max-w-2xl rounded-2xl border-4 border-red-200 bg-white p-8 shadow-soft">
           <h1 className="text-center text-2xl font-bold text-brand-dark">Friends</h1>
-          <p className="mt-4 text-center text-base font-medium text-red-600">{error}</p>
+          <p className="mt-4 text-center text-base font-medium text-red-600">{loadError}</p>
           <p className="mt-2 text-center text-sm text-brand-muted">
             Check your session and network requests, then try reloading the page.
           </p>
@@ -65,6 +67,21 @@ export function FriendsPage(): JSX.Element {
     <div className="flex flex-1 justify-center py-12">
       <div className="w-full max-w-5xl rounded-2xl border-4 border-brand-primary/20 bg-white p-10 shadow-soft space-y-8">
         <h1 className="text-center text-3xl font-bold text-brand-dark">Friends</h1>
+
+        {actionError ? (
+          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+            <div className="flex items-start justify-between gap-4">
+              <p className="text-sm font-medium text-red-700">{actionError}</p>
+              <button
+                type="button"
+                onClick={clearActionError}
+                className="shrink-0 text-sm font-semibold text-red-600 transition-colors hover:text-red-700"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        ) : null}
 
         <section className="space-y-3">
           <h2 className="text-2xl font-semibold text-brand-dark">Pending</h2>

@@ -209,7 +209,7 @@ describe('acceptRequest', () => {
         });
         expect(result.current.pendingIncoming.some(r => r.id === alice.id)).toBe(true);
         expect(result.current.friends.some(f => f.id === alice.id)).toBe(false);
-        expect(result.current.error).toBeTruthy();
+        expect(result.current.actionError).toBeTruthy();
     });
 
     it('is a no-op when userId is not in pendingIncoming', async () => {
@@ -293,7 +293,7 @@ describe('declineRequest', () => {
         });
 
         expect(result.current.pendingIncoming.some(r => r.id === alice.id)).toBe(true);
-        expect(result.current.error).toBeTruthy();
+        expect(result.current.actionError).toBeTruthy();
     });
 
     it('is a no-op when userId is not in pendingIncoming', async () => {
@@ -371,7 +371,7 @@ describe('removeFriend', () => {
         });
 
         expect(result.current.friends.some(f => f.id === bob.id)).toBe(true);
-        expect(result.current.error).toBeTruthy();
+        expect(result.current.actionError).toBeTruthy();
     });
 
     it('is a no-op when friendId is not in friends', async () => {
