@@ -39,6 +39,7 @@ from models import (
     PanelCreate,
     StoryCreate,
 )
+from services.rate_limit import generation_rate_limiter
 
 # NDJSON = newline-delimited JSON. Each line is a standalone JSON object, which
 # makes it straightforward for the frontend to parse events incrementally.
@@ -47,11 +48,24 @@ NDJSON_MEDIA_TYPE = "application/x-ndjson"
 router = APIRouter(prefix="/api", tags=["generation"])
 
 
+async def require_generation_quota(current_user: dict = Depends(get_current_user)) -> dict:
+    """Apply per-user quota before starting expensive Gemini work."""
+    decision = await generation_rate_limiter.check(f"user:{current_user['id']}")
+    if decision.allowed:
+        return current_user
+
+    raise HTTPException(
+        status_code=429,
+        detail="Generation rate limit exceeded. Please try again later.",
+        headers={"Retry-After": str(decision.retry_after_seconds)},
+    )
+
+
 @router.post("/stories/generate", response_model=GenerateAndSaveStoryResponse)
 async def generate_and_save_story(
     request: GenerateAndSaveStoryRequest,
     db: aiosqlite.Connection = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(require_generation_quota),
 ):
     """Generate story script + images and save to DB."""
     story_funnel_total.labels(stage="pipeline", status="started").inc()
@@ -126,7 +140,7 @@ async def generate_and_save_story(
 @router.post("/generate/story-script", response_model=GenerateStoryScriptResponse)
 async def generate_story_script(
     request: GenerateStoryScriptRequest,
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(require_generation_quota),
 ):
     """Generate a story script using Gemini AI."""
     story_funnel_total.labels(stage="script_sync", status="started").inc()
@@ -175,7 +189,7 @@ async def _stream_story_script_events(
 @router.post("/generate/story-script/stream")
 async def generate_story_script_stream_endpoint(
     request: GenerateStoryScriptRequest,
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(require_generation_quota),
 ) -> StreamingResponse:
     """Stream story-script generation as NDJSON events.
 
@@ -196,7 +210,7 @@ async def generate_story_script_stream_endpoint(
 @router.post("/generate/panel-image", response_model=GeneratePanelImageResponse)
 async def generate_panel_image_endpoint(
     request: GeneratePanelImageRequest,
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(require_generation_quota),
 ):
     """Generate a comic panel image using Gemini AI."""
     try:
@@ -215,7 +229,7 @@ async def generate_panel_image_endpoint(
 @router.post("/generate/edit-image", response_model=EditPanelImageResponse)
 async def edit_panel_image_endpoint(
     request: EditPanelImageRequest,
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(require_generation_quota),
 ):
     """Edit an existing comic panel image using Gemini AI."""
     try:
