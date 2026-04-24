@@ -91,10 +91,10 @@ def grafana_admin():
 def backend_metrics_text():
     result = docker_exec(
         "backend",
-        "python3 -c \""
+        'python3 -c "'
         "import urllib.request; "
         "print(urllib.request.urlopen('http://localhost:8000/metrics').read().decode())"
-        "\"",
+        '"',
     )
     assert result.returncode == 0, f"Cannot fetch /metrics from backend: {result.stderr}"
     return result.stdout
@@ -133,9 +133,7 @@ def all_alert_rule_names(prometheus_rules):
 class TestPrometheusAccessControl:
     def test_prometheus_not_exposed_on_host_port_9090(self):
         """Prometheus uses `expose` not `ports` — host must refuse the connection."""
-        with pytest.raises(
-            (requests.exceptions.ConnectionError, ConnectionRefusedError, OSError)
-        ):
+        with pytest.raises((requests.exceptions.ConnectionError, ConnectionRefusedError, OSError)):
             requests.get("http://localhost:9090", timeout=3, verify=False)
 
     def test_prometheus_port_9090_socket_closed(self):
@@ -144,9 +142,7 @@ class TestPrometheusAccessControl:
         sock.settimeout(2)
         result = sock.connect_ex(("localhost", 9090))
         sock.close()
-        assert result != 0, (
-            "Port 9090 is open on the host — Prometheus should not be directly reachable."
-        )
+        assert result != 0, "Port 9090 is open on the host — Prometheus should not be directly reachable."
 
 
 # ---------------------------------------------------------------------------
@@ -158,8 +154,7 @@ class TestBackendMetricsEndpoint:
     def test_metrics_endpoint_is_reachable_internally(self, backend_metrics_text):
         """Backend /metrics endpoint must respond with valid Prometheus text."""
         assert "# HELP" in backend_metrics_text, (
-            "Response does not look like Prometheus text format — "
-            "missing '# HELP' comment lines."
+            "Response does not look like Prometheus text format — missing '# HELP' comment lines."
         )
         assert "# TYPE" in backend_metrics_text
 
@@ -230,20 +225,15 @@ class TestScrapeTargets:
     def test_backend_scrape_target_exists(self, prometheus_targets):
         """Prometheus must have an active target for job=wondercomic-backend."""
         active = prometheus_targets["data"]["activeTargets"]
-        backend_targets = [
-            t for t in active if t["labels"].get("job") == "wondercomic-backend"
-        ]
+        backend_targets = [t for t in active if t["labels"].get("job") == "wondercomic-backend"]
         assert backend_targets, (
-            "No active scrape target found for job=wondercomic-backend. "
-            "Check prometheus.yml scrape_configs."
+            "No active scrape target found for job=wondercomic-backend. Check prometheus.yml scrape_configs."
         )
 
     def test_backend_scrape_target_is_up(self, prometheus_targets):
         """Backend scrape target health must be 'up'."""
         active = prometheus_targets["data"]["activeTargets"]
-        backend_targets = [
-            t for t in active if t["labels"].get("job") == "wondercomic-backend"
-        ]
+        backend_targets = [t for t in active if t["labels"].get("job") == "wondercomic-backend"]
         assert backend_targets, "Backend target not found."
         target = backend_targets[0]
         assert target["health"] == "up", (
@@ -303,20 +293,22 @@ class TestAlertRules:
         assert "wondercomic.api" in group_names
         assert "node.resources" in group_names
 
-    @pytest.mark.parametrize("rule_name", [
-        "BackendDown",
-        "NodeExporterDown",
-        "HighErrorRate",
-        "HighP95Latency",
-        "HighCPUUsage",
-        "HighMemoryUsage",
-        "HighDiskUsage",
-    ])
+    @pytest.mark.parametrize(
+        "rule_name",
+        [
+            "BackendDown",
+            "NodeExporterDown",
+            "HighErrorRate",
+            "HighP95Latency",
+            "HighCPUUsage",
+            "HighMemoryUsage",
+            "HighDiskUsage",
+        ],
+    )
     def test_alert_rule_exists(self, all_alert_rule_names, rule_name):
         """Each of the 7 configured alert rules must be loaded."""
         assert rule_name in all_alert_rule_names, (
-            f"Alert rule '{rule_name}' not found in Prometheus. "
-            f"Loaded rules: {all_alert_rule_names}"
+            f"Alert rule '{rule_name}' not found in Prometheus. Loaded rules: {all_alert_rule_names}"
         )
 
     def test_backend_down_is_critical_severity(self, prometheus_rules):
@@ -338,8 +330,7 @@ class TestAlertRules:
     def test_total_alert_rules_count(self, all_alert_rule_names):
         """Exactly 7 alert rules should be defined."""
         assert len(all_alert_rule_names) == 7, (
-            f"Expected 7 alert rules, found {len(all_alert_rule_names)}: "
-            f"{all_alert_rule_names}"
+            f"Expected 7 alert rules, found {len(all_alert_rule_names)}: {all_alert_rule_names}"
         )
 
 
@@ -360,8 +351,7 @@ class TestAlertmanagerIntegration:
         assert data["status"] == "success"
         active = data["data"]["activeAlertmanagers"]
         assert len(active) >= 1, (
-            "No active Alertmanager found in Prometheus. "
-            "Check alerting.alertmanagers config in prometheus.yml."
+            "No active Alertmanager found in Prometheus. Check alerting.alertmanagers config in prometheus.yml."
         )
 
     def test_alertmanager_url_points_to_correct_service(self):
@@ -373,9 +363,7 @@ class TestAlertmanagerIntegration:
         data = json.loads(result.stdout)
         active = data["data"]["activeAlertmanagers"]
         urls = [a["url"] for a in active]
-        assert any("alertmanager" in url for url in urls), (
-            f"No Alertmanager URL contains 'alertmanager': {urls}"
-        )
+        assert any("alertmanager" in url for url in urls), f"No Alertmanager URL contains 'alertmanager': {urls}"
 
     def test_alertmanager_health_ok(self):
         """Alertmanager container must respond healthy on its API."""
@@ -401,12 +389,10 @@ class TestPrometheusRetention:
         )
         cmdline = result.stdout
         assert "--storage.tsdb.retention.time=15d" in cmdline, (
-            f"Expected --storage.tsdb.retention.time=15d in Prometheus args.\n"
-            f"Got: {cmdline}"
+            f"Expected --storage.tsdb.retention.time=15d in Prometheus args.\nGot: {cmdline}"
         )
         assert "--storage.tsdb.retention.size=1GB" in cmdline, (
-            f"Expected --storage.tsdb.retention.size=1GB in Prometheus args.\n"
-            f"Got: {cmdline}"
+            f"Expected --storage.tsdb.retention.size=1GB in Prometheus args.\nGot: {cmdline}"
         )
 
 
@@ -424,9 +410,7 @@ class TestGrafanaAccessibility:
     def test_grafana_reachable_via_https(self, http):
         """GET /grafana/ must return a response (not a connection error)."""
         response = http.get(f"{GRAFANA_URL}/", timeout=10, allow_redirects=True)
-        assert response.status_code in (200, 302), (
-            f"Expected 200 or 302, got {response.status_code}"
-        )
+        assert response.status_code in (200, 302), f"Expected 200 or 302, got {response.status_code}"
 
     def test_grafana_served_from_subpath(self, http):
         """Grafana must be accessible at /grafana/ (subpath configured in nginx + GF_SERVER)."""
@@ -437,9 +421,7 @@ class TestGrafanaAccessibility:
         """Login page must serve actual Grafana HTML, not an nginx error page."""
         response = http.get(f"{GRAFANA_URL}/login", timeout=10)
         body = response.text.lower()
-        assert "grafana" in body, (
-            "Login page does not contain 'grafana' — nginx may not be proxying correctly."
-        )
+        assert "grafana" in body, "Login page does not contain 'grafana' — nginx may not be proxying correctly."
 
     def test_grafana_redirect_from_bare_path(self, http):
         """GET /grafana (no trailing slash) must redirect to /grafana/."""
@@ -469,9 +451,7 @@ class TestGrafanaSecurity:
 
     def test_anonymous_dashboard_api_denied(self, http):
         """Dashboard API must not be accessible without credentials."""
-        response = http.get(
-            f"{GRAFANA_URL}/api/dashboards/uid/wondercomic-api-v1", timeout=10
-        )
+        response = http.get(f"{GRAFANA_URL}/api/dashboards/uid/wondercomic-api-v1", timeout=10)
         assert response.status_code == 401
 
     def test_self_signup_disabled(self, http):
@@ -482,8 +462,7 @@ class TestGrafanaSecurity:
             timeout=10,
         )
         assert response.status_code in (401, 403), (
-            f"Self-signup should be disabled (GF_USERS_ALLOW_SIGN_UP=false). "
-            f"Got {response.status_code}."
+            f"Self-signup should be disabled (GF_USERS_ALLOW_SIGN_UP=false). Got {response.status_code}."
         )
 
     def test_grafana_port_3000_not_exposed_on_host(self):
@@ -492,16 +471,12 @@ class TestGrafanaSecurity:
         sock.settimeout(2)
         result = sock.connect_ex(("localhost", 3000))
         sock.close()
-        assert result != 0, (
-            "Port 3000 is open on the host — Grafana is directly reachable without nginx/HTTPS."
-        )
+        assert result != 0, "Port 3000 is open on the host — Grafana is directly reachable without nginx/HTTPS."
 
     def test_grafana_served_over_https_only(self, http):
         """Grafana must be served via HTTPS (port 443 through nginx), not plain HTTP."""
         response = http.get(f"{GRAFANA_URL}/login", timeout=10)
-        assert response.url.startswith("https://"), (
-            f"Response URL is not HTTPS: {response.url}"
-        )
+        assert response.url.startswith("https://"), f"Response URL is not HTTPS: {response.url}"
 
 
 # ---------------------------------------------------------------------------
@@ -514,8 +489,7 @@ class TestGrafanaAuthentication:
         """Admin credentials must authenticate successfully."""
         response = grafana_admin.get(f"{GRAFANA_URL}/api/user", timeout=10)
         assert response.status_code == 200, (
-            f"Admin login failed with status {response.status_code}. "
-            f"Check GRAFANA_ADMIN_PASSWORD env var."
+            f"Admin login failed with status {response.status_code}. Check GRAFANA_ADMIN_PASSWORD env var."
         )
 
     def test_admin_has_admin_role(self, grafana_admin):
@@ -523,9 +497,7 @@ class TestGrafanaAuthentication:
         response = grafana_admin.get(f"{GRAFANA_URL}/api/user", timeout=10)
         assert response.status_code == 200
         user = response.json()
-        assert user.get("isGrafanaAdmin") is True, (
-            f"Admin user does not have admin role: {user}"
-        )
+        assert user.get("isGrafanaAdmin") is True, f"Admin user does not have admin role: {user}"
 
     def test_admin_login_with_wrong_password_denied(self):
         """Wrong credentials must return 401."""
@@ -548,77 +520,49 @@ class TestGrafanaDatasource:
         assert response.status_code == 200
         datasources = response.json()
         names = [ds["name"] for ds in datasources]
-        assert "Prometheus" in names, (
-            f"Prometheus datasource not found. Available datasources: {names}"
-        )
+        assert "Prometheus" in names, f"Prometheus datasource not found. Available datasources: {names}"
 
     def test_prometheus_datasource_is_default(self, grafana_admin):
         """Prometheus datasource must be set as the default datasource."""
         response = grafana_admin.get(f"{GRAFANA_URL}/api/datasources", timeout=10)
-        assert response.status_code == 200, (
-            f"Cannot fetch datasources: {response.status_code} — {response.text}"
-        )
+        assert response.status_code == 200, f"Cannot fetch datasources: {response.status_code} — {response.text}"
         datasources = response.json()
-        prometheus_ds = next(
-            (ds for ds in datasources if ds["name"] == "Prometheus"), None
-        )
+        prometheus_ds = next((ds for ds in datasources if ds["name"] == "Prometheus"), None)
         assert prometheus_ds is not None
-        assert prometheus_ds.get("isDefault") is True, (
-            "Prometheus datasource is not set as default."
-        )
+        assert prometheus_ds.get("isDefault") is True, "Prometheus datasource is not set as default."
 
     def test_prometheus_datasource_type_is_prometheus(self, grafana_admin):
         """Datasource type must be 'prometheus'."""
         response = grafana_admin.get(f"{GRAFANA_URL}/api/datasources", timeout=10)
-        assert response.status_code == 200, (
-            f"Cannot fetch datasources: {response.status_code} — {response.text}"
-        )
+        assert response.status_code == 200, f"Cannot fetch datasources: {response.status_code} — {response.text}"
         datasources = response.json()
-        prometheus_ds = next(
-            (ds for ds in datasources if ds["name"] == "Prometheus"), None
-        )
+        prometheus_ds = next((ds for ds in datasources if ds["name"] == "Prometheus"), None)
         assert prometheus_ds is not None
         assert prometheus_ds.get("type") == "prometheus"
 
     def test_prometheus_datasource_url_points_to_container(self, grafana_admin):
         """Datasource URL must point to the prometheus container, not localhost."""
         response = grafana_admin.get(f"{GRAFANA_URL}/api/datasources", timeout=10)
-        assert response.status_code == 200, (
-            f"Cannot fetch datasources: {response.status_code} — {response.text}"
-        )
+        assert response.status_code == 200, f"Cannot fetch datasources: {response.status_code} — {response.text}"
         datasources = response.json()
-        prometheus_ds = next(
-            (ds for ds in datasources if ds["name"] == "Prometheus"), None
-        )
+        prometheus_ds = next((ds for ds in datasources if ds["name"] == "Prometheus"), None)
         assert prometheus_ds is not None
         url = prometheus_ds.get("url", "")
-        assert "prometheus" in url, (
-            f"Datasource URL should reference the prometheus container, got: {url}"
-        )
+        assert "prometheus" in url, f"Datasource URL should reference the prometheus container, got: {url}"
 
     def test_prometheus_datasource_health_check_passes(self, grafana_admin):
         """Grafana must be able to reach Prometheus (datasource health check)."""
         response = grafana_admin.get(f"{GRAFANA_URL}/api/datasources", timeout=10)
-        assert response.status_code == 200, (
-            f"Cannot fetch datasources: {response.status_code} — {response.text}"
-        )
+        assert response.status_code == 200, f"Cannot fetch datasources: {response.status_code} — {response.text}"
         datasources = response.json()
-        prometheus_ds = next(
-            (ds for ds in datasources if ds["name"] == "Prometheus"), None
-        )
+        prometheus_ds = next((ds for ds in datasources if ds["name"] == "Prometheus"), None)
         assert prometheus_ds is not None, "Prometheus datasource not found."
         ds_id = prometheus_ds["id"]
 
-        health_response = grafana_admin.get(
-            f"{GRAFANA_URL}/api/datasources/{ds_id}/health", timeout=15
-        )
-        assert health_response.status_code == 200, (
-            f"Datasource health check failed: {health_response.text}"
-        )
+        health_response = grafana_admin.get(f"{GRAFANA_URL}/api/datasources/{ds_id}/health", timeout=15)
+        assert health_response.status_code == 200, f"Datasource health check failed: {health_response.text}"
         health = health_response.json()
-        assert health.get("status") == "OK", (
-            f"Prometheus datasource is not healthy: {health}"
-        )
+        assert health.get("status") == "OK", f"Prometheus datasource is not healthy: {health}"
 
 
 # ---------------------------------------------------------------------------
@@ -629,25 +573,16 @@ class TestGrafanaDatasource:
 class TestGrafanaDashboard:
     def test_wondercomic_dashboard_exists(self, grafana_admin):
         """WonderComic dashboard must be provisioned with the correct UID."""
-        response = grafana_admin.get(
-            f"{GRAFANA_URL}/api/dashboards/uid/wondercomic-api-v1", timeout=10
-        )
+        response = grafana_admin.get(f"{GRAFANA_URL}/api/dashboards/uid/wondercomic-api-v1", timeout=10)
         assert response.status_code == 200, (
-            f"Dashboard with UID 'wondercomic-api-v1' not found. "
-            f"Status: {response.status_code}"
+            f"Dashboard with UID 'wondercomic-api-v1' not found. Status: {response.status_code}"
         )
 
     def _fetch_dashboard(self, grafana_admin) -> dict:
-        response = grafana_admin.get(
-            f"{GRAFANA_URL}/api/dashboards/uid/wondercomic-api-v1", timeout=10
-        )
-        assert response.status_code == 200, (
-            f"Cannot fetch dashboard: {response.status_code} — {response.text}"
-        )
+        response = grafana_admin.get(f"{GRAFANA_URL}/api/dashboards/uid/wondercomic-api-v1", timeout=10)
+        assert response.status_code == 200, f"Cannot fetch dashboard: {response.status_code} — {response.text}"
         data = response.json()
-        assert "dashboard" in data, (
-            f"Unexpected response structure — 'dashboard' key missing: {data}"
-        )
+        assert "dashboard" in data, f"Unexpected response structure — 'dashboard' key missing: {data}"
         return data
 
     def test_dashboard_title_is_correct(self, grafana_admin):
@@ -660,27 +595,27 @@ class TestGrafanaDashboard:
         """Dashboard must contain at least 15 panels (7 rows + 15 data panels)."""
         data = self._fetch_dashboard(grafana_admin)
         panels = data["dashboard"]["panels"]
-        assert len(panels) >= 15, (
-            f"Expected at least 15 panels, found {len(panels)}."
-        )
+        assert len(panels) >= 15, f"Expected at least 15 panels, found {len(panels)}."
 
-    @pytest.mark.parametrize("expected_title", [
-        "Traffic",
-        "Latency",
-        "Summary Stats",
-        "Per-Endpoint Breakdown",
-        "Node Resources",
-        "Gemini AI",
-        "Story Generation",
-    ])
+    @pytest.mark.parametrize(
+        "expected_title",
+        [
+            "Traffic",
+            "Latency",
+            "Summary Stats",
+            "Per-Endpoint Breakdown",
+            "Node Resources",
+            "Gemini AI",
+            "Story Generation",
+        ],
+    )
     def test_dashboard_section_rows_present(self, grafana_admin, expected_title):
         """All 7 section rows must be present in the dashboard."""
         data = self._fetch_dashboard(grafana_admin)
         panels = data["dashboard"]["panels"]
         titles = [p.get("title", "") for p in panels]
         assert expected_title in titles, (
-            f"Section row '{expected_title}' not found in dashboard panels. "
-            f"Found titles: {titles}"
+            f"Section row '{expected_title}' not found in dashboard panels. Found titles: {titles}"
         )
 
     def test_dashboard_uses_prometheus_datasource(self, grafana_admin):
@@ -691,9 +626,7 @@ class TestGrafanaDashboard:
         for panel in data_panels:
             ds = panel.get("datasource", {})
             ds_type = ds.get("type", "") if isinstance(ds, dict) else ""
-            assert ds_type == "prometheus", (
-                f"Panel '{panel.get('title')}' does not use prometheus datasource: {ds}"
-            )
+            assert ds_type == "prometheus", f"Panel '{panel.get('title')}' does not use prometheus datasource: {ds}"
 
     def test_dashboard_auto_refresh_enabled(self, grafana_admin):
         """Dashboard must have auto-refresh configured (30s)."""
@@ -749,9 +682,7 @@ class TestWebhookAccessControl:
 
     def test_get_to_monitoring_alerts_returns_403(self, http):
         """External GET to /api/monitoring/alerts must also be blocked."""
-        response = http.get(
-            f"{HTTPS_BASE}/api/monitoring/alerts", timeout=10
-        )
+        response = http.get(f"{HTTPS_BASE}/api/monitoring/alerts", timeout=10)
         assert response.status_code == 403
 
     def test_put_to_monitoring_alerts_returns_403(self, http):
@@ -765,17 +696,14 @@ class TestWebhookAccessControl:
 
     def test_monitoring_subpath_also_blocked(self, http):
         """Any path under /api/monitoring must be blocked."""
-        response = http.get(
-            f"{HTTPS_BASE}/api/monitoring/anything", timeout=10
-        )
+        response = http.get(f"{HTTPS_BASE}/api/monitoring/anything", timeout=10)
         assert response.status_code == 403
 
     def test_regular_api_routes_still_accessible(self, http):
         """Blocking /api/monitoring must not affect other /api routes."""
         response = http.get(f"{HTTPS_BASE}/health", timeout=10)
         assert response.status_code == 200, (
-            f"/health must still be accessible after the nginx block rule. "
-            f"Got {response.status_code}."
+            f"/health must still be accessible after the nginx block rule. Got {response.status_code}."
         )
 
 
@@ -791,9 +719,7 @@ class TestAlertmanagerHealth:
             "alertmanager",
             "wget -qO- 'http://localhost:9093/-/healthy'",
         )
-        assert result.returncode == 0, (
-            f"Alertmanager health check failed.\nstderr: {result.stderr}"
-        )
+        assert result.returncode == 0, f"Alertmanager health check failed.\nstderr: {result.stderr}"
 
     def test_alertmanager_ready_endpoint(self):
         """Alertmanager /-/ready must return OK from inside Docker network."""
@@ -801,9 +727,7 @@ class TestAlertmanagerHealth:
             "alertmanager",
             "wget -qO- 'http://localhost:9093/-/ready'",
         )
-        assert result.returncode == 0, (
-            f"Alertmanager readiness check failed.\nstderr: {result.stderr}"
-        )
+        assert result.returncode == 0, f"Alertmanager readiness check failed.\nstderr: {result.stderr}"
 
     def test_alertmanager_status_api_responds(self):
         """Alertmanager /api/v2/status must return valid JSON."""
@@ -811,13 +735,9 @@ class TestAlertmanagerHealth:
             "alertmanager",
             "wget -qO- 'http://localhost:9093/api/v2/status'",
         )
-        assert result.returncode == 0, (
-            f"Cannot query Alertmanager status API.\nstderr: {result.stderr}"
-        )
+        assert result.returncode == 0, f"Cannot query Alertmanager status API.\nstderr: {result.stderr}"
         data = json.loads(result.stdout)
-        assert "cluster" in data or "config" in data, (
-            f"Unexpected Alertmanager status response: {result.stdout[:200]}"
-        )
+        assert "cluster" in data or "config" in data, f"Unexpected Alertmanager status response: {result.stdout[:200]}"
 
 
 # ---------------------------------------------------------------------------
@@ -863,17 +783,19 @@ class TestAlertmanagerConfiguration:
 class TestBackendWebhookInternal:
     def test_backend_webhook_reachable_from_alertmanager_container(self):
         """Alertmanager must be able to POST to http://backend:8000/api/monitoring/alerts."""
-        fake_payload = json.dumps({
-            "version": "4",
-            "status": "firing",
-            "alerts": [
-                {
-                    "status": "firing",
-                    "labels": {"alertname": "E2ETest", "severity": "info"},
-                    "annotations": {"summary": "Integration test probe"},
-                }
-            ],
-        })
+        fake_payload = json.dumps(
+            {
+                "version": "4",
+                "status": "firing",
+                "alerts": [
+                    {
+                        "status": "firing",
+                        "labels": {"alertname": "E2ETest", "severity": "info"},
+                        "annotations": {"summary": "Integration test probe"},
+                    }
+                ],
+            }
+        )
         result = docker_exec(
             "alertmanager",
             f"wget -qO- --post-data='{fake_payload}' "
@@ -881,24 +803,23 @@ class TestBackendWebhookInternal:
             "'http://backend:8000/api/monitoring/alerts'",
         )
         assert result.returncode == 0, (
-            f"Backend webhook is not reachable from alertmanager container.\n"
-            f"stderr: {result.stderr}"
+            f"Backend webhook is not reachable from alertmanager container.\nstderr: {result.stderr}"
         )
         response_body = result.stdout
-        assert "ok" in response_body.lower(), (
-            f"Backend webhook did not return expected response. Got: {response_body}"
-        )
+        assert "ok" in response_body.lower(), f"Backend webhook did not return expected response. Got: {response_body}"
 
     def test_backend_webhook_returns_received_count(self):
         """Backend webhook must return a JSON body with 'received' count."""
-        fake_payload = json.dumps({
-            "version": "4",
-            "status": "firing",
-            "alerts": [
-                {"status": "firing", "labels": {"alertname": "CountTest"}, "annotations": {}},
-                {"status": "firing", "labels": {"alertname": "CountTest2"}, "annotations": {}},
-            ],
-        })
+        fake_payload = json.dumps(
+            {
+                "version": "4",
+                "status": "firing",
+                "alerts": [
+                    {"status": "firing", "labels": {"alertname": "CountTest"}, "annotations": {}},
+                    {"status": "firing", "labels": {"alertname": "CountTest2"}, "annotations": {}},
+                ],
+            }
+        )
         result = docker_exec(
             "alertmanager",
             f"wget -qO- --post-data='{fake_payload}' "
@@ -907,6 +828,4 @@ class TestBackendWebhookInternal:
         )
         assert result.returncode == 0
         data = json.loads(result.stdout)
-        assert data.get("received") == 2, (
-            f"Expected 'received': 2 in response, got: {data}"
-        )
+        assert data.get("received") == 2, f"Expected 'received': 2 in response, got: {data}"
