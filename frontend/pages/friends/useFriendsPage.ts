@@ -22,6 +22,17 @@ import {
     MOCK_PENDING_FRIENDS,
     USE_FRIENDS_MOCK_DATA,
 } from './friends.fixtures';
+import {
+    addIdToSet,
+    createAcceptedFriend,
+    createIdSet,
+    createOutgoingRequest,
+    decorateSearchResults,
+    getSendRequestErrorMessage,
+    removeFriendById,
+    removeIdFromSet,
+    replaceFriendById,
+} from './useFriendsPage.helpers';
 
 // ----------------------------------------------------
 // Constants
@@ -76,20 +87,20 @@ export function useFriendsPage(): UseFriendsPageResult {
     const [loadError, setLoadError] = useState<string | null>(null);
     const [actionError, setActionError] = useState<string | null>(null);
 
-    // Memoized sets for quick lookup of friend and pending IDs
-    const friendsIds = useMemo(() => new Set(friends.map(f => f.id)), [friends]);
-    const pendingIncomingIds = useMemo(() => new Set(pendingIncoming.map(p => p.id)), [pendingIncoming]);
-    const pendingOutgoingIds = useMemo(() => new Set(pendingOutgoing.map(p => p.id)), [pendingOutgoing]);
+    const friendsIds = useMemo(() => createIdSet(friends), [friends]);
+    const pendingIncomingIds = useMemo(() => createIdSet(pendingIncoming), [pendingIncoming]);
+    const pendingOutgoingIds = useMemo(() => createIdSet(pendingOutgoing), [pendingOutgoing]);
     
-    const decoratedResults = useMemo<SearchUserResult[]>(() => searchResults.map(u => ({
-        ...u,
-        relationship: friendsIds.has(u.id) ? 'friend'
-                    : pendingIncomingIds.has(u.id) ? 'pending_in'
-                    : pendingOutgoingIds.has(u.id) ? 'pending_out'
-                    : 'none',
-        isSending: sendingIds.has(u.id),
-    })),
-    [searchResults, friendsIds, pendingIncomingIds, pendingOutgoingIds, sendingIds]);
+    const decoratedResults = useMemo(
+        () => decorateSearchResults({
+            searchResults,
+            friendIds: friendsIds,
+            pendingIncomingIds,
+            pendingOutgoingIds,
+            sendingIds,
+        }),
+        [searchResults, friendsIds, pendingIncomingIds, pendingOutgoingIds, sendingIds],
+    );
 
     // Initial load effect: fetch friends and pending requests
     useEffect(() => {
@@ -172,13 +183,8 @@ export function useFriendsPage(): UseFriendsPageResult {
         setActionError(null);
 
         // mark inflight
-        setSendingIds(prev => new Set(prev).add(userId));
-        // snapshot, optimistic insert into pending
-        const optimistic: FriendResponse = {
-            ...target,
-            friendship_status: 'pending',
-            is_requester: true,
-        };
+        setSendingIds(prev => addIdToSet(prev, userId));
+        const optimistic = createOutgoingRequest(target);
         setPendingOutgoing(prev => [...prev, optimistic]);
 
         try {
@@ -186,22 +192,12 @@ export function useFriendsPage(): UseFriendsPageResult {
 
             if (!accessToken) throw new Error('No session');
             const confirmed = await sendFriendRequest(accessToken, userId);
-            setPendingOutgoing(prev => prev.map(p => p.id === userId ? confirmed : p));
+            setPendingOutgoing(prev => replaceFriendById(prev, userId, confirmed));
         } catch (err) {
-            // rollback on failure
-            setPendingOutgoing(prev => prev.filter(p => p.id !== userId));
-            if (typeof err === 'object' && err !== null && 'status' in err && err.status === 409) {
-                setActionError('Friend request already exists.');
-            } else {
-                setActionError('Could not send friend request.');
-            }
+            setPendingOutgoing(prev => removeFriendById(prev, userId));
+            setActionError(getSendRequestErrorMessage(err));
         } finally {
-            // clear inflight flag
-            setSendingIds(prev => {
-                const next = new Set(prev);
-                next.delete(userId);
-                return next;
-            });
+            setSendingIds(prev => removeIdFromSet(prev, userId));
         }
     }, [accessToken, friendsIds, pendingIncomingIds, pendingOutgoingIds, searchResults, sendingIds]);
 
@@ -211,34 +207,22 @@ export function useFriendsPage(): UseFriendsPageResult {
         const target = pendingIncoming.find(r => r.id === userId);
         if (!target) return;
         setActionError(null);
-        // mark inflight
-        setPendingActionIds(prev => new Set(prev).add(userId));
-        // snapshot, optimistic mutation: remove from pending, add provisional to friends
-        const optimistic: FriendResponse = {
-            ...target,
-            friendship_status: 'accepted',
-        };
-        setPendingIncoming(prev => prev.filter(r => r.id !== userId));
+        setPendingActionIds(prev => addIdToSet(prev, userId));
+        const optimistic = createAcceptedFriend(target);
+        setPendingIncoming(prev => removeFriendById(prev, userId));
         setFriends(prev => [...prev, optimistic]);
-        // api call and reconcile
         try {
             if (!USE_FRIENDS_MOCK_DATA) {
                 if (!accessToken) throw new Error('No session');
                 const confirmed = await acceptFriendRequest(accessToken, userId);
-                setFriends(prev => prev.map(f => f.id === userId ? confirmed : f));
+                setFriends(prev => replaceFriendById(prev, userId, confirmed));
             }
         } catch {
-            // rollback on failure: remove from friends, restore to pending, set error
-            setFriends(prev => prev.filter(f => f.id !== userId));
+            setFriends(prev => removeFriendById(prev, userId));
             setPendingIncoming(prev => [...prev, target]);
             setActionError('Could not accept friend request.');
         } finally {
-            // clear inflight flag
-            setPendingActionIds(prev => {
-                const next = new Set(prev);
-                next.delete(userId);
-                return next;
-            });
+            setPendingActionIds(prev => removeIdFromSet(prev, userId));
         }
     }, [accessToken, pendingIncoming]);
 
@@ -248,27 +232,18 @@ export function useFriendsPage(): UseFriendsPageResult {
         const target = pendingIncoming.find(r => r.id === userId);
         if (!target) return;
         setActionError(null);
-        // mark inflight
-        setPendingActionIds(prev => new Set(prev).add(userId));
-        // snapshot, optimistic mutation: remove from pending
-        setPendingIncoming(prev => prev.filter(r => r.id !== userId));
-        // api call and reconcile
+        setPendingActionIds(prev => addIdToSet(prev, userId));
+        setPendingIncoming(prev => removeFriendById(prev, userId));
         try {
             if (!USE_FRIENDS_MOCK_DATA) {
                 if (!accessToken) throw new Error('No session');
                 await removeFriendApi(accessToken, userId);
             }
         } catch {
-            // rollback on failure: restore to pending, set error
             setPendingIncoming(prev => [...prev, target]);
             setActionError('Could not decline friend request.');
         } finally {
-            // clear inflight flag
-            setPendingActionIds(prev => {
-                const next = new Set(prev);
-                next.delete(userId);
-                return next;
-            });
+            setPendingActionIds(prev => removeIdFromSet(prev, userId));
         }
     }, [accessToken, pendingIncoming]);
 
@@ -278,10 +253,8 @@ export function useFriendsPage(): UseFriendsPageResult {
         const target = friends.find(f => f.id === friendId);
         if (!target) return;
         setActionError(null);
-        // mark inflight
-        setPendingActionIds(prev => new Set(prev).add(friendId));
-        setFriends(prev => prev.filter(f => f.id !== friendId));
-        // api call and reconcile
+        setPendingActionIds(prev => addIdToSet(prev, friendId));
+        setFriends(prev => removeFriendById(prev, friendId));
         try {
             if (!USE_FRIENDS_MOCK_DATA) {
                 if (!accessToken) throw new Error('No session');
@@ -291,11 +264,7 @@ export function useFriendsPage(): UseFriendsPageResult {
             setFriends(prev => [...prev, target]);
             setActionError('Could not remove friend.');
         } finally {
-            setPendingActionIds(prev => {
-                const next = new Set(prev);
-                next.delete(friendId);
-                return next;
-            });
+            setPendingActionIds(prev => removeIdFromSet(prev, friendId));
         }
     }, [accessToken, friends]);
 
