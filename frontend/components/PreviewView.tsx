@@ -6,9 +6,11 @@ import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ComicPanel from '@/components/ComicPanel';
+import StoryReadAloudControl from '@/components/StoryReadAloudControl';
 import type { ComicPanelData, Story } from '@/types';
 import { SketchyButton } from '@/components/design-system/Primitives';
 import { Heading, Label, Text } from '@/components/design-system/Typography';
+import { getStoryReadAloudText } from '@/utils';
 
 interface PreviewViewProps {
   story: Story;
@@ -29,6 +31,7 @@ interface PreviewBookFrameProps {
   rightPage: ReactNode;
   backHref: string;
   isReadOnly: boolean;
+  readAloudText: string;
 }
 
 interface PreviewTitlePageProps {
@@ -59,6 +62,7 @@ function PreviewBookFrame({
   rightPage,
   backHref,
   isReadOnly,
+  readAloudText,
 }: PreviewBookFrameProps): JSX.Element {
   const isFirstPage = currentPage === 0;
   const isLastPage = currentPage === 1;
@@ -74,7 +78,8 @@ function PreviewBookFrame({
         </Link>
       </div>
 
-      <div className="absolute top-4 right-4 z-30">
+      <div className="absolute top-4 right-4 z-30 flex items-center gap-3">
+        <StoryReadAloudControl text={readAloudText} />
         <div className="bg-white/90 backdrop-blur-sm py-2 px-4 rounded-full shadow-soft border border-brand-secondary/20">
           <Label className="text-brand-primary uppercase tracking-widest">
             {isReadOnly ? t('story.preview.readOnly') : t('story.preview.label')}
@@ -247,6 +252,7 @@ function PreviewView({
   const currentPageLabel = pageLabels[previewPage] || '';
   const middlePanelCount = Math.max(0, story.panels.length - 2);
   const backHref = ownerUserId ? `/friends/${ownerUserId}/library` : '/gallery';
+  const readAloudText = getStoryReadAloudText(story);
 
   if (!firstPanel || !lastPanel) {
     return null;
@@ -310,6 +316,7 @@ function PreviewView({
       rightPage={rightPage}
       backHref={backHref}
       isReadOnly={isReadOnly}
+      readAloudText={readAloudText}
     />
   );
 }

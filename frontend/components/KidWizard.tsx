@@ -8,6 +8,7 @@ import type { KidProfile } from '@/types';
 import { SketchyButton } from '@/components/design-system/Primitives';
 import { Heading, Label } from '@/components/design-system/Typography';
 import { SketchyInput, SketchyTextarea } from '@/components/design-system/Forms';
+import { useSpeechRecognition } from '@/components/speech/useSpeechRecognition';
 import {
   ARCHETYPES,
   ART_STYLES,
@@ -340,9 +341,41 @@ function DreamStepSection({
   onUpdateProfileField,
 }: DreamStepSectionProps): JSX.Element {
   const { t } = useTranslation();
+
+  const speech = useSpeechRecognition({
+    onTranscript: (transcript) => {
+      const nextDream = profile.dream
+        ? `${profile.dream.trim()} ${transcript}`
+        : transcript;
+
+      onUpdateProfileField('dream', nextDream);
+    },
+  });
+
+  const handleSpeechToggle = () => {
+    if (speech.isListening) {
+      speech.stopListening();
+      return;
+    }
+
+    speech.startListening();
+  };
+
   return (
     <div className="animate-in fade-in duration-500 flex-1 flex flex-col justify-center">
-      <Heading className="mb-6 text-brand-dark">{t('kidWizard.grandDream')}</Heading>
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <Heading className="text-brand-dark">{t('kidWizard.grandDream')}</Heading>
+        <button
+          type="button"
+          aria-label={speech.isListening ? 'Stop voice input' : 'Start voice input'}
+          title={speech.isListening ? 'Stop voice input' : 'Start voice input'}
+          onClick={handleSpeechToggle}
+          disabled={!speech.isSupported}
+          className="w-12 h-12 shrink-0 rounded-full border-4 border-brand-primary/20 bg-white text-xl shadow-soft hover:bg-brand-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          {speech.isListening ? '■' : '🎙'}
+        </button>
+      </div>
       <SketchyTextarea
         autoFocus
         placeholder={t('kidWizard.dreamPlaceholder')}
@@ -350,6 +383,16 @@ function DreamStepSection({
         onChange={(event) => onUpdateProfileField('dream', event.target.value)}
         className="min-h-[120px]"
       />
+      {speech.interimTranscript ? (
+        <div className="mt-3 text-sm font-semibold text-brand-muted italic">
+          {speech.interimTranscript}
+        </div>
+      ) : null}
+      {speech.error ? (
+        <div className="mt-3 text-sm font-semibold text-red-500">
+          {speech.error}
+        </div>
+      ) : null}
     </div>
   );
 }
