@@ -16,49 +16,12 @@ import {
     searchUsers,
 } from "@api";
 import type { SearchUserResult } from "@/components/friends/friends.types";
-
-// ----------------------------------------------------
-// Mock toggle and data for testing UI without backend
-// ----------------------------------------------------
-const USE_MOCK_DATA = false; // Toggle to true to test with mock data in useFriendsPage
-const MOCK_FRIENDS: FriendResponse[] = [
-    {
-        id: 101,
-        username: "Alice",
-        avatar_url: null,
-        is_online: true,
-        friendship_status: "accepted",
-        is_requester: false,
-    },
-    {
-        id: 102,
-        username: "Bob",
-        avatar_url: null,
-        is_online: false,
-        friendship_status: "accepted",
-        is_requester: true,
-    }
-]
-const MOCK_PENDING: FriendResponse[] = [
-    {
-        id: 201,
-        username: "Charlie",
-        avatar_url: null,
-        is_online: true,
-        friendship_status: "pending",
-        is_requester: false,
-    },
-]
-
-// Pool of users returned by mock search.
-const MOCK_DISCOVERABLE_USERS: PublicUserResponse[] = [
-    { id: 101, username: "Alice",   avatar_url: null, is_online: true,  created_at: "2026-04-21T00:00:00Z" }, // friend
-    { id: 102, username: "Bob",     avatar_url: null, is_online: false, created_at: "2026-04-21T00:00:00Z" }, // friend
-    { id: 201, username: "Charlie", avatar_url: null, is_online: true,  created_at: "2026-04-21T00:00:00Z" }, // pending
-    { id: 301, username: "Dana",    avatar_url: null, is_online: true,  created_at: "2026-04-21T00:00:00Z" }, // stranger
-    { id: 302, username: "Eli",     avatar_url: null, is_online: false, created_at: "2026-04-21T00:00:00Z" }, // stranger
-    { id: 303, username: "Fatima",  avatar_url: null, is_online: true,  created_at: "2026-04-21T00:00:00Z" }, // stranger
-]
+import {
+    MOCK_DISCOVERABLE_USERS,
+    MOCK_FRIENDS,
+    MOCK_PENDING_FRIENDS,
+    USE_FRIENDS_MOCK_DATA,
+} from './friends.fixtures';
 
 // ----------------------------------------------------
 // Constants
@@ -99,8 +62,8 @@ interface UseFriendsPageResult {
 // ----------------------------------------------------
 export function useFriendsPage(): UseFriendsPageResult {
     const { accessToken } = useAuth();
-    const [friends, setFriends] = useState<FriendResponse[]>(USE_MOCK_DATA ? MOCK_FRIENDS : []);
-    const [pendingIncoming, setPendingIncoming] = useState<FriendResponse[]>(USE_MOCK_DATA ? MOCK_PENDING : []);
+    const [friends, setFriends] = useState<FriendResponse[]>(USE_FRIENDS_MOCK_DATA ? MOCK_FRIENDS : []);
+    const [pendingIncoming, setPendingIncoming] = useState<FriendResponse[]>(USE_FRIENDS_MOCK_DATA ? MOCK_PENDING_FRIENDS : []);
     const [pendingOutgoing, setPendingOutgoing] = useState<FriendResponse[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<PublicUserResponse[]>([]);
@@ -130,7 +93,7 @@ export function useFriendsPage(): UseFriendsPageResult {
 
     // Initial load effect: fetch friends and pending requests
     useEffect(() => {
-        if (USE_MOCK_DATA) return; // keep the seeded mock state, skip network
+        if (USE_FRIENDS_MOCK_DATA) return; // keep the seeded mock state, skip network
         if (!accessToken) return;
         const fetchFriendsData = async () => {
             setIsLoading(true);
@@ -166,7 +129,7 @@ export function useFriendsPage(): UseFriendsPageResult {
         }
 
         // Mock mode: filter the discoverable pool locally, no network call.
-        if (USE_MOCK_DATA) {
+        if (USE_FRIENDS_MOCK_DATA) {
             const needle = trimmed.toLowerCase();
             setSearchResults(
                 MOCK_DISCOVERABLE_USERS.filter(u =>
@@ -219,7 +182,7 @@ export function useFriendsPage(): UseFriendsPageResult {
         setPendingOutgoing(prev => [...prev, optimistic]);
 
         try {
-            if (USE_MOCK_DATA) return;
+            if (USE_FRIENDS_MOCK_DATA) return;
 
             if (!accessToken) throw new Error('No session');
             const confirmed = await sendFriendRequest(accessToken, userId);
@@ -259,7 +222,7 @@ export function useFriendsPage(): UseFriendsPageResult {
         setFriends(prev => [...prev, optimistic]);
         // api call and reconcile
         try {
-            if (!USE_MOCK_DATA) {
+            if (!USE_FRIENDS_MOCK_DATA) {
                 if (!accessToken) throw new Error('No session');
                 const confirmed = await acceptFriendRequest(accessToken, userId);
                 setFriends(prev => prev.map(f => f.id === userId ? confirmed : f));
@@ -291,7 +254,7 @@ export function useFriendsPage(): UseFriendsPageResult {
         setPendingIncoming(prev => prev.filter(r => r.id !== userId));
         // api call and reconcile
         try {
-            if (!USE_MOCK_DATA) {
+            if (!USE_FRIENDS_MOCK_DATA) {
                 if (!accessToken) throw new Error('No session');
                 await removeFriendApi(accessToken, userId);
             }
@@ -320,7 +283,7 @@ export function useFriendsPage(): UseFriendsPageResult {
         setFriends(prev => prev.filter(f => f.id !== friendId));
         // api call and reconcile
         try {
-            if (!USE_MOCK_DATA) {
+            if (!USE_FRIENDS_MOCK_DATA) {
                 if (!accessToken) throw new Error('No session');
                 await removeFriendApi(accessToken, friendId);
             }
@@ -341,10 +304,10 @@ export function useFriendsPage(): UseFriendsPageResult {
     }, []);
 
     // Mock override for testing UI without backend
-    if (USE_MOCK_DATA) {
+    if (USE_FRIENDS_MOCK_DATA) {
         return {
             friends: MOCK_FRIENDS,
-            pendingIncoming: MOCK_PENDING,
+            pendingIncoming: MOCK_PENDING_FRIENDS,
             searchResults: decoratedResults,
             searchQuery: searchQuery,
             setSearchQuery: setSearchQuery,
