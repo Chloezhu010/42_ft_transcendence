@@ -15,6 +15,46 @@ interface StoryCardProps {
   onUpdateVisibility: (storyId: number, visibility: StoryVisibility) => Promise<void>;
 }
 
+interface SharingControlProps {
+  storyTitle: string;
+  value: StoryVisibility;
+  onChange: (visibility: StoryVisibility) => Promise<void>;
+}
+
+const sharingOptions: StoryVisibility[] = ['private', 'shared_with_friends'];
+
+function SharingControl({ storyTitle, value, onChange }: SharingControlProps): JSX.Element {
+  return (
+    <fieldset className="mb-4 flex items-center justify-between gap-3">
+      <legend className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400">
+        Sharing
+      </legend>
+      <div className="inline-grid grid-cols-2 gap-0.5 rounded-full border border-purple-100 bg-purple-50 p-0.5 shadow-inner">
+        {sharingOptions.map((option) => {
+          const isSelected = value === option;
+          const visibleLabel = option === 'shared_with_friends' ? 'Friends' : getVisibilityLabel(option);
+          const selectedClassName = isSelected
+            ? 'bg-white text-purple-900 shadow-sm'
+            : 'text-purple-500 hover:bg-white/60 hover:text-purple-800';
+
+          return (
+            <button
+              key={option}
+              type="button"
+              aria-label={`${getVisibilityLabel(option)} sharing for ${storyTitle}`}
+              aria-pressed={isSelected}
+              onClick={() => void onChange(option)}
+              className={`min-h-8 min-w-16 rounded-full px-3 py-1 text-center text-[10px] font-black uppercase leading-none transition-colors focus:outline-none focus:ring-2 focus:ring-purple-300 ${selectedClassName}`}
+            >
+              {visibleLabel}
+            </button>
+          );
+        })}
+      </div>
+    </fieldset>
+  );
+}
+
 function StoryCard({ story, onDeleteStory, onUpdateVisibility }: StoryCardProps): JSX.Element {
   const { t } = useTranslation();
   const fallbackTitle = t('galleryPage.untitledMasterpiece');
@@ -56,20 +96,11 @@ function StoryCard({ story, onDeleteStory, onUpdateVisibility }: StoryCardProps)
           {displayTitle}
         </h3>
 
-        <div className="mb-4">
-          <label className="block text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-2">
-            Sharing
-          </label>
-          <select
-            aria-label={`Sharing for ${getStoryDisplayTitle(story.title, fallbackTitle)}`}
-            value={story.visibility}
-            onChange={(event) => void onUpdateVisibility(story.id, event.target.value as StoryVisibility)}
-            className="w-full rounded-xl border border-purple-200 bg-purple-50 px-3 py-2 text-sm font-semibold text-purple-900 outline-none focus:border-purple-400"
-          >
-            <option value="private">{getVisibilityLabel('private')}</option>
-            <option value="shared_with_friends">{getVisibilityLabel('shared_with_friends')}</option>
-          </select>
-        </div>
+        <SharingControl
+          storyTitle={displayTitle}
+          value={story.visibility}
+          onChange={(visibility) => onUpdateVisibility(story.id, visibility)}
+        />
 
         <div className="flex flex-wrap gap-2">
           <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full uppercase tracking-wide">
