@@ -601,6 +601,7 @@ def test_unfriending_immediately_removes_shared_story_access(client):
     [
         "/api/stories/generate",
         "/api/generate/story-script",
+        "/api/generate/story-script/stream",
         "/api/generate/panel-image",
         "/api/generate/edit-image",
     ],
@@ -616,6 +617,7 @@ def test_generation_routes_reject_no_token(gen_client, path):
     [
         "/api/stories/generate",
         "/api/generate/story-script",
+        "/api/generate/story-script/stream",
         "/api/generate/panel-image",
         "/api/generate/edit-image",
     ],
