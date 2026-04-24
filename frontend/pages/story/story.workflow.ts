@@ -6,6 +6,7 @@
  */
 import {
   generatePanelImage,
+  getFriendSharedStory,
   getStory,
   saveStory,
   streamStoryScript,
@@ -35,6 +36,22 @@ interface GeneratedPreviewState {
 
 export async function loadStoryState(accessToken: string, storyId: number): Promise<LoadedStoryState> {
   const savedStory = await getStory(accessToken, storyId);
+  return mapLoadedStoryState(savedStory, storyId);
+}
+
+export async function loadFriendSharedStoryState(
+  accessToken: string,
+  ownerUserId: number,
+  storyId: number,
+): Promise<LoadedStoryState> {
+  const sharedStory = await getFriendSharedStory(accessToken, ownerUserId, storyId);
+  return mapLoadedStoryState(sharedStory, storyId);
+}
+
+function mapLoadedStoryState(
+  savedStory: Awaited<ReturnType<typeof getStory>>,
+  storyId: number,
+): LoadedStoryState {
   const nextStory = mapApiStoryToStory(savedStory);
   const nextProfile = mapApiProfileToKidProfile(savedStory.profile);
   const profileForApi = mapKidProfileToGenerationProfile(nextProfile);
@@ -90,6 +107,7 @@ async function buildPreviewStory(
     foreword: script.foreword,
     characterDescription: script.characterDescription,
     coverImagePrompt: script.coverImagePrompt,
+    visibility: 'private',
     panels: script.panels.map((panel, index) => ({
       id: panel.id || String(index + 1),
       text: panel.text,

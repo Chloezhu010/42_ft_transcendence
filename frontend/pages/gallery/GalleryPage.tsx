@@ -3,22 +3,62 @@
  * Renders loading, empty, and card-grid states from page-level data.
  */
 import { Link } from 'react-router-dom';
+import type { StoryListItem, StoryVisibility } from '@api';
 import { useTranslation } from 'react-i18next';
-import type { StoryListItem } from '@api';
 import StorageImage from '@/components/StorageImage';
-import { formatStoryDate, getStoryDisplayTitle } from './gallery.helpers';
+import { formatStoryDate, getStoryDisplayTitle, getVisibilityLabel } from './gallery.helpers';
 import { useGalleryPage } from './useGalleryPage';
 
 interface StoryCardProps {
   story: StoryListItem;
   onDeleteStory: (storyId: number) => Promise<void>;
+  onUpdateVisibility: (storyId: number, visibility: StoryVisibility) => Promise<void>;
 }
 
-function StoryCard({ story, onDeleteStory }: StoryCardProps): JSX.Element {
+interface SharingControlProps {
+  storyTitle: string;
+  value: StoryVisibility;
+  onChange: (visibility: StoryVisibility) => Promise<void>;
+}
+
+const sharingOptions: StoryVisibility[] = ['private', 'shared_with_friends'];
+
+function SharingControl({ storyTitle, value, onChange }: SharingControlProps): JSX.Element {
+  return (
+    <fieldset className="mb-4 flex items-center justify-between gap-3">
+      <legend className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400">
+        Sharing
+      </legend>
+      <div className="inline-grid grid-cols-2 gap-0.5 rounded-full border border-purple-100 bg-purple-50 p-0.5 shadow-inner">
+        {sharingOptions.map((option) => {
+          const isSelected = value === option;
+          const visibleLabel = option === 'shared_with_friends' ? 'Friends' : getVisibilityLabel(option);
+          const selectedClassName = isSelected
+            ? 'bg-white text-purple-900 shadow-sm'
+            : 'text-purple-500 hover:bg-white/60 hover:text-purple-800';
+
+          return (
+            <button
+              key={option}
+              type="button"
+              aria-label={`${getVisibilityLabel(option)} sharing for ${storyTitle}`}
+              aria-pressed={isSelected}
+              onClick={() => void onChange(option)}
+              className={`min-h-8 min-w-16 rounded-full px-3 py-1 text-center text-[10px] font-black uppercase leading-none transition-colors focus:outline-none focus:ring-2 focus:ring-purple-300 ${selectedClassName}`}
+            >
+              {visibleLabel}
+            </button>
+          );
+        })}
+      </div>
+    </fieldset>
+  );
+}
+
+function StoryCard({ story, onDeleteStory, onUpdateVisibility }: StoryCardProps): JSX.Element {
   const { t } = useTranslation();
   const fallbackTitle = t('galleryPage.untitledMasterpiece');
   const displayTitle = getStoryDisplayTitle(story.title, fallbackTitle);
-
   return (
     <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden group border-2 border-gray-100 hover:border-purple-200 transition-all hover:-translate-y-1 relative">
       <button
@@ -56,6 +96,12 @@ function StoryCard({ story, onDeleteStory }: StoryCardProps): JSX.Element {
           {displayTitle}
         </h3>
 
+        <SharingControl
+          storyTitle={displayTitle}
+          value={story.visibility}
+          onChange={(visibility) => onUpdateVisibility(story.id, visibility)}
+        />
+
         <div className="flex flex-wrap gap-2">
           <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full uppercase tracking-wide">
             {story.profile.name}
@@ -77,8 +123,8 @@ function StoryCard({ story, onDeleteStory }: StoryCardProps): JSX.Element {
 }
 
 function GalleryPage(): JSX.Element {
+  const { isLoading, onDeleteStory, onUpdateVisibility, stories } = useGalleryPage();
   const { t } = useTranslation();
-  const { isLoading, onDeleteStory, stories } = useGalleryPage();
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 animate-in fade-in duration-700">
@@ -93,7 +139,12 @@ function GalleryPage(): JSX.Element {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {stories.map((story) => (
-            <StoryCard key={story.id} story={story} onDeleteStory={onDeleteStory} />
+            <StoryCard
+              key={story.id}
+              story={story}
+              onDeleteStory={onDeleteStory}
+              onUpdateVisibility={onUpdateVisibility}
+            />
           ))}
 
           {stories.length === 0 && (

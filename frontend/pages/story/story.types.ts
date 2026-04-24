@@ -24,3 +24,8 @@ export interface PendingGeneration {
   previewStory: Story;
   previewStoryId: number;
 }
+
+export interface StoryPageAccessContext {
+  ownerUserId: number | null;
+  isReadOnly: boolean;
+}

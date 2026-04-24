@@ -8,10 +8,12 @@ from db.crud_users import (
     create_user,
     get_friends,
     get_friendship_between,
+    get_outgoing_pending_requests,
     get_pending_requests,
     get_user_by_email,
     get_user_by_id,
     remove_friend,
+    search_users_by_username,
     send_friend_request,
     set_online_status,
     update_avatar,
@@ -112,6 +114,86 @@ async def test_get_user_by_id_returns_none_when_missing(db):
     user = await get_user_by_id(db, 99999)
 
     assert user is None
+
+
+# --- search_users_by_username ---
+@pytest.mark.asyncio
+async def test_search_users_by_username_matches_partial_case_insensitive(db):
+    _, bob_id, _ = await create_sample_users(db)
+
+    results = await search_users_by_username(db, "ALI", current_user_id=bob_id)
+
+    usernames = [row["username"] for row in results]
+    assert "alice" in usernames
+    assert all(row["id"] != bob_id for row in results)
+
+
+@pytest.mark.asyncio
+async def test_search_users_by_username_excludes_current_user(db):
+    alice_id, _, _ = await create_sample_users(db)
+
+    results = await search_users_by_username(db, "ali", current_user_id=alice_id)
+
+    assert all(row["id"] != alice_id for row in results)
+    assert results == []
+
+
+@pytest.mark.asyncio
+async def test_search_users_by_username_returns_empty_for_blank_query(db):
+    alice_id, _, _ = await create_sample_users(db)
+
+    assert await search_users_by_username(db, "", current_user_id=alice_id) == []
+    assert await search_users_by_username(db, "   ", current_user_id=alice_id) == []
+
+
+@pytest.mark.asyncio
+async def test_search_users_by_username_orders_alphabetically(db):
+    # Insert out of alphabetical order to confirm ORDER BY, not insertion order.
+    zoe_id = await create_user(db, "zoe", "zoe@example.com", "password123")
+    await create_user(db, "Aaron", "aaron@example.com", "password123")
+    await create_user(db, "amy", "amy@example.com", "password123")
+
+    results = await search_users_by_username(db, "a", current_user_id=zoe_id)
+
+    usernames = [row["username"] for row in results]
+    # COLLATE NOCASE => "Aaron" sorts before "amy"
+    assert usernames == sorted(usernames, key=str.lower)
+    assert usernames[0].lower() == "aaron"
+
+
+@pytest.mark.asyncio
+async def test_search_users_by_username_clamps_limit(db):
+    searcher_id = await create_user(db, "searcher", "s@example.com", "password123")
+    for i in range(25):
+        await create_user(db, f"user{i:02d}", f"u{i}@example.com", "password123")
+
+    # limit above max (20) should be clamped down to 20
+    capped = await search_users_by_username(db, "user", current_user_id=searcher_id, limit=999)
+    assert len(capped) == 20
+
+    # limit below min (1) should be clamped up to 1
+    floored = await search_users_by_username(db, "user", current_user_id=searcher_id, limit=0)
+    assert len(floored) == 1
+
+
+@pytest.mark.asyncio
+async def test_search_users_by_username_escapes_like_wildcards(db):
+    searcher_id = await create_user(db, "searcher", "s@example.com", "password123")
+    await create_user(db, "a_c", "a_c@example.com", "password123")
+    await create_user(db, "abc", "abc@example.com", "password123")
+    await create_user(db, "a%z", "apz@example.com", "password123")
+    await create_user(db, "plain", "plain@example.com", "password123")
+
+    # "_" must be treated literally, not as "any single char"
+    underscore_results = await search_users_by_username(db, "a_c", current_user_id=searcher_id)
+    usernames = [row["username"] for row in underscore_results]
+    assert "a_c" in usernames
+    assert "abc" not in usernames
+
+    # "%" must be treated literally, not as "match anything"
+    percent_results = await search_users_by_username(db, "%", current_user_id=searcher_id)
+    percent_usernames = [row["username"] for row in percent_results]
+    assert percent_usernames == ["a%z"]
 
 
 @pytest.mark.asyncio
@@ -480,3 +562,52 @@ async def test_get_pending_requests_returns_empty_list_when_none(db):
     pending_requests = await get_pending_requests(db, alice_id)
 
     assert pending_requests == []
+
+
+# --- get_outgoing_pending_requests ---
+
+
+@pytest.mark.asyncio
+async def test_get_outgoing_pending_requests_returns_sent_requests(db):
+    alice_id, bob_id, charlie_id = await create_sample_users(db)
+    await send_friend_request(db, alice_id, bob_id)
+    await send_friend_request(db, alice_id, charlie_id)
+
+    outgoing = await get_outgoing_pending_requests(db, alice_id)
+
+    assert len(outgoing) == 2
+    addressee_ids = {row["id"] for row in outgoing}
+    assert addressee_ids == {bob_id, charlie_id}
+    assert all(row["status"] == "pending" for row in outgoing)
+    assert all(row["requester_id"] == alice_id for row in outgoing)
+
+
+@pytest.mark.asyncio
+async def test_get_outgoing_pending_requests_excludes_incoming(db):
+    """A request sent *to* alice must not appear in her outgoing list."""
+    alice_id, bob_id, _ = await create_sample_users(db)
+    await send_friend_request(db, bob_id, alice_id)
+
+    outgoing = await get_outgoing_pending_requests(db, alice_id)
+
+    assert outgoing == []
+
+
+@pytest.mark.asyncio
+async def test_get_outgoing_pending_requests_excludes_accepted(db):
+    alice_id, bob_id, _ = await create_sample_users(db)
+    await send_friend_request(db, alice_id, bob_id)
+    await accept_friend_request(db, bob_id, alice_id)
+
+    outgoing = await get_outgoing_pending_requests(db, alice_id)
+
+    assert outgoing == []
+
+
+@pytest.mark.asyncio
+async def test_get_outgoing_pending_requests_returns_empty_list_when_none(db):
+    alice_id = await create_user(db, "alice", "alice@example.com", "password123")
+
+    outgoing = await get_outgoing_pending_requests(db, alice_id)
+
+    assert outgoing == []

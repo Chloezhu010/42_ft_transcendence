@@ -55,6 +55,12 @@ function AppLayout(): JSX.Element {
             >
               {t('app.myLibrary')}
             </Link>
+            <Link
+              to="/friends"
+              className="text-brand-muted hover:text-brand-primary transition-colors px-4 py-2 rounded-full hover:bg-brand-light"
+            >
+              Friends
+            </Link>
             {currentUser ? (
               <Link
                 to="/profile"
@@ -87,13 +93,11 @@ function AppLayout(): JSX.Element {
           <div className="max-w-xl">
             <div className="font-rounded text-2xl text-brand-primary">Funova</div>
             <p className="mt-2 text-sm leading-6 text-brand-muted">
-              A student-built AI comic book generator for the 42 ft_transcendence project.
+              AI comic book generator.
             </p>
           </div>
 
           <div className="flex flex-wrap gap-4 text-sm font-semibold text-brand-primary">
-            <Link className="hover:text-brand-dark" to="/create">Create Story</Link>
-            <Link className="hover:text-brand-dark" to="/gallery">Library</Link>
             <Link className="hover:text-brand-dark" to="/privacy">Privacy Policy</Link>
             <Link className="hover:text-brand-dark" to="/terms">Terms of Service</Link>
             <a
