@@ -4,6 +4,7 @@ providers:
   - name: WonderComic
     type: file
     updateIntervalSeconds: 30
+    allowUiUpdates: true
     options:
       path: /etc/grafana/provisioning/dashboards
       foldersFromFilesStructure: false

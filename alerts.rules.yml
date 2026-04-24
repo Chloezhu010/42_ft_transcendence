@@ -1,0 +1,78 @@
+groups:
+  - name: wondercomic.availability
+    rules:
+      - alert: BackendDown
+        expr: up{job="wondercomic-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "WonderComic backend is down"
+          description: "Backend service has been unreachable for more than 1 minute."
+
+      - alert: NodeExporterDown
+        expr: up{job="node"} == 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Node exporter is down"
+          description: "Host metrics collection has been unavailable for more than 1 minute."
+
+  - name: wondercomic.api
+    rules:
+      - alert: HighErrorRate
+        expr: >
+          sum(rate(http_requests_total{job="wondercomic-backend",status_code=~"5.."}[5m]))
+          / sum(rate(http_requests_total{job="wondercomic-backend"}[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High 5xx error rate on WonderComic API"
+          description: "5xx error rate has been above 5% for the past 5 minutes."
+
+      - alert: HighP95Latency
+        expr: >
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket{job="wondercomic-backend"}[5m])) by (le)
+          ) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High p95 latency on WonderComic API"
+          description: "p95 response latency has exceeded 2s for the past 5 minutes."
+
+  - name: node.resources
+    rules:
+      - alert: HighCPUUsage
+        expr: >
+          (1 - avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m]))) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage on host"
+          description: "CPU usage has been above 80% for the past 5 minutes."
+
+      - alert: HighMemoryUsage
+        expr: >
+          (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on host"
+          description: "Memory usage has been above 85% for the past 5 minutes."
+
+      - alert: HighDiskUsage
+        expr: >
+          (1 - node_filesystem_avail_bytes{mountpoint="/"}
+          / node_filesystem_size_bytes{mountpoint="/"}) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High disk usage on host"
+          description: "Disk usage on / has been above 85% for the past 5 minutes."

@@ -6,6 +6,7 @@ import asyncio
 import base64
 import os
 import random
+import time
 from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Any
@@ -15,6 +16,7 @@ from google import genai
 from google.genai import types
 
 from llm.streaming import StoryIntroStreamer
+from metrics import gemini_failures_total, gemini_request_duration_seconds
 from models import GenerateStoryScriptResponse, KidProfileCreate
 
 STORY_SCRIPT_MODEL = "gemini-3-flash-preview"
@@ -154,7 +156,14 @@ async def generate_story_script(
         result = GenerateStoryScriptResponse.model_validate_json(response.text)
         return result.model_dump()
 
-    return await with_retry(_generate)
+    start = time.perf_counter()
+    try:
+        result = await with_retry(_generate)
+        gemini_request_duration_seconds.labels(operation="script").observe(time.perf_counter() - start)
+        return result
+    except Exception:
+        gemini_failures_total.labels(operation="script").inc()
+        raise
 
 
 async def generate_story_script_stream(
@@ -177,29 +186,35 @@ async def generate_story_script_stream(
     prompt = _build_story_script_prompt(profile)
     contents = _build_story_script_contents(prompt, profile.photo_base64)
 
-    response_stream = await _get_client().aio.models.generate_content_stream(
-        model=STORY_SCRIPT_MODEL,
-        contents=contents,
-        config=_STORY_SCRIPT_CONFIG,
-    )
+    start = time.perf_counter()
+    try:
+        response_stream = await _get_client().aio.models.generate_content_stream(
+            model=STORY_SCRIPT_MODEL,
+            contents=contents,
+            config=_STORY_SCRIPT_CONFIG,
+        )
 
-    streamer = StoryIntroStreamer(INTRO_FIELDS)
-    raw_json = ""
+        streamer = StoryIntroStreamer(INTRO_FIELDS)
+        raw_json = ""
 
-    async for chunk in response_stream:
-        text = chunk.text
-        if not text:
-            continue
-        raw_json += text
-        for event in streamer.feed(text):
-            yield {
-                "type": "intro_delta",
-                "field": event.field,
-                "delta": event.delta,
-            }
+        async for chunk in response_stream:
+            text = chunk.text
+            if not text:
+                continue
+            raw_json += text
+            for event in streamer.feed(text):
+                yield {
+                    "type": "intro_delta",
+                    "field": event.field,
+                    "delta": event.delta,
+                }
 
-    result = GenerateStoryScriptResponse.model_validate_json(raw_json)
-    yield {"type": "script", "script": result.model_dump()}
+        result = GenerateStoryScriptResponse.model_validate_json(raw_json)
+        yield {"type": "script", "script": result.model_dump()}
+        gemini_request_duration_seconds.labels(operation="script_stream").observe(time.perf_counter() - start)
+    except Exception:
+        gemini_failures_total.labels(operation="script_stream").inc()
+        raise
 
 
 async def generate_panel_image(prompt: str, cast_guide: str, style: str | None = None) -> str:
@@ -221,7 +236,14 @@ Cinematic angles, characters interact with each other/world — NEVER face the c
 
         return extract_image_from_response(response)
 
-    return await with_retry(_generate)
+    start = time.perf_counter()
+    try:
+        result = await with_retry(_generate)
+        gemini_request_duration_seconds.labels(operation="panel_image").observe(time.perf_counter() - start)
+        return result
+    except Exception:
+        gemini_failures_total.labels(operation="panel_image").inc()
+        raise
 
 
 async def edit_panel_image(
@@ -256,4 +278,11 @@ Preserve composition and style. Characters must NOT face the camera."""
 
         return extract_image_from_response(response)
 
-    return await with_retry(_generate)
+    start = time.perf_counter()
+    try:
+        result = await with_retry(_generate)
+        gemini_request_duration_seconds.labels(operation="edit").observe(time.perf_counter() - start)
+        return result
+    except Exception:
+        gemini_failures_total.labels(operation="edit").inc()
+        raise

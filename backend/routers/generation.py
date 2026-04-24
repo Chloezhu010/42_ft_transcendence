@@ -26,6 +26,7 @@ from llm.gemini_service import (
 from llm.gemini_service import (
     generate_story_script_stream as gen_script_stream,
 )
+from metrics import stories_generation_in_progress, story_funnel_total
 from models import (
     EditPanelImageRequest,
     EditPanelImageResponse,
@@ -53,64 +54,73 @@ async def generate_and_save_story(
     current_user: dict = Depends(get_current_user),
 ):
     """Generate story script + images and save to DB."""
-    # 1. Generate story script via Gemini
+    story_funnel_total.labels(stage="pipeline", status="started").inc()
+    stories_generation_in_progress.inc()
     try:
-        result = await gen_script(profile=request.profile)
-    except Exception as e:
-        print(f"Story script generation error: {e}")
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=safe_error_detail(e, "Story generation failed"))
+        # 1. Generate story script via Gemini
+        try:
+            result = await gen_script(profile=request.profile)
+        except Exception as e:
+            story_funnel_total.labels(stage="pipeline_script", status="failed").inc()
+            print(f"Story script generation error: {e}")
+            traceback.print_exc()
+            raise HTTPException(status_code=500, detail=safe_error_detail(e, "Story generation failed"))
 
-    # 2. Generate images (cover + all panels)
-    all_panels = result["panels"]
-    art_style = request.profile.art_style
-    char_desc = result["characterDescription"]
+        # 2. Generate images (cover + all panels)
+        all_panels = result["panels"]
+        art_style = request.profile.art_style
+        char_desc = result["characterDescription"]
 
-    try:
-        cover_image_base64 = await gen_panel_image(
-            prompt=result["coverImagePrompt"],
-            cast_guide=char_desc,
-            style=art_style,
-        )
-
-        panel_images: dict[int, str] = {}
-        for i in range(len(all_panels)):
-            panel_images[i] = await gen_panel_image(
-                prompt=all_panels[i]["imagePrompt"],
+        try:
+            cover_image_base64 = await gen_panel_image(
+                prompt=result["coverImagePrompt"],
                 cast_guide=char_desc,
                 style=art_style,
             )
-    except Exception as e:
-        print(f"Image generation error: {e}")
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=safe_error_detail(e, "Image generation failed"))
 
-    # 3. Save story to DB with images
-    try:
-        story_data = StoryCreate(
-            profile=request.profile,
-            title=result["title"],
-            foreword=result["foreword"],
-            character_description=result["characterDescription"],
-            cover_image_prompt=result["coverImagePrompt"],
-            cover_image_base64=cover_image_base64,
-            panels=[
-                PanelCreate(
-                    panel_order=idx,
-                    text=p["text"],
-                    image_prompt=p["imagePrompt"],
-                    image_base64=panel_images.get(idx),
+            panel_images: dict[int, str] = {}
+            for i in range(len(all_panels)):
+                panel_images[i] = await gen_panel_image(
+                    prompt=all_panels[i]["imagePrompt"],
+                    cast_guide=char_desc,
+                    style=art_style,
                 )
-                for idx, p in enumerate(all_panels)
-            ],
-        )
-        saved = await crud.create_story(db, story_data, current_user["id"])
-    except Exception as e:
-        print(f"Story save error: {e}")
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail="Failed to save story")
+        except Exception as e:
+            story_funnel_total.labels(stage="pipeline_images", status="failed").inc()
+            print(f"Image generation error: {e}")
+            traceback.print_exc()
+            raise HTTPException(status_code=500, detail=safe_error_detail(e, "Image generation failed"))
 
-    return GenerateAndSaveStoryResponse(story=saved)
+        # 3. Save story to DB with images
+        try:
+            story_data = StoryCreate(
+                profile=request.profile,
+                title=result["title"],
+                foreword=result["foreword"],
+                character_description=result["characterDescription"],
+                cover_image_prompt=result["coverImagePrompt"],
+                cover_image_base64=cover_image_base64,
+                panels=[
+                    PanelCreate(
+                        panel_order=idx,
+                        text=p["text"],
+                        image_prompt=p["imagePrompt"],
+                        image_base64=panel_images.get(idx),
+                    )
+                    for idx, p in enumerate(all_panels)
+                ],
+            )
+            saved = await crud.create_story(db, story_data, current_user["id"])
+        except Exception as e:
+            story_funnel_total.labels(stage="pipeline_save", status="failed").inc()
+            print(f"Story save error: {e}")
+            traceback.print_exc()
+            raise HTTPException(status_code=500, detail="Failed to save story")
+
+        story_funnel_total.labels(stage="pipeline", status="completed").inc()
+        return GenerateAndSaveStoryResponse(story=saved)
+    finally:
+        stories_generation_in_progress.dec()
 
 
 @router.post("/generate/story-script", response_model=GenerateStoryScriptResponse)
@@ -119,13 +129,19 @@ async def generate_story_script(
     current_user: dict = Depends(get_current_user),
 ):
     """Generate a story script using Gemini AI."""
+    story_funnel_total.labels(stage="script_sync", status="started").inc()
+    stories_generation_in_progress.inc()
     try:
         result = await gen_script(profile=request.profile)
+        story_funnel_total.labels(stage="script_sync", status="completed").inc()
         return result
     except Exception as e:
+        story_funnel_total.labels(stage="script_sync", status="failed").inc()
         print(f"Story script generation error: {e}")
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=safe_error_detail(e, "Story generation failed"))
+    finally:
+        stories_generation_in_progress.dec()
 
 
 async def _stream_story_script_events(
@@ -137,10 +153,14 @@ async def _stream_story_script_events(
     than an HTTP failure, because headers are already on the wire by the time
     Gemini might reject a request mid-stream.
     """
+    story_funnel_total.labels(stage="script_stream", status="started").inc()
+    stories_generation_in_progress.inc()
     try:
         async for event in gen_script_stream(profile=request.profile):
             yield (json.dumps(event) + "\n").encode("utf-8")
+        story_funnel_total.labels(stage="script_stream", status="completed").inc()
     except Exception as err:
+        story_funnel_total.labels(stage="script_stream", status="failed").inc()
         print(f"Streaming story script error: {err}")
         traceback.print_exc()
         error_event = {
@@ -148,6 +168,8 @@ async def _stream_story_script_events(
             "message": safe_error_detail(err, "Story generation failed"),
         }
         yield (json.dumps(error_event) + "\n").encode("utf-8")
+    finally:
+        stories_generation_in_progress.dec()
 
 
 @router.post("/generate/story-script/stream")

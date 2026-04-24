@@ -15,7 +15,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 
 from config import get_config
 from db.database import get_db, init_db
-from routers import auth, friend, generation, stories, user
+from routers import auth, friend, generation, monitoring, stories, user
 
 
 @asynccontextmanager
@@ -74,6 +74,7 @@ app.include_router(user.router)
 app.include_router(friend.router)
 app.include_router(generation.router)
 app.include_router(stories.router)
+app.include_router(monitoring.router)
 
 # Expose /metrics endpoint for Prometheus scraping
 # Exclude internal endpoints to avoid noise in dashboards
