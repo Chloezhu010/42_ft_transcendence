@@ -30,10 +30,10 @@ import json
 import os
 import socket
 import subprocess
-import urllib3
 
 import pytest
 import requests
+import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
