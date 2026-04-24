@@ -72,6 +72,19 @@ def docker_exec(service: str, command: str) -> subprocess.CompletedProcess:
 # ---------------------------------------------------------------------------
 
 
+@pytest.fixture(scope="session", autouse=True)
+def require_docker_stack():
+    """Skip the entire module when the Docker stack is not running."""
+    result = subprocess.run(
+        ["docker", "ps", "--filter", "name=backend", "--format", "{{.Names}}"],
+        capture_output=True,
+        text=True,
+    )
+    running = [n for n in result.stdout.splitlines() if "-backend-" in n]
+    if not running:
+        pytest.skip("Docker stack not running — skipping monitoring tests")
+
+
 @pytest.fixture(scope="session")
 def http():
     session = requests.Session()
