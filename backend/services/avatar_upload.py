@@ -8,7 +8,7 @@ from typing import Any
 import aiofiles
 from fastapi import UploadFile
 
-from db.crud_users import get_user_by_id, update_avatar
+from db.users_crud import get_user_by_id, update_avatar
 
 DEFAULT_IMAGE_DIR = Path(__file__).resolve().parent.parent / "images"
 ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/jpg", "image/png", "image/webp"}
