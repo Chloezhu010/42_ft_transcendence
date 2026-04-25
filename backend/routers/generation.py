@@ -12,7 +12,7 @@ from fastapi.responses import StreamingResponse
 
 from auth_utils import get_current_user
 from config import safe_error_detail
-from db import crud
+from db import stories_crud
 from db.database import get_db
 from llm.gemini_service import (
     edit_panel_image as edit_image,
@@ -27,7 +27,7 @@ from llm.gemini_service import (
     generate_story_script_stream as gen_script_stream,
 )
 from metrics import stories_generation_in_progress, story_funnel_total
-from models import (
+from schemas import (
     EditPanelImageRequest,
     EditPanelImageResponse,
     GenerateAndSaveStoryRequest,
@@ -124,7 +124,7 @@ async def generate_and_save_story(
                     for idx, p in enumerate(all_panels)
                 ],
             )
-            saved = await crud.create_story(db, story_data, current_user["id"])
+            saved = await stories_crud.create_story(db, story_data, current_user["id"])
         except Exception as e:
             story_funnel_total.labels(stage="pipeline_save", status="failed").inc()
             print(f"Story save error: {e}")
