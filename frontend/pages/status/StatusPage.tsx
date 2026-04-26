@@ -63,9 +63,14 @@ function BackupSection({ backupStatus, isTriggeringBackup, onTrigger }: BackupSe
   return (
     <section className="bg-white rounded-2xl shadow-md border border-gray-100 p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-black text-gray-700 uppercase tracking-wide">
-          Backups
-        </h2>
+        <div>
+          <h2 className="text-lg font-black text-gray-700 uppercase tracking-wide">
+            Backups
+          </h2>
+          <span className="text-xs text-gray-400">
+            {backupStatus.total_backups} snapshot{backupStatus.total_backups !== 1 ? 's' : ''} available
+          </span>
+        </div>
         <button
           type="button"
           onClick={onTrigger}

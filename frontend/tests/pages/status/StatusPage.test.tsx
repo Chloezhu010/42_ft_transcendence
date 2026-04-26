@@ -65,6 +65,7 @@ function renderStatusPage(): void {
 }
 
 beforeEach(() => {
+  vi.clearAllMocks();
   mockGetHealthStatus.mockResolvedValue(HEALTHY_STATUS);
   mockGetBackupStatus.mockResolvedValue(BACKUP_STATUS_WITH_ENTRIES);
   mockTriggerBackup.mockResolvedValue(undefined);
@@ -122,7 +123,7 @@ describe('StatusPage', () => {
     it('shows the number of available backups', async () => {
       renderStatusPage();
       await waitFor(() => {
-        expect(screen.getByText(/2/)).toBeInTheDocument();
+        expect(screen.getByText(/2 snapshots available/)).toBeInTheDocument();
       });
     });
 
@@ -192,7 +193,7 @@ describe('StatusPage', () => {
       fireEvent.click(screen.getByRole('button', { name: /back up now/i }));
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /back up now/i })).toBeDisabled();
+        expect(screen.getByRole('button', { name: /backing up/i })).toBeDisabled();
       });
 
       resolveBackup!();
