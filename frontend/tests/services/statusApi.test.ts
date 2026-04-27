@@ -135,11 +135,17 @@ describe('getBackupStatus', () => {
   });
 });
 
+const TRIGGER_RESPONSE = {
+  filename: 'wondercomic_20260427_000000.db',
+  size_bytes: 102400,
+  created_at: '2026-04-27T00:00:00+00:00',
+};
+
 describe('triggerBackup', () => {
   it('sends POST to /backup/trigger', async () => {
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(JSON.stringify({ message: 'Backup started' }), {
-        status: 202,
+      new Response(JSON.stringify(TRIGGER_RESPONSE), {
+        status: 200,
         headers: { 'Content-Type': 'application/json' },
       }),
     );
@@ -154,8 +160,8 @@ describe('triggerBackup', () => {
 
   it('sends Authorization header with the access token', async () => {
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(JSON.stringify({ message: 'Backup started' }), {
-        status: 202,
+      new Response(JSON.stringify(TRIGGER_RESPONSE), {
+        status: 200,
         headers: { 'Content-Type': 'application/json' },
       }),
     );
@@ -170,18 +176,18 @@ describe('triggerBackup', () => {
     );
   });
 
-  it('resolves without a return value on success', async () => {
+  it('resolves with the new backup entry on success', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(JSON.stringify({ message: 'Backup started' }), {
-        status: 202,
+      new Response(JSON.stringify(TRIGGER_RESPONSE), {
+        status: 200,
         headers: { 'Content-Type': 'application/json' },
       }),
     );
 
-    await expect(triggerBackup('test-token')).resolves.toBeUndefined();
+    await expect(triggerBackup('test-token')).resolves.toEqual(TRIGGER_RESPONSE);
   });
 
-  it('surfaces backend detail on non-202 response', async () => {
+  it('surfaces backend detail on non-200 response', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       new Response(JSON.stringify({ detail: 'Backup already in progress' }), {
         status: 409,

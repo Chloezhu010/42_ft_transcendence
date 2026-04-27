@@ -132,11 +132,6 @@ export function StatusPage(): JSX.Element {
     }
   };
 
-  const refreshBackupStatus = async (): Promise<void> => {
-    const data = await getBackupStatus();
-    setBackupStatus(data);
-  };
-
   useEffect(() => {
     void loadData();
   }, []);
@@ -145,8 +140,15 @@ export function StatusPage(): JSX.Element {
     if (!accessToken) return;
     setIsTriggeringBackup(true);
     try {
-      await triggerBackup(accessToken);
-      await refreshBackupStatus();
+      const newEntry = await triggerBackup(accessToken);
+      setBackupStatus((prev) => {
+        if (!prev) return prev;
+        return {
+          last_backup: newEntry.created_at,
+          total_backups: prev.total_backups + 1,
+          backups: [newEntry, ...prev.backups],
+        };
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to trigger backup');
     } finally {

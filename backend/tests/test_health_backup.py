@@ -172,20 +172,34 @@ class TestBackupStatusEndpoint:
 # ===========================================================================
 
 
+def _make_backup_stub(backup_dir):
+    """Return an async callable that creates a fake backup file and returns its filename."""
+    filename = "wondercomic_20260427_000000.db"
+
+    async def _stub():
+        backup_dir.mkdir(parents=True, exist_ok=True)
+        (backup_dir / filename).write_bytes(b"\x00" * 1024)
+        return filename
+
+    return _stub
+
+
 class TestBackupTriggerEndpoint:
-    def test_returns_202_accepted(self, backup_client):
-        with patch("routers.backup.create_backup", new_callable=AsyncMock):
-            assert backup_client.post("/backup/trigger").status_code == 202
+    def test_returns_200_ok(self, backup_client, isolate_backup_dir):
+        with patch("routers.backup.create_backup", side_effect=_make_backup_stub(isolate_backup_dir)):
+            assert backup_client.post("/backup/trigger").status_code == 200
 
-    def test_response_contains_message(self, backup_client):
-        with patch("routers.backup.create_backup", new_callable=AsyncMock):
+    def test_response_contains_backup_entry_fields(self, backup_client, isolate_backup_dir):
+        with patch("routers.backup.create_backup", side_effect=_make_backup_stub(isolate_backup_dir)):
             data = backup_client.post("/backup/trigger").json()
-            assert "message" in data
+            assert "filename" in data
+            assert "size_bytes" in data
+            assert "created_at" in data
 
-    def test_message_indicates_backup_started(self, backup_client):
-        with patch("routers.backup.create_backup", new_callable=AsyncMock):
+    def test_returned_filename_matches_new_backup(self, backup_client, isolate_backup_dir):
+        with patch("routers.backup.create_backup", side_effect=_make_backup_stub(isolate_backup_dir)):
             data = backup_client.post("/backup/trigger").json()
-            assert "backup" in data["message"].lower() or "started" in data["message"].lower()
+            assert data["filename"] == "wondercomic_20260427_000000.db"
 
     def test_returns_401_without_authentication(self, tmp_path):
         db_path = str(tmp_path / "test.db")

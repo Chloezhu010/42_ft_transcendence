@@ -62,6 +62,12 @@ const BACKUP_STATUS_EMPTY = {
   backups: [],
 };
 
+const NEW_BACKUP_ENTRY = {
+  filename: 'wondercomic_20260427_000000.db',
+  size_bytes: 102400,
+  created_at: '2026-04-27T00:00:00+00:00',
+};
+
 function renderStatusPage(): void {
   render(
     <MemoryRouter>
@@ -74,7 +80,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   mockGetHealthStatus.mockResolvedValue(HEALTHY_STATUS);
   mockGetBackupStatus.mockResolvedValue(BACKUP_STATUS_WITH_ENTRIES);
-  mockTriggerBackup.mockResolvedValue(undefined);
+  mockTriggerBackup.mockResolvedValue(NEW_BACKUP_ENTRY);
   mockUseAuth.mockReturnValue({ accessToken: 'test-token' });
 });
 
@@ -170,20 +176,16 @@ describe('StatusPage', () => {
       });
     });
 
-    it('refreshes backup status after a successful backup trigger', async () => {
+    it('prepends the new backup entry to the list without a second fetch', async () => {
       renderStatusPage();
       await waitFor(() => screen.getByRole('button', { name: /back up now/i }));
-
-      mockGetBackupStatus.mockResolvedValue({
-        ...BACKUP_STATUS_WITH_ENTRIES,
-        total_backups: 3,
-      });
 
       fireEvent.click(screen.getByRole('button', { name: /back up now/i }));
 
       await waitFor(() => {
-        expect(mockGetBackupStatus).toHaveBeenCalledTimes(2);
+        expect(screen.getByText(/wondercomic_20260427_000000\.db/)).toBeInTheDocument();
       });
+      expect(mockGetBackupStatus).toHaveBeenCalledTimes(1);
     });
 
     it('hides the trigger button when the user is not authenticated', async () => {
@@ -195,9 +197,9 @@ describe('StatusPage', () => {
     });
 
     it('disables the button while a backup is in progress', async () => {
-      let resolveBackup: () => void;
+      let resolveBackup: (entry: typeof NEW_BACKUP_ENTRY) => void;
       mockTriggerBackup.mockReturnValue(
-        new Promise<void>((resolve) => {
+        new Promise<typeof NEW_BACKUP_ENTRY>((resolve) => {
           resolveBackup = resolve;
         }),
       );
@@ -211,7 +213,7 @@ describe('StatusPage', () => {
         expect(screen.getByRole('button', { name: /backing up/i })).toBeDisabled();
       });
 
-      resolveBackup!();
+      resolveBackup!(NEW_BACKUP_ENTRY);
     });
   });
 
