@@ -88,6 +88,10 @@ def test_verify_whitespace_matters():
     assert verify_password("password", h) is False
 
 
+def test_verify_password_with_none_hash_returns_false():
+    assert verify_password("secret123", None) is False
+
+
 # --- create_access_token ---
 
 
