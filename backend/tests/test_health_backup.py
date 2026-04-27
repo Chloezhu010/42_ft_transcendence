@@ -13,7 +13,6 @@ Covers:
 import asyncio
 import sqlite3
 import time
-from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import aiosqlite
@@ -22,7 +21,7 @@ from fastapi import Depends, FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.testclient import TestClient
 
-from db.backup import BACKUP_DIR, MAX_BACKUPS, create_backup, get_last_backup_time, list_backups
+from db.backup import MAX_BACKUPS, create_backup, get_last_backup_time, list_backups
 from db.database import get_db
 from routers.backup import router as backup_router
 from tests.conftest import _init_test_db, make_test_app

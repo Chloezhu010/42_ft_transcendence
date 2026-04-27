@@ -162,7 +162,7 @@ export function StatusPage(): JSX.Element {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 animate-in fade-in duration-700">
-      <h1 className="text-3xl font-black text-gray-800 mb-8">System Status</h1>
+      <h2 className="text-3xl font-black text-gray-800 mb-8">System Status</h2>
 
       {error && (
         <div

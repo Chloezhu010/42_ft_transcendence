@@ -18,8 +18,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from config import get_config
 from db.backup import create_backup
 from db.database import get_db, init_db
-from routers import auth, friend, generation, monitoring, stories, user
-from routers import backup
+from routers import auth, backup, friend, generation, monitoring, stories, user
 
 _BACKUP_INTERVAL_SECONDS = 24 * 60 * 60
 
