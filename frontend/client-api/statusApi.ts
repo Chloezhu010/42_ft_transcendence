@@ -21,10 +21,10 @@ export interface BackupStatus {
 
 export async function getHealthStatus(): Promise<HealthCheck> {
   const response = await apiFetch(`${API_BASE_URL}/health`, { method: 'GET' });
-  if (!response.ok) {
-    throw await buildApiError(response, 'Health check failed');
+  if (response.ok || response.status === 503) {
+    return response.json() as Promise<HealthCheck>;
   }
-  return response.json() as Promise<HealthCheck>;
+  throw await buildApiError(response, 'Health check failed');
 }
 
 export async function getBackupStatus(): Promise<BackupStatus> {

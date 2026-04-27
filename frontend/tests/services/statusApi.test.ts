@@ -60,19 +60,19 @@ describe('getHealthStatus', () => {
       }),
     );
 
-    await expect(getHealthStatus()).rejects.toThrow();
+    await expect(getHealthStatus()).resolves.toEqual(unhealthyResponse);
   });
 
-  it('surfaces backend error message on non-200 response', async () => {
+  it('surfaces backend error message on unexpected error status', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(JSON.stringify({ detail: 'Service unavailable' }), {
-        status: 503,
+      new Response(JSON.stringify({ detail: 'Internal server error' }), {
+        status: 500,
         headers: { 'Content-Type': 'application/json' },
-        statusText: 'Service Unavailable',
+        statusText: 'Internal Server Error',
       }),
     );
 
-    await expect(getHealthStatus()).rejects.toThrow('Service unavailable');
+    await expect(getHealthStatus()).rejects.toThrow('Internal server error');
   });
 
   it('throws a network error when fetch fails', async () => {
