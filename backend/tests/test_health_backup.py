@@ -21,6 +21,7 @@ from fastapi import Depends, FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.testclient import TestClient
 
+from auth_utils import get_current_user
 from db.backup import MAX_BACKUPS, create_backup, get_last_backup_time, list_backups
 from db.database import get_db
 from routers.backup import router as backup_router
@@ -127,10 +128,12 @@ def failing_health_client():
 
 @pytest.fixture
 def backup_client(tmp_path):
-    """TestClient with the backup router and a fresh temp DB."""
+    """TestClient with the backup router, a fresh temp DB, and a mock authenticated user."""
     db_path = str(tmp_path / "test.db")
     asyncio.run(_init_test_db(db_path))
-    with TestClient(make_test_app(db_path, backup_router)) as c:
+    app = make_test_app(db_path, backup_router)
+    app.dependency_overrides[get_current_user] = lambda: {"id": 1, "username": "testuser", "email": "test@example.com"}
+    with TestClient(app) as c:
         yield c
 
 
@@ -251,6 +254,12 @@ class TestBackupTriggerEndpoint:
         with patch("routers.backup.create_backup", new_callable=AsyncMock):
             data = backup_client.post("/backup/trigger").json()
             assert "backup" in data["message"].lower() or "started" in data["message"].lower()
+
+    def test_returns_401_without_authentication(self, tmp_path):
+        db_path = str(tmp_path / "test.db")
+        asyncio.run(_init_test_db(db_path))
+        with TestClient(make_test_app(db_path, backup_router)) as c:
+            assert c.post("/backup/trigger").status_code == 401
 
 
 # ===========================================================================

@@ -5,6 +5,7 @@
 import { useEffect, useState } from 'react';
 import type { BackupEntry, BackupStatus, HealthCheck } from '@api';
 import { getBackupStatus, getHealthStatus, triggerBackup } from '@api';
+import { useAuth } from '@/app/auth/useAuth';
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -56,7 +57,7 @@ function HealthSection({ health }: HealthSectionProps): JSX.Element {
 interface BackupSectionProps {
   backupStatus: BackupStatus;
   isTriggeringBackup: boolean;
-  onTrigger: () => void;
+  onTrigger: (() => void) | null;
 }
 
 function BackupSection({ backupStatus, isTriggeringBackup, onTrigger }: BackupSectionProps): JSX.Element {
@@ -71,14 +72,16 @@ function BackupSection({ backupStatus, isTriggeringBackup, onTrigger }: BackupSe
             {backupStatus.total_backups} snapshot{backupStatus.total_backups !== 1 ? 's' : ''} available
           </span>
         </div>
-        <button
-          type="button"
-          onClick={onTrigger}
-          disabled={isTriggeringBackup}
-          className="px-4 py-2 bg-purple-600 text-white text-sm font-bold rounded-full hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          {isTriggeringBackup ? 'Backing up…' : 'Back up now'}
-        </button>
+        {onTrigger && (
+          <button
+            type="button"
+            onClick={onTrigger}
+            disabled={isTriggeringBackup}
+            className="px-4 py-2 bg-purple-600 text-white text-sm font-bold rounded-full hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {isTriggeringBackup ? 'Backing up…' : 'Back up now'}
+          </button>
+        )}
       </div>
 
       {backupStatus.last_backup && (
@@ -106,6 +109,7 @@ function BackupSection({ backupStatus, isTriggeringBackup, onTrigger }: BackupSe
 }
 
 export function StatusPage(): JSX.Element {
+  const { accessToken } = useAuth();
   const [health, setHealth] = useState<HealthCheck | null>(null);
   const [backupStatus, setBackupStatus] = useState<BackupStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -138,9 +142,10 @@ export function StatusPage(): JSX.Element {
   }, []);
 
   const handleTriggerBackup = async (): Promise<void> => {
+    if (!accessToken) return;
     setIsTriggeringBackup(true);
     try {
-      await triggerBackup();
+      await triggerBackup(accessToken);
       await refreshBackupStatus();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to trigger backup');
@@ -179,7 +184,7 @@ export function StatusPage(): JSX.Element {
         <BackupSection
           backupStatus={backupStatus}
           isTriggeringBackup={isTriggeringBackup}
-          onTrigger={() => void handleTriggerBackup()}
+          onTrigger={accessToken ? () => void handleTriggerBackup() : null}
         />
       )}
     </div>

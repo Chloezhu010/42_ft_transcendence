@@ -35,8 +35,11 @@ export async function getBackupStatus(): Promise<BackupStatus> {
   return response.json() as Promise<BackupStatus>;
 }
 
-export async function triggerBackup(): Promise<void> {
-  const response = await apiFetch(`${API_BASE_URL}/backup/trigger`, { method: 'POST' });
+export async function triggerBackup(accessToken: string): Promise<void> {
+  const response = await apiFetch(`${API_BASE_URL}/backup/trigger`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
   if (!response.ok) {
     throw await buildApiError(response, 'Failed to trigger backup');
   }

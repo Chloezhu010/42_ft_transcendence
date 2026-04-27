@@ -144,11 +144,29 @@ describe('triggerBackup', () => {
       }),
     );
 
-    await triggerBackup();
+    await triggerBackup('test-token');
 
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining('/backup/trigger'),
       expect.objectContaining({ method: 'POST' }),
+    );
+  });
+
+  it('sends Authorization header with the access token', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ message: 'Backup started' }), {
+        status: 202,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+
+    await triggerBackup('my-secret-token');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        headers: expect.objectContaining({ Authorization: 'Bearer my-secret-token' }),
+      }),
     );
   });
 
@@ -160,7 +178,7 @@ describe('triggerBackup', () => {
       }),
     );
 
-    await expect(triggerBackup()).resolves.toBeUndefined();
+    await expect(triggerBackup('test-token')).resolves.toBeUndefined();
   });
 
   it('surfaces backend detail on non-202 response', async () => {
@@ -172,12 +190,12 @@ describe('triggerBackup', () => {
       }),
     );
 
-    await expect(triggerBackup()).rejects.toThrow('Backup already in progress');
+    await expect(triggerBackup('test-token')).rejects.toThrow('Backup already in progress');
   });
 
   it('throws a network error when fetch fails', async () => {
     vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('Network error'));
 
-    await expect(triggerBackup()).rejects.toThrow('Network error');
+    await expect(triggerBackup('test-token')).rejects.toThrow('Network error');
   });
 });

@@ -9,16 +9,22 @@ const {
   mockGetHealthStatus,
   mockGetBackupStatus,
   mockTriggerBackup,
+  mockUseAuth,
 } = vi.hoisted(() => ({
   mockGetHealthStatus: vi.fn(),
   mockGetBackupStatus: vi.fn(),
   mockTriggerBackup: vi.fn(),
+  mockUseAuth: vi.fn(),
 }));
 
 vi.mock('@api', () => ({
   getHealthStatus: mockGetHealthStatus,
   getBackupStatus: mockGetBackupStatus,
   triggerBackup: mockTriggerBackup,
+}));
+
+vi.mock('@/app/auth/useAuth', () => ({
+  useAuth: mockUseAuth,
 }));
 
 const HEALTHY_STATUS = {
@@ -69,6 +75,7 @@ beforeEach(() => {
   mockGetHealthStatus.mockResolvedValue(HEALTHY_STATUS);
   mockGetBackupStatus.mockResolvedValue(BACKUP_STATUS_WITH_ENTRIES);
   mockTriggerBackup.mockResolvedValue(undefined);
+  mockUseAuth.mockReturnValue({ accessToken: 'test-token' });
 });
 
 describe('StatusPage', () => {
@@ -176,6 +183,14 @@ describe('StatusPage', () => {
 
       await waitFor(() => {
         expect(mockGetBackupStatus).toHaveBeenCalledTimes(2);
+      });
+    });
+
+    it('hides the trigger button when the user is not authenticated', async () => {
+      mockUseAuth.mockReturnValue({ accessToken: null });
+      renderStatusPage();
+      await waitFor(() => {
+        expect(screen.queryByRole('button', { name: /back up now/i })).not.toBeInTheDocument();
       });
     });
 
