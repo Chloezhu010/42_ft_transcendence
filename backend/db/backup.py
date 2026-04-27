@@ -5,6 +5,10 @@ Uses sqlite3's built-in Connection.backup() API, which is safe under
 concurrent writes (WAL mode is in effect at runtime). Backups are
 stored in a rotating set; once MAX_BACKUPS is reached the oldest file
 is removed automatically.
+
+create_backup() is serialized by _backup_lock so that concurrent callers
+(scheduled task + manual trigger) never race on filename generation or
+the rotation glob/unlink.
 """
 
 import asyncio
@@ -16,6 +20,9 @@ from db.database import DB_PATH
 
 BACKUP_DIR = Path("backups")
 MAX_BACKUPS = 7  # keep at most 7 daily snapshots
+
+# Serializes concurrent create_backup() calls within the process.
+_backup_lock = asyncio.Lock()
 
 
 def _sync_backup(db_path: str, dest_path: str) -> None:
@@ -30,21 +37,24 @@ async def create_backup() -> str:
     Returns:
         The filename (not full path) of the new backup.
     """
-    BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+    async with _backup_lock:
+        BACKUP_DIR.mkdir(parents=True, exist_ok=True)
 
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
-    filename = f"wondercomic_{timestamp}.db"
-    dest = BACKUP_DIR / filename
+        # Microsecond precision avoids filename collisions on rapid or
+        # concurrent calls that land in the same wall-clock second.
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_%f")
+        filename = f"wondercomic_{timestamp}.db"
+        dest = BACKUP_DIR / filename
 
-    loop = asyncio.get_event_loop()
-    await loop.run_in_executor(None, _sync_backup, DB_PATH, str(dest))
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(None, _sync_backup, DB_PATH, str(dest))
 
-    # Rotate: drop oldest when over the limit
-    existing = sorted(BACKUP_DIR.glob("wondercomic_*.db"))
-    for old in existing[:-MAX_BACKUPS]:
-        old.unlink(missing_ok=True)
+        # Rotate: drop oldest when over the limit
+        existing = sorted(BACKUP_DIR.glob("wondercomic_*.db"))
+        for old in existing[:-MAX_BACKUPS]:
+            old.unlink(missing_ok=True)
 
-    return filename
+        return filename
 
 
 def list_backups() -> list[dict]:
