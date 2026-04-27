@@ -15,94 +15,15 @@ import sqlite3
 import time
 from unittest.mock import AsyncMock, patch
 
-import aiosqlite
 import pytest
-from fastapi import Depends, FastAPI
-from fastapi.responses import JSONResponse
 from fastapi.testclient import TestClient
 
 from auth_utils import get_current_user
 from db.backup import MAX_BACKUPS, create_backup, get_last_backup_time, list_backups
 from db.database import get_db
 from routers.backup import router as backup_router
+from routers.health import router as health_router
 from tests.conftest import _init_test_db, make_test_app
-
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
-
-def _make_health_app(db_path: str) -> FastAPI:
-    """Reproduce the /health endpoint in a minimal test app with a temp DB."""
-    app = FastAPI()
-
-    async def override_get_db():
-        db = await aiosqlite.connect(db_path)
-        db.row_factory = aiosqlite.Row
-        try:
-            yield db
-        finally:
-            await db.close()
-
-    app.dependency_overrides[get_db] = override_get_db
-
-    @app.get("/health")
-    async def health_check(db: aiosqlite.Connection = Depends(get_db)):
-        checks: dict[str, str] = {}
-        healthy = True
-        try:
-            cursor = await db.execute("SELECT 1")
-            await cursor.fetchone()
-            checks["database"] = "ok"
-        except Exception:
-            checks["database"] = "unavailable"
-            healthy = False
-        return JSONResponse(
-            status_code=200 if healthy else 503,
-            content={
-                "status": "healthy" if healthy else "unhealthy",
-                "version": "1.0.0",
-                "checks": checks,
-            },
-        )
-
-    return app
-
-
-def _make_failing_health_app() -> FastAPI:
-    """Health app wired to a DB connection that always fails on execute."""
-    app = FastAPI()
-
-    mock_db = AsyncMock()
-    mock_db.execute.side_effect = Exception("Connection refused")
-
-    async def failing_db():
-        yield mock_db
-
-    app.dependency_overrides[get_db] = failing_db
-
-    @app.get("/health")
-    async def health_check(db: aiosqlite.Connection = Depends(get_db)):
-        checks: dict[str, str] = {}
-        healthy = True
-        try:
-            cursor = await db.execute("SELECT 1")
-            await cursor.fetchone()
-            checks["database"] = "ok"
-        except Exception:
-            checks["database"] = "unavailable"
-            healthy = False
-        return JSONResponse(
-            status_code=200 if healthy else 503,
-            content={
-                "status": "healthy" if healthy else "unhealthy",
-                "version": "1.0.0",
-                "checks": checks,
-            },
-        )
-
-    return app
 
 
 # ---------------------------------------------------------------------------
@@ -112,17 +33,28 @@ def _make_failing_health_app() -> FastAPI:
 
 @pytest.fixture
 def health_client(tmp_path):
-    """TestClient with the health endpoint backed by a real temp DB."""
+    """TestClient running the real health router against a temp DB."""
     db_path = str(tmp_path / "test.db")
     asyncio.run(_init_test_db(db_path))
-    with TestClient(_make_health_app(db_path)) as c:
+    with TestClient(make_test_app(db_path, health_router)) as c:
         yield c
 
 
 @pytest.fixture
-def failing_health_client():
-    """TestClient where the DB always raises on execute."""
-    with TestClient(_make_failing_health_app()) as c:
+def failing_health_client(tmp_path):
+    """TestClient running the real health router with a DB that always fails on execute."""
+    db_path = str(tmp_path / "test.db")
+    asyncio.run(_init_test_db(db_path))
+    app = make_test_app(db_path, health_router)
+
+    mock_db = AsyncMock()
+    mock_db.execute.side_effect = Exception("Connection refused")
+
+    async def failing_db():
+        yield mock_db
+
+    app.dependency_overrides[get_db] = failing_db
+    with TestClient(app) as c:
         yield c
 
 
