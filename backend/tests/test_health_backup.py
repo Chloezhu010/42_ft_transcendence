@@ -189,17 +189,18 @@ class TestBackupTriggerEndpoint:
         with patch("routers.backup.create_backup", side_effect=_make_backup_stub(isolate_backup_dir)):
             assert backup_client.post("/api/backup/trigger").status_code == 200
 
-    def test_response_contains_backup_entry_fields(self, backup_client, isolate_backup_dir):
+    def test_response_contains_backup_status_fields(self, backup_client, isolate_backup_dir):
         with patch("routers.backup.create_backup", side_effect=_make_backup_stub(isolate_backup_dir)):
             data = backup_client.post("/api/backup/trigger").json()
-            assert "filename" in data
-            assert "size_bytes" in data
-            assert "created_at" in data
+            assert "last_backup" in data
+            assert "total_backups" in data
+            assert "backups" in data
 
-    def test_returned_filename_matches_new_backup(self, backup_client, isolate_backup_dir):
+    def test_response_includes_the_new_backup_in_list(self, backup_client, isolate_backup_dir):
         with patch("routers.backup.create_backup", side_effect=_make_backup_stub(isolate_backup_dir)):
             data = backup_client.post("/api/backup/trigger").json()
-            assert data["filename"] == "wondercomic_20260427_000000.db"
+            filenames = [b["filename"] for b in data["backups"]]
+            assert "wondercomic_20260427_000000.db" in filenames
 
     def test_returns_401_without_authentication(self, tmp_path):
         db_path = str(tmp_path / "test.db")

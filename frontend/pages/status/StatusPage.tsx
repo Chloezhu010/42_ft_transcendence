@@ -140,15 +140,8 @@ export function StatusPage(): JSX.Element {
     if (!accessToken) return;
     setIsTriggeringBackup(true);
     try {
-      const newEntry = await triggerBackup(accessToken);
-      setBackupStatus((prev) => {
-        if (!prev) return prev;
-        return {
-          last_backup: newEntry.created_at,
-          total_backups: prev.total_backups + 1,
-          backups: [newEntry, ...prev.backups],
-        };
-      });
+      const status = await triggerBackup(accessToken);
+      setBackupStatus(status);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to trigger backup');
     } finally {

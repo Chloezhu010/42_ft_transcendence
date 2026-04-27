@@ -62,10 +62,26 @@ const BACKUP_STATUS_EMPTY = {
   backups: [],
 };
 
-const NEW_BACKUP_ENTRY = {
-  filename: 'wondercomic_20260427_000000.db',
-  size_bytes: 102400,
-  created_at: '2026-04-27T00:00:00+00:00',
+const TRIGGER_BACKUP_STATUS = {
+  last_backup: '2026-04-27T00:00:00+00:00',
+  total_backups: 3,
+  backups: [
+    {
+      filename: 'wondercomic_20260427_000000_000000.db',
+      size_bytes: 102400,
+      created_at: '2026-04-27T00:00:00+00:00',
+    },
+    {
+      filename: 'wondercomic_20260426_100000_000000.db',
+      size_bytes: 204800,
+      created_at: '2026-04-26T10:00:00+00:00',
+    },
+    {
+      filename: 'wondercomic_20260425_100000_000000.db',
+      size_bytes: 196608,
+      created_at: '2026-04-25T10:00:00+00:00',
+    },
+  ],
 };
 
 function renderStatusPage(): void {
@@ -80,7 +96,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   mockGetHealthStatus.mockResolvedValue(HEALTHY_STATUS);
   mockGetBackupStatus.mockResolvedValue(BACKUP_STATUS_WITH_ENTRIES);
-  mockTriggerBackup.mockResolvedValue(NEW_BACKUP_ENTRY);
+  mockTriggerBackup.mockResolvedValue(TRIGGER_BACKUP_STATUS);
   mockUseAuth.mockReturnValue({ accessToken: 'test-token' });
 });
 
@@ -176,14 +192,14 @@ describe('StatusPage', () => {
       });
     });
 
-    it('prepends the new backup entry to the list without a second fetch', async () => {
+    it('replaces backup list with the full status returned by trigger', async () => {
       renderStatusPage();
       await waitFor(() => screen.getByRole('button', { name: /back up now/i }));
 
       fireEvent.click(screen.getByRole('button', { name: /back up now/i }));
 
       await waitFor(() => {
-        expect(screen.getByText(/wondercomic_20260427_000000\.db/)).toBeInTheDocument();
+        expect(screen.getByText(/wondercomic_20260427_000000_000000\.db/)).toBeInTheDocument();
       });
       expect(mockGetBackupStatus).toHaveBeenCalledTimes(1);
     });
@@ -197,9 +213,9 @@ describe('StatusPage', () => {
     });
 
     it('disables the button while a backup is in progress', async () => {
-      let resolveBackup: (entry: typeof NEW_BACKUP_ENTRY) => void;
+      let resolveBackup: (status: typeof TRIGGER_BACKUP_STATUS) => void;
       mockTriggerBackup.mockReturnValue(
-        new Promise<typeof NEW_BACKUP_ENTRY>((resolve) => {
+        new Promise<typeof TRIGGER_BACKUP_STATUS>((resolve) => {
           resolveBackup = resolve;
         }),
       );
@@ -213,7 +229,7 @@ describe('StatusPage', () => {
         expect(screen.getByRole('button', { name: /backing up/i })).toBeDisabled();
       });
 
-      resolveBackup!(NEW_BACKUP_ENTRY);
+      resolveBackup!(TRIGGER_BACKUP_STATUS);
     });
   });
 

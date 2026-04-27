@@ -136,9 +136,25 @@ describe('getBackupStatus', () => {
 });
 
 const TRIGGER_RESPONSE = {
-  filename: 'wondercomic_20260427_000000.db',
-  size_bytes: 102400,
-  created_at: '2026-04-27T00:00:00+00:00',
+  last_backup: '2026-04-27T00:00:00+00:00',
+  total_backups: 3,
+  backups: [
+    {
+      filename: 'wondercomic_20260427_000000_000000.db',
+      size_bytes: 102400,
+      created_at: '2026-04-27T00:00:00+00:00',
+    },
+    {
+      filename: 'wondercomic_20260426_100000_000000.db',
+      size_bytes: 204800,
+      created_at: '2026-04-26T10:00:00+00:00',
+    },
+    {
+      filename: 'wondercomic_20260425_100000_000000.db',
+      size_bytes: 196608,
+      created_at: '2026-04-25T10:00:00+00:00',
+    },
+  ],
 };
 
 describe('triggerBackup', () => {
@@ -176,7 +192,7 @@ describe('triggerBackup', () => {
     );
   });
 
-  it('resolves with the new backup entry on success', async () => {
+  it('resolves with the full backup status after rotation', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       new Response(JSON.stringify(TRIGGER_RESPONSE), {
         status: 200,

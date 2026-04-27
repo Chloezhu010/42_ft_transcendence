@@ -2,10 +2,10 @@
 Backup management endpoints.
 
 GET  /backup/status  — list available backups and last backup timestamp
-POST /backup/trigger — run an immediate backup and return the new entry
+POST /backup/trigger — run an immediate backup and return the full status after rotation
 """
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from auth_utils import get_current_user
@@ -37,14 +37,15 @@ async def backup_status():
     }
 
 
-@router.post("/trigger", response_model=BackupEntry)
+@router.post("/trigger", response_model=BackupStatusResponse)
 async def trigger_backup(
     current_user: dict = Depends(get_current_user),
 ):
-    """Run an immediate database backup and return the new entry. Requires authentication."""
-    filename = await create_backup()
+    """Run an immediate database backup and return the full status after rotation. Requires authentication."""
+    await create_backup()
     backups = list_backups()
-    entry = next((b for b in backups if b["filename"] == filename), None)
-    if entry is None:
-        raise HTTPException(status_code=500, detail="Backup completed but entry not found")
-    return entry
+    return {
+        "last_backup": get_last_backup_time(),
+        "total_backups": len(backups),
+        "backups": backups,
+    }
