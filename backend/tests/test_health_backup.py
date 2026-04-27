@@ -123,25 +123,25 @@ class TestHealthEndpoint:
 
 class TestBackupStatusEndpoint:
     def test_returns_200(self, backup_client):
-        assert backup_client.get("/backup/status").status_code == 200
+        assert backup_client.get("/api/backup/status").status_code == 200
 
     def test_response_has_last_backup_field(self, backup_client):
-        assert "last_backup" in backup_client.get("/backup/status").json()
+        assert "last_backup" in backup_client.get("/api/backup/status").json()
 
     def test_response_has_total_backups_field(self, backup_client):
-        assert "total_backups" in backup_client.get("/backup/status").json()
+        assert "total_backups" in backup_client.get("/api/backup/status").json()
 
     def test_response_has_backups_list_field(self, backup_client):
-        assert "backups" in backup_client.get("/backup/status").json()
+        assert "backups" in backup_client.get("/api/backup/status").json()
 
     def test_last_backup_is_none_when_no_backups_exist(self, backup_client):
-        assert backup_client.get("/backup/status").json()["last_backup"] is None
+        assert backup_client.get("/api/backup/status").json()["last_backup"] is None
 
     def test_total_backups_is_zero_on_fresh_start(self, backup_client):
-        assert backup_client.get("/backup/status").json()["total_backups"] == 0
+        assert backup_client.get("/api/backup/status").json()["total_backups"] == 0
 
     def test_backups_list_is_empty_on_fresh_start(self, backup_client):
-        assert backup_client.get("/backup/status").json()["backups"] == []
+        assert backup_client.get("/api/backup/status").json()["backups"] == []
 
     def test_backup_entry_has_required_fields(self, backup_client, isolate_backup_dir):
         # Create a real backup file so the inventory has something to report.
@@ -150,7 +150,7 @@ class TestBackupStatusEndpoint:
         fake = backup_dir / "wondercomic_20260101_000000.db"
         fake.write_bytes(b"SQLite format 3\x00" + b"\x00" * 84)
 
-        data = backup_client.get("/backup/status").json()
+        data = backup_client.get("/api/backup/status").json()
         assert data["total_backups"] == 1
         entry = data["backups"][0]
         assert "filename" in entry
@@ -162,7 +162,7 @@ class TestBackupStatusEndpoint:
         backup_dir.mkdir(parents=True, exist_ok=True)
         (backup_dir / "wondercomic_20260101_000000.db").write_bytes(b"\x00" * 100)
 
-        last = backup_client.get("/backup/status").json()["last_backup"]
+        last = backup_client.get("/api/backup/status").json()["last_backup"]
         assert last is not None
         assert "T" in last  # ISO 8601 format contains 'T'
 
@@ -187,25 +187,25 @@ def _make_backup_stub(backup_dir):
 class TestBackupTriggerEndpoint:
     def test_returns_200_ok(self, backup_client, isolate_backup_dir):
         with patch("routers.backup.create_backup", side_effect=_make_backup_stub(isolate_backup_dir)):
-            assert backup_client.post("/backup/trigger").status_code == 200
+            assert backup_client.post("/api/backup/trigger").status_code == 200
 
     def test_response_contains_backup_entry_fields(self, backup_client, isolate_backup_dir):
         with patch("routers.backup.create_backup", side_effect=_make_backup_stub(isolate_backup_dir)):
-            data = backup_client.post("/backup/trigger").json()
+            data = backup_client.post("/api/backup/trigger").json()
             assert "filename" in data
             assert "size_bytes" in data
             assert "created_at" in data
 
     def test_returned_filename_matches_new_backup(self, backup_client, isolate_backup_dir):
         with patch("routers.backup.create_backup", side_effect=_make_backup_stub(isolate_backup_dir)):
-            data = backup_client.post("/backup/trigger").json()
+            data = backup_client.post("/api/backup/trigger").json()
             assert data["filename"] == "wondercomic_20260427_000000.db"
 
     def test_returns_401_without_authentication(self, tmp_path):
         db_path = str(tmp_path / "test.db")
         asyncio.run(_init_test_db(db_path))
         with TestClient(make_test_app(db_path, backup_router)) as c:
-            assert c.post("/backup/trigger").status_code == 401
+            assert c.post("/api/backup/trigger").status_code == 401
 
 
 # ===========================================================================

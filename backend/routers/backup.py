@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from auth_utils import get_current_user
 from db.backup import create_backup, get_last_backup_time, list_backups
 
-router = APIRouter(prefix="/backup", tags=["backup"])
+router = APIRouter(prefix="/api/backup", tags=["backup"])
 
 
 class BackupEntry(BaseModel):

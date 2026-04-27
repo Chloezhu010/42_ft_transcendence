@@ -95,7 +95,7 @@ describe('getBackupStatus', () => {
 
     expect(result).toEqual(BACKUP_STATUS_RESPONSE);
     expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringContaining('/backup/status'),
+      expect.stringContaining('/api/backup/status'),
       expect.objectContaining({ method: 'GET' }),
     );
   });
@@ -153,7 +153,7 @@ describe('triggerBackup', () => {
     await triggerBackup('test-token');
 
     expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringContaining('/backup/trigger'),
+      expect.stringContaining('/api/backup/trigger'),
       expect.objectContaining({ method: 'POST' }),
     );
   });

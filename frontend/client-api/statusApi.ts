@@ -1,4 +1,4 @@
-import { API_BASE_URL, apiFetch } from './apiClient';
+import { API_BASE, API_BASE_URL, apiFetch } from './apiClient';
 import { buildApiError } from './apiErrors';
 
 export interface HealthCheck {
@@ -28,7 +28,7 @@ export async function getHealthStatus(): Promise<HealthCheck> {
 }
 
 export async function getBackupStatus(): Promise<BackupStatus> {
-  const response = await apiFetch(`${API_BASE_URL}/backup/status`, { method: 'GET' });
+  const response = await apiFetch(`${API_BASE}/backup/status`, { method: 'GET' });
   if (!response.ok) {
     throw await buildApiError(response, 'Failed to fetch backup status');
   }
@@ -36,7 +36,7 @@ export async function getBackupStatus(): Promise<BackupStatus> {
 }
 
 export async function triggerBackup(accessToken: string): Promise<BackupEntry> {
-  const response = await apiFetch(`${API_BASE_URL}/backup/trigger`, {
+  const response = await apiFetch(`${API_BASE}/backup/trigger`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${accessToken}` },
   });
