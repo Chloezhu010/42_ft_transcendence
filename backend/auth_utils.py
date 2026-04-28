@@ -48,12 +48,11 @@ def hash_password(plain: str) -> str:
     ).decode()
 
 
-def verify_password(plain: str, hashed: str) -> bool:
+def verify_password(plain: str, hashed: str | None) -> bool:
     """Verify a plaintext password against a hash. Returns True if they match."""
-    return bcrypt.checkpw(
-        plain.encode(),
-        hashed.encode(),
-    )
+    if hashed is None:
+        return False
+    return bcrypt.checkpw(plain.encode(), hashed.encode())
 
 
 # --- JWT Token creation ---

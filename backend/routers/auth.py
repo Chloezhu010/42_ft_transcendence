@@ -45,7 +45,12 @@ async def login(body: LoginRequest, db=Depends(get_db)):
     """Login: verify password, set user online, return JWT token."""
     # Fetch user by email
     user = await get_user_by_email(db, body.email)
-    if not user or not verify_password(body.password, user["password_hash"]):
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    if user["password_hash"] is None:
+        raise HTTPException(status_code=401, detail="This account does not use password login.")
+    # Verify password
+    if not verify_password(body.password, user["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     # Set user online
     await set_online_status(db, user["id"], True)
