@@ -10,7 +10,7 @@ import StoryReadAloudControl from '@/components/StoryReadAloudControl';
 import type { ComicPanelData, Story } from '@/types';
 import { SketchyButton } from '@/components/design-system/Primitives';
 import { Heading, Label, Text } from '@/components/design-system/Typography';
-import { getStoryReadAloudText } from '@/utils';
+import { getPreviewReadAloudText } from '@/utils';
 
 interface PreviewViewProps {
   story: Story;
@@ -252,7 +252,7 @@ function PreviewView({
   const currentPageLabel = pageLabels[previewPage] || '';
   const middlePanelCount = Math.max(0, story.panels.length - 2);
   const backHref = ownerUserId ? `/friends/${ownerUserId}/library` : '/gallery';
-  const readAloudText = getStoryReadAloudText(story);
+  const readAloudText = getPreviewReadAloudText(story);
 
   if (!firstPanel || !lastPanel) {
     return null;
