@@ -16,6 +16,7 @@ function MarketingFooter(): JSX.Element {
         <div className="flex gap-8 font-bold text-xl">
           <Link to="/privacy" className="hover:text-brand-primary transition-colors">Privacy</Link>
           <Link to="/terms" className="hover:text-brand-primary transition-colors">Terms</Link>
+          <Link to="/status" className="hover:text-brand-primary transition-colors">Status</Link>
           <a
             href="https://github.com/Chloezhu010/42_ft_transcendence"
             target="_blank"

@@ -100,6 +100,7 @@ function AppLayout(): JSX.Element {
           <div className="flex flex-wrap gap-4 text-sm font-semibold text-brand-primary">
             <Link className="hover:text-brand-dark" to="/privacy">Privacy Policy</Link>
             <Link className="hover:text-brand-dark" to="/terms">Terms of Service</Link>
+            <Link className="hover:text-brand-dark" to="/status">Status</Link>
             <a
               className="hover:text-brand-dark"
               href="https://github.com/Chloezhu010/42_ft_transcendence"
