@@ -170,7 +170,7 @@ async def _create_tables(db: aiosqlite.Connection):
             UNIQUE(story_id, panel_order)
         );
     """)
-    
+
     await _migrate_users_password_hash_nullable(db)
     await _create_oauth_accounts_table(db)
     await _create_oauth_results_table(db)

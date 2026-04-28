@@ -33,9 +33,7 @@ async def test_users_password_hash_column_is_nullable_after_init(db):
 @pytest.mark.asyncio
 async def test_oauth_accounts_table_exists(db):
     row = await (
-        await db.execute(
-            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'oauth_accounts'"
-        )
+        await db.execute("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'oauth_accounts'")
     ).fetchone()
 
     assert row is not None
@@ -45,9 +43,7 @@ async def test_oauth_accounts_table_exists(db):
 @pytest.mark.asyncio
 async def test_oauth_results_table_exists(db):
     row = await (
-        await db.execute(
-            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'oauth_results'"
-        )
+        await db.execute("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'oauth_results'")
     ).fetchone()
 
     assert row is not None
