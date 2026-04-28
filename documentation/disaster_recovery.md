@@ -15,7 +15,7 @@ API, which is safe to run while the application is live (WAL mode).
 | Mechanism | SQLite `Connection.backup()` (online, no downtime) |
 | Schedule | On startup + every 24 hours automatically |
 | Retention | Last 7 snapshots (oldest deleted automatically) |
-| Storage | `backend/backups/` (Docker: `backend_backups` named volume) |
+| Storage | `backend_backups` named Docker volume (mounted at `/app/backups` in the container) |
 | Filename format | `wondercomic_YYYYMMDD_HHMMSS_ffffff.db` (microsecond precision) |
 
 ### Manual Backup (API)
@@ -60,11 +60,12 @@ Visit `http://localhost:3000/status` for a visual backup inventory and a
    ```bash
    docker run --rm \
      -v backend_backups:/backups \
-     -v tran_main1_backend_data:/app \
-     alpine cp /backups/wondercomic_YYYYMMDD_HHMMSS_ffffff.db /app/wondercomic.db
+     -v "$(pwd)/backend:/host_backend" \
+     alpine cp /backups/wondercomic_YYYYMMDD_HHMMSS_ffffff.db /host_backend/wondercomic.db
    ```
-   Replace `wondercomic_YYYYMMDD_HHMMSS_ffffff.db` with the chosen filename and
-   `tran_main1_backend_data` with your actual backend volume name.
+   Replace `wondercomic_YYYYMMDD_HHMMSS_ffffff.db` with the chosen filename.
+   This mounts the backup volume and the host `backend/` directory so the database
+   file (which lives in the bind mount) is overwritten correctly.
 
 4. **Restart the backend.**
    ```bash
@@ -132,5 +133,5 @@ rclone sync /path/to/backend_backups s3:my-bucket/wondercomic-backups
 | `backend/db/backup.py` | Backup creation, rotation, and listing logic |
 | `backend/routers/backup.py` | `GET /api/backup/status` and `POST /api/backup/trigger` endpoints |
 | `backend/main.py` | Startup backup + 24-hour scheduled task |
-| `docker-compose.yml` | `backend_backups` named volume declaration |
+| `docker-compose.yml` | Declares `backend_backups` named volume, mounted at `/app/backups` in the backend service |
 | `frontend/pages/status/StatusPage.tsx` | `/status` page — shows backup inventory and manual trigger |
