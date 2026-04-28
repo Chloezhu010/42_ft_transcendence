@@ -66,9 +66,7 @@ def list_backups() -> list[dict]:
         {
             "filename": f.name,
             "size_bytes": f.stat().st_size,
-            "created_at": datetime.fromtimestamp(
-                f.stat().st_mtime, tz=UTC
-            ).isoformat(),
+            "created_at": datetime.fromtimestamp(f.stat().st_mtime, tz=UTC).isoformat(),
         }
         for f in files
     ]
@@ -81,6 +79,4 @@ def get_last_backup_time() -> str | None:
     files = sorted(BACKUP_DIR.glob("wondercomic_*.db"))
     if not files:
         return None
-    return datetime.fromtimestamp(
-        files[-1].stat().st_mtime, tz=UTC
-    ).isoformat()
+    return datetime.fromtimestamp(files[-1].stat().st_mtime, tz=UTC).isoformat()

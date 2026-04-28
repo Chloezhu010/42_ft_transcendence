@@ -64,7 +64,10 @@ def backup_client(tmp_path):
     asyncio.run(_init_test_db(db_path))
     app = make_test_app(db_path, backup_router)
     app.dependency_overrides[get_current_user] = lambda: {
-        "id": 1, "username": "testuser", "email": "test@example.com", "is_admin": True
+        "id": 1,
+        "username": "testuser",
+        "email": "test@example.com",
+        "is_admin": True,
     }
     with TestClient(app) as c:
         yield c
@@ -77,7 +80,10 @@ def non_admin_backup_client(tmp_path):
     asyncio.run(_init_test_db(db_path))
     app = make_test_app(db_path, backup_router)
     app.dependency_overrides[get_current_user] = lambda: {
-        "id": 2, "username": "regular", "email": "regular@example.com", "is_admin": False
+        "id": 2,
+        "username": "regular",
+        "email": "regular@example.com",
+        "is_admin": False,
     }
     with TestClient(app) as c:
         yield c
