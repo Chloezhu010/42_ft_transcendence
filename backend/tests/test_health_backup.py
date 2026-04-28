@@ -18,13 +18,12 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from fastapi.testclient import TestClient
 
-from auth_utils import get_current_user, require_admin
+from auth_utils import get_current_user
 from db.backup import MAX_BACKUPS, create_backup, get_last_backup_time, list_backups
 from db.database import get_db
 from routers.backup import router as backup_router
 from routers.health import router as health_router
 from tests.conftest import _init_test_db, make_test_app
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -64,7 +63,9 @@ def backup_client(tmp_path):
     db_path = str(tmp_path / "test.db")
     asyncio.run(_init_test_db(db_path))
     app = make_test_app(db_path, backup_router)
-    app.dependency_overrides[get_current_user] = lambda: {"id": 1, "username": "testuser", "email": "test@example.com", "is_admin": True}
+    app.dependency_overrides[get_current_user] = lambda: {
+        "id": 1, "username": "testuser", "email": "test@example.com", "is_admin": True
+    }
     with TestClient(app) as c:
         yield c
 
@@ -75,7 +76,9 @@ def non_admin_backup_client(tmp_path):
     db_path = str(tmp_path / "test.db")
     asyncio.run(_init_test_db(db_path))
     app = make_test_app(db_path, backup_router)
-    app.dependency_overrides[get_current_user] = lambda: {"id": 2, "username": "regular", "email": "regular@example.com", "is_admin": False}
+    app.dependency_overrides[get_current_user] = lambda: {
+        "id": 2, "username": "regular", "email": "regular@example.com", "is_admin": False
+    }
     with TestClient(app) as c:
         yield c
 

@@ -13,7 +13,7 @@ the rotation glob/unlink.
 
 import asyncio
 import sqlite3
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from db.database import DB_PATH
@@ -42,7 +42,7 @@ async def create_backup() -> str:
 
         # Microsecond precision avoids filename collisions on rapid or
         # concurrent calls that land in the same wall-clock second.
-        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_%f")
+        timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S_%f")
         filename = f"wondercomic_{timestamp}.db"
         dest = BACKUP_DIR / filename
 
@@ -67,7 +67,7 @@ def list_backups() -> list[dict]:
             "filename": f.name,
             "size_bytes": f.stat().st_size,
             "created_at": datetime.fromtimestamp(
-                f.stat().st_mtime, tz=timezone.utc
+                f.stat().st_mtime, tz=UTC
             ).isoformat(),
         }
         for f in files
@@ -82,5 +82,5 @@ def get_last_backup_time() -> str | None:
     if not files:
         return None
     return datetime.fromtimestamp(
-        files[-1].stat().st_mtime, tz=timezone.utc
+        files[-1].stat().st_mtime, tz=UTC
     ).isoformat()
