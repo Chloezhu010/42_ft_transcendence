@@ -1,6 +1,17 @@
 {
   "app": {
-    "myLibrary": "我的图书馆"
+    "myLibrary": "我的图书馆",
+    "createStory": "创作故事",
+    "footer": {
+      "tagline": "为 42 ft_transcendence 项目打造的学生版 AI 漫画生成器。",
+      "links": {
+        "create": "创作故事",
+        "library": "图书馆",
+        "privacy": "隐私政策",
+        "terms": "服务条款",
+        "repository": "仓库"
+      }
+    }
   },
   "comicPanel": {
     "paintingScene": "绘制场景...",
@@ -96,5 +107,512 @@
     "transformStories": "将睡前故事转变为电影漫画体验。",
     "startAdventure": "开始您的冒险",
     "viewLibrary": "查看图书馆"
+  },
+  "story": {
+    "introStream": {
+      "status": {
+        "drafting": "正在撰写",
+        "painting": "正在绘制前几页",
+        "ready": "准备就绪"
+      },
+      "onceUpon": "从前"
+    },
+    "preview": {
+      "backToLibrary": "返回图书馆",
+      "label": "预览",
+      "pageLabels": {
+        "opening": "开篇",
+        "ending": "结尾"
+      },
+      "turnPage": "翻页 →",
+      "ctaTitle": "喜欢现在的样子吗？",
+      "ctaDescription": "我们会补全开篇与结尾之间的 {{count}} 个分镜。",
+      "generateFull": "生成完整故事",
+      "startOver": "重新开始",
+      "ariaPrevious": "上一页",
+      "ariaNext": "下一页"
+    },
+    "storyboard": {
+      "pageLabel": {
+        "frontCover": "封面",
+        "backCover": "封底",
+        "spread": "跨页 {{number}}"
+      },
+      "introduction": "序言",
+      "originalLabel": "Funova 原创",
+      "theEnd": "完",
+      "closingLine": "愿你的梦想和你的故事一样大胆，{{name}}。",
+      "closeBook": "合上书",
+      "paintingCover": "正在绘制封面...",
+      "heroicMasterpiece": "英雄杰作",
+      "storyCompleteTitle": "你的故事已完成",
+      "storyCompleteBody": "<strong>{{title}}</strong> 已经准备好在你的图书馆中随时享受。",
+      "reread": "再读一遍",
+      "backToLibrary": "返回图书馆"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "欢迎回来",
+      "submit": "登录",
+      "submitting": "正在登录…",
+      "footerText": "还没有账号？",
+      "footerLink": "注册"
+    },
+    "signup": {
+      "title": "创建你的账号",
+      "submit": "注册",
+      "submitting": "正在注册…",
+      "footerText": "已经有账号？",
+      "footerLink": "登录"
+    },
+    "fields": {
+      "emailLabel": "邮箱",
+      "emailPlaceholder": "you@example.com",
+      "usernameLabel": "用户名",
+      "usernamePlaceholder": "your_username",
+      "passwordLabel": "密码",
+      "passwordPlaceholder": "••••••••"
+    },
+    "status": {
+      "loading": "加载中…"
+    },
+    "errors": {
+      "authFailed": "认证失败"
+    }
+  },
+  "landing": {
+    "nav": {
+      "howItWorks": "工作原理",
+      "gallery": "画廊",
+      "explore": "探索",
+      "startCreating": "开始创作"
+    },
+    "hero": {
+      "titleLine1": "孩子的想象力，",
+      "titleLine2": "跃然纸上。",
+      "subtitle": "把简单想法变成个性化、手绘风格的 AI 漫画书。",
+      "ctaCreate": "创作故事",
+      "ctaGallery": "查看画廊",
+      "imageAlt": "Funova 故事世界"
+    },
+    "features": {
+      "title": "为什么选择 Funova？",
+      "items": [
+        {
+          "image": "/ai-sketch-engine.png",
+          "title": "AI 草绘引擎",
+          "description": "我们的引擎可在短时间内把角色描述变成鲜活的手绘漫画分镜。",
+          "rotateClassName": "-rotate-1"
+        },
+        {
+          "image": "/kid-safe-content.png",
+          "title": "儿童友好内容",
+          "description": "项目专注于家庭友好的故事生成，语气积极且适龄。",
+          "rotateClassName": "rotate-1"
+        },
+        {
+          "image": "/printed-keepsakes.png",
+          "title": "珍藏回忆",
+          "description": "完成的故事会保存在画廊中，便于反复回味喜爱的冒险。",
+          "rotateClassName": "-rotate-1"
+        }
+      ]
+    },
+    "howItWorks": {
+      "title": "工作原理",
+      "steps": [
+        {
+          "number": "1",
+          "title": "想一想",
+          "description": "描述孩子英雄以及他们想体验的故事。",
+          "image": "/step1.png"
+        },
+        {
+          "number": "2",
+          "title": "AI 画出来",
+          "description": "先看到标题和序言，再生成分镜画面。",
+          "image": "/step2.png"
+        },
+        {
+          "number": "3",
+          "title": "一起阅读",
+          "description": "打开完整图书，修改单个分镜，并保存到图书馆。",
+          "image": "/step3.png"
+        }
+      ]
+    },
+    "showcase": {
+      "title": "孩子们创作，孩子们喜爱",
+      "subtitle": "探索小小故事家们创造的精彩世界。",
+      "stories": [
+        { "title": "银河救援", "category": "科幻", "image": "/alex.png" },
+        { "title": "魔法花园", "category": "奇幻", "image": "/lily.png" },
+        { "title": "海洋谜案", "category": "冒险", "image": "/anna.png" },
+        { "title": "森林朋友", "category": "自然", "image": "/alice.png" }
+      ],
+      "disclaimer": "* 所有展示图片均为 AI 生成的示意，不代表真实儿童。"
+    },
+    "pricing": {
+      "title": "开始探索",
+      "subtitle": "两种简单方式体验项目。",
+      "create": {
+        "title": "创作",
+        "description": "从角色想法开始创建新漫画",
+        "features": [
+          "角色档案流程",
+          "标题与序言流式生成",
+          "可编辑的漫画分镜"
+        ],
+        "cta": "开始创作"
+      },
+      "library": {
+        "badge": "快速导览",
+        "title": "图书馆",
+        "description": "重新打开已保存的作品并回顾最终结果",
+        "features": [
+          "浏览生成的封面",
+          "打开任意已保存故事",
+          "查看最终故事板"
+        ],
+        "cta": "打开图书馆"
+      }
+    }
+  },
+  "footer": {
+    "tagline": "用一点魔法和 AI 赋能新一代故事家。",
+    "links": {
+      "privacy": "隐私",
+      "terms": "条款",
+      "repository": "仓库"
+    },
+    "madeFor": "为小小梦想家而作",
+    "copyright": "© 2026 Funova"
+  },
+  "legal": {
+    "backToHome": "← 返回首页",
+    "lastUpdatedLabel": "最后更新：",
+    "switchLinks": {
+      "privacy": "隐私政策",
+      "terms": "服务条款"
+    },
+    "maintainerContact": {
+      "title": "维护者联系",
+      "termsIntro": "如问题不包含个人数据，可通过 Funova 仓库的 issue 追踪器咨询条款相关问题。",
+      "termsButton": "联系条款咨询",
+      "privacyNotice": "隐私与删除请求不应提交到公开的 issue 追踪器。如需隐私相关帮助，请通过应用外的私密渠道联系部署负责人，并不要在公开报告中包含个人细节。"
+    },
+    "documents": {
+      "privacy": {
+        "title": "隐私政策",
+        "description": "说明 Funova 在当前项目版本中如何处理故事输入、生成的图书以及可选的图片数据。",
+        "updatedAt": "2026 年 4 月 18 日",
+        "sections": [
+          {
+            "id": "introduction",
+            "title": "1. 引言",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Funova 是为 42 ft_transcendence 项目打造的学生应用。它将孩子英雄的档案转化为 AI 生成的漫画书，提供预览流程、可编辑分镜和保存画廊。",
+                  "本隐私政策说明当前版本处理哪些信息、如何使用这些信息，以及该项目部署适用的实际限制。"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "information",
+            "title": "2. 我们处理的信息",
+            "blocks": [
+              {
+                "heading": "2.1 故事输入数据",
+                "paragraphs": [
+                  "当你创建故事时，Funova 可能会处理你在创建流程中输入的信息，包括："
+                ],
+                "bullets": [
+                  "角色档案细节，如英雄姓名、外观特征、喜欢的颜色、原型以及自由梦想提示。",
+                  "可选上传的参考图片（当用户希望生成的角色更像提供的孩子照片时）。"
+                ]
+              },
+              {
+                "heading": "2.2 生成内容",
+                "bullets": [
+                  "生成的故事标题、序言、分镜文本、图片提示词和故事元数据。",
+                  "用于从画廊重新打开作品的已保存图片 URL 与封面数据。"
+                ]
+              },
+              {
+                "heading": "2.3 技术与服务数据",
+                "bullets": [
+                  "时间戳、浏览器请求和基础应用日志等请求元数据，用于运行与排错。",
+                  "由数据库与容器化运行环境保留的部署级存储记录。"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "use",
+            "title": "3. 我们如何使用你的信息",
+            "blocks": [
+              {
+                "paragraphs": ["我们使用处理的信息来："],
+                "bullets": [
+                  "生成所请求的漫画故事，包括预览状态、分镜文本与相关图片。",
+                  "在同一部署环境中存储并展示生成的图书，供图书馆与阅读视图使用。",
+                  "在开发、演示或评估阶段调查故障、服务不稳定、审核问题与滥用。",
+                  "改进项目代码中的提示词质量、可靠性与输出一致性。"
+                ]
+              },
+              {
+                "note": "Funova 不用于出售个人数据、投放广告或建立无关的营销画像。当前版本使用故事数据来完成所请求的漫画生成流程。"
+              }
+            ]
+          },
+          {
+            "id": "services",
+            "title": "4. 第三方服务与存储",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Funova 依赖支持服务来运行当前部署。这些服务可能会处理其职责所需的最少数据。"
+                ],
+                "cards": [
+                  {
+                    "title": "AI 生成服务提供商",
+                    "description": "接收故事概要和生成所需输入，以产出所请求的故事文本与图片。"
+                  },
+                  {
+                    "title": "应用数据库",
+                    "description": "存储故事记录、档案细节、提示词和已保存图片引用，以便在画廊中重新打开图书。"
+                  },
+                  {
+                    "title": "部署基础设施",
+                    "description": "提供 Web 应用并通过当前环境的基础设施进行流量路由。"
+                  }
+                ]
+              },
+              {
+                "paragraphs": [
+                  "我们不出售个人数据。信息仅在生成故事、保存结果和运行应用所需范围内共享。"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "retention",
+            "title": "5. 数据存储与保留",
+            "blocks": [
+              {
+                "bullets": [
+                  "故事记录保留在项目数据库中，直到通过应用删除、由维护者移除或环境重置。",
+                  "上传图片作为生成流程的一部分处理，可能在相关故事可用期间保留在部署中。",
+                  "由于这是项目部署，评审环境可能重建、重置或清空，无法保证长期归档。"
+                ]
+              },
+              {
+                "paragraphs": [
+                  "如果存储行为随项目演进而变化，应更新本政策以反映新的保留模型。"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "children",
+            "title": "6. 儿童与上传内容",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Funova 为家庭友好的故事生成而设计，但用户仍需对提交内容负责。"
+                ],
+                "bullets": [
+                  "只上传你有权分享的信息或图片。",
+                  "不要提交与漫画生成流程无关的敏感信息。",
+                  "若故事涉及真实儿童，请将细节限制在创作所需范围内。"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "security",
+            "title": "7. 安全",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "项目设计在 HTTPS 下运行并使用容器化部署，但任何 Web 应用都无法承诺绝对安全。",
+                  "如果你认为当前版本存在隐私问题，请不要在公共仓库 issue 中发布儿童姓名、故事 ID、上传图片或其他个人细节。",
+                  "需要个人背景的隐私问题应通过公共仓库之外的私密支持渠道联系部署负责人。"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "contact",
+            "title": "8. 联系与请求",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "隐私问题、删除请求与敏感内容举报应通过部署负责人控制的私密联系渠道处理。",
+                  "Funova 未提供公开的应用内表单，因为仓库 issue 为公开渠道，不应接收个人细节。"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "terms": {
+        "title": "服务条款",
+        "description": "使用 Funova 的规则，包括可接受的输入、AI 输出限制和项目交付预期。",
+        "updatedAt": "2026 年 4 月 18 日",
+        "sections": [
+          {
+            "id": "acceptance",
+            "title": "1. 条款接受",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "访问 Funova 即表示你同意按照本服务条款和相关隐私政策使用该站点。",
+                  "若你不同意这些条款，请勿使用当前项目部署。"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "service",
+            "title": "2. 服务描述",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Funova 是一款项目型 Web 应用，根据用户提供的角色与故事输入生成漫画风格故事。",
+                  "当前版本用于演示、评估与在部署环境限制内的正常创作使用，不承诺生产级连续性或商业服务保障。"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "acceptable-use",
+            "title": "3. 可接受的使用方式",
+            "blocks": [
+              {
+                "paragraphs": ["使用 Funova 即表示你不会提交或请求以下内容："],
+                "bullets": [
+                  "违法、辱骂、仇恨或剥削性内容。",
+                  "侵犯他人版权、商标或隐私权的内容。",
+                  "基于你无权分享的照片或个人信息的内容。",
+                  "旨在破坏、过载、抓取或干扰服务的内容。"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "user-content",
+            "title": "4. 你的输入与生成结果",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "你需对提供给应用的提示词、档案细节和上传资源负责。",
+                  "你可将生成故事用于个人或项目演示，但不得主张底层模型、部署或平台代码的所有权。"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "ai-limits",
+            "title": "5. AI 生成内容限制",
+            "blocks": [
+              {
+                "paragraphs": ["Funova 依赖生成式 AI，这意味着输出可能变化并需要人工审阅。"],
+                "bullets": [
+                  "生成的文字与图片可能包含错误、不一致或艺术性变化。",
+                  "预览或成品在分享前可能需要人工审核。",
+                  "Funova 不保证完全相似、事实准确或生成质量持续稳定。"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "availability",
+            "title": "6. 服务可用性与变更",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "由于是项目部署，功能可能更改，环境可能重置，故事可能在维护或评估期间被移除。",
+                  "团队可能随着项目演进更新界面、提示词、存储规则或法律文本。"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "liability",
+            "title": "7. 责任限制",
+            "blocks": [
+              {
+                "paragraphs": ["在法律允许范围内："],
+                "bullets": [
+                  "Funova 按现状提供用于项目用途，不保证服务连续或输出完美。",
+                  "维护者不对间接损失、对 AI 输出的主观不满或服务临时不可用负责。",
+                  "用户需在依赖或更广泛分享前审核生成内容。"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "termination",
+            "title": "8. 暂停或移除",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "维护者可在需要进行审核、安全、维护或项目交付时移除故事、阻止滥用或关闭部署。"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "contact",
+            "title": "9. 联系方式",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "关于这些条款的疑问可通过 Funova 仓库 issue 追踪器提交，因为这些请求不需要个人细节。"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+  ,
+  "profile": {
+    "title": "你的个人资料",
+    "status": {
+      "loading": "加载中…"
+    },
+    "avatar": {
+      "uploading": "上传中…",
+      "change": "更换头像"
+    },
+    "fields": {
+      "username": "用户名",
+      "email": "邮箱"
+    },
+    "actions": {
+      "logout": "退出登录",
+      "saving": "保存中…",
+      "save": "保存",
+      "cancel": "取消",
+      "edit": "编辑"
+    },
+    "messages": {
+      "noChanges": "没有需要保存的更改。",
+      "updated": "个人资料已更新。",
+      "avatarUpdated": "头像已更新。"
+    },
+    "errors": {
+      "invalidEmail": "请输入有效的邮箱地址。",
+      "usernameEmpty": "用户名不能为空。",
+      "saveFailed": "保存失败",
+      "uploadFailed": "上传失败",
+      "logoutFailed": "退出登录失败"
+    }
   }
 }

@@ -46,7 +46,7 @@ function AppLayout(): JSX.Element {
                 to="/create"
                 className="text-brand-primary hover:text-brand-dark transition-colors px-4 py-2 rounded-full hover:bg-brand-light"
               >
-                Create Story
+                {t('app.createStory')}
               </Link>
             ) : null}
             <Link
@@ -87,22 +87,22 @@ function AppLayout(): JSX.Element {
           <div className="max-w-xl">
             <div className="font-rounded text-2xl text-brand-primary">Funova</div>
             <p className="mt-2 text-sm leading-6 text-brand-muted">
-              A student-built AI comic book generator for the 42 ft_transcendence project.
+              {t('app.footer.tagline')}
             </p>
           </div>
 
           <div className="flex flex-wrap gap-4 text-sm font-semibold text-brand-primary">
-            <Link className="hover:text-brand-dark" to="/create">Create Story</Link>
-            <Link className="hover:text-brand-dark" to="/gallery">Library</Link>
-            <Link className="hover:text-brand-dark" to="/privacy">Privacy Policy</Link>
-            <Link className="hover:text-brand-dark" to="/terms">Terms of Service</Link>
+            <Link className="hover:text-brand-dark" to="/create">{t('app.footer.links.create')}</Link>
+            <Link className="hover:text-brand-dark" to="/gallery">{t('app.footer.links.library')}</Link>
+            <Link className="hover:text-brand-dark" to="/privacy">{t('app.footer.links.privacy')}</Link>
+            <Link className="hover:text-brand-dark" to="/terms">{t('app.footer.links.terms')}</Link>
             <a
               className="hover:text-brand-dark"
               href="https://github.com/Chloezhu010/42_ft_transcendence"
               rel="noreferrer"
               target="_blank"
             >
-              Repository
+              {t('app.footer.links.repository')}
             </a>
           </div>
         </div>

@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 function MarketingFooter(): JSX.Element {
+  const { t } = useTranslation();
+
   return (
     <footer className="bg-white text-brand-dark py-16 px-6 relative overflow-hidden border-t-4 border-brand-primary/10">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 relative z-10">
@@ -9,26 +12,26 @@ function MarketingFooter(): JSX.Element {
             <img src="/logo-highres.png" alt="Funova logo" className="h-40 w-auto object-contain" />
           </div>
           <p className="text-brand-muted text-lg max-w-sm text-center md:text-left font-medium">
-            Empowering the next generation of storytellers with a little bit of magic and AI.
+            {t('footer.tagline')}
           </p>
         </div>
 
         <div className="flex gap-8 font-bold text-xl">
-          <Link to="/privacy" className="hover:text-brand-primary transition-colors">Privacy</Link>
-          <Link to="/terms" className="hover:text-brand-primary transition-colors">Terms</Link>
+          <Link to="/privacy" className="hover:text-brand-primary transition-colors">{t('footer.links.privacy')}</Link>
+          <Link to="/terms" className="hover:text-brand-primary transition-colors">{t('footer.links.terms')}</Link>
           <a
             href="https://github.com/Chloezhu010/42_ft_transcendence"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-brand-primary transition-colors"
           >
-            Repository
+            {t('footer.links.repository')}
           </a>
         </div>
 
         <div className="text-center md:text-right">
-          <p className="font-bold text-2xl mb-2 text-brand-primary">Made for little dreamers</p>
-          <p className="text-sm text-brand-muted font-bold">© 2026 Funova</p>
+          <p className="font-bold text-2xl mb-2 text-brand-primary">{t('footer.madeFor')}</p>
+          <p className="text-sm text-brand-muted font-bold">{t('footer.copyright')}</p>
         </div>
       </div>
     </footer>

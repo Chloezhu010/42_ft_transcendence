@@ -1,35 +1,25 @@
+import { useTranslation } from 'react-i18next';
 import { SketchyCard } from '@/components/design-system/Primitives';
 import { SketchArrow } from './SketchIcons';
 
-const steps = [
-  {
-    number: '1',
-    title: 'Dream It',
-    description: 'Describe the child hero and the story they want to live through.',
-    image: '/step1.png',
-  },
-  {
-    number: '2',
-    title: 'AI Sketches It',
-    description: 'Watch the title and foreword arrive, then generate the panels.',
-    image: '/step2.png',
-  },
-  {
-    number: '3',
-    title: 'Read Together',
-    description: 'Open the full book, revise individual panels, and keep it in the library.',
-    image: '/step3.png',
-  },
-];
+interface StepItem {
+  number: string;
+  title: string;
+  description: string;
+  image: string;
+}
 
 function HowItWorksSection(): JSX.Element {
+  const { t } = useTranslation();
+  const steps = t('landing.howItWorks.steps', { returnObjects: true }) as StepItem[];
+
   return (
     <section
       id="how-it-works"
       className="py-24 px-6 bg-white/50 border-y-4 border-brand-primary/10 relative overflow-hidden"
     >
       <div className="max-w-7xl mx-auto text-center relative z-10">
-        <h2 className="font-semibold text-4xl md:text-5xl text-brand-primary mb-16">How it Works</h2>
+        <h2 className="font-semibold text-4xl md:text-5xl text-brand-primary mb-16">{t('landing.howItWorks.title')}</h2>
 
         <div className="flex flex-col md:flex-row justify-center items-stretch gap-8 md:gap-4">
           {steps.map((step, index) => (

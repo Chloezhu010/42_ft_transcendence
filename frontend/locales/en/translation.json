@@ -1,6 +1,17 @@
 {
   "app": {
-    "myLibrary": "My Library"
+    "myLibrary": "My Library",
+    "createStory": "Create Story",
+    "footer": {
+      "tagline": "A student-built AI comic book generator for the 42 ft_transcendence project.",
+      "links": {
+        "create": "Create Story",
+        "library": "Library",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service",
+        "repository": "Repository"
+      }
+    }
   },
   "comicPanel": {
     "paintingScene": "Painting Scene...",
@@ -96,5 +107,512 @@
     "transformStories": "Transform bedtime stories into cinematic comic book experiences.",
     "startAdventure": "Start Your Adventure",
     "viewLibrary": "View Library"
+  },
+  "story": {
+    "introStream": {
+      "status": {
+        "drafting": "Drafting",
+        "painting": "Painting first pages",
+        "ready": "Ready"
+      },
+      "onceUpon": "Once upon a time"
+    },
+    "preview": {
+      "backToLibrary": "Back to Library",
+      "label": "Preview",
+      "pageLabels": {
+        "opening": "Opening",
+        "ending": "Ending"
+      },
+      "turnPage": "Turn page →",
+      "ctaTitle": "Like what you see?",
+      "ctaDescription": "We'll fill in the {{count}} panels between opening and ending.",
+      "generateFull": "Generate Full Story",
+      "startOver": "Start Over",
+      "ariaPrevious": "Previous page",
+      "ariaNext": "Next page"
+    },
+    "storyboard": {
+      "pageLabel": {
+        "frontCover": "Front Cover",
+        "backCover": "Back Cover",
+        "spread": "Spread {{number}}"
+      },
+      "introduction": "Introduction",
+      "originalLabel": "A Funova Original",
+      "theEnd": "THE END",
+      "closingLine": "May your dreams be as bold as your story, {{name}}.",
+      "closeBook": "Close Book",
+      "paintingCover": "Painting Cover...",
+      "heroicMasterpiece": "A Heroic Masterpiece",
+      "storyCompleteTitle": "Your Story is Complete",
+      "storyCompleteBody": "<strong>{{title}}</strong> is ready to enjoy anytime in your library.",
+      "reread": "Re-read Tale",
+      "backToLibrary": "Back to Library"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "footerText": "Don't have an account?",
+      "footerLink": "Sign up"
+    },
+    "signup": {
+      "title": "Create your account",
+      "submit": "Sign up",
+      "submitting": "Signing up…",
+      "footerText": "Already have an account?",
+      "footerLink": "Log in"
+    },
+    "fields": {
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "usernameLabel": "Username",
+      "usernamePlaceholder": "your_username",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "••••••••"
+    },
+    "status": {
+      "loading": "Loading…"
+    },
+    "errors": {
+      "authFailed": "Authentication failed"
+    }
+  },
+  "landing": {
+    "nav": {
+      "howItWorks": "How it Works",
+      "gallery": "Gallery",
+      "explore": "Explore",
+      "startCreating": "Start Creating"
+    },
+    "hero": {
+      "titleLine1": "Your Child's Imagination,",
+      "titleLine2": "Sketched to Life.",
+      "subtitle": "Transform simple ideas into personalized, hand-drawn AI comic books.",
+      "ctaCreate": "Create a Story",
+      "ctaGallery": "View Gallery",
+      "imageAlt": "Funova story world"
+    },
+    "features": {
+      "title": "Why Funova?",
+      "items": [
+        {
+          "image": "/ai-sketch-engine.png",
+          "title": "AI Sketch Engine",
+          "description": "Our engine turns a character brief into vibrant, hand-drawn comic panels in moments.",
+          "rotateClassName": "-rotate-1"
+        },
+        {
+          "image": "/kid-safe-content.png",
+          "title": "Kid-Safe Content",
+          "description": "The project is aimed at family-friendly story generation with positive, age-appropriate framing.",
+          "rotateClassName": "rotate-1"
+        },
+        {
+          "image": "/printed-keepsakes.png",
+          "title": "Saved Keepsakes",
+          "description": "Completed stories stay in the gallery so families can revisit favorite adventures after generation.",
+          "rotateClassName": "-rotate-1"
+        }
+      ]
+    },
+    "howItWorks": {
+      "title": "How it Works",
+      "steps": [
+        {
+          "number": "1",
+          "title": "Dream It",
+          "description": "Describe the child hero and the story they want to live through.",
+          "image": "/step1.png"
+        },
+        {
+          "number": "2",
+          "title": "AI Sketches It",
+          "description": "Watch the title and foreword arrive, then generate the panels.",
+          "image": "/step2.png"
+        },
+        {
+          "number": "3",
+          "title": "Read Together",
+          "description": "Open the full book, revise individual panels, and keep it in the library.",
+          "image": "/step3.png"
+        }
+      ]
+    },
+    "showcase": {
+      "title": "Made by Kids, for Kids",
+      "subtitle": "Explore the wonderful worlds created by our young storytellers.",
+      "stories": [
+        { "title": "Galactic Rescue", "category": "Sci-Fi", "image": "/alex.png" },
+        { "title": "The Magic Garden", "category": "Fantasy", "image": "/lily.png" },
+        { "title": "Ocean Mystery", "category": "Adventure", "image": "/anna.png" },
+        { "title": "Forest Friends", "category": "Nature", "image": "/alice.png" }
+      ],
+      "disclaimer": "* All images shown are AI-generated representations and do not depict real children."
+    },
+    "pricing": {
+      "title": "Start Exploring",
+      "subtitle": "Two simple ways to see the project in action.",
+      "create": {
+        "title": "Create",
+        "description": "Build a new comic from a character idea",
+        "features": [
+          "Character profile flow",
+          "Streaming title and foreword",
+          "Editable comic panels"
+        ],
+        "cta": "Start Creating"
+      },
+      "library": {
+        "badge": "QUICK TOUR",
+        "title": "Library",
+        "description": "Reopen saved books and review finished output",
+        "features": [
+          "Browse generated covers",
+          "Open any saved story",
+          "Review the final storyboard"
+        ],
+        "cta": "Open Library"
+      }
+    }
+  },
+  "footer": {
+    "tagline": "Empowering the next generation of storytellers with a little bit of magic and AI.",
+    "links": {
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "repository": "Repository"
+    },
+    "madeFor": "Made for little dreamers",
+    "copyright": "© 2026 Funova"
+  },
+  "legal": {
+    "backToHome": "← Back to Home",
+    "lastUpdatedLabel": "Last updated:",
+    "switchLinks": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service"
+    },
+    "maintainerContact": {
+      "title": "Maintainer Contact",
+      "termsIntro": "Questions about the terms can be sent through the Funova repository issue tracker when they do not include personal data.",
+      "termsButton": "Contact About Terms",
+      "privacyNotice": "Privacy and deletion requests should not be filed in the public repository issue tracker. If you need help with a privacy-specific request, contact the deployment owner through a private channel outside the app and do not include personal details in public issue reports."
+    },
+    "documents": {
+      "privacy": {
+        "title": "Privacy Policy",
+        "description": "How Funova handles story inputs, generated books, and optional image data in the current project build.",
+        "updatedAt": "April 18, 2026",
+        "sections": [
+          {
+            "id": "introduction",
+            "title": "1. Introduction",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Funova is a student-built web application created for the 42 ft_transcendence project. It turns a child hero profile into an AI-generated comic book with a preview flow, editable panels, and a saved gallery.",
+                  "This Privacy Policy explains what information the current build handles, how that information is used, and what practical limits apply to this project deployment."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "information",
+            "title": "2. Information We Process",
+            "blocks": [
+              {
+                "heading": "2.1 Story Input Data",
+                "paragraphs": [
+                  "When you create a story, Funova may process the information you enter into the creation flow, including:"
+                ],
+                "bullets": [
+                  "Character profile details such as the hero name, appearance traits, favorite color, archetype, and free-form dream prompt.",
+                  "Optional uploaded reference images when a user wants the generated character art to resemble a provided child photo."
+                ]
+              },
+              {
+                "heading": "2.2 Generated Content",
+                "bullets": [
+                  "Generated story titles, forewords, panel text, image prompts, and story metadata.",
+                  "Saved image URLs and cover data needed to reopen a generated book from the gallery."
+                ]
+              },
+              {
+                "heading": "2.3 Technical and Service Data",
+                "bullets": [
+                  "Request metadata such as timestamps, browser requests, and basic application logs needed to operate and debug the service.",
+                  "Deployment-level storage records kept by the database and containerized runtime used for this project."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "use",
+            "title": "3. How We Use Your Information",
+            "blocks": [
+              {
+                "paragraphs": ["We use the processed information to:"],
+                "bullets": [
+                  "Generate the requested comic story, including the preview state, panel text, and related images.",
+                  "Store and display generated books back to the same deployment through the library and book views.",
+                  "Investigate failures, service instability, moderation concerns, and misuse during development, demo, or evaluation.",
+                  "Improve prompt quality, reliability, and output consistency inside the project codebase."
+                ]
+              },
+              {
+                "note": "Funova is not intended to sell personal data, serve ads, or build unrelated marketing profiles. The current build uses story data to run the requested comic-generation flow."
+              }
+            ]
+          },
+          {
+            "id": "services",
+            "title": "4. Third-Party Services and Storage",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Funova relies on supporting services to run the current deployment. Those services may process the minimum data needed for their role."
+                ],
+                "cards": [
+                  {
+                    "title": "AI Generation Provider",
+                    "description": "Receives the story brief and generation inputs needed to produce story text and images for the requested comic."
+                  },
+                  {
+                    "title": "Application Database",
+                    "description": "Stores story records, profile details, prompts, and saved image references so books can be reopened in the gallery."
+                  },
+                  {
+                    "title": "Deployment Stack",
+                    "description": "Serves the web application and routes traffic through the project infrastructure used for the current environment."
+                  }
+                ]
+              },
+              {
+                "paragraphs": [
+                  "We do not sell personal data. Information is shared only to the extent required to generate stories, store the results, and operate the application."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "retention",
+            "title": "5. Data Storage and Retention",
+            "blocks": [
+              {
+                "bullets": [
+                  "Story records remain in the project database until they are deleted through the app, removed by maintainers, or cleared during environment resets.",
+                  "Uploaded images are processed as part of the generation flow and may remain stored with the deployment while the related story remains available.",
+                  "Because this is a project deployment, review environments may be rebuilt, reseeded, or wiped without long-term archival guarantees."
+                ]
+              },
+              {
+                "paragraphs": [
+                  "If storage behavior changes as the project evolves, this policy should be updated to reflect the new retention model."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "children",
+            "title": "6. Children and Uploaded Content",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Funova is designed for family-friendly story generation, but users remain responsible for what they submit."
+                ],
+                "bullets": [
+                  "Only upload information or images you are authorized to share.",
+                  "Do not submit sensitive information that is not needed for the comic-generation flow.",
+                  "If a story references a real child, keep the provided details limited to what is necessary for the creative result."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "security",
+            "title": "7. Security",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "The project is designed to run behind HTTPS and uses a containerized deployment. Even so, no web application can promise perfect security.",
+                  "If you believe a privacy issue exists in the current build, do not post child names, story IDs, uploaded images, or other personal details in the public repository issue tracker.",
+                  "Privacy concerns that require personal context should be sent to the deployment owner through a private support channel outside the public repository."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "contact",
+            "title": "8. Contact and Requests",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Privacy questions, deletion requests, and sensitive content reports should be handled through a private contact path controlled by the deployment owner.",
+                  "Funova does not provide a public in-app form for those requests because the repository issue tracker is public and should not receive personal details."
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "terms": {
+        "title": "Terms of Service",
+        "description": "The rules for using Funova, including acceptable inputs, AI-output limits, and project-delivery expectations.",
+        "updatedAt": "April 18, 2026",
+        "sections": [
+          {
+            "id": "acceptance",
+            "title": "1. Acceptance of Terms",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "By accessing Funova, you agree to use the site according to these Terms of Service and the related Privacy Policy.",
+                  "If you do not agree with these terms, do not use the current project deployment."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "service",
+            "title": "2. Description of Service",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Funova is a project web application that generates comic-style stories from user-provided character and story inputs.",
+                  "The current build is intended for demos, evaluation, and normal creative use within the limits of the deployed environment. It does not promise production-grade continuity or commercial service guarantees."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "acceptable-use",
+            "title": "3. Acceptable Use",
+            "blocks": [
+              {
+                "paragraphs": ["By using Funova, you agree not to submit or request content that is:"],
+                "bullets": [
+                  "Illegal, abusive, hateful, or exploitative.",
+                  "Infringing on another party's copyright, trademark, or privacy rights.",
+                  "Based on photos or personal information you are not authorized to share.",
+                  "Designed to break, overload, scrape, or interfere with the service."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "user-content",
+            "title": "4. Your Inputs and Generated Output",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "You keep responsibility for the prompts, profile details, and uploaded assets you provide to the app.",
+                  "You may use the generated stories for personal or project-demo purposes, but you should not claim ownership of the underlying models, deployment, or platform code."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "ai-limits",
+            "title": "5. AI-Generated Content Limits",
+            "blocks": [
+              {
+                "paragraphs": ["Funova relies on generative AI, which means the output can vary and may require human review."],
+                "bullets": [
+                  "Generated text and images may contain mistakes, inconsistencies, or artistic surprises.",
+                  "A preview or finished book may require human review before it is shared with others.",
+                  "Funova does not guarantee exact likeness, factual accuracy, or uninterrupted generation quality."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "availability",
+            "title": "6. Service Availability and Changes",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Because this is a project deployment, features may change, environments may reset, and stories may be removed during maintenance or evaluation.",
+                  "The team may update the interface, prompts, storage rules, or legal text when the project evolves."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "liability",
+            "title": "7. Limitation of Liability",
+            "blocks": [
+              {
+                "paragraphs": ["To the extent allowed by law:"],
+                "bullets": [
+                  "Funova is provided on an as-is basis for project use, without warranties of uninterrupted service or perfect output.",
+                  "The maintainers are not liable for indirect loss, subjective dissatisfaction with AI output, or temporary unavailability of the service.",
+                  "Users remain responsible for reviewing generated content before relying on it or sharing it more broadly."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "termination",
+            "title": "8. Suspension or Removal",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "The maintainers may remove stories, block abusive usage, or shut down a deployment if that is required for moderation, security, maintenance, or project delivery."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "contact",
+            "title": "9. Contact",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Questions about these terms can be sent through the Funova repository issue tracker because those requests do not require personal details."
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+  ,
+  "profile": {
+    "title": "Your profile",
+    "status": {
+      "loading": "Loading…"
+    },
+    "avatar": {
+      "uploading": "Uploading…",
+      "change": "Change avatar"
+    },
+    "fields": {
+      "username": "Username",
+      "email": "Email"
+    },
+    "actions": {
+      "logout": "Log out",
+      "saving": "Saving…",
+      "save": "Save",
+      "cancel": "Cancel",
+      "edit": "Edit"
+    },
+    "messages": {
+      "noChanges": "No changes to save.",
+      "updated": "Profile updated.",
+      "avatarUpdated": "Avatar updated."
+    },
+    "errors": {
+      "invalidEmail": "Please enter a valid email address.",
+      "usernameEmpty": "Username cannot be empty.",
+      "saveFailed": "Save failed",
+      "uploadFailed": "Upload failed",
+      "logoutFailed": "Logout failed"
+    }
   }
 }

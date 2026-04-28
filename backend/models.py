@@ -86,6 +86,7 @@ class KidProfileCreate(BaseModel):
     archetype: str | None = None
     art_style: str | None = None
     photo_base64: str | None = None  # For multimodal character analysis
+    language: str | None = None
 
 
 class KidProfileResponse(BaseModel):

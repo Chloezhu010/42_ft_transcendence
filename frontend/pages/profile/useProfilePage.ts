@@ -5,6 +5,7 @@
  */
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { updateMe, uploadAvatar, type UserResponse } from '@api';
 import { useAuth } from '@/app/auth';
 
@@ -29,6 +30,7 @@ interface UseProfilePageResult {
 }
 
 export function useProfilePage(): UseProfilePageResult {
+  const { t } = useTranslation();
   const { currentUser, accessToken, refreshMe } = useAuth();
 
   const [editingField, setEditingField] = useState<EditableField | null>(null);
@@ -77,24 +79,24 @@ export function useProfilePage(): UseProfilePageResult {
     setIsSaving(true);
     try {
       if (currentUser && currentUser[editingField] === draftValue) {
-        toast('No changes to save.');
+        toast(t('profile.messages.noChanges'));
         cancelEditing();
         return;
       }
       if (editingField === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draftValue)) {
-        toast.error('Please enter a valid email address.');
+        toast.error(t('profile.errors.invalidEmail'));
         return;
       }
       if (editingField === 'username' && draftValue.trim() === '') {
-        toast.error('Username cannot be empty.');
+        toast.error(t('profile.errors.usernameEmpty'));
         return;
       }
       await updateMe(accessToken, { [editingField]: draftValue });
       await refreshMe();
-      toast.success('Profile updated.');
+      toast.success(t('profile.messages.updated'));
       cancelEditing();
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Save failed';
+      const message = error instanceof Error ? error.message : t('profile.errors.saveFailed');
       toast.error(message);
     } finally {
       setIsSaving(false);
@@ -119,9 +121,9 @@ export function useProfilePage(): UseProfilePageResult {
       await uploadAvatar(accessToken, croppedFile);
       await refreshMe();
       setPendingAvatarFile(null);
-      toast.success('Avatar updated.');
+      toast.success(t('profile.messages.avatarUpdated'));
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Upload failed';
+      const message = error instanceof Error ? error.message : t('profile.errors.uploadFailed');
       toast.error(message);
     } finally {
       setIsUploadingAvatar(false);

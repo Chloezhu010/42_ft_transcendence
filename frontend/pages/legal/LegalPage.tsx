@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import MarketingFooter from '@/pages/landing/MarketingFooter';
 import {
-  legalDocuments,
+  getLegalDocuments,
   legalTermsIssuesUrl,
   type LegalDocumentKey,
 } from './legal.content';
@@ -12,7 +13,8 @@ interface LegalPageProps {
 }
 
 function LegalPage({ documentKey }: LegalPageProps): JSX.Element {
-  const document = legalDocuments[documentKey];
+  const { t } = useTranslation();
+  const document = getLegalDocuments(t)[documentKey];
   const showPublicTermsLink = documentKey === 'terms';
 
   return (
@@ -25,7 +27,7 @@ function LegalPage({ documentKey }: LegalPageProps): JSX.Element {
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
             <Link to="/" className="text-brand-primary hover:text-brand-primary/80 font-bold transition-colors">
-              ← Back to Home
+              {t('legal.backToHome')}
             </Link>
           </div>
         </div>
@@ -33,15 +35,17 @@ function LegalPage({ documentKey }: LegalPageProps): JSX.Element {
 
       <main className="max-w-4xl mx-auto px-6 py-12">
         <h1 className="text-4xl font-bold text-brand-dark mb-2">{document.title}</h1>
-        <p className="text-brand-muted mb-3">Last updated: {document.updatedAt}</p>
+        <p className="text-brand-muted mb-3">
+          {t('legal.lastUpdatedLabel')} {document.updatedAt}
+        </p>
         <p className="text-lg text-brand-dark/85 leading-relaxed max-w-3xl">{document.description}</p>
 
         <div className="mt-6 flex flex-wrap gap-4 text-sm font-semibold">
           <Link className="text-brand-primary hover:text-brand-primary/80 transition-colors" to="/privacy">
-            Privacy Policy
+            {t('legal.switchLinks.privacy')}
           </Link>
           <Link className="text-brand-primary hover:text-brand-primary/80 transition-colors" to="/terms">
-            Terms of Service
+            {t('legal.switchLinks.terms')}
           </Link>
         </div>
 
@@ -98,12 +102,11 @@ function LegalPage({ documentKey }: LegalPageProps): JSX.Element {
           ))}
 
           <section>
-            <h2 className="text-2xl font-bold text-brand-primary mb-4">Maintainer Contact</h2>
+            <h2 className="text-2xl font-bold text-brand-primary mb-4">{t('legal.maintainerContact.title')}</h2>
             {showPublicTermsLink ? (
               <>
                 <p>
-                  Questions about the terms can be sent through the Funova repository issue tracker when they do not
-                  include personal data.
+                  {t('legal.maintainerContact.termsIntro')}
                 </p>
                 <a
                   href={legalTermsIssuesUrl}
@@ -111,14 +114,12 @@ function LegalPage({ documentKey }: LegalPageProps): JSX.Element {
                   rel="noopener noreferrer"
                   className="inline-block mt-4 px-6 py-2 bg-brand-primary text-white font-bold rounded-full hover:bg-brand-primary/90 transition-colors"
                 >
-                  Contact About Terms
+                  {t('legal.maintainerContact.termsButton')}
                 </a>
               </>
             ) : (
               <p className="rounded-2xl border-2 border-brand-primary/10 bg-white p-4 leading-relaxed">
-                Privacy and deletion requests should not be filed in the public repository issue tracker. If you need
-                help with a privacy-specific request, contact the deployment owner through a private channel outside the
-                app and do not include personal details in public issue reports.
+                {t('legal.maintainerContact.privacyNotice')}
               </p>
             )}
           </section>

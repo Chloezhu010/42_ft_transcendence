@@ -12,6 +12,8 @@ import {
   type StoryIntroField,
   updateStory,
 } from '@api';
+import i18n from '@/i18n';
+import { defaultLanguage, normalizeLanguageCode } from '@/i18n.languages';
 import type { KidProfile, Story } from '@/types';
 import {
   imageSourceToPureBase64,
@@ -37,7 +39,10 @@ export async function loadStoryState(accessToken: string, storyId: number): Prom
   const savedStory = await getStory(accessToken, storyId);
   const nextStory = mapApiStoryToStory(savedStory);
   const nextProfile = mapApiProfileToKidProfile(savedStory.profile);
-  const profileForApi = mapKidProfileToGenerationProfile(nextProfile);
+  const profileForApi = {
+    ...mapKidProfileToGenerationProfile(nextProfile),
+    language: normalizeLanguageCode(i18n.resolvedLanguage || i18n.language || defaultLanguage),
+  };
 
   if (isPreviewDraft(nextStory)) {
     return {
@@ -138,7 +143,10 @@ export async function generatePreviewState(
   profile: KidProfile,
   onIntroDelta: (field: StoryIntroField, delta: string) => void,
 ): Promise<GeneratedPreviewState> {
-  const profileForApi = mapKidProfileToGenerationProfile(profile);
+  const profileForApi = {
+    ...mapKidProfileToGenerationProfile(profile),
+    language: normalizeLanguageCode(i18n.resolvedLanguage || i18n.language || defaultLanguage),
+  };
   const script = await streamStoryScript(accessToken, profileForApi, { onIntroDelta });
   const previewStory = await buildPreviewStory(accessToken, profileForApi, script);
   const previewStoryId = await persistPreviewStory(accessToken, profileForApi, previewStory);

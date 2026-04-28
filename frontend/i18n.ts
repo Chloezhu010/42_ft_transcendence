@@ -1,7 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import { defaultLanguage, supportedLanguageCodes } from './i18n.languages';
+import { defaultLanguage, normalizeLanguageCode, supportedLanguageCodes } from './i18n.languages';
 
 // Import translations
 import translationEN from './locales/en/translation.json';
@@ -25,8 +25,9 @@ function syncDocumentLanguage(languageCode: string): void {
     return;
   }
 
-  document.documentElement.lang = languageCode;
-  document.documentElement.dir = i18n.dir(languageCode);
+  const normalizedCode = normalizeLanguageCode(languageCode);
+  document.documentElement.lang = normalizedCode;
+  document.documentElement.dir = i18n.dir(normalizedCode);
 }
 
 void i18n

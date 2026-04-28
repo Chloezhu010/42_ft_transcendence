@@ -43,6 +43,15 @@ DEFAULT_STYLE = (
     "Bold black ink outlines, vibrant flat colors, clean cel-shading. No 3D, no gradients, no text in images."
 )
 
+LANGUAGE_LABELS = {
+    "en": "English",
+    "fr": "French",
+    "es": "Spanish",
+    "zh": "Chinese",
+    "ja": "Japanese",
+    "ar": "Arabic",
+}
+
 
 def get_style_prompt(style: str | None) -> str:
     return ART_STYLES.get(style, DEFAULT_STYLE)
@@ -108,7 +117,16 @@ def _build_story_script_prompt(profile: KidProfileCreate) -> str:
         )
     theme = f"{profile.archetype or 'adventure'} adventure about {profile.dream or 'discovering something amazing'}"
 
-    return f"""Create a 10-panel children's comic story. Simple vocabulary, 6-10 words per panel.
+    language_code = (profile.language or "").strip().lower()
+    language_name = LANGUAGE_LABELS.get(language_code, "")
+    language_instruction = ""
+    if language_name and language_code != "en":
+        language_instruction = (
+            f"LANGUAGE REQUIREMENT: Write ALL story text (title, foreword, panel text) in {language_name} only. "
+            "Do not use English in story text. Keep characterDescription, coverImagePrompt, and imagePrompt in English.\n"
+        )
+
+    return f"""{language_instruction}Create a 10-panel children's comic story. Simple vocabulary, 6-10 words per panel.
 
 HERO: {hero_desc}, depicted as a 5-6 year old. Do NOT age up.
 THEME: {theme}. Favorite color: {profile.favorite_color}. Art style: {profile.art_style or "classic comic"}.
