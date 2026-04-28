@@ -104,9 +104,7 @@ async def _create_tables(db: aiosqlite.Connection):
             raise
     await db.execute("UPDATE stories SET visibility = 'private' WHERE visibility IS NULL")
     try:
-        await db.execute(
-            "ALTER TABLE users ADD COLUMN is_admin BOOLEAN NOT NULL DEFAULT 0"
-        )
+        await db.execute("ALTER TABLE users ADD COLUMN is_admin BOOLEAN NOT NULL DEFAULT 0")
     except aiosqlite.OperationalError as exc:
         if "duplicate column name" not in str(exc).lower():
             raise
