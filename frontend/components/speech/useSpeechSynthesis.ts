@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export interface SpeakOptions {
   lang?: string;
@@ -26,11 +26,32 @@ function getSpeechSynthesis(): SpeechSynthesis | null {
   return window.speechSynthesis;
 }
 
+function resetSpeechSynthesis(synthesis: SpeechSynthesis): void {
+  synthesis.cancel();
+  synthesis.resume();
+}
+
+function isExpectedCancellationError(event: SpeechSynthesisErrorEvent): boolean {
+  return event.error === 'canceled' || event.error === 'interrupted';
+}
+
 export function useSpeechSynthesis(): UseSpeechSynthesisResult {
+  const currentUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const ignoredUtteranceErrorsRef = useRef<WeakSet<SpeechSynthesisUtterance>>(new WeakSet());
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSupported] = useState(() => getSpeechSynthesis() !== null);
+
+  const resetCurrentSpeech = useCallback((synthesis: SpeechSynthesis) => {
+    const currentUtterance = currentUtteranceRef.current;
+
+    if (currentUtterance) {
+      ignoredUtteranceErrorsRef.current.add(currentUtterance);
+    }
+
+    resetSpeechSynthesis(synthesis);
+  }, []);
 
   const stop = useCallback(() => {
     const synthesis = getSpeechSynthesis();
@@ -39,10 +60,12 @@ export function useSpeechSynthesis(): UseSpeechSynthesisResult {
       return;
     }
 
-    synthesis.cancel();
+    resetCurrentSpeech(synthesis);
+    currentUtteranceRef.current = null;
     setIsSpeaking(false);
     setIsPaused(false);
-  }, []);
+    setError(null);
+  }, [resetCurrentSpeech]);
 
   const speak = useCallback((text: string, options: SpeakOptions = {}) => {
     const synthesis = getSpeechSynthesis();
@@ -58,9 +81,10 @@ export function useSpeechSynthesis(): UseSpeechSynthesisResult {
       return;
     }
 
-    synthesis.cancel();
+    resetCurrentSpeech(synthesis);
 
     const utterance = new SpeechSynthesisUtterance(content);
+    currentUtteranceRef.current = utterance;
     utterance.lang = options.lang ?? 'en-US';
     utterance.pitch = options.pitch ?? 1;
     utterance.rate = options.rate ?? 1;
@@ -80,19 +104,27 @@ export function useSpeechSynthesis(): UseSpeechSynthesisResult {
       setIsPaused(false);
     };
 
-    utterance.onerror = () => {
+    utterance.onerror = (event) => {
+      if (ignoredUtteranceErrorsRef.current.has(utterance) || isExpectedCancellationError(event)) {
+        return;
+      }
+
       setError('Text-to-speech playback failed.');
       setIsSpeaking(false);
       setIsPaused(false);
     };
 
     utterance.onend = () => {
+      if (currentUtteranceRef.current === utterance) {
+        currentUtteranceRef.current = null;
+      }
+
       setIsSpeaking(false);
       setIsPaused(false);
     };
 
     synthesis.speak(utterance);
-  }, []);
+  }, [resetCurrentSpeech]);
 
   const pause = useCallback(() => {
     const synthesis = getSpeechSynthesis();
@@ -108,7 +140,7 @@ export function useSpeechSynthesis(): UseSpeechSynthesisResult {
   const resume = useCallback(() => {
     const synthesis = getSpeechSynthesis();
 
-    if (!synthesis || !synthesis.paused) {
+    if (!synthesis) {
       return;
     }
 
@@ -118,9 +150,13 @@ export function useSpeechSynthesis(): UseSpeechSynthesisResult {
 
   useEffect(() => {
     return () => {
-      getSpeechSynthesis()?.cancel();
+      const synthesis = getSpeechSynthesis();
+
+      if (synthesis) {
+        resetCurrentSpeech(synthesis);
+      }
     };
-  }, []);
+  }, [resetCurrentSpeech]);
 
   return {
     isSpeaking,
