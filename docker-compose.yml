@@ -2,8 +2,8 @@ services:
   nginx:
     build: ./nginx
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:80"
+      - "8443:443"
     depends_on:
       - frontend
       - backend
@@ -34,7 +34,8 @@ services:
       - backend
 
   prometheus:
-    image: prom/prometheus:v3.3.0
+    image: docker.io/prom/prometheus:v3.5.1
+    container_name: prometheus
     ports:
       - "9090:9090"
     volumes:
@@ -49,7 +50,7 @@ services:
       - backend
 
   grafana:
-    image: grafana/grafana:11.6.1
+    image: docker.io/grafana/grafana:11.6.1
     ports:
       - "3001:3000"
     environment:

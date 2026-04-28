@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import FeaturesSection from './FeaturesSection';
 import MarketingFooter from './MarketingFooter';
 import HeroSection from './HeroSection';
@@ -20,12 +21,15 @@ function LandingPage(): JSX.Element {
           <a href="#project-highlights" className="hover:text-brand-primary transition-colors">Explore</a>
         </div>
 
-        <Link
-          to="/create"
-          className="px-6 py-2 text-xl font-black bg-brand-accent text-brand-dark border-4 border-brand-primary rounded-[32px] transition-all hover:scale-105 active:scale-95 shadow-soft"
-        >
-          Start Creating
-        </Link>
+        <div className="flex items-center gap-4">
+          <LanguageSwitcher />
+          <Link
+            to="/create"
+            className="px-6 py-2 text-xl font-black bg-brand-accent text-brand-dark border-4 border-brand-primary rounded-[32px] transition-all hover:scale-105 active:scale-95 shadow-soft"
+          >
+            Start Creating
+          </Link>
+        </div>
       </nav>
 
       <main className="flex-1 w-full">

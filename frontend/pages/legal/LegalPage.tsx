@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import MarketingFooter from '@/pages/landing/MarketingFooter';
 import {
   legalDocuments,
@@ -17,13 +18,16 @@ function LegalPage({ documentKey }: LegalPageProps): JSX.Element {
   return (
     <div className="min-h-screen bg-brand-light">
       <header className="py-4 px-6 bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b-4 border-brand-primary/10 shadow-sm">
-        <div className="max-w-4xl mx-auto flex justify-between items-center">
+        <div className="max-w-4xl mx-auto flex justify-between items-center gap-4">
           <Link to="/" className="flex items-center">
             <img src="/logo-highres.png" alt="Funova logo" className="h-12 w-auto object-contain" />
           </Link>
-          <Link to="/" className="text-brand-primary hover:text-brand-primary/80 font-bold transition-colors">
-            ← Back to Home
-          </Link>
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher />
+            <Link to="/" className="text-brand-primary hover:text-brand-primary/80 font-bold transition-colors">
+              ← Back to Home
+            </Link>
+          </div>
         </div>
       </header>
 
