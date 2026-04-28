@@ -15,7 +15,7 @@ API, which is safe to run while the application is live (WAL mode).
 | Mechanism | SQLite `Connection.backup()` (online, no downtime) |
 | Schedule | On startup + every 24 hours automatically |
 | Retention | Last 7 snapshots (oldest deleted automatically) |
-| Storage | `backend_backups` named Docker volume (mounted at `/app/backups` in the container) |
+| Storage | `backend_backups` named Docker volume, mounted at `/app/backups` in the container (Compose prefixes the physical name with the project name, e.g. `tran_main1_backend_backups`) |
 | Filename format | `wondercomic_YYYYMMDD_HHMMSS_ffffff.db` (microsecond precision) |
 
 ### Manual Backup (API)
@@ -52,20 +52,19 @@ Visit `http://localhost:3000/status` for a visual backup inventory and a
 
 2. **Identify the backup to restore.**
    ```bash
-   docker run --rm -v backend_backups:/backups alpine ls /backups
+   docker compose run --rm --no-deps backend ls /app/backups
    ```
    Pick the most recent `wondercomic_YYYYMMDD_HHMMSS_ffffff.db` file.
 
 3. **Copy the backup over the live database.**
    ```bash
-   docker run --rm \
-     -v backend_backups:/backups \
-     -v "$(pwd)/backend:/host_backend" \
-     alpine cp /backups/wondercomic_YYYYMMDD_HHMMSS_ffffff.db /host_backend/wondercomic.db
+   docker compose run --rm --no-deps backend \
+     cp /app/backups/wondercomic_YYYYMMDD_HHMMSS_ffffff.db /app/wondercomic.db
    ```
    Replace `wondercomic_YYYYMMDD_HHMMSS_ffffff.db` with the chosen filename.
-   This mounts the backup volume and the host `backend/` directory so the database
-   file (which lives in the bind mount) is overwritten correctly.
+   `docker compose run` starts a temporary container with the same volume mounts as
+   the backend service (both the named backup volume and the bind-mounted app
+   directory), so no manual volume name resolution is needed.
 
 4. **Restart the backend.**
    ```bash
