@@ -175,7 +175,7 @@ def test_login_oauth_only_user_returns_401_without_crashing(client_with_db_path)
     )
 
     assert resp.status_code == 401
-    assert "social sign-in" in resp.json()["detail"].lower()
+    assert "does not use password login" in resp.json()["detail"].lower()
 
 
 # --- Logout ---
