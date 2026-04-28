@@ -8,7 +8,7 @@ POST /backup/trigger — run an immediate backup and return the full status afte
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from auth_utils import get_current_user
+from auth_utils import require_admin
 from db.backup import create_backup, get_last_backup_time, list_backups
 
 router = APIRouter(prefix="/api/backup", tags=["backup"])
@@ -39,9 +39,9 @@ async def backup_status():
 
 @router.post("/trigger", response_model=BackupStatusResponse)
 async def trigger_backup(
-    current_user: dict = Depends(get_current_user),
+    _: dict = Depends(require_admin),
 ):
-    """Run an immediate database backup and return the full status after rotation. Requires authentication."""
+    """Run an immediate database backup and return the full status after rotation. Requires admin."""
     await create_backup()
     backups = list_backups()
     return {

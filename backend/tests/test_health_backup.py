@@ -18,7 +18,7 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from fastapi.testclient import TestClient
 
-from auth_utils import get_current_user
+from auth_utils import get_current_user, require_admin
 from db.backup import MAX_BACKUPS, create_backup, get_last_backup_time, list_backups
 from db.database import get_db
 from routers.backup import router as backup_router
@@ -60,11 +60,22 @@ def failing_health_client(tmp_path):
 
 @pytest.fixture
 def backup_client(tmp_path):
-    """TestClient with the backup router, a fresh temp DB, and a mock authenticated user."""
+    """TestClient with the backup router and a mock admin user."""
     db_path = str(tmp_path / "test.db")
     asyncio.run(_init_test_db(db_path))
     app = make_test_app(db_path, backup_router)
-    app.dependency_overrides[get_current_user] = lambda: {"id": 1, "username": "testuser", "email": "test@example.com"}
+    app.dependency_overrides[get_current_user] = lambda: {"id": 1, "username": "testuser", "email": "test@example.com", "is_admin": True}
+    with TestClient(app) as c:
+        yield c
+
+
+@pytest.fixture
+def non_admin_backup_client(tmp_path):
+    """TestClient with the backup router and a mock non-admin user."""
+    db_path = str(tmp_path / "test.db")
+    asyncio.run(_init_test_db(db_path))
+    app = make_test_app(db_path, backup_router)
+    app.dependency_overrides[get_current_user] = lambda: {"id": 2, "username": "regular", "email": "regular@example.com", "is_admin": False}
     with TestClient(app) as c:
         yield c
 
@@ -207,6 +218,9 @@ class TestBackupTriggerEndpoint:
         asyncio.run(_init_test_db(db_path))
         with TestClient(make_test_app(db_path, backup_router)) as c:
             assert c.post("/api/backup/trigger").status_code == 401
+
+    def test_returns_403_for_non_admin_user(self, non_admin_backup_client):
+        assert non_admin_backup_client.post("/api/backup/trigger").status_code == 403
 
 
 # ===========================================================================

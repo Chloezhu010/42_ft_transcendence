@@ -109,7 +109,7 @@ function BackupSection({ backupStatus, isTriggeringBackup, onTrigger }: BackupSe
 }
 
 export function StatusPage(): JSX.Element {
-  const { accessToken } = useAuth();
+  const { accessToken, currentUser } = useAuth();
   const [health, setHealth] = useState<HealthCheck | null>(null);
   const [backupStatus, setBackupStatus] = useState<BackupStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -179,7 +179,7 @@ export function StatusPage(): JSX.Element {
         <BackupSection
           backupStatus={backupStatus}
           isTriggeringBackup={isTriggeringBackup}
-          onTrigger={accessToken ? () => void handleTriggerBackup() : null}
+          onTrigger={accessToken && currentUser?.is_admin ? () => void handleTriggerBackup() : null}
         />
       )}
     </div>

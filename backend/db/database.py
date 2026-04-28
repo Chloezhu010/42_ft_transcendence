@@ -103,11 +103,19 @@ async def _create_tables(db: aiosqlite.Connection):
         if "duplicate column name" not in str(exc).lower():
             raise
     await db.execute("UPDATE stories SET visibility = 'private' WHERE visibility IS NULL")
-    # Seed a default local user for dev mode
+    try:
+        await db.execute(
+            "ALTER TABLE users ADD COLUMN is_admin BOOLEAN NOT NULL DEFAULT 0"
+        )
+    except aiosqlite.OperationalError as exc:
+        if "duplicate column name" not in str(exc).lower():
+            raise
+    # Seed a default local user for dev mode and mark it admin
     await db.execute("""
         INSERT OR IGNORE INTO users (id, email, username, password_hash)
         VALUES (1, 'local@dev', 'local-user', 'none')
     """)
+    await db.execute("UPDATE users SET is_admin = 1 WHERE id = 1")
     await db.commit()
 
 

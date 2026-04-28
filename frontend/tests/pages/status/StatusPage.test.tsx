@@ -97,7 +97,10 @@ beforeEach(() => {
   mockGetHealthStatus.mockResolvedValue(HEALTHY_STATUS);
   mockGetBackupStatus.mockResolvedValue(BACKUP_STATUS_WITH_ENTRIES);
   mockTriggerBackup.mockResolvedValue(TRIGGER_BACKUP_STATUS);
-  mockUseAuth.mockReturnValue({ accessToken: 'test-token' });
+  mockUseAuth.mockReturnValue({
+    accessToken: 'test-token',
+    currentUser: { id: 1, username: 'admin', email: 'admin@example.com', avatar_url: null, is_online: true, is_admin: true, created_at: '2026-01-01T00:00:00+00:00' },
+  });
 });
 
 describe('StatusPage', () => {
@@ -205,7 +208,18 @@ describe('StatusPage', () => {
     });
 
     it('hides the trigger button when the user is not authenticated', async () => {
-      mockUseAuth.mockReturnValue({ accessToken: null });
+      mockUseAuth.mockReturnValue({ accessToken: null, currentUser: null });
+      renderStatusPage();
+      await waitFor(() => {
+        expect(screen.queryByRole('button', { name: /back up now/i })).not.toBeInTheDocument();
+      });
+    });
+
+    it('hides the trigger button when the user is not an admin', async () => {
+      mockUseAuth.mockReturnValue({
+        accessToken: 'test-token',
+        currentUser: { id: 2, username: 'regular', email: 'regular@example.com', avatar_url: null, is_online: true, is_admin: false, created_at: '2026-01-01T00:00:00+00:00' },
+      });
       renderStatusPage();
       await waitFor(() => {
         expect(screen.queryByRole('button', { name: /back up now/i })).not.toBeInTheDocument();
