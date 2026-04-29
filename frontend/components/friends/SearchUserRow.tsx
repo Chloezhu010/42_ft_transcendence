@@ -3,6 +3,7 @@
  */
 import StorageImage from '@/components/StorageImage';
 import type { SearchUserResult } from '@/components/friends/friends.types';
+import { useTranslation } from 'react-i18next';
 
 interface SearchUserRowProps {
     user: SearchUserResult;
@@ -10,8 +11,9 @@ interface SearchUserRowProps {
 }
 
 export function SearchUserRow({ user, onSendRequest }: SearchUserRowProps): JSX.Element {
+    const { t } = useTranslation();
     const avatarFallback = user.username.charAt(0).toUpperCase();
-    const onlineLabel = user.is_online ? 'Online' : 'Offline';
+    const onlineLabel = user.is_online ? t('friends.status.online') : t('friends.status.offline');
 
     return (
         <div className="flex items-center gap-4 rounded-xl border border-brand-primary/10 bg-brand-light/30 p-4">
@@ -35,13 +37,13 @@ export function SearchUserRow({ user, onSendRequest }: SearchUserRowProps): JSX.
             <div className="shrink-0">
                 {user.relationship === 'friend' && (
                     <span className="rounded-full bg-brand-primary/10 px-3 py-1 text-sm font-semibold text-brand-primary">
-                        Friends
+                        {t('friends.badges.alreadyFriends')}
                     </span>
                 )}
 
                 {user.relationship === 'pending_in' && (
                     <span className="rounded-full bg-yellow-100 px-3 py-1 text-sm font-semibold text-yellow-800">
-                        Respond in Pending
+                        {t('friends.badges.respondPending')}
                     </span>
                 )}
 
@@ -51,7 +53,7 @@ export function SearchUserRow({ user, onSendRequest }: SearchUserRowProps): JSX.
                         disabled
                         className="rounded-full bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-500 cursor-not-allowed"
                     >
-                        Request Sent
+                        {t('friends.buttons.requestSent')}
                     </button>
                 )}
 
@@ -62,7 +64,7 @@ export function SearchUserRow({ user, onSendRequest }: SearchUserRowProps): JSX.
                         onClick={() => onSendRequest?.(user.id)}
                         className="rounded-full bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
                     >
-                        {user.isSending ? 'Sending...' : 'Add Friend'}
+                        {user.isSending ? t('friends.buttons.sending') : t('friends.buttons.addFriend')}
                     </button>
                 )}
             </div>

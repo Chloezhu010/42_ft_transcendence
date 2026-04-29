@@ -1,4 +1,5 @@
 import type { FriendResponse } from '@api';
+import { useTranslation } from 'react-i18next';
 import { FriendRow } from '@/components/friends/FriendRow';
 import { PendingRequestRow } from '@/components/friends/PendingRequestRow';
 import { SearchUserRow } from '@/components/friends/SearchUserRow';
@@ -17,17 +18,21 @@ export function FriendsPanel({
   onOpenLibrary,
   onRemove,
 }: FriendsPanelProps): JSX.Element {
+  const { t } = useTranslation();
+
   return (
     <section aria-labelledby="friends-panel-heading" className="space-y-3">
       <div className="space-y-1">
-        <p className="text-sm font-bold uppercase tracking-[0.24em] text-brand-primary">Your circle</p>
+        <p className="text-sm font-bold uppercase tracking-[0.24em] text-brand-primary">
+          {t('friends.panels.friends.eyebrow')}
+        </p>
         <h2 id="friends-panel-heading" className="text-2xl font-semibold text-brand-dark">
-          Friends
+          {t('friends.tabs.friends')}
         </h2>
       </div>
 
       {friends.length === 0 ? (
-        <p className="text-brand-muted">You have no friends added yet.</p>
+        <p className="text-brand-muted">{t('friends.panels.friends.empty')}</p>
       ) : (
         <ul className="space-y-2">
           {friends.map((friend) => (
@@ -59,17 +64,21 @@ export function PendingPanel({
   onAccept,
   onDecline,
 }: PendingPanelProps): JSX.Element {
+  const { t } = useTranslation();
+
   return (
     <section aria-labelledby="pending-panel-heading" className="space-y-3">
       <div className="space-y-1">
-        <p className="text-sm font-bold uppercase tracking-[0.24em] text-brand-primary">Needs attention</p>
+        <p className="text-sm font-bold uppercase tracking-[0.24em] text-brand-primary">
+          {t('friends.panels.pending.eyebrow')}
+        </p>
         <h2 id="pending-panel-heading" className="text-2xl font-semibold text-brand-dark">
-          Pending
+          {t('friends.tabs.pending')}
         </h2>
       </div>
 
       {pendingIncoming.length === 0 ? (
-        <p className="text-brand-muted">No pending friend requests yet.</p>
+        <p className="text-brand-muted">{t('friends.panels.pending.empty')}</p>
       ) : (
         <ul className="space-y-2">
           {pendingIncoming.map((request) => (
@@ -103,41 +112,44 @@ export function DiscoverPanel({
   onSearchQueryChange,
   onSendRequest,
 }: DiscoverPanelProps): JSX.Element {
+  const { t } = useTranslation();
   const trimmedSearchQuery = searchQuery.trim();
 
   return (
     <section aria-labelledby="discover-panel-heading" className="space-y-4">
       <div className="space-y-1">
-        <p className="text-sm font-bold uppercase tracking-[0.24em] text-brand-primary">Grow the list</p>
+        <p className="text-sm font-bold uppercase tracking-[0.24em] text-brand-primary">
+          {t('friends.panels.discover.eyebrow')}
+        </p>
         <h2 id="discover-panel-heading" className="text-2xl font-semibold text-brand-dark">
-          Discover
+          {t('friends.tabs.discover')}
         </h2>
       </div>
 
       <div className="space-y-2">
         <label htmlFor="friend-search" className="block text-sm font-bold text-brand-muted">
-          Search users
+          {t('friends.panels.discover.searchLabel')}
         </label>
         <input
           id="friend-search"
           type="text"
           value={searchQuery}
           onChange={(event) => onSearchQueryChange(event.target.value)}
-          placeholder="Search by username"
+          placeholder={t('friends.panels.discover.searchPlaceholder')}
           className="w-full rounded-xl border border-brand-primary/20 bg-white px-4 py-3 text-brand-dark outline-none transition-colors focus:border-brand-primary"
         />
       </div>
 
       {trimmedSearchQuery === '' ? (
-        <p className="text-brand-muted">Type a username to discover other users.</p>
+        <p className="text-brand-muted">{t('friends.panels.discover.emptyPrompt')}</p>
       ) : null}
 
       {isSearching ? (
-        <p className="text-brand-muted">Searching…</p>
+        <p className="text-brand-muted">{t('friends.panels.discover.searching')}</p>
       ) : null}
 
       {!isSearching && trimmedSearchQuery !== '' && searchResults.length === 0 ? (
-        <p className="text-brand-muted">No users found.</p>
+        <p className="text-brand-muted">{t('friends.panels.discover.noResults')}</p>
       ) : null}
 
       {!isSearching && searchResults.length > 0 ? (

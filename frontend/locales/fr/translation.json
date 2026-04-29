@@ -29,7 +29,69 @@
     "noStoriesFound": "Aucune histoire trouvée pour le moment.",
     "readNow": "LIRE MAINTENANT",
     "untitledMasterpiece": "Chef-d'œuvre sans titre",
-    "deleteStory": "Êtes-vous sûr de vouloir supprimer cette histoire? Cela ne peut pas être annulé."
+    "deleteStory": "Êtes-vous sûr de vouloir supprimer cette histoire? Cela ne peut pas être annulé.",
+    "sharing": {
+      "label": "Partage",
+      "private": "Privé",
+      "friends": "Amis"
+    }
+  },
+  "friends": {
+    "title": "Amis",
+    "loading": "Chargement…",
+    "header": {
+      "eyebrow": "Communauté",
+      "description": "Basculez entre votre cercle actuel, les demandes en attente et la découverte."
+    },
+    "tabs": {
+      "friends": "Amis",
+      "pending": "En attente",
+      "discover": "Découvrir",
+      "ariaLabel": "Sections des amis"
+    },
+    "actions": {
+      "dismiss": "Fermer"
+    },
+    "errors": {
+      "loadHint": "Vérifiez votre session et vos requêtes réseau, puis rechargez la page."
+    },
+    "status": {
+      "online": "En ligne",
+      "offline": "Hors ligne"
+    },
+    "buttons": {
+      "viewLibrary": "Voir la bibliothèque",
+      "remove": "Supprimer",
+      "removing": "Suppression...",
+      "decline": "Refuser",
+      "accept": "Accepter",
+      "working": "Traitement...",
+      "requestSent": "Demande envoyée",
+      "addFriend": "Ajouter un ami",
+      "sending": "Envoi..."
+    },
+    "badges": {
+      "alreadyFriends": "Amis",
+      "respondPending": "Répondre dans En attente"
+    },
+    "panels": {
+      "friends": {
+        "eyebrow": "Votre cercle",
+        "empty": "Vous n'avez pas encore ajouté d'amis."
+      },
+      "pending": {
+        "eyebrow": "À traiter",
+        "empty": "Aucune demande d'ami en attente."
+      },
+      "discover": {
+        "eyebrow": "Élargir la liste",
+        "searchLabel": "Rechercher des utilisateurs",
+        "searchPlaceholder": "Rechercher par nom d'utilisateur",
+        "emptyPrompt": "Tapez un nom d'utilisateur pour découvrir d'autres utilisateurs.",
+        "searching": "Recherche…",
+        "noResults": "Aucun utilisateur trouvé."
+      }
+    }
   },
   "kidWizard": {
     "heroQuestion": "Qui est le Héros?",
@@ -120,6 +182,9 @@
     "preview": {
       "backToLibrary": "Retour à la bibliothèque",
       "label": "Aperçu",
+      "readOnly": "Lecture seule",
+      "sharedTitle": "Aperçu partagé",
+      "sharedDescription": "Cette BD est partagée en lecture seule. La génération et l'édition sont désactivées.",
       "pageLabels": {
         "opening": "Ouverture",
         "ending": "Conclusion"
