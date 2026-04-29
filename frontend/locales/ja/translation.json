@@ -146,9 +146,10 @@
       "paintingCover": "表紙を描いています...",
       "heroicMasterpiece": "英雄の傑作",
       "storyCompleteTitle": "物語が完成しました",
-      "storyCompleteBody": "<strong>{{title}}</strong> はライブラリでいつでも楽しめます。",
+      "storyCompleteBody": "はライブラリでいつでも楽しめます。",
       "reread": "もう一度読む",
-      "backToLibrary": "ライブラリに戻る"
+      "backToLibrary": "ライブラリに戻る",
+      "storyCompleteBodyShared": "はこの共有ライブラリでいつでも楽しめます。"
     }
   },
   "auth": {
@@ -246,10 +247,26 @@
       "title": "子どもが作り、子どものために",
       "subtitle": "小さな物語作家たちが生み出した素敵な世界を探検しましょう。",
       "stories": [
-        { "title": "銀河の救出", "category": "SF", "image": "/alex.png" },
-        { "title": "魔法の庭", "category": "ファンタジー", "image": "/lily.png" },
-        { "title": "海のミステリー", "category": "冒険", "image": "/anna.png" },
-        { "title": "森の友だち", "category": "自然", "image": "/alice.png" }
+        {
+          "title": "銀河の救出",
+          "category": "SF",
+          "image": "/alex.png"
+        },
+        {
+          "title": "魔法の庭",
+          "category": "ファンタジー",
+          "image": "/lily.png"
+        },
+        {
+          "title": "海のミステリー",
+          "category": "冒険",
+          "image": "/anna.png"
+        },
+        {
+          "title": "森の友だち",
+          "category": "自然",
+          "image": "/alice.png"
+        }
       ],
       "disclaimer": "* 表示される画像はすべてAI生成のイメージであり、実在の子どもではありません。"
     },
@@ -355,7 +372,9 @@
             "title": "3. 情報の利用目的",
             "blocks": [
               {
-                "paragraphs": ["処理した情報は以下のために使用します："],
+                "paragraphs": [
+                  "処理した情報は以下のために使用します："
+                ],
                 "bullets": [
                   "プレビュー、パネルテキスト、関連画像を含むリクエストされたコミックの生成。",
                   "同一デプロイ内で生成された本を保存し、ライブラリや書籍ビューで再表示。",
@@ -493,7 +512,9 @@
             "title": "3. 適切な利用",
             "blocks": [
               {
-                "paragraphs": ["Funovaを利用する場合、以下の内容を送信または要求しないことに同意します："],
+                "paragraphs": [
+                  "Funovaを利用する場合、以下の内容を送信または要求しないことに同意します："
+                ],
                 "bullets": [
                   "違法、虐待的、憎悪的、または搾取的な内容。",
                   "他者の著作権、商標、プライバシーを侵害する内容。",
@@ -520,7 +541,9 @@
             "title": "5. AI生成コンテンツの制限",
             "blocks": [
               {
-                "paragraphs": ["Funovaは生成AIに依存しており、出力は変動し、確認が必要になる場合があります。"],
+                "paragraphs": [
+                  "Funovaは生成AIに依存しており、出力は変動し、確認が必要になる場合があります。"
+                ],
                 "bullets": [
                   "生成されたテキストや画像には誤り、不整合、意外な表現が含まれることがあります。",
                   "プレビューまたは完成本は、共有前に人間による確認が必要になる場合があります。",
@@ -546,7 +569,9 @@
             "title": "7. 免責事項",
             "blocks": [
               {
-                "paragraphs": ["法律で認められる範囲で："],
+                "paragraphs": [
+                  "法律で認められる範囲で："
+                ],
                 "bullets": [
                   "Funovaはプロジェクト用途として現状有姿で提供され、継続的なサービスや完璧な出力を保証しません。",
                   "運営者は間接的な損失、AI出力への主観的不満、または一時的なサービス停止に責任を負いません。",
@@ -580,8 +605,7 @@
         ]
       }
     }
-  }
-  ,
+  },
   "profile": {
     "title": "プロフィール",
     "status": {

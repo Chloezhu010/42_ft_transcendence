@@ -28,7 +28,7 @@ vi.mock('react-i18next', () => ({
         'auth.login.submit': 'Sign in',
         'auth.login.submitting': 'Signing in...',
         'auth.login.title': 'Welcome back',
-        'auth.signup.footerLink': 'Sign in',
+        'auth.signup.footerLink': 'Log in',
         'auth.signup.footerText': 'Already have an account?',
         'auth.signup.submit': 'Sign up',
         'auth.signup.submitting': 'Creating account...',

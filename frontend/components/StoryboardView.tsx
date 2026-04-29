@@ -268,11 +268,14 @@ function StoryboardView({
                 {t('story.storyboard.storyCompleteTitle')}
               </Heading>
               <Text className="text-brand-surface mb-10 italic">
-                <strong>{story.title}</strong> is ready to enjoy anytime{isReadOnly ? ' in this shared library.' : ' in your library.'}
+                <strong>{story.title}</strong>{' '}
+                {isReadOnly
+                  ? t('story.storyboard.storyCompleteBodyShared')
+                  : t('story.storyboard.storyCompleteBody')}
               </Text>
               <div className="mt-8 flex flex-col items-center gap-2">
-                <button type="button" onClick={() => navigate(-1)} className="text-brand-surface/60 font-bold uppercase text-[10px] tracking-widest hover:text-white transition-colors">Re-read Tale</button>
-                <Link to={backHref} className="text-brand-surface/40 font-bold uppercase text-[10px] tracking-widest hover:text-white transition-colors border-b border-brand-surface/20 pb-0.5">Back to Library</Link>
+                <button type="button" onClick={() => navigate(-1)} className="text-brand-surface/60 font-bold uppercase text-[10px] tracking-widest hover:text-white transition-colors">{t('story.storyboard.reread')}</button>
+                <Link to={backHref} className="text-brand-surface/40 font-bold uppercase text-[10px] tracking-widest hover:text-white transition-colors border-b border-brand-surface/20 pb-0.5">{t('story.storyboard.backToLibrary')}</Link>
               </div>
               <div className="absolute right-0 top-0 bottom-0 w-4 bg-black/20" />
             </div>

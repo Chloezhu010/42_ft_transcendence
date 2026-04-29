@@ -146,9 +146,10 @@
       "paintingCover": "Pintando portada...",
       "heroicMasterpiece": "Una obra maestra heroica",
       "storyCompleteTitle": "Tu historia esta completa",
-      "storyCompleteBody": "<strong>{{title}}</strong> esta lista para disfrutarse cuando quieras en tu biblioteca.",
+      "storyCompleteBody": "esta lista para disfrutarse cuando quieras en tu biblioteca.",
       "reread": "Releer historia",
-      "backToLibrary": "Volver a la biblioteca"
+      "backToLibrary": "Volver a la biblioteca",
+      "storyCompleteBodyShared": "esta lista para disfrutarse cuando quieras en esta biblioteca compartida."
     }
   },
   "auth": {
@@ -246,10 +247,26 @@
       "title": "Hecho por ninos, para ninos",
       "subtitle": "Explora los maravillosos mundos creados por nuestros jovenes narradores.",
       "stories": [
-        { "title": "Rescate galactico", "category": "Ciencia ficcion", "image": "/alex.png" },
-        { "title": "El jardin magico", "category": "Fantasia", "image": "/lily.png" },
-        { "title": "Misterio del oceano", "category": "Aventura", "image": "/anna.png" },
-        { "title": "Amigos del bosque", "category": "Naturaleza", "image": "/alice.png" }
+        {
+          "title": "Rescate galactico",
+          "category": "Ciencia ficcion",
+          "image": "/alex.png"
+        },
+        {
+          "title": "El jardin magico",
+          "category": "Fantasia",
+          "image": "/lily.png"
+        },
+        {
+          "title": "Misterio del oceano",
+          "category": "Aventura",
+          "image": "/anna.png"
+        },
+        {
+          "title": "Amigos del bosque",
+          "category": "Naturaleza",
+          "image": "/alice.png"
+        }
       ],
       "disclaimer": "* Todas las imagenes mostradas son representaciones generadas por IA y no representan a ninos reales."
     },
@@ -355,7 +372,9 @@
             "title": "3. Como usamos tu informacion",
             "blocks": [
               {
-                "paragraphs": ["Usamos la informacion procesada para:"],
+                "paragraphs": [
+                  "Usamos la informacion procesada para:"
+                ],
                 "bullets": [
                   "Generar la historia de comic solicitada, incluyendo el estado de vista previa, texto de paneles e imagenes relacionadas.",
                   "Guardar y mostrar libros generados en el mismo despliegue mediante la biblioteca y las vistas de libro.",
@@ -493,7 +512,9 @@
             "title": "3. Uso aceptable",
             "blocks": [
               {
-                "paragraphs": ["Al usar Funova, aceptas no enviar ni solicitar contenido que sea:"],
+                "paragraphs": [
+                  "Al usar Funova, aceptas no enviar ni solicitar contenido que sea:"
+                ],
                 "bullets": [
                   "Ilegal, abusivo, odioso o explotador.",
                   "Que infrinja derechos de autor, marcas o privacidad de otra parte.",
@@ -520,7 +541,9 @@
             "title": "5. Limites del contenido generado por IA",
             "blocks": [
               {
-                "paragraphs": ["Funova se basa en IA generativa, lo que significa que el resultado puede variar y requerir revision humana."],
+                "paragraphs": [
+                  "Funova se basa en IA generativa, lo que significa que el resultado puede variar y requerir revision humana."
+                ],
                 "bullets": [
                   "Los textos e imagenes generados pueden contener errores, inconsistencias o sorpresas artisticias.",
                   "Una vista previa o un libro terminado pueden requerir revision humana antes de compartirse.",
@@ -546,7 +569,9 @@
             "title": "7. Limitacion de responsabilidad",
             "blocks": [
               {
-                "paragraphs": ["En la medida permitida por la ley:"],
+                "paragraphs": [
+                  "En la medida permitida por la ley:"
+                ],
                 "bullets": [
                   "Funova se ofrece tal cual para uso de proyecto, sin garantias de servicio ininterrumpido o resultados perfectos.",
                   "Los mantenedores no son responsables de perdidas indirectas, insatisfaccion subjetiva con el resultado de IA o indisponibilidad temporal.",
@@ -580,8 +605,7 @@
         ]
       }
     }
-  }
-  ,
+  },
   "profile": {
     "title": "Tu perfil",
     "status": {

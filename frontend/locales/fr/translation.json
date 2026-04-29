@@ -146,9 +146,10 @@
       "paintingCover": "Peinture de la couverture...",
       "heroicMasterpiece": "Un chef-d'œuvre héroïque",
       "storyCompleteTitle": "Votre histoire est terminée",
-      "storyCompleteBody": "<strong>{{title}}</strong> est prête à être relue à tout moment dans votre bibliothèque.",
+      "storyCompleteBody": "est prête à être relue à tout moment dans votre bibliothèque.",
       "reread": "Relire l'histoire",
-      "backToLibrary": "Retour à la bibliothèque"
+      "backToLibrary": "Retour à la bibliothèque",
+      "storyCompleteBodyShared": "est prête à être relue à tout moment dans cette bibliothèque partagée."
     }
   },
   "auth": {
@@ -246,10 +247,26 @@
       "title": "Fait par les enfants, pour les enfants",
       "subtitle": "Explorez les merveilleux mondes crees par nos jeunes conteurs.",
       "stories": [
-        { "title": "Sauvetage galactique", "category": "Science-fiction", "image": "/alex.png" },
-        { "title": "Le jardin magique", "category": "Fantasy", "image": "/lily.png" },
-        { "title": "Mystere de l'ocean", "category": "Aventure", "image": "/anna.png" },
-        { "title": "Amis de la foret", "category": "Nature", "image": "/alice.png" }
+        {
+          "title": "Sauvetage galactique",
+          "category": "Science-fiction",
+          "image": "/alex.png"
+        },
+        {
+          "title": "Le jardin magique",
+          "category": "Fantasy",
+          "image": "/lily.png"
+        },
+        {
+          "title": "Mystere de l'ocean",
+          "category": "Aventure",
+          "image": "/anna.png"
+        },
+        {
+          "title": "Amis de la foret",
+          "category": "Nature",
+          "image": "/alice.png"
+        }
       ],
       "disclaimer": "* Toutes les images presentees sont generees par IA et ne representent pas de vrais enfants."
     },
@@ -355,7 +372,9 @@
             "title": "3. Comment nous utilisons vos informations",
             "blocks": [
               {
-                "paragraphs": ["Nous utilisons les informations traitees pour :"],
+                "paragraphs": [
+                  "Nous utilisons les informations traitees pour :"
+                ],
                 "bullets": [
                   "Generer l'histoire demandee, y compris la previsualisation, le texte des planches et les images associees.",
                   "Stocker et afficher les livres generes via la bibliotheque et les vues de livres du meme deploiement.",
@@ -493,7 +512,9 @@
             "title": "3. Utilisation acceptable",
             "blocks": [
               {
-                "paragraphs": ["En utilisant Funova, vous acceptez de ne pas soumettre ou demander du contenu :"],
+                "paragraphs": [
+                  "En utilisant Funova, vous acceptez de ne pas soumettre ou demander du contenu :"
+                ],
                 "bullets": [
                   "Illégal, abusif, haineux ou exploitant.",
                   "Portant atteinte aux droits d'auteur, marques ou droits à la vie privée d'autrui.",
@@ -520,7 +541,9 @@
             "title": "5. Limites du contenu genere par IA",
             "blocks": [
               {
-                "paragraphs": ["Funova repose sur une IA generative, ce qui signifie que la sortie peut varier et necessiter une relecture humaine."],
+                "paragraphs": [
+                  "Funova repose sur une IA generative, ce qui signifie que la sortie peut varier et necessiter une relecture humaine."
+                ],
                 "bullets": [
                   "Les textes et images generes peuvent contenir des erreurs, incoherences ou surprises artistiques.",
                   "Une previsualisation ou un livre final peut necessiter une validation humaine avant d'etre partage.",
@@ -546,7 +569,9 @@
             "title": "7. Limitation de responsabilite",
             "blocks": [
               {
-                "paragraphs": ["Dans la mesure permise par la loi :"],
+                "paragraphs": [
+                  "Dans la mesure permise par la loi :"
+                ],
                 "bullets": [
                   "Funova est fourni tel quel pour un usage de projet, sans garantie de service ininterrompu ou de sortie parfaite.",
                   "Les mainteneurs ne sont pas responsables des pertes indirectes, d'une insatisfaction subjective avec les sorties IA ou d'une indisponibilite temporaire.",
@@ -580,8 +605,7 @@
         ]
       }
     }
-  }
-  ,
+  },
   "profile": {
     "title": "Votre profil",
     "status": {

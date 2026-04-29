@@ -146,9 +146,10 @@
       "paintingCover": "正在绘制封面...",
       "heroicMasterpiece": "英雄杰作",
       "storyCompleteTitle": "你的故事已完成",
-      "storyCompleteBody": "<strong>{{title}}</strong> 已经准备好在你的图书馆中随时享受。",
+      "storyCompleteBody": "已经准备好在你的图书馆中随时享受。",
       "reread": "再读一遍",
-      "backToLibrary": "返回图书馆"
+      "backToLibrary": "返回图书馆",
+      "storyCompleteBodyShared": "已经准备好在这个共享图书馆中随时享受。"
     }
   },
   "auth": {
@@ -246,10 +247,26 @@
       "title": "孩子们创作，孩子们喜爱",
       "subtitle": "探索小小故事家们创造的精彩世界。",
       "stories": [
-        { "title": "银河救援", "category": "科幻", "image": "/alex.png" },
-        { "title": "魔法花园", "category": "奇幻", "image": "/lily.png" },
-        { "title": "海洋谜案", "category": "冒险", "image": "/anna.png" },
-        { "title": "森林朋友", "category": "自然", "image": "/alice.png" }
+        {
+          "title": "银河救援",
+          "category": "科幻",
+          "image": "/alex.png"
+        },
+        {
+          "title": "魔法花园",
+          "category": "奇幻",
+          "image": "/lily.png"
+        },
+        {
+          "title": "海洋谜案",
+          "category": "冒险",
+          "image": "/anna.png"
+        },
+        {
+          "title": "森林朋友",
+          "category": "自然",
+          "image": "/alice.png"
+        }
       ],
       "disclaimer": "* 所有展示图片均为 AI 生成的示意，不代表真实儿童。"
     },
@@ -355,7 +372,9 @@
             "title": "3. 我们如何使用你的信息",
             "blocks": [
               {
-                "paragraphs": ["我们使用处理的信息来："],
+                "paragraphs": [
+                  "我们使用处理的信息来："
+                ],
                 "bullets": [
                   "生成所请求的漫画故事，包括预览状态、分镜文本与相关图片。",
                   "在同一部署环境中存储并展示生成的图书，供图书馆与阅读视图使用。",
@@ -493,7 +512,9 @@
             "title": "3. 可接受的使用方式",
             "blocks": [
               {
-                "paragraphs": ["使用 Funova 即表示你不会提交或请求以下内容："],
+                "paragraphs": [
+                  "使用 Funova 即表示你不会提交或请求以下内容："
+                ],
                 "bullets": [
                   "违法、辱骂、仇恨或剥削性内容。",
                   "侵犯他人版权、商标或隐私权的内容。",
@@ -520,7 +541,9 @@
             "title": "5. AI 生成内容限制",
             "blocks": [
               {
-                "paragraphs": ["Funova 依赖生成式 AI，这意味着输出可能变化并需要人工审阅。"],
+                "paragraphs": [
+                  "Funova 依赖生成式 AI，这意味着输出可能变化并需要人工审阅。"
+                ],
                 "bullets": [
                   "生成的文字与图片可能包含错误、不一致或艺术性变化。",
                   "预览或成品在分享前可能需要人工审核。",
@@ -546,7 +569,9 @@
             "title": "7. 责任限制",
             "blocks": [
               {
-                "paragraphs": ["在法律允许范围内："],
+                "paragraphs": [
+                  "在法律允许范围内："
+                ],
                 "bullets": [
                   "Funova 按现状提供用于项目用途，不保证服务连续或输出完美。",
                   "维护者不对间接损失、对 AI 输出的主观不满或服务临时不可用负责。",
@@ -580,8 +605,7 @@
         ]
       }
     }
-  }
-  ,
+  },
   "profile": {
     "title": "你的个人资料",
     "status": {

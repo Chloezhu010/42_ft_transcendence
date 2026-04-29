@@ -146,9 +146,10 @@
       "paintingCover": "Painting Cover...",
       "heroicMasterpiece": "A Heroic Masterpiece",
       "storyCompleteTitle": "Your Story is Complete",
-      "storyCompleteBody": "<strong>{{title}}</strong> is ready to enjoy anytime in your library.",
+      "storyCompleteBody": "is ready to enjoy anytime in your library.",
       "reread": "Re-read Tale",
-      "backToLibrary": "Back to Library"
+      "backToLibrary": "Back to Library",
+      "storyCompleteBodyShared": "is ready to enjoy anytime in this shared library."
     }
   },
   "auth": {
@@ -246,10 +247,26 @@
       "title": "Made by Kids, for Kids",
       "subtitle": "Explore the wonderful worlds created by our young storytellers.",
       "stories": [
-        { "title": "Galactic Rescue", "category": "Sci-Fi", "image": "/alex.png" },
-        { "title": "The Magic Garden", "category": "Fantasy", "image": "/lily.png" },
-        { "title": "Ocean Mystery", "category": "Adventure", "image": "/anna.png" },
-        { "title": "Forest Friends", "category": "Nature", "image": "/alice.png" }
+        {
+          "title": "Galactic Rescue",
+          "category": "Sci-Fi",
+          "image": "/alex.png"
+        },
+        {
+          "title": "The Magic Garden",
+          "category": "Fantasy",
+          "image": "/lily.png"
+        },
+        {
+          "title": "Ocean Mystery",
+          "category": "Adventure",
+          "image": "/anna.png"
+        },
+        {
+          "title": "Forest Friends",
+          "category": "Nature",
+          "image": "/alice.png"
+        }
       ],
       "disclaimer": "* All images shown are AI-generated representations and do not depict real children."
     },
@@ -355,7 +372,9 @@
             "title": "3. How We Use Your Information",
             "blocks": [
               {
-                "paragraphs": ["We use the processed information to:"],
+                "paragraphs": [
+                  "We use the processed information to:"
+                ],
                 "bullets": [
                   "Generate the requested comic story, including the preview state, panel text, and related images.",
                   "Store and display generated books back to the same deployment through the library and book views.",
@@ -493,7 +512,9 @@
             "title": "3. Acceptable Use",
             "blocks": [
               {
-                "paragraphs": ["By using Funova, you agree not to submit or request content that is:"],
+                "paragraphs": [
+                  "By using Funova, you agree not to submit or request content that is:"
+                ],
                 "bullets": [
                   "Illegal, abusive, hateful, or exploitative.",
                   "Infringing on another party's copyright, trademark, or privacy rights.",
@@ -520,7 +541,9 @@
             "title": "5. AI-Generated Content Limits",
             "blocks": [
               {
-                "paragraphs": ["Funova relies on generative AI, which means the output can vary and may require human review."],
+                "paragraphs": [
+                  "Funova relies on generative AI, which means the output can vary and may require human review."
+                ],
                 "bullets": [
                   "Generated text and images may contain mistakes, inconsistencies, or artistic surprises.",
                   "A preview or finished book may require human review before it is shared with others.",
@@ -546,7 +569,9 @@
             "title": "7. Limitation of Liability",
             "blocks": [
               {
-                "paragraphs": ["To the extent allowed by law:"],
+                "paragraphs": [
+                  "To the extent allowed by law:"
+                ],
                 "bullets": [
                   "Funova is provided on an as-is basis for project use, without warranties of uninterrupted service or perfect output.",
                   "The maintainers are not liable for indirect loss, subjective dissatisfaction with AI output, or temporary unavailability of the service.",
@@ -580,8 +605,7 @@
         ]
       }
     }
-  }
-  ,
+  },
   "profile": {
     "title": "Your profile",
     "status": {
