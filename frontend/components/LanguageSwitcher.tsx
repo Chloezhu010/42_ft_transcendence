@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { defaultLanguage, supportedLanguages } from '@/i18n.languages';
+import { defaultLanguage, normalizeLanguageCode, supportedLanguages } from '@/i18n.languages';
 
 function getLanguageLabel(languageCode: string): string {
   return (
@@ -14,7 +14,8 @@ function LanguageSwitcher(): JSX.Element {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const language = i18n.resolvedLanguage || i18n.language || defaultLanguage;
+  const resolvedLanguage = i18n.resolvedLanguage || i18n.language || defaultLanguage;
+  const language = normalizeLanguageCode(resolvedLanguage);
   const currentLanguageLabel = getLanguageLabel(language);
 
   useEffect(() => {

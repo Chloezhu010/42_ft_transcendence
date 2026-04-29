@@ -12,6 +12,7 @@ export interface KidProfile {
   favoriteColor: string;
   dream: string;
   archetype?: string;
+  language?: string;
   photoUrl?: string;
   artStyle?: string;
 }

@@ -32,6 +32,7 @@ export function mapApiProfileToKidProfile(profile: KidProfileResponse): KidProfi
     favoriteColor: profile.favorite_color,
     dream: profile.dream || '',
     archetype: profile.archetype || undefined,
+    language: profile.language || undefined,
     artStyle: profile.art_style || undefined,
   };
 }
@@ -46,6 +47,7 @@ export function mapKidProfileToGenerationProfile(profile: KidProfile): KidProfil
     favorite_color: profile.favoriteColor,
     dream: profile.dream,
     archetype: profile.archetype,
+    language: profile.language,
     art_style: profile.artStyle,
     photo_base64: profile.photoUrl?.startsWith('data:')
       ? profile.photoUrl.split(',')[1]

@@ -61,6 +61,7 @@ async def _create_tables(db: aiosqlite.Connection):
             dream TEXT,
             archetype TEXT,
             art_style TEXT,
+            language TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
 
@@ -97,6 +98,16 @@ async def _create_tables(db: aiosqlite.Connection):
             ALTER TABLE stories
             ADD COLUMN visibility TEXT NOT NULL DEFAULT 'private'
                 CHECK(visibility IN ('private', 'shared_with_friends'))
+            """
+        )
+    except aiosqlite.OperationalError as exc:
+        if "duplicate column name" not in str(exc).lower():
+            raise
+    try:
+        await db.execute(
+            """
+            ALTER TABLE kid_profiles
+            ADD COLUMN language TEXT
             """
         )
     except aiosqlite.OperationalError as exc:

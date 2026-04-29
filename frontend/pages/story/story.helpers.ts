@@ -23,6 +23,7 @@ export function createEmptyKidProfile(): KidProfile {
     favoriteColor: 'Purple',
     dream: '',
     archetype: 'Brave Explorer',
+    language: undefined,
     photoUrl: '',
     artStyle: 'Classic Comic',
   };

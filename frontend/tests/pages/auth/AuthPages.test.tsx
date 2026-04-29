@@ -12,6 +12,35 @@ const { mockNavigate, mockUseAuth, mockLogin, mockSignup } = vi.hoisted(() => ({
   mockSignup: vi.fn(),
 }));
 
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'auth.errors.authFailed': 'Authentication failed',
+        'auth.fields.emailLabel': 'Email',
+        'auth.fields.emailPlaceholder': 'you@example.com',
+        'auth.fields.passwordLabel': 'Password',
+        'auth.fields.passwordPlaceholder': '••••••••',
+        'auth.fields.usernameLabel': 'Username',
+        'auth.fields.usernamePlaceholder': 'your_username',
+        'auth.login.footerLink': 'Sign up',
+        'auth.login.footerText': "Don't have an account?",
+        'auth.login.submit': 'Sign in',
+        'auth.login.submitting': 'Signing in...',
+        'auth.login.title': 'Welcome back',
+        'auth.signup.footerLink': 'Log in',
+        'auth.signup.footerText': 'Already have an account?',
+        'auth.signup.submit': 'Sign up',
+        'auth.signup.submitting': 'Creating account...',
+        'auth.signup.title': 'Create your account',
+        'auth.status.loading': 'Loading…',
+      };
+
+      return translations[key] ?? key;
+    },
+  }),
+}));
+
 vi.mock('@/app/auth', () => ({
   useAuth: mockUseAuth,
 }));

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Heading, Label, Text } from '@/components/design-system/Typography';
 
 interface StoryIntroStreamProps {
@@ -11,16 +12,20 @@ interface StoryIntroStreamProps {
   isPreparingPreview: boolean;
 }
 
-function getStreamStatusLabel(isStreaming: boolean, isPreparingPreview: boolean): string {
+function getStreamStatusLabel(
+  isStreaming: boolean,
+  isPreparingPreview: boolean,
+  t: (key: string) => string,
+): string {
   if (isStreaming) {
-    return 'Drafting';
+    return t('story.introStream.status.drafting');
   }
 
   if (isPreparingPreview) {
-    return 'Painting first pages';
+    return t('story.introStream.status.painting');
   }
 
-  return 'Ready';
+  return t('story.introStream.status.ready');
 }
 
 function Caret(): JSX.Element {
@@ -38,11 +43,12 @@ function StoryIntroStream({
   isStreaming,
   isPreparingPreview,
 }: StoryIntroStreamProps): JSX.Element {
+  const { t } = useTranslation();
   const hasTitle = title.length > 0;
   const hasForeword = foreword.length > 0;
   const titleCaret = isStreaming && !hasForeword;
   const forewordCaret = isStreaming && hasForeword;
-  const statusLabel = getStreamStatusLabel(isStreaming, isPreparingPreview);
+  const statusLabel = getStreamStatusLabel(isStreaming, isPreparingPreview, t);
 
   return (
     <div className="flex-1 flex items-center justify-center py-16 animate-in fade-in duration-500">
@@ -57,7 +63,7 @@ function StoryIntroStream({
 
         <div className="rounded-3xl border-4 border-brand-secondary/10 bg-white shadow-[0_30px_70px_rgba(0,0,0,0.12)] px-10 py-16 md:px-16 md:py-20 text-center">
           <Label className="text-brand-primary/50 text-[10px] mb-6 block">
-            Once upon a time
+            {t('story.introStream.onceUpon')}
           </Label>
 
           <Heading

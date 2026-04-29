@@ -4,12 +4,11 @@
  */
 import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import ComicPanel from '@/components/ComicPanel';
 import type { ComicPanelData, Story } from '@/types';
 import { SketchyButton } from '@/components/design-system/Primitives';
 import { Heading, Label, Text } from '@/components/design-system/Typography';
-
-const PREVIEW_PAGE_LABELS = ['Opening', 'Ending'] as const;
 
 interface PreviewViewProps {
   story: Story;
@@ -23,6 +22,7 @@ interface PreviewViewProps {
 interface PreviewBookFrameProps {
   currentPage: number;
   currentPageLabel: string;
+  pageLabels: string[];
   onPreviousPage: () => void;
   onNextPage: () => void;
   leftPage: ReactNode;
@@ -52,6 +52,7 @@ interface PreviewGeneratePageProps {
 function PreviewBookFrame({
   currentPage,
   currentPageLabel,
+  pageLabels,
   onPreviousPage,
   onNextPage,
   leftPage,
@@ -60,27 +61,28 @@ function PreviewBookFrame({
   isReadOnly,
 }: PreviewBookFrameProps): JSX.Element {
   const isFirstPage = currentPage === 0;
-  const isLastPage = currentPage === PREVIEW_PAGE_LABELS.length - 1;
+  const isLastPage = currentPage === 1;
   const previousButtonStateClass = isFirstPage ? 'opacity-0 pointer-events-none' : '';
   const nextButtonStateClass = isLastPage ? 'opacity-0 pointer-events-none' : '';
+  const { t } = useTranslation();
 
   return (
     <div className="flex-1 flex flex-col animate-in fade-in duration-700 h-[calc(100vh-140px)] relative">
       <div className="absolute top-4 left-4 z-30">
         <Link to={backHref} className="text-sm font-bold text-brand-muted hover:text-brand-primary flex items-center gap-2 transition-colors bg-white/80 backdrop-blur-sm py-3 px-6 rounded-full shadow-soft border-2 border-brand-primary/10">
-          <span>←</span> Back to Library
+          <span>←</span> {t('story.preview.backToLibrary')}
         </Link>
       </div>
 
       <div className="absolute top-4 right-4 z-30">
         <div className="bg-white/90 backdrop-blur-sm py-2 px-4 rounded-full shadow-soft border border-brand-secondary/20">
-          <Label className="text-brand-primary uppercase tracking-widest">{isReadOnly ? 'Read Only' : 'Preview'}</Label>
+          <Label className="text-brand-primary uppercase tracking-widest">{isReadOnly ? 'Read Only' : t('story.preview.label')}</Label>
         </div>
       </div>
 
       <SketchyButton
         variant="outline"
-        aria-label="Previous page"
+        aria-label={t('story.preview.ariaPrevious')}
         onClick={onPreviousPage}
         disabled={isFirstPage}
         className={`absolute left-0 top-1/2 -translate-y-1/2 z-40 w-16 h-16 flex items-center justify-center text-2xl !p-0 rounded-full ${previousButtonStateClass}`}
@@ -91,7 +93,7 @@ function PreviewBookFrame({
 
       <SketchyButton
         variant="outline"
-        aria-label="Next page"
+        aria-label={t('story.preview.ariaNext')}
         onClick={onNextPage}
         disabled={isLastPage}
         className={`absolute right-0 top-1/2 -translate-y-1/2 z-40 w-16 h-16 flex items-center justify-center text-2xl !p-0 rounded-full ${nextButtonStateClass}`}
@@ -124,7 +126,7 @@ function PreviewBookFrame({
             {currentPageLabel}
           </span>
           <div className="flex space-x-1.5">
-            {PREVIEW_PAGE_LABELS.map((pageLabel, index) => {
+            {pageLabels.map((pageLabel, index) => {
               const isActivePage = index === currentPage;
               const pageIndicatorClass = isActivePage
                 ? 'bg-brand-primary w-6'
@@ -149,9 +151,10 @@ function PreviewTitlePage({
   foreword,
   onOpenEndingSpread,
 }: PreviewTitlePageProps): JSX.Element {
+  const { t } = useTranslation();
   return (
     <div className="h-full flex flex-col justify-center p-12 md:p-16">
-      <Label className="text-brand-primary/50 text-[10px] mb-4">Preview</Label>
+      <Label className="text-brand-primary/50 text-[10px] mb-4">{t('story.preview.label')}</Label>
       <Heading variant="h3" className="text-brand-primary mb-6 italic underline decoration-brand-accent decoration-4">
         {title}
       </Heading>
@@ -163,7 +166,7 @@ function PreviewTitlePage({
         onClick={onOpenEndingSpread}
         className="mt-8 text-brand-primary/40 hover:text-brand-primary transition-colors text-sm font-bold"
       >
-        Turn page →
+        {t('story.preview.turnPage')}
       </button>
     </div>
   );
@@ -226,11 +229,16 @@ function PreviewView({
   isReadOnly = false,
   ownerUserId = null,
 }: PreviewViewProps): JSX.Element | null {
+  const { t } = useTranslation();
   const [previewPage, setPreviewPage] = useState(0);
   const firstPanel = story.panels[0];
   const lastPanel = story.panels[story.panels.length - 1];
   const isOpeningSpread = previewPage === 0;
-  const currentPageLabel = PREVIEW_PAGE_LABELS[previewPage];
+  const pageLabels = [
+    t('story.preview.pageLabels.opening'),
+    t('story.preview.pageLabels.ending'),
+  ];
+  const currentPageLabel = pageLabels[previewPage] || '';
   const middlePanelCount = Math.max(0, story.panels.length - 2);
   const backHref = ownerUserId ? `/friends/${ownerUserId}/library` : '/gallery';
 
@@ -289,6 +297,7 @@ function PreviewView({
     <PreviewBookFrame
       currentPage={previewPage}
       currentPageLabel={currentPageLabel}
+      pageLabels={pageLabels}
       onPreviousPage={showPreviousPage}
       onNextPage={showNextPage}
       leftPage={leftPage}
