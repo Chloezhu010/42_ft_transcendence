@@ -29,7 +29,69 @@
     "noStoriesFound": "まだストーリーが見つかりません。",
     "readNow": "今読む",
     "untitledMasterpiece": "無題の傑作",
-    "deleteStory": "このストーリーを削除してもよろしいですか？これは元に戻すことはできません。"
+    "deleteStory": "このストーリーを削除してもよろしいですか？これは元に戻すことはできません。",
+    "sharing": {
+      "label": "共有",
+      "private": "非公開",
+      "friends": "フレンド"
+    }
+  },
+  "friends": {
+    "title": "フレンド",
+    "loading": "読み込み中…",
+    "header": {
+      "eyebrow": "コミュニティ",
+      "description": "現在のフレンド、保留中のリクエスト、発見を切り替えます。"
+    },
+    "tabs": {
+      "friends": "フレンド",
+      "pending": "保留中",
+      "discover": "見つける",
+      "ariaLabel": "フレンドのセクション"
+    },
+    "actions": {
+      "dismiss": "閉じる"
+    },
+    "errors": {
+      "loadHint": "セッションとネットワークリクエストを確認してから、ページを再読み込みしてください。"
+    },
+    "status": {
+      "online": "オンライン",
+      "offline": "オフライン"
+    },
+    "buttons": {
+      "viewLibrary": "ライブラリを見る",
+      "remove": "削除",
+      "removing": "削除中...",
+      "decline": "拒否",
+      "accept": "承認",
+      "working": "処理中...",
+      "requestSent": "リクエスト送信済み",
+      "addFriend": "フレンド追加",
+      "sending": "送信中..."
+    },
+    "badges": {
+      "alreadyFriends": "フレンド",
+      "respondPending": "保留中で対応"
+    },
+    "panels": {
+      "friends": {
+        "eyebrow": "あなたの仲間",
+        "empty": "まだフレンドが追加されていません。"
+      },
+      "pending": {
+        "eyebrow": "要対応",
+        "empty": "保留中のフレンド申請はありません。"
+      },
+      "discover": {
+        "eyebrow": "リストを広げる",
+        "searchLabel": "ユーザーを検索",
+        "searchPlaceholder": "ユーザー名で検索",
+        "emptyPrompt": "ユーザー名を入力して他のユーザーを見つけましょう。",
+        "searching": "検索中…",
+        "noResults": "ユーザーが見つかりません。"
+      }
+    }
   },
   "kidWizard": {
     "heroQuestion": "ヒーローは誰ですか？",
@@ -120,6 +182,9 @@
     "preview": {
       "backToLibrary": "ライブラリに戻る",
       "label": "プレビュー",
+      "readOnly": "読み取り専用",
+      "sharedTitle": "共有プレビュー",
+      "sharedDescription": "このコミックは読み取り専用で共有されています。生成と編集は無効です。",
       "pageLabels": {
         "opening": "はじまり",
         "ending": "おわり"

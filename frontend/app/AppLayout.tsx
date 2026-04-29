@@ -59,7 +59,7 @@ function AppLayout(): JSX.Element {
               to="/friends"
               className="text-brand-muted hover:text-brand-primary transition-colors px-4 py-2 rounded-full hover:bg-brand-light"
             >
-              Friends
+              {t('friends.title')}
             </Link>
             {currentUser ? (
               <Link

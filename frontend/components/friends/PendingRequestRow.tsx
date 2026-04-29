@@ -2,6 +2,7 @@
  * Render a single incoming pending friend request
  */
 import type { FriendUser } from '@/components/friends/friends.types';
+import { useTranslation } from 'react-i18next';
 import StorageImage from '@/components/StorageImage';
 
 interface PendingRequestRowProps {
@@ -17,8 +18,9 @@ export function PendingRequestRow({
   onDecline,
   isActing = false,
 }: PendingRequestRowProps): JSX.Element {
+  const { t } = useTranslation();
   const avatarFallback = request.username.charAt(0).toUpperCase();
-  const onlineLabel = request.is_online ? 'Online' : 'Offline';
+  const onlineLabel = request.is_online ? t('friends.status.online') : t('friends.status.offline');
 
   return (
     <div className="flex items-center gap-4 rounded-xl border border-brand-primary/10 bg-brand-light/30 p-4">
@@ -48,7 +50,7 @@ export function PendingRequestRow({
               onClick={() => onDecline(request.id)}
               className="rounded-full border border-brand-primary/15 px-4 py-2 text-sm font-semibold text-brand-muted transition-colors hover:border-brand-primary/25 hover:text-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Decline
+              {t('friends.buttons.decline')}
             </button>
           ) : null}
           {onAccept ? (
@@ -58,7 +60,7 @@ export function PendingRequestRow({
               onClick={() => onAccept(request.id)}
               className="rounded-full bg-brand-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isActing ? 'Working...' : 'Accept'}
+              {isActing ? t('friends.buttons.working') : t('friends.buttons.accept')}
             </button>
           ) : null}
         </div>

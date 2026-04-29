@@ -5,6 +5,7 @@
  */
 import { useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useFriendsPage } from './useFriendsPage';
 import { DiscoverPanel, FriendsPanel, PendingPanel } from './FriendsPanels';
 
@@ -27,6 +28,7 @@ function parseFriendsTab(tabValue: string | null): FriendsTabKey {
 }
 
 export function FriendsPage(): JSX.Element {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const {
@@ -50,11 +52,11 @@ export function FriendsPage(): JSX.Element {
   const activeTab = parseFriendsTab(searchParams.get('tab'));
   const tabs = useMemo<FriendsTabDefinition[]>(
     () => [
-      { key: 'friends', label: 'Friends', count: friends.length },
-      { key: 'pending', label: 'Pending', count: pendingIncoming.length },
-      { key: 'discover', label: 'Discover' },
+      { key: 'friends', label: t('friends.tabs.friends'), count: friends.length },
+      { key: 'pending', label: t('friends.tabs.pending'), count: pendingIncoming.length },
+      { key: 'discover', label: t('friends.tabs.discover') },
     ],
-    [friends.length, pendingIncoming.length],
+    [friends.length, pendingIncoming.length, t],
   );
 
   function handleAccept(userId: number): void {
@@ -88,7 +90,7 @@ export function FriendsPage(): JSX.Element {
   if (isLoading) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <p className="font-rounded text-xl text-brand-muted">Loading…</p>
+        <p className="font-rounded text-xl text-brand-muted">{t('friends.loading')}</p>
       </div>
     );
   }
@@ -97,10 +99,10 @@ export function FriendsPage(): JSX.Element {
     return (
       <div className="flex flex-1 items-center justify-center py-12">
         <div className="w-full max-w-2xl rounded-2xl border-4 border-red-200 bg-white p-8 shadow-soft">
-          <h1 className="text-center text-2xl font-bold text-brand-dark">Friends</h1>
+          <h1 className="text-center text-2xl font-bold text-brand-dark">{t('friends.title')}</h1>
           <p className="mt-4 text-center text-base font-medium text-red-600">{loadError}</p>
           <p className="mt-2 text-center text-sm text-brand-muted">
-            Check your session and network requests, then try reloading the page.
+            {t('friends.errors.loadHint')}
           </p>
         </div>
       </div>
@@ -111,11 +113,9 @@ export function FriendsPage(): JSX.Element {
     <div className="flex flex-1 justify-center py-12">
       <div className="w-full max-w-5xl space-y-8 rounded-2xl border-4 border-brand-primary/20 bg-white p-10 shadow-soft">
         <div className="space-y-2 text-center">
-          <p className="text-sm font-bold uppercase tracking-[0.28em] text-brand-primary">Community</p>
-          <h1 className="text-3xl font-bold text-brand-dark">Friends</h1>
-          <p className="text-sm text-brand-muted">
-            Switch between your current circle, pending requests, and discovery.
-          </p>
+          <p className="text-sm font-bold uppercase tracking-[0.28em] text-brand-primary">{t('friends.header.eyebrow')}</p>
+          <h1 className="text-3xl font-bold text-brand-dark">{t('friends.title')}</h1>
+          <p className="text-sm text-brand-muted">{t('friends.header.description')}</p>
         </div>
 
         {actionError ? (
@@ -127,7 +127,7 @@ export function FriendsPage(): JSX.Element {
                 onClick={clearActionError}
                 className="shrink-0 text-sm font-semibold text-red-600 transition-colors hover:text-red-700"
               >
-                Dismiss
+                {t('friends.actions.dismiss')}
               </button>
             </div>
           </div>
@@ -136,7 +136,7 @@ export function FriendsPage(): JSX.Element {
         <div className="rounded-2xl border border-brand-primary/15 bg-brand-light/30 p-2">
           <div
             role="tablist"
-            aria-label="Friends sections"
+            aria-label={t('friends.tabs.ariaLabel')}
             className="grid grid-cols-1 gap-2 md:grid-cols-3"
           >
             {tabs.map((tab) => {

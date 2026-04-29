@@ -29,7 +29,69 @@
     "noStoriesFound": "Ninguna historia encontrada aún.",
     "readNow": "LEER AHORA",
     "untitledMasterpiece": "Obra Maestra sin Título",
-    "deleteStory": "¿Está seguro de que desea eliminar esta historia? Esto no se puede deshacer."
+    "deleteStory": "¿Está seguro de que desea eliminar esta historia? Esto no se puede deshacer.",
+    "sharing": {
+      "label": "Compartir",
+      "private": "Privado",
+      "friends": "Amigos"
+    }
+  },
+  "friends": {
+    "title": "Amigos",
+    "loading": "Cargando…",
+    "header": {
+      "eyebrow": "Comunidad",
+      "description": "Cambia entre tu círculo actual, solicitudes pendientes y descubrimiento."
+    },
+    "tabs": {
+      "friends": "Amigos",
+      "pending": "Pendientes",
+      "discover": "Descubrir",
+      "ariaLabel": "Secciones de amigos"
+    },
+    "actions": {
+      "dismiss": "Cerrar"
+    },
+    "errors": {
+      "loadHint": "Revisa tu sesión y las solicitudes de red, luego recarga la página."
+    },
+    "status": {
+      "online": "En línea",
+      "offline": "Desconectado"
+    },
+    "buttons": {
+      "viewLibrary": "Ver biblioteca",
+      "remove": "Eliminar",
+      "removing": "Eliminando...",
+      "decline": "Rechazar",
+      "accept": "Aceptar",
+      "working": "Procesando...",
+      "requestSent": "Solicitud enviada",
+      "addFriend": "Agregar amigo",
+      "sending": "Enviando..."
+    },
+    "badges": {
+      "alreadyFriends": "Amigos",
+      "respondPending": "Responde en Pendientes"
+    },
+    "panels": {
+      "friends": {
+        "eyebrow": "Tu círculo",
+        "empty": "Aún no has agregado amigos."
+      },
+      "pending": {
+        "eyebrow": "Necesita atención",
+        "empty": "Aún no hay solicitudes de amistad pendientes."
+      },
+      "discover": {
+        "eyebrow": "Ampliar la lista",
+        "searchLabel": "Buscar usuarios",
+        "searchPlaceholder": "Buscar por nombre de usuario",
+        "emptyPrompt": "Escribe un nombre de usuario para descubrir otros usuarios.",
+        "searching": "Buscando…",
+        "noResults": "No se encontraron usuarios."
+      }
+    }
   },
   "kidWizard": {
     "heroQuestion": "¿Quién es el Héroe?",
@@ -120,6 +182,9 @@
     "preview": {
       "backToLibrary": "Volver a la biblioteca",
       "label": "Vista previa",
+      "readOnly": "Solo lectura",
+      "sharedTitle": "Vista previa compartida",
+      "sharedDescription": "Este cómic se comparte en modo solo lectura. La generación y la edición están desactivadas.",
       "pageLabels": {
         "opening": "Apertura",
         "ending": "Final"

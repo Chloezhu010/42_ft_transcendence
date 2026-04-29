@@ -2,6 +2,7 @@
  * Render a single accepted friend
  */
 import type { FriendUser } from '@/components/friends/friends.types';
+import { useTranslation } from 'react-i18next';
 import StorageImage from '@/components/StorageImage';
 
 interface FriendRowProps {
@@ -12,8 +13,9 @@ interface FriendRowProps {
 }
 
 export function FriendRow({ friend, onOpenLibrary, onRemove, isRemoving = false }: FriendRowProps): JSX.Element {
+  const { t } = useTranslation();
   const avatarFallback = friend.username.charAt(0).toUpperCase();
-  const onlineLabel = friend.is_online ? 'Online' : 'Offline';
+  const onlineLabel = friend.is_online ? t('friends.status.online') : t('friends.status.offline');
 
   return (
     <div className="flex items-center gap-4 rounded-xl border border-brand-primary/10 bg-brand-light/30 p-4">
@@ -44,7 +46,7 @@ export function FriendRow({ friend, onOpenLibrary, onRemove, isRemoving = false 
           onClick={() => onOpenLibrary(friend.id)}
           className="rounded-full border border-brand-primary/20 px-4 py-2 text-sm font-semibold text-brand-primary transition-colors hover:border-brand-primary hover:bg-white"
         >
-          View Library
+          {t('friends.buttons.viewLibrary')}
         </button>
       ) : null}
 
@@ -55,7 +57,7 @@ export function FriendRow({ friend, onOpenLibrary, onRemove, isRemoving = false 
           onClick={() => onRemove(friend.id)}
           className="ml-auto rounded-full border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 transition-colors hover:border-red-300 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isRemoving ? 'Removing...' : 'Remove'}
+          {isRemoving ? t('friends.buttons.removing') : t('friends.buttons.remove')}
         </button>
       ) : null}
     </div>

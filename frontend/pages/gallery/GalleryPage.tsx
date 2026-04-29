@@ -5,9 +5,11 @@
 import { Link } from 'react-router-dom';
 import type { StoryListItem, StoryVisibility } from '@api';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import StorageImage from '@/components/StorageImage';
-import { formatStoryDate, getStoryDisplayTitle, getVisibilityLabel } from './gallery.helpers';
+import { formatStoryDate, getStoryDisplayTitle } from './gallery.helpers';
 import { useGalleryPage } from './useGalleryPage';
+import { ARCHETYPES } from '@/components/kidWizard.constants';
 
 interface StoryCardProps {
   story: StoryListItem;
@@ -23,16 +25,32 @@ interface SharingControlProps {
 
 const sharingOptions: StoryVisibility[] = ['private', 'shared_with_friends'];
 
+function getArchetypeLabel(archetype: string, t: TFunction<'translation'>): string {
+  const match = ARCHETYPES.find((option) => option.id === archetype || option.label === archetype);
+
+  if (!match) {
+    return archetype;
+  }
+
+  return t(`kidWizard.archetypes.${match.id}.label` as const);
+}
+
 function SharingControl({ storyTitle, value, onChange }: SharingControlProps): JSX.Element {
+  const { t } = useTranslation();
+  const getVisibilityLabel = (visibility: StoryVisibility): string =>
+    visibility === 'shared_with_friends'
+      ? t('galleryPage.sharing.friends')
+      : t('galleryPage.sharing.private');
+
   return (
     <fieldset className="mb-4 flex items-center justify-between gap-3">
       <legend className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400">
-        Sharing
+        {t('galleryPage.sharing.label')}
       </legend>
       <div className="inline-grid grid-cols-2 gap-0.5 rounded-full border border-purple-100 bg-purple-50 p-0.5 shadow-inner">
         {sharingOptions.map((option) => {
           const isSelected = value === option;
-          const visibleLabel = option === 'shared_with_friends' ? 'Friends' : getVisibilityLabel(option);
+          const visibleLabel = getVisibilityLabel(option);
           const selectedClassName = isSelected
             ? 'bg-white text-purple-900 shadow-sm'
             : 'text-purple-500 hover:bg-white/60 hover:text-purple-800';
@@ -59,6 +77,9 @@ function StoryCard({ story, onDeleteStory, onUpdateVisibility }: StoryCardProps)
   const { t } = useTranslation();
   const fallbackTitle = t('galleryPage.untitledMasterpiece');
   const displayTitle = getStoryDisplayTitle(story.title, fallbackTitle);
+  const archetypeLabel = story.profile.archetype
+    ? getArchetypeLabel(story.profile.archetype, t)
+    : null;
   return (
     <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden group border-2 border-gray-100 hover:border-purple-200 transition-all hover:-translate-y-1 relative">
       <button
@@ -107,11 +128,11 @@ function StoryCard({ story, onDeleteStory, onUpdateVisibility }: StoryCardProps)
             {story.profile.name}
           </span>
 
-          {story.profile.archetype && (
+          {archetypeLabel ? (
             <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-bold rounded-full uppercase tracking-wide">
-              {story.profile.archetype}
+              {archetypeLabel}
             </span>
-          )}
+          ) : null}
         </div>
 
         <div className="mt-4 text-xs text-gray-400 font-medium">
