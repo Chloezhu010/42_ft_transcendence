@@ -61,7 +61,8 @@ services:
       - "--storage.path=/alertmanager"
 
   prometheus:
-    image: prom/prometheus:v3.3.0
+    image: docker.io/prom/prometheus:v3.5.1
+    container_name: prometheus
     expose:
       - "9090"
     volumes:
@@ -79,7 +80,7 @@ services:
       - alertmanager
 
   grafana:
-    image: grafana/grafana:11.6.1
+    image: docker.io/grafana/grafana:11.6.1
     expose:
       - "3000"
     environment:

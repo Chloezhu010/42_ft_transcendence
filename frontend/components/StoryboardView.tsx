@@ -4,6 +4,7 @@
  */
 import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import ComicPanel from '@/components/ComicPanel';
 import StorageImage from '@/components/StorageImage';
 import { SketchyButton } from '@/components/design-system/Primitives';
@@ -38,16 +39,20 @@ interface StoryboardProgressProps {
 const HIDDEN_NAVIGATION_CLASS = 'opacity-0 pointer-events-none';
 const ROUNDED_BUTTON_STYLE = { borderRadius: '9999px' };
 
-function getPageLabel(currentPage: number, totalStates: number): string {
+function getPageLabel(
+  currentPage: number,
+  totalStates: number,
+  t: (key: string, options?: { number?: number }) => string,
+): string {
   if (currentPage === 0) {
-    return 'Front Cover';
+    return t('story.storyboard.pageLabel.frontCover');
   }
 
   if (currentPage === totalStates - 1) {
-    return 'Back Cover';
+    return t('story.storyboard.pageLabel.backCover');
   }
 
-  return `Spread ${currentPage}`;
+  return t('story.storyboard.pageLabel.spread', { number: currentPage });
 }
 
 function getSpreadPanelIndexes(currentPage: number): {
@@ -146,6 +151,7 @@ function StoryboardView({
   isReadOnly = false,
   ownerUserId = null,
 }: StoryboardViewProps): JSX.Element {
+  const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(0);
   const backHref = ownerUserId ? `/friends/${ownerUserId}/library` : '/gallery';
 
@@ -165,14 +171,18 @@ function StoryboardView({
     setCurrentPage((previousPage) => Math.max(0, Math.min(totalStates - 1, previousPage + direction)));
   };
 
-  const pageLabel = getPageLabel(currentPage, totalStates);
+  const pageLabel = getPageLabel(currentPage, totalStates, t);
   const bookFrameClassName = getBookFrameClassName(isCoverPage);
 
   const leftSpreadPage = isIntroductionSpread ? (
     <div className="h-full flex flex-col justify-center p-12 md:p-16">
-      <Heading variant="h3" className="text-brand-primary mb-6 italic underline decoration-brand-accent decoration-4">Introduction</Heading>
+      <Heading variant="h3" className="text-brand-primary mb-6 italic underline decoration-brand-accent decoration-4">
+        {t('story.storyboard.introduction')}
+      </Heading>
       <Text className="text-brand-dark/80 italic border-l-4 border-brand-accent pl-6">&quot;{story.foreword}&quot;</Text>
-      <Label className="mt-8 text-brand-primary/50 text-[10px]">A Funova Original</Label>
+      <Label className="mt-8 text-brand-primary/50 text-[10px]">
+        {t('story.storyboard.originalLabel')}
+      </Label>
     </div>
   ) : (
     <ComicPanel
@@ -184,9 +194,15 @@ function StoryboardView({
   const rightSpreadPage = isFinalSpread ? (
     <div className="h-full flex flex-col items-center justify-center bg-brand-accent p-12 text-brand-dark text-center border-8 border-brand-primary shadow-inner">
       <div className="text-7xl mb-6 drop-shadow-lg">✨</div>
-      <Heading variant="h3" className="mb-4 uppercase text-brand-dark">THE END</Heading>
-      <Text className="font-bold italic text-brand-dark/70">May your dreams be as bold as your story, {profile?.name}.</Text>
-      <SketchyButton onClick={() => navigate(1)} className="mt-8 px-8 py-3 text-sm rounded-full">Close Book</SketchyButton>
+      <Heading variant="h3" className="mb-4 uppercase text-brand-dark">
+        {t('story.storyboard.theEnd')}
+      </Heading>
+      <Text className="font-bold italic text-brand-dark/70">
+        {t('story.storyboard.closingLine', { name: profile?.name || '' })}
+      </Text>
+      <SketchyButton onClick={() => navigate(1)} className="mt-8 px-8 py-3 text-sm rounded-full">
+        {t('story.storyboard.closeBook')}
+      </SketchyButton>
     </div>
   ) : (
     <ComicPanel
@@ -199,7 +215,7 @@ function StoryboardView({
     <div className="flex-1 flex flex-col animate-in fade-in duration-700 h-[calc(100vh-140px)] relative">
       <div className="absolute top-4 left-4 z-30">
         <Link to={backHref} className="text-sm font-bold text-brand-muted hover:text-brand-primary flex items-center gap-2 transition-colors bg-white/80 backdrop-blur-sm py-3 px-6 rounded-full shadow-soft border-2 border-brand-primary/10">
-          <span>←</span> Back to Library
+          <span>←</span> {t('story.storyboard.backToLibrary')}
         </Link>
       </div>
 
@@ -221,12 +237,16 @@ function StoryboardView({
               {story.coverImageUrl ? (
                 <StorageImage src={story.coverImageUrl} alt={story.title || 'Cover'} className="w-full h-full object-cover" />
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-brand-secondary animate-pulse text-white font-bold">Painting Cover...</div>
+                <div className="absolute inset-0 flex items-center justify-center bg-brand-secondary animate-pulse text-white font-bold">
+                  {t('story.storyboard.paintingCover')}
+                </div>
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
               <div className="absolute bottom-12 left-10 right-10">
                 <Heading variant="h2" className="text-white mb-2 uppercase drop-shadow-xl">{story.title}</Heading>
-                <Label className="text-brand-accent opacity-90">A Heroic Masterpiece</Label>
+                <Label className="text-brand-accent opacity-90">
+                  {t('story.storyboard.heroicMasterpiece')}
+                </Label>
               </div>
               <div className="absolute left-0 top-0 bottom-0 w-4 bg-black/20" />
               <div onClick={() => navigate(1)} className="absolute inset-0 cursor-pointer group">
@@ -244,13 +264,18 @@ function StoryboardView({
           {isBackCover && (
             <div className="w-full h-full bg-brand-secondary rounded-l-3xl shadow-[-20px_20px_60px_rgba(0,0,0,0.3)] overflow-hidden border-y-8 border-l-8 border-brand-dark flex flex-col items-center justify-center p-12 text-center relative">
               <div className="text-7xl mb-8">✨</div>
-              <Heading variant="h3" className="text-white mb-4">Your Story is Complete</Heading>
+              <Heading variant="h3" className="text-white mb-4">
+                {t('story.storyboard.storyCompleteTitle')}
+              </Heading>
               <Text className="text-brand-surface mb-10 italic">
-                <strong>{story.title}</strong> is ready to enjoy anytime{isReadOnly ? ' in this shared library.' : ' in your library.'}
+                <strong>{story.title}</strong>{' '}
+                {isReadOnly
+                  ? t('story.storyboard.storyCompleteBodyShared')
+                  : t('story.storyboard.storyCompleteBody')}
               </Text>
               <div className="mt-8 flex flex-col items-center gap-2">
-                <button type="button" onClick={() => navigate(-1)} className="text-brand-surface/60 font-bold uppercase text-[10px] tracking-widest hover:text-white transition-colors">Re-read Tale</button>
-                <Link to={backHref} className="text-brand-surface/40 font-bold uppercase text-[10px] tracking-widest hover:text-white transition-colors border-b border-brand-surface/20 pb-0.5">Back to Library</Link>
+                <button type="button" onClick={() => navigate(-1)} className="text-brand-surface/60 font-bold uppercase text-[10px] tracking-widest hover:text-white transition-colors">{t('story.storyboard.reread')}</button>
+                <Link to={backHref} className="text-brand-surface/40 font-bold uppercase text-[10px] tracking-widest hover:text-white transition-colors border-b border-brand-surface/20 pb-0.5">{t('story.storyboard.backToLibrary')}</Link>
               </div>
               <div className="absolute right-0 top-0 bottom-0 w-4 bg-black/20" />
             </div>

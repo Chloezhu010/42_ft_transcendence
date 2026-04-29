@@ -13,6 +13,8 @@ import {
   type StoryIntroField,
   updateStory,
 } from '@api';
+import i18n from '@/i18n';
+import { defaultLanguage, normalizeLanguageCode } from '@/i18n.languages';
 import type { KidProfile, Story } from '@/types';
 import {
   imageSourceToPureBase64,
@@ -54,7 +56,13 @@ function mapLoadedStoryState(
 ): LoadedStoryState {
   const nextStory = mapApiStoryToStory(savedStory);
   const nextProfile = mapApiProfileToKidProfile(savedStory.profile);
-  const profileForApi = mapKidProfileToGenerationProfile(nextProfile);
+  const persistedLanguage = normalizeLanguageCode(
+    savedStory.profile.language || i18n.resolvedLanguage || i18n.language || defaultLanguage,
+  );
+  const profileForApi = {
+    ...mapKidProfileToGenerationProfile(nextProfile),
+    language: persistedLanguage,
+  };
 
   if (isPreviewDraft(nextStory)) {
     return {
@@ -142,6 +150,7 @@ async function persistPreviewStory(
       favorite_color: profileForApi.favorite_color,
       dream: profileForApi.dream,
       archetype: profileForApi.archetype,
+      language: profileForApi.language,
     },
     title: previewStory.title,
     foreword: previewStory.foreword,
@@ -156,7 +165,10 @@ export async function generatePreviewState(
   profile: KidProfile,
   onIntroDelta: (field: StoryIntroField, delta: string) => void,
 ): Promise<GeneratedPreviewState> {
-  const profileForApi = mapKidProfileToGenerationProfile(profile);
+  const profileForApi = {
+    ...mapKidProfileToGenerationProfile(profile),
+    language: normalizeLanguageCode(i18n.resolvedLanguage || i18n.language || defaultLanguage),
+  };
   const script = await streamStoryScript(accessToken, profileForApi, { onIntroDelta });
   const previewStory = await buildPreviewStory(accessToken, profileForApi, script);
   const previewStoryId = await persistPreviewStory(accessToken, profileForApi, previewStory);

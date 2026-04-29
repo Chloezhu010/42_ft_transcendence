@@ -17,6 +17,7 @@ export interface KidProfileResponse {
   dream: string | null;
   archetype: string | null;
   art_style: string | null;
+  language: string | null;
   created_at: string;
 }
 
@@ -63,6 +64,7 @@ export interface SaveStoryParams {
     favorite_color: string;
     dream?: string;
     archetype?: string;
+    language?: string;
   };
   title?: string;
   foreword?: string;

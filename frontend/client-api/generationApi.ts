@@ -15,6 +15,7 @@ export interface KidProfileForGeneration {
   archetype?: string;
   art_style?: string;
   photo_base64?: string; // Pure base64, no data URL prefix
+  language?: string;
 }
 
 export interface GeneratedPanel {

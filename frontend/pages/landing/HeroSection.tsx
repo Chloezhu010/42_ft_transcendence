@@ -1,8 +1,10 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getSketchyButtonClassName } from '@/components/design-system/Primitives';
 
 function HeroSection(): JSX.Element {
+  const { t } = useTranslation();
   const { scrollY } = useScroll();
   const scale = useTransform(scrollY, [0, 300], [1, 1.1]);
   const y = useTransform(scrollY, [0, 300], [0, 50]);
@@ -15,7 +17,7 @@ function HeroSection(): JSX.Element {
       >
         <img
           src="/hero_image.png"
-          alt="Funova story world"
+          alt={t('landing.hero.imageAlt')}
           className="w-full h-full object-cover object-center opacity-90"
         />
         <div className="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-brand-light via-brand-light/50 to-transparent" />
@@ -31,9 +33,9 @@ function HeroSection(): JSX.Element {
             transition={{ duration: 0.8 }}
           >
             <h1 className="font-semibold text-5xl md:text-7xl leading-tight text-brand-primary mb-6 drop-shadow-sm tracking-normal">
-              Your Child&apos;s Imagination, <br />
+              {t('landing.hero.titleLine1')} <br />
               <span className="text-brand-dark relative inline-block">
-                Sketched to Life.
+                {t('landing.hero.titleLine2')}
                 <svg
                   className="absolute -bottom-2 left-0 w-full h-4 text-brand-accent -z-10"
                   viewBox="0 0 100 10"
@@ -44,7 +46,7 @@ function HeroSection(): JSX.Element {
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-brand-dark mb-10 max-w-lg mx-auto md:mx-0 font-medium">
-              Transform simple ideas into personalized, hand-drawn AI comic books.
+              {t('landing.hero.subtitle')}
             </p>
 
             <div className="flex flex-col md:flex-row gap-4 justify-center md:justify-start">
@@ -53,14 +55,14 @@ function HeroSection(): JSX.Element {
                 className={`inline-flex items-center justify-center ${getSketchyButtonClassName('primary', 'px-8 py-4 text-2xl shadow-xl')}`}
                 style={{ borderRadius: '32px' }}
               >
-                Create a Story
+                {t('landing.hero.ctaCreate')}
               </Link>
               <Link
                 to="/gallery"
                 className={`inline-flex items-center justify-center ${getSketchyButtonClassName('outline', 'px-8 py-4 text-2xl bg-white/80 backdrop-blur-sm')}`}
                 style={{ borderRadius: '32px' }}
               >
-                View Gallery
+                {t('landing.hero.ctaGallery')}
               </Link>
             </div>
           </motion.div>

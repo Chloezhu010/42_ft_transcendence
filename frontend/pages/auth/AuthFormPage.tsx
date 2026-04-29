@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import type { UserResponse } from '@api';
 import { SketchyButton } from '@/components/design-system/Primitives';
@@ -30,6 +31,7 @@ export function AuthFormPage({
     title,
     onSubmit,
 }: AuthFormPageProps): JSX.Element {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const location = useLocation();
     const redirectTo =
@@ -50,7 +52,7 @@ export function AuthFormPage({
             await onSubmit();
             navigate(redirectPath, { replace: true });
         } catch (error) {
-            setError(error instanceof Error ? error.message : 'Authentication failed');
+            setError(error instanceof Error ? error.message : t('auth.errors.authFailed'));
         } finally {
             setIsSubmitting(false);
         }
@@ -59,7 +61,7 @@ export function AuthFormPage({
     if (isLoadingSession) {
         return (
             <div className="flex flex-1 items-center justify-center">
-                <p className="font-rounded text-xl text-brand-muted">Loading…</p>
+                <p className="font-rounded text-xl text-brand-muted">{t('auth.status.loading')}</p>
             </div>
         );
     }

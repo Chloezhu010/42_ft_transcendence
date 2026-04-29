@@ -1,6 +1,17 @@
 {
   "app": {
-    "myLibrary": "Ma Bibliothèque"
+    "myLibrary": "Ma Bibliothèque",
+    "createStory": "Créer une histoire",
+    "footer": {
+      "tagline": "Générateur de bandes dessinées IA créé par des étudiants pour le projet 42 ft_transcendence.",
+      "links": {
+        "create": "Créer une histoire",
+        "library": "Bibliothèque",
+        "privacy": "Politique de confidentialité",
+        "terms": "Conditions d'utilisation",
+        "repository": "Dépôt"
+      }
+    }
   },
   "comicPanel": {
     "paintingScene": "Peindre une Scène...",
@@ -96,5 +107,536 @@
     "transformStories": "Transformez les histoires du soir en expériences de bandes dessinées cinématiques.",
     "startAdventure": "Commencez Votre Aventure",
     "viewLibrary": "Voir la Bibliothèque"
+  },
+  "story": {
+    "introStream": {
+      "status": {
+        "drafting": "Rédaction en cours",
+        "painting": "Peinture des premières pages",
+        "ready": "Prêt"
+      },
+      "onceUpon": "Il était une fois"
+    },
+    "preview": {
+      "backToLibrary": "Retour à la bibliothèque",
+      "label": "Aperçu",
+      "pageLabels": {
+        "opening": "Ouverture",
+        "ending": "Conclusion"
+      },
+      "turnPage": "Tourner la page →",
+      "ctaTitle": "Ça vous plaît ?",
+      "ctaDescription": "Nous compléterons les {{count}} planches entre l'ouverture et la conclusion.",
+      "generateFull": "Générer l'histoire complète",
+      "startOver": "Recommencer",
+      "ariaPrevious": "Page précédente",
+      "ariaNext": "Page suivante"
+    },
+    "storyboard": {
+      "pageLabel": {
+        "frontCover": "Couverture avant",
+        "backCover": "Couverture arrière",
+        "spread": "Planche {{number}}"
+      },
+      "introduction": "Introduction",
+      "originalLabel": "Un original Funova",
+      "theEnd": "FIN",
+      "closingLine": "Que tes rêves soient aussi audacieux que ton histoire, {{name}}.",
+      "closeBook": "Fermer le livre",
+      "paintingCover": "Peinture de la couverture...",
+      "heroicMasterpiece": "Un chef-d'œuvre héroïque",
+      "storyCompleteTitle": "Votre histoire est terminée",
+      "storyCompleteBody": "est prête à être relue à tout moment dans votre bibliothèque.",
+      "reread": "Relire l'histoire",
+      "backToLibrary": "Retour à la bibliothèque",
+      "storyCompleteBodyShared": "est prête à être relue à tout moment dans cette bibliothèque partagée."
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Bon retour",
+      "submit": "Se connecter",
+      "submitting": "Connexion…",
+      "footerText": "Pas encore de compte ?",
+      "footerLink": "S'inscrire"
+    },
+    "signup": {
+      "title": "Créez votre compte",
+      "submit": "S'inscrire",
+      "submitting": "Inscription…",
+      "footerText": "Vous avez déjà un compte ?",
+      "footerLink": "Se connecter"
+    },
+    "fields": {
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "vous@example.com",
+      "usernameLabel": "Nom d'utilisateur",
+      "usernamePlaceholder": "votre_nom",
+      "passwordLabel": "Mot de passe",
+      "passwordPlaceholder": "••••••••"
+    },
+    "status": {
+      "loading": "Chargement…"
+    },
+    "errors": {
+      "authFailed": "Échec de l'authentification"
+    }
+  },
+  "landing": {
+    "nav": {
+      "howItWorks": "Comment ca marche",
+      "gallery": "Galerie",
+      "explore": "Explorer",
+      "startCreating": "Commencer la creation"
+    },
+    "hero": {
+      "titleLine1": "L'imagination de votre enfant,",
+      "titleLine2": "mise en esquisse.",
+      "subtitle": "Transformez des idees simples en bandes dessinees IA personnalisees, dessinees a la main.",
+      "ctaCreate": "Creer une histoire",
+      "ctaGallery": "Voir la galerie",
+      "imageAlt": "Univers d'histoires Funova"
+    },
+    "features": {
+      "title": "Pourquoi Funova ?",
+      "items": [
+        {
+          "image": "/ai-sketch-engine.png",
+          "title": "Moteur d'esquisse IA",
+          "description": "Notre moteur transforme un brief de personnage en vignettes de BD vives et dessinees a la main en quelques instants.",
+          "rotateClassName": "-rotate-1"
+        },
+        {
+          "image": "/kid-safe-content.png",
+          "title": "Contenu securise pour enfants",
+          "description": "Le projet vise une generation d'histoires familiales avec un cadre positif et adapte a l'age.",
+          "rotateClassName": "rotate-1"
+        },
+        {
+          "image": "/printed-keepsakes.png",
+          "title": "Souvenirs sauvegardes",
+          "description": "Les histoires terminees restent dans la galerie pour revisiter les aventures preferées apres generation.",
+          "rotateClassName": "-rotate-1"
+        }
+      ]
+    },
+    "howItWorks": {
+      "title": "Comment ca marche",
+      "steps": [
+        {
+          "number": "1",
+          "title": "Revez-le",
+          "description": "Decrivez le hero enfant et l'histoire qu'il veut vivre.",
+          "image": "/step1.png"
+        },
+        {
+          "number": "2",
+          "title": "L'IA l'esquisse",
+          "description": "Regardez arriver le titre et l'avant-propos, puis generez les planches.",
+          "image": "/step2.png"
+        },
+        {
+          "number": "3",
+          "title": "Lisez ensemble",
+          "description": "Ouvrez le livre complet, modifiez des planches et gardez-le dans la bibliotheque.",
+          "image": "/step3.png"
+        }
+      ]
+    },
+    "showcase": {
+      "title": "Fait par les enfants, pour les enfants",
+      "subtitle": "Explorez les merveilleux mondes crees par nos jeunes conteurs.",
+      "stories": [
+        {
+          "title": "Sauvetage galactique",
+          "category": "Science-fiction",
+          "image": "/alex.png"
+        },
+        {
+          "title": "Le jardin magique",
+          "category": "Fantasy",
+          "image": "/lily.png"
+        },
+        {
+          "title": "Mystere de l'ocean",
+          "category": "Aventure",
+          "image": "/anna.png"
+        },
+        {
+          "title": "Amis de la foret",
+          "category": "Nature",
+          "image": "/alice.png"
+        }
+      ],
+      "disclaimer": "* Toutes les images presentees sont generees par IA et ne representent pas de vrais enfants."
+    },
+    "pricing": {
+      "title": "Commencer a explorer",
+      "subtitle": "Deux facons simples de voir le projet en action.",
+      "create": {
+        "title": "Creer",
+        "description": "Construire une nouvelle BD a partir d'une idee de personnage",
+        "features": [
+          "Parcours de profil du personnage",
+          "Titre et avant-propos en streaming",
+          "Planches de BD modifiables"
+        ],
+        "cta": "Commencer la creation"
+      },
+      "library": {
+        "badge": "VISITE RAPIDE",
+        "title": "Bibliotheque",
+        "description": "Rouvrir les livres sauvegardes et relire le resultat final",
+        "features": [
+          "Parcourir les couvertures generees",
+          "Ouvrir n'importe quelle histoire sauvegardee",
+          "Revoir le storyboard final"
+        ],
+        "cta": "Ouvrir la bibliotheque"
+      }
+    }
+  },
+  "footer": {
+    "tagline": "Donner aux jeunes conteurs le pouvoir d'imaginer, avec un peu de magie et d'IA.",
+    "links": {
+      "privacy": "Confidentialite",
+      "terms": "Conditions",
+      "repository": "Depot"
+    },
+    "madeFor": "Concu pour les petits reveurs",
+    "copyright": "© 2026 Funova"
+  },
+  "legal": {
+    "backToHome": "← Retour a l'accueil",
+    "lastUpdatedLabel": "Derniere mise a jour :",
+    "switchLinks": {
+      "privacy": "Politique de confidentialite",
+      "terms": "Conditions d'utilisation"
+    },
+    "maintainerContact": {
+      "title": "Contact mainteneur",
+      "termsIntro": "Les questions sur les conditions peuvent etre envoyees via l'outil de suivi des tickets du depot Funova lorsqu'elles ne contiennent pas de donnees personnelles.",
+      "termsButton": "Contacter pour les conditions",
+      "privacyNotice": "Les demandes de confidentialite et de suppression ne doivent pas etre deposees dans le suivi public des issues. Pour une demande liee a la confidentialite, contactez le responsable du deploiement via un canal prive hors de l'application et n'incluez pas de details personnels dans les rapports publics."
+    },
+    "documents": {
+      "privacy": {
+        "title": "Politique de confidentialite",
+        "description": "Comment Funova traite les saisies d'histoires, les livres generes et les donnees d'image facultatives dans la version actuelle du projet.",
+        "updatedAt": "18 avril 2026",
+        "sections": [
+          {
+            "id": "introduction",
+            "title": "1. Introduction",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Funova est une application web etudiante creee pour le projet 42 ft_transcendence. Elle transforme le profil d'un enfant hero en bande dessinee generee par IA avec un flux de previsualisation, des planches modifiables et une galerie sauvegardee.",
+                  "Cette politique explique quelles informations sont traitees par la version actuelle, comment elles sont utilisees et quelles limites pratiques s'appliquent a ce deploiement du projet."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "information",
+            "title": "2. Informations que nous traitons",
+            "blocks": [
+              {
+                "heading": "2.1 Donnees de saisie de l'histoire",
+                "paragraphs": [
+                  "Lorsque vous creez une histoire, Funova peut traiter les informations saisies dans le flux de creation, notamment :"
+                ],
+                "bullets": [
+                  "Details du profil du personnage tels que le nom du hero, ses traits d'apparence, sa couleur preferee, son archetype et le reve libre.",
+                  "Images de reference televersees en option lorsque l'utilisateur souhaite que l'art genere ressemble a une photo fournie."
+                ]
+              },
+              {
+                "heading": "2.2 Contenu genere",
+                "bullets": [
+                  "Titres d'histoires generes, avant-propos, texte des planches, invites d'image et metadonnees.",
+                  "URL d'images sauvegardees et donnees de couverture necessaires pour rouvrir un livre genere depuis la galerie."
+                ]
+              },
+              {
+                "heading": "2.3 Donnees techniques et de service",
+                "bullets": [
+                  "Metadonnees des requetes telles que les horodatages, requetes navigateur et journaux applicatifs de base pour faire fonctionner et deboguer le service.",
+                  "Enregistrements de stockage au niveau du deploiement conserves par la base de donnees et l'environnement conteneurise du projet."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "use",
+            "title": "3. Comment nous utilisons vos informations",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Nous utilisons les informations traitees pour :"
+                ],
+                "bullets": [
+                  "Generer l'histoire demandee, y compris la previsualisation, le texte des planches et les images associees.",
+                  "Stocker et afficher les livres generes via la bibliotheque et les vues de livres du meme deploiement.",
+                  "Enqueter sur les pannes, instabilites, questions de moderation et usages abusifs pendant le developpement, la demo ou l'evaluation.",
+                  "Ameliorer la qualite des invites, la fiabilite et la coherence des sorties dans la base de code du projet."
+                ]
+              },
+              {
+                "note": "Funova n'a pas pour but de vendre des donnees personnelles, de diffuser des publicites ou de construire des profils marketing non lies. La version actuelle utilise les donnees d'histoire pour executer le flux de generation demande."
+              }
+            ]
+          },
+          {
+            "id": "services",
+            "title": "4. Services tiers et stockage",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Funova s'appuie sur des services de support pour executer le deploiement actuel. Ces services peuvent traiter les donnees minimales necessaires a leur role."
+                ],
+                "cards": [
+                  {
+                    "title": "Fournisseur de generation IA",
+                    "description": "Recoit le brief d'histoire et les informations de generation necessaires pour produire le texte et les images du comic demande."
+                  },
+                  {
+                    "title": "Base de donnees de l'application",
+                    "description": "Stocke les enregistrements d'histoires, details de profil, invites et references d'images sauvegardees pour rouvrir les livres dans la galerie."
+                  },
+                  {
+                    "title": "Pile de deploiement",
+                    "description": "Heberge l'application web et achemine le trafic via l'infrastructure utilisee pour l'environnement actuel."
+                  }
+                ]
+              },
+              {
+                "paragraphs": [
+                  "Nous ne vendons pas de donnees personnelles. Les informations sont partagees uniquement dans la mesure necessaire pour generer les histoires, stocker les resultats et exploiter l'application."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "retention",
+            "title": "5. Stockage et conservation des donnees",
+            "blocks": [
+              {
+                "bullets": [
+                  "Les enregistrements d'histoires restent dans la base du projet jusqu'a suppression via l'application, retrait par les mainteneurs ou reinitialisation de l'environnement.",
+                  "Les images televersees sont traitees dans le flux de generation et peuvent rester stockees tant que l'histoire correspondante est disponible.",
+                  "Comme il s'agit d'un deploiement de projet, les environnements peuvent etre reconstruits, reinitialises ou effaces sans garantie d'archivage long terme."
+                ]
+              },
+              {
+                "paragraphs": [
+                  "Si le comportement de stockage evolue, cette politique doit etre mise a jour pour refleter le nouveau modele de conservation."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "children",
+            "title": "6. Enfants et contenu televerse",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Funova est concu pour une generation d'histoires familiale, mais les utilisateurs restent responsables de leurs soumissions."
+                ],
+                "bullets": [
+                  "Ne televersez que des informations ou des images que vous etes autorise a partager.",
+                  "N'envoyez pas d'informations sensibles non necessaires au flux de generation de comics.",
+                  "Si une histoire fait reference a un enfant reel, limitez les details fournis a ce qui est necessaire pour le resultat creatif."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "security",
+            "title": "7. Securite",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Le projet est concu pour fonctionner derriere HTTPS et utilise un deploiement conteneurise. Aucun service web ne peut toutefois garantir une securite parfaite.",
+                  "Si vous pensez qu'un probleme de confidentialite existe dans la version actuelle, ne publiez pas de noms d'enfants, d'identifiants d'histoires, d'images televersees ou d'autres details personnels dans le suivi public des issues.",
+                  "Les préoccupations de confidentialité nécessitant un contexte personnel doivent être envoyées au responsable du déploiement via un canal privé en dehors du dépôt public."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "contact",
+            "title": "8. Contact et demandes",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Les questions de confidentialite, demandes de suppression et signalements de contenu sensible doivent etre traites via un canal prive controle par le responsable du deploiement.",
+                  "Funova ne fournit pas de formulaire public dans l'application pour ces demandes car le suivi des issues est public et ne doit pas recevoir de details personnels."
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "terms": {
+        "title": "Conditions d'utilisation",
+        "description": "Les regles d'utilisation de Funova, y compris les contenus acceptables, les limites des sorties IA et les attentes de livraison du projet.",
+        "updatedAt": "18 avril 2026",
+        "sections": [
+          {
+            "id": "acceptance",
+            "title": "1. Acceptation des conditions",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "En accedant a Funova, vous acceptez d'utiliser le site selon ces conditions d'utilisation et la politique de confidentialite associee.",
+                  "Si vous n'acceptez pas ces conditions, n'utilisez pas le deploiement actuel du projet."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "service",
+            "title": "2. Description du service",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Funova est une application web de projet qui genere des histoires de type BD a partir des saisies des utilisateurs.",
+                  "La version actuelle est destinee aux demos, a l'evaluation et a un usage creatif normal dans les limites de l'environnement de deploiement. Elle ne garantit pas une continuite de niveau production ni des services commerciaux."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "acceptable-use",
+            "title": "3. Utilisation acceptable",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "En utilisant Funova, vous acceptez de ne pas soumettre ou demander du contenu :"
+                ],
+                "bullets": [
+                  "Illégal, abusif, haineux ou exploitant.",
+                  "Portant atteinte aux droits d'auteur, marques ou droits à la vie privée d'autrui.",
+                  "Basé sur des photos ou des informations personnelles que vous n'êtes pas autorisé à partager.",
+                  "Conçu pour casser, surcharger, aspirer ou interférer avec le service."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "user-content",
+            "title": "4. Vos entrees et les sorties generees",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Vous restez responsable des invites, details de profil et assets televerses que vous fournissez a l'application.",
+                  "Vous pouvez utiliser les histoires generees a des fins personnelles ou de demo de projet, mais vous ne devez pas revendiquer la propriete des modeles sous-jacents, du deploiement ou du code de la plateforme."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "ai-limits",
+            "title": "5. Limites du contenu genere par IA",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Funova repose sur une IA generative, ce qui signifie que la sortie peut varier et necessiter une relecture humaine."
+                ],
+                "bullets": [
+                  "Les textes et images generes peuvent contenir des erreurs, incoherences ou surprises artistiques.",
+                  "Une previsualisation ou un livre final peut necessiter une validation humaine avant d'etre partage.",
+                  "Funova ne garantit pas une ressemblance exacte, une precision factuelle ou une generation ininterrompue."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "availability",
+            "title": "6. Disponibilite du service et changements",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Parce qu'il s'agit d'un deploiement de projet, les fonctionnalites peuvent changer, les environnements peuvent etre reinitialises et les histoires peuvent etre supprimees lors de la maintenance ou de l'evaluation.",
+                  "L'equipe peut mettre a jour l'interface, les invites, les regles de stockage ou les textes juridiques a mesure que le projet evolue."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "liability",
+            "title": "7. Limitation de responsabilite",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Dans la mesure permise par la loi :"
+                ],
+                "bullets": [
+                  "Funova est fourni tel quel pour un usage de projet, sans garantie de service ininterrompu ou de sortie parfaite.",
+                  "Les mainteneurs ne sont pas responsables des pertes indirectes, d'une insatisfaction subjective avec les sorties IA ou d'une indisponibilite temporaire.",
+                  "Les utilisateurs restent responsables de revoir le contenu genere avant de s'y fier ou de le partager plus largement."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "termination",
+            "title": "8. Suspension ou suppression",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Les mainteneurs peuvent retirer des histoires, bloquer un usage abusif ou arreter un deploiement si cela est necessaire pour la moderation, la securite, la maintenance ou la livraison du projet."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "contact",
+            "title": "9. Contact",
+            "blocks": [
+              {
+                "paragraphs": [
+                  "Les questions sur ces conditions peuvent etre envoyees via le suivi des issues du depot Funova car ces demandes ne necessitent pas de details personnels."
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "profile": {
+    "title": "Votre profil",
+    "status": {
+      "loading": "Chargement…"
+    },
+    "avatar": {
+      "uploading": "Téléversement…",
+      "change": "Changer l'avatar"
+    },
+    "fields": {
+      "username": "Nom d'utilisateur",
+      "email": "E-mail"
+    },
+    "actions": {
+      "logout": "Se déconnecter",
+      "saving": "Enregistrement…",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "edit": "Modifier"
+    },
+    "messages": {
+      "noChanges": "Aucun changement à enregistrer.",
+      "updated": "Profil mis à jour.",
+      "avatarUpdated": "Avatar mis à jour."
+    },
+    "errors": {
+      "invalidEmail": "Veuillez saisir une adresse e-mail valide.",
+      "usernameEmpty": "Le nom d'utilisateur ne peut pas être vide.",
+      "saveFailed": "Échec de l'enregistrement",
+      "uploadFailed": "Échec du téléversement",
+      "logoutFailed": "Échec de la déconnexion"
+    }
   }
 }

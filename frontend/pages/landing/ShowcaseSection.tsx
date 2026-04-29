@@ -1,23 +1,25 @@
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { SketchyCard } from '@/components/design-system/Primitives';
 
-const stories = [
-  { title: 'Galactic Rescue', category: 'Sci-Fi', image: '/alex.png' },
-  { title: 'The Magic Garden', category: 'Fantasy', image: '/lily.png' },
-  { title: 'Ocean Mystery', category: 'Adventure', image: '/anna.png' },
-  { title: 'Forest Friends', category: 'Nature', image: '/alice.png' },
-];
-
-const duplicatedStories = [...stories, ...stories, ...stories];
+interface ShowcaseStory {
+  title: string;
+  category: string;
+  image: string;
+}
 
 function ShowcaseSection(): JSX.Element {
+  const { t } = useTranslation();
+  const stories = t('landing.showcase.stories', { returnObjects: true }) as ShowcaseStory[];
+  const duplicatedStories = [...stories, ...stories, ...stories];
+
   return (
     <section id="gallery" className="py-24 bg-brand-primary text-white w-full overflow-hidden">
       <div className="w-full">
         <div className="text-center mb-16 px-6">
-          <h2 className="text-4xl md:text-5xl font-semibold mb-4 text-brand-accent">Made by Kids, for Kids</h2>
+          <h2 className="text-4xl md:text-5xl font-semibold mb-4 text-brand-accent">{t('landing.showcase.title')}</h2>
           <p className="text-xl text-white/80 font-medium max-w-2xl mx-auto">
-            Explore the wonderful worlds created by our young storytellers.
+            {t('landing.showcase.subtitle')}
           </p>
         </div>
 
@@ -59,7 +61,7 @@ function ShowcaseSection(): JSX.Element {
 
         <div className="text-center mt-8 px-6 opacity-60">
           <p className="text-xs uppercase tracking-widest font-semibold">
-            * All images shown are AI-generated representations and do not depict real children.
+            {t('landing.showcase.disclaimer')}
           </p>
         </div>
       </div>

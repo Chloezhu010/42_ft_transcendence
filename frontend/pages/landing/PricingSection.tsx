@@ -1,12 +1,17 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getSketchyButtonClassName, SketchyCard } from '@/components/design-system/Primitives';
 
 function PricingSection(): JSX.Element {
+  const { t } = useTranslation();
+  const createFeatures = t('landing.pricing.create.features', { returnObjects: true }) as string[];
+  const libraryFeatures = t('landing.pricing.library.features', { returnObjects: true }) as string[];
+
   return (
     <section id="project-highlights" className="py-24 px-6 max-w-6xl mx-auto">
       <div className="text-center mb-16">
-        <h2 className="font-semibold text-4xl md:text-5xl text-brand-primary mb-4">Start Exploring</h2>
-        <p className="text-xl text-brand-muted font-medium">Two simple ways to see the project in action.</p>
+        <h2 className="font-semibold text-4xl md:text-5xl text-brand-primary mb-4">{t('landing.pricing.title')}</h2>
+        <p className="text-xl text-brand-muted font-medium">{t('landing.pricing.subtitle')}</p>
       </div>
 
       <div className="flex flex-col md:flex-row justify-center gap-10">
@@ -16,15 +21,15 @@ function PricingSection(): JSX.Element {
         >
           <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-brand-light/80 backdrop-blur-sm transform rotate-2 border-2 border-brand-primary/10 shadow-sm rounded-lg" />
 
-          <h3 className="font-semibold text-4xl text-brand-dark mb-2">Create</h3>
+          <h3 className="font-semibold text-4xl text-brand-dark mb-2">{t('landing.pricing.create.title')}</h3>
           <p className="text-brand-muted mb-8 border-b-4 border-brand-light pb-4 font-semibold">
-            Build a new comic from a character idea
+            {t('landing.pricing.create.description')}
           </p>
 
           <ul className="space-y-4 font-semibold text-brand-dark mb-8">
-            <li className="flex items-center gap-2">✨ Character profile flow</li>
-            <li className="flex items-center gap-2">✨ Streaming title and foreword</li>
-            <li className="flex items-center gap-2">✨ Editable comic panels</li>
+            {createFeatures.map((feature) => (
+              <li key={feature} className="flex items-center gap-2">✨ {feature}</li>
+            ))}
           </ul>
 
           <Link
@@ -32,7 +37,7 @@ function PricingSection(): JSX.Element {
             className={`flex w-full items-center justify-center ${getSketchyButtonClassName('outline', 'py-4 text-xl rounded-2xl')}`}
             style={{ borderRadius: '16px' }}
           >
-            Start Creating
+            {t('landing.pricing.create.cta')}
           </Link>
         </SketchyCard>
 
@@ -44,18 +49,18 @@ function PricingSection(): JSX.Element {
           <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-brand-accent/80 backdrop-blur-sm transform -rotate-1 border-2 border-brand-primary/10 shadow-sm rounded-lg" />
 
           <div className="absolute top-4 right-4 text-xs font-semibold bg-brand-accent text-brand-dark px-3 py-1.5 rounded-full border-2 border-brand-primary transform rotate-12 shadow-soft">
-            QUICK TOUR
+            {t('landing.pricing.library.badge')}
           </div>
 
-          <h3 className="font-semibold text-4xl text-brand-primary mb-2">Library</h3>
+          <h3 className="font-semibold text-4xl text-brand-primary mb-2">{t('landing.pricing.library.title')}</h3>
           <p className="text-brand-primary/70 mb-8 border-b-4 border-brand-light pb-4 font-semibold">
-            Reopen saved books and review finished output
+            {t('landing.pricing.library.description')}
           </p>
 
           <ul className="space-y-4 font-semibold text-brand-dark mb-8">
-            <li className="flex items-center gap-2">🚀 Browse generated covers</li>
-            <li className="flex items-center gap-2">🚀 Open any saved story</li>
-            <li className="flex items-center gap-2">🚀 Review the final storyboard</li>
+            {libraryFeatures.map((feature) => (
+              <li key={feature} className="flex items-center gap-2">🚀 {feature}</li>
+            ))}
           </ul>
 
           <Link
@@ -63,7 +68,7 @@ function PricingSection(): JSX.Element {
             className={`flex w-full items-center justify-center ${getSketchyButtonClassName('primary', 'py-4 text-xl rounded-2xl')}`}
             style={{ borderRadius: '16px' }}
           >
-            Open Library
+            {t('landing.pricing.library.cta')}
           </Link>
         </SketchyCard>
       </div>

@@ -6,6 +6,7 @@
 import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/app/auth';
 import { SketchyInput } from '@/components/design-system/Forms';
 import { SketchyButton } from '@/components/design-system/Primitives';
@@ -15,6 +16,7 @@ import { useProfilePage } from './useProfilePage';
 
 export function ProfilePage(): JSX.Element {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { logout } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const {
@@ -36,7 +38,7 @@ export function ProfilePage(): JSX.Element {
   if (!currentUser) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <p className="font-rounded text-xl text-brand-muted">Loading…</p>
+        <p className="font-rounded text-xl text-brand-muted">{t('profile.status.loading')}</p>
       </div>
     );
   }
@@ -53,14 +55,14 @@ export function ProfilePage(): JSX.Element {
       await logout();
       navigate('/login');
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Logout failed');
+      toast.error(err instanceof Error ? err.message : t('profile.errors.logoutFailed'));
     }
   }
 
   return (
     <div className="flex flex-1 justify-center py-12">
       <div className="w-full max-w-2xl bg-white rounded-2xl border-4 border-brand-primary/20 shadow-soft p-10 space-y-8">
-        <h1 className="font-sans font-bold text-3xl text-brand-dark text-center">Your profile</h1>
+        <h1 className="font-sans font-bold text-3xl text-brand-dark text-center">{t('profile.title')}</h1>
 
         {/* Avatar */}
         <section className="flex flex-col items-center gap-3">
@@ -92,7 +94,7 @@ export function ProfilePage(): JSX.Element {
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploadingAvatar}
               >
-                {isUploadingAvatar ? 'Uploading…' : 'Change avatar'}
+                {isUploadingAvatar ? t('profile.avatar.uploading') : t('profile.avatar.change')}
               </SketchyButton>
             </>
           )}
@@ -101,7 +103,7 @@ export function ProfilePage(): JSX.Element {
         {/* Inline-editable fields */}
         <section className="space-y-6">
           <EditableRow
-            label="Username"
+            label={t('profile.fields.username')}
             value={currentUser.username}
             isEditing={editingField === 'username'}
             draft={draftValue}
@@ -112,7 +114,7 @@ export function ProfilePage(): JSX.Element {
             isSaving={isSaving}
           />
           <EditableRow
-            label="Email"
+            label={t('profile.fields.email')}
             value={currentUser.email}
             isEditing={editingField === 'email'}
             draft={draftValue}
@@ -127,7 +129,7 @@ export function ProfilePage(): JSX.Element {
 
         <div className="pt-4 border-t border-brand-primary/10 flex justify-end">
           <SketchyButton type="button" variant="outline" onClick={onLogout}>
-            Log out
+            {t('profile.actions.logout')}
           </SketchyButton>
         </div>
       </div>
@@ -160,6 +162,8 @@ function EditableRow({
   isSaving,
   inputType = 'text',
 }: EditableRowProps): JSX.Element {
+  const { t } = useTranslation();
+
   return (
     <div>
       <label className="block text-sm font-bold text-brand-muted mb-2">{label}</label>
@@ -173,10 +177,10 @@ function EditableRow({
             autoFocus
           />
           <SketchyButton type="button" onClick={onSave} disabled={isSaving}>
-            {isSaving ? 'Saving…' : 'Save'}
+            {isSaving ? t('profile.actions.saving') : t('profile.actions.save')}
           </SketchyButton>
           <SketchyButton type="button" variant="outline" onClick={onCancel} disabled={isSaving}>
-            Cancel
+            {t('profile.actions.cancel')}
           </SketchyButton>
         </div>
       ) : (
@@ -187,7 +191,7 @@ function EditableRow({
             onClick={onEdit}
             className="text-sm font-bold text-brand-primary hover:underline"
           >
-            Edit
+            {t('profile.actions.edit')}
           </button>
         </div>
       )}

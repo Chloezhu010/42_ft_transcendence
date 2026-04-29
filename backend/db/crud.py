@@ -25,8 +25,8 @@ async def create_kid_profile(db: aiosqlite.Connection, profile: KidProfileCreate
         """
         INSERT INTO kid_profiles (
             name, gender, skin_tone, hair_color, eye_color,
-            favorite_color, dream, archetype, user_id
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            favorite_color, dream, archetype, language, user_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """,
         (
             profile.name,
@@ -37,6 +37,7 @@ async def create_kid_profile(db: aiosqlite.Connection, profile: KidProfileCreate
             profile.favorite_color,
             profile.dream,
             profile.archetype,
+            profile.language,
             user_id,
         ),
     )
@@ -60,6 +61,8 @@ async def get_kid_profile(db: aiosqlite.Connection, profile_id: int) -> KidProfi
         favorite_color=row["favorite_color"],
         dream=row["dream"],
         archetype=row["archetype"],
+        art_style=row["art_style"],
+        language=row["language"],
         created_at=row["created_at"],
     )
 

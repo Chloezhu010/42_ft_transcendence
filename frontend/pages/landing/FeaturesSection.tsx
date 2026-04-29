@@ -1,31 +1,21 @@
+import { useTranslation } from 'react-i18next';
 import { SketchyCard } from '@/components/design-system/Primitives';
 
-const features = [
-  {
-    image: '/ai-sketch-engine.png',
-    title: 'AI Sketch Engine',
-    description: 'Our engine turns a character brief into vibrant, hand-drawn comic panels in moments.',
-    rotateClassName: '-rotate-1',
-  },
-  {
-    image: '/kid-safe-content.png',
-    title: 'Kid-Safe Content',
-    description: 'The project is aimed at family-friendly story generation with positive, age-appropriate framing.',
-    rotateClassName: 'rotate-1',
-  },
-  {
-    image: '/printed-keepsakes.png',
-    title: 'Saved Keepsakes',
-    description: 'Completed stories stay in the gallery so families can revisit favorite adventures after generation.',
-    rotateClassName: '-rotate-1',
-  },
-];
+interface FeatureItem {
+  image: string;
+  title: string;
+  description: string;
+  rotateClassName: string;
+}
 
 function FeaturesSection(): JSX.Element {
+  const { t } = useTranslation();
+  const features = t('landing.features.items', { returnObjects: true }) as FeatureItem[];
+
   return (
     <section className="py-20 px-6 max-w-7xl mx-auto">
       <div className="text-center mb-16">
-        <h2 className="font-semibold text-4xl md:text-5xl text-brand-primary mb-4">Why Funova?</h2>
+        <h2 className="font-semibold text-4xl md:text-5xl text-brand-primary mb-4">{t('landing.features.title')}</h2>
         <div className="h-2 w-32 bg-brand-accent mx-auto rounded-full shadow-sm" />
       </div>
 
