@@ -125,7 +125,8 @@ def _build_story_script_prompt(profile: KidProfileCreate) -> str:
     if language_name and language_code != "en":
         language_instruction = (
             f"LANGUAGE REQUIREMENT: Write ALL story text (title, foreword, panel text) in {language_name} only. "
-            "Do not use English in story text. Keep characterDescription, coverImagePrompt, and imagePrompt in English.\n"
+            "Do not use English in story text. "
+            "Keep characterDescription, coverImagePrompt, and imagePrompt in English.\n"
         )
 
     return f"""{language_instruction}Create a 10-panel children's comic story. Simple vocabulary, 6-10 words per panel.

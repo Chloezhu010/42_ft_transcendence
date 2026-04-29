@@ -56,9 +56,12 @@ function mapLoadedStoryState(
 ): LoadedStoryState {
   const nextStory = mapApiStoryToStory(savedStory);
   const nextProfile = mapApiProfileToKidProfile(savedStory.profile);
+  const persistedLanguage = normalizeLanguageCode(
+    savedStory.profile.language || i18n.resolvedLanguage || i18n.language || defaultLanguage,
+  );
   const profileForApi = {
     ...mapKidProfileToGenerationProfile(nextProfile),
-    language: normalizeLanguageCode(i18n.resolvedLanguage || i18n.language || defaultLanguage),
+    language: persistedLanguage,
   };
 
   if (isPreviewDraft(nextStory)) {
@@ -147,6 +150,7 @@ async function persistPreviewStory(
       favorite_color: profileForApi.favorite_color,
       dream: profileForApi.dream,
       archetype: profileForApi.archetype,
+      language: profileForApi.language,
     },
     title: previewStory.title,
     foreword: previewStory.foreword,

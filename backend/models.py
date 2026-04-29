@@ -102,6 +102,7 @@ class KidProfileResponse(BaseModel):
     dream: str | None = None
     archetype: str | None = None
     art_style: str | None = None
+    language: str | None = None
     created_at: datetime
 
 

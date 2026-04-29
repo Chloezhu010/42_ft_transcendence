@@ -187,7 +187,6 @@ function PreviewGeneratePage({
   onStartOver,
   isReadOnly,
 }: PreviewGeneratePageProps): JSX.Element {
-  const { t } = useTranslation();
   return (
     <div className="h-full flex flex-col items-center justify-center p-12 text-center bg-gradient-to-br from-brand-accent/10 to-white">
       <div className="text-5xl mb-6">✨</div>
