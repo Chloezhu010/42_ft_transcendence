@@ -73,6 +73,8 @@ async def _create_tables(db: aiosqlite.Connection):
             character_description TEXT,
             cover_image_prompt TEXT,
             cover_image_path TEXT,
+            visibility TEXT NOT NULL DEFAULT 'private'
+                CHECK(visibility IN ('private', 'shared_with_friends')),
             is_unlocked BOOLEAN NOT NULL DEFAULT 1,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -89,6 +91,18 @@ async def _create_tables(db: aiosqlite.Connection):
             UNIQUE(story_id, panel_order)
         );
     """)
+    try:
+        await db.execute(
+            """
+            ALTER TABLE stories
+            ADD COLUMN visibility TEXT NOT NULL DEFAULT 'private'
+                CHECK(visibility IN ('private', 'shared_with_friends'))
+            """
+        )
+    except aiosqlite.OperationalError as exc:
+        if "duplicate column name" not in str(exc).lower():
+            raise
+    await db.execute("UPDATE stories SET visibility = 'private' WHERE visibility IS NULL")
     # Seed a default local user for dev mode
     await db.execute("""
         INSERT OR IGNORE INTO users (id, email, username, password_hash)

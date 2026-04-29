@@ -5,13 +5,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { deleteStory, getStories, type StoryListItem } from '@api';
+import { deleteStory, getStories, type StoryListItem, type StoryVisibility, updateStoryVisibility } from '@api';
 import { useAuth } from '@/app/auth';
 
 interface UseGalleryPageResult {
   isLoading: boolean;
   stories: StoryListItem[];
   onDeleteStory: (storyId: number) => Promise<void>;
+  onUpdateVisibility: (storyId: number, visibility: StoryVisibility) => Promise<void>;
 }
 
 export function useGalleryPage(): UseGalleryPageResult {
@@ -56,9 +57,36 @@ export function useGalleryPage(): UseGalleryPageResult {
     }
   }, [accessToken, t]);
 
+  const handleUpdateVisibility = useCallback(async (storyId: number, visibility: StoryVisibility) => {
+    if (!accessToken) return;
+
+    const previousStory = stories.find((story) => story.id === storyId);
+    if (!previousStory) {
+      return;
+    }
+
+    setStories((currentStories) => currentStories.map((story) => (
+      story.id === storyId ? { ...story, visibility } : story
+    )));
+
+    try {
+      const updatedStory = await updateStoryVisibility(accessToken, storyId, visibility);
+      setStories((currentStories) => currentStories.map((story) => (
+        story.id === storyId ? { ...story, visibility: updatedStory.visibility } : story
+      )));
+    } catch (error) {
+      console.error('Failed to update story visibility:', error);
+      setStories((currentStories) => currentStories.map((story) => (
+        story.id === storyId ? { ...story, visibility: previousStory.visibility } : story
+      )));
+      toast.error('Failed to update story sharing.');
+    }
+  }, [accessToken, stories]);
+
   return {
     isLoading,
     stories,
     onDeleteStory: handleDeleteStory,
+    onUpdateVisibility: handleUpdateVisibility,
   };
 }

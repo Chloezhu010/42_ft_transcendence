@@ -11,6 +11,7 @@ export function mapApiStoryToStory(data: StoryDetailResponse): Story {
     characterDescription: data.character_description || '',
     coverImagePrompt: data.cover_image_prompt || '',
     coverImageUrl: data.cover_image_url || undefined,
+    visibility: data.visibility,
     panels: data.panels.map((panel, index) => ({
       id: panel.id ? String(panel.id) : String(index + 1),
       text: panel.text,

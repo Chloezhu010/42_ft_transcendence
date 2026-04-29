@@ -75,3 +75,20 @@ export async function getUser(userId: number): Promise<PublicUserResponse> {
     }
     return (await response.json()) as PublicUserResponse;
 }
+
+export async function searchUsers(accessToken: string, query: string): Promise<PublicUserResponse[]> {
+    const trimmed = query.trim();
+    if (!trimmed) {
+        return [];
+    }
+    const response = await apiFetch(`${API_BASE}/users/search?q=${encodeURIComponent(trimmed)}`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        }
+    });
+    if (!response.ok) {
+        throw await buildApiError(response, 'Failed to search users');
+    }
+    return (await response.json()) as PublicUserResponse[];
+}

@@ -33,6 +33,28 @@ async def get_user_by_id(db: aiosqlite.Connection, user_id: int) -> Row | None:
         return await cursor.fetchone()  # return the user row or None if not found
 
 
+async def search_users_by_username(
+    db: aiosqlite.Connection, query: str, current_user_id: int, limit: int = 10
+) -> list[Row]:
+    """Search users by username fragment, excluding the current user. Returns a list of user rows."""
+    normalized_query = query.strip()
+    if not normalized_query:
+        return []
+    safe_limit = max(1, min(limit, 20))
+    escaped_query = normalized_query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    like_pattern = f"%{escaped_query}%"
+    async with db.execute(
+        """
+        SELECT * FROM users
+        WHERE id != ? AND username LIKE ? ESCAPE '\\' COLLATE NOCASE
+        ORDER BY username COLLATE NOCASE ASC, id ASC
+        LIMIT ?
+        """,
+        (current_user_id, like_pattern, safe_limit),
+    ) as cursor:
+        return await cursor.fetchall()
+
+
 # --- User profile management ---
 async def update_user(
     db: aiosqlite.Connection, user_id: int, username: str | None = None, email: str | None = None
@@ -110,6 +132,12 @@ async def get_friendship_between(db, user_id: int, other_user_id: int) -> Row | 
         (user_id, other_user_id, other_user_id, user_id),
     ) as cursor:
         return await cursor.fetchone()  # return the friendship row or None if not found
+
+
+async def has_accepted_friendship(db, user_id: int, other_user_id: int) -> bool:
+    """Return True when the two users have an accepted friendship."""
+    friendship = await get_friendship_between(db, user_id, other_user_id)
+    return friendship is not None and friendship["status"] == "accepted"
 
 
 async def get_friend_view(db, viewer_id: int, other_user_id: int) -> Row | None:
@@ -239,3 +267,26 @@ async def get_pending_requests(db, user_id: int) -> list[Row]:
         (user_id,),
     ) as cursor:
         return await cursor.fetchall()  # return a list of pending friend requests
+
+
+async def get_outgoing_pending_requests(db, user_id: int) -> list[Row]:
+    """Get a list of pending *outgoing* friend requests for the given user id.
+
+    Returns rows shaped for FriendResponse: the viewer is always the requester,
+    so the "other user" (u.*) is the addressee. requester_id is included so the
+    router's is_requester check stays consistent with the other friend reads.
+    """
+    async with db.execute(
+        """
+        SELECT
+            u.id, u.username, u.avatar_path, u.is_online,
+            f.id AS friendship_id, f.requester_id, f.status, f.created_at
+        FROM friendships f
+        JOIN users u
+            ON f.addressee_id = u.id
+        WHERE f.requester_id = ? AND f.status = 'pending'
+        ORDER BY f.created_at DESC
+        """,
+        (user_id,),
+    ) as cursor:
+        return await cursor.fetchall()

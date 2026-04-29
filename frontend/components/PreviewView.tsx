@@ -15,6 +15,8 @@ interface PreviewViewProps {
   onEditPanelImage: (panel: ComicPanelData, editPrompt: string) => Promise<void> | void;
   onGenerate: () => Promise<void>;
   onStartOver: () => void;
+  isReadOnly?: boolean;
+  ownerUserId?: number | null;
 }
 
 interface PreviewBookFrameProps {
@@ -25,6 +27,8 @@ interface PreviewBookFrameProps {
   onNextPage: () => void;
   leftPage: ReactNode;
   rightPage: ReactNode;
+  backHref: string;
+  isReadOnly: boolean;
 }
 
 interface PreviewTitlePageProps {
@@ -42,6 +46,7 @@ interface PreviewGeneratePageProps {
   middlePanelCount: number;
   onGenerate: () => Promise<void>;
   onStartOver: () => void;
+  isReadOnly: boolean;
 }
 
 function PreviewBookFrame({
@@ -52,6 +57,8 @@ function PreviewBookFrame({
   onNextPage,
   leftPage,
   rightPage,
+  backHref,
+  isReadOnly,
 }: PreviewBookFrameProps): JSX.Element {
   const isFirstPage = currentPage === 0;
   const isLastPage = currentPage === 1;
@@ -62,14 +69,14 @@ function PreviewBookFrame({
   return (
     <div className="flex-1 flex flex-col animate-in fade-in duration-700 h-[calc(100vh-140px)] relative">
       <div className="absolute top-4 left-4 z-30">
-        <Link to="/gallery" className="text-sm font-bold text-brand-muted hover:text-brand-primary flex items-center gap-2 transition-colors bg-white/80 backdrop-blur-sm py-3 px-6 rounded-full shadow-soft border-2 border-brand-primary/10">
+        <Link to={backHref} className="text-sm font-bold text-brand-muted hover:text-brand-primary flex items-center gap-2 transition-colors bg-white/80 backdrop-blur-sm py-3 px-6 rounded-full shadow-soft border-2 border-brand-primary/10">
           <span>←</span> {t('story.preview.backToLibrary')}
         </Link>
       </div>
 
       <div className="absolute top-4 right-4 z-30">
         <div className="bg-white/90 backdrop-blur-sm py-2 px-4 rounded-full shadow-soft border border-brand-secondary/20">
-          <Label className="text-brand-primary uppercase tracking-widest">{t('story.preview.label')}</Label>
+          <Label className="text-brand-primary uppercase tracking-widest">{isReadOnly ? 'Read Only' : t('story.preview.label')}</Label>
         </div>
       </div>
 
@@ -178,29 +185,39 @@ function PreviewGeneratePage({
   middlePanelCount,
   onGenerate,
   onStartOver,
+  isReadOnly,
 }: PreviewGeneratePageProps): JSX.Element {
   const { t } = useTranslation();
   return (
     <div className="h-full flex flex-col items-center justify-center p-12 text-center bg-gradient-to-br from-brand-accent/10 to-white">
       <div className="text-5xl mb-6">✨</div>
-      <Heading variant="h3" className="text-brand-primary mb-3">
-        {t('story.preview.ctaTitle')}
-      </Heading>
-      <Text className="text-brand-dark/60 italic mb-8 text-sm">
-        {t('story.preview.ctaDescription', { count: middlePanelCount })}
-      </Text>
-      <div className="flex flex-col gap-3 w-full max-w-[220px]">
-        <SketchyButton onClick={() => void onGenerate()} className="px-6 py-3 rounded-full text-sm w-full">
-          {t('story.preview.generateFull')}
-        </SketchyButton>
-        <SketchyButton
-          variant="outline"
-          onClick={onStartOver}
-          className="px-6 py-3 rounded-full text-sm w-full"
-        >
-          {t('story.preview.startOver')}
-        </SketchyButton>
-      </div>
+      {isReadOnly ? (
+        <>
+          <Heading variant="h3" className="text-brand-primary mb-3">Shared Preview</Heading>
+          <Text className="text-brand-dark/60 italic text-sm">
+            This comic is shared as read-only. Generation and editing are disabled.
+          </Text>
+        </>
+      ) : (
+        <>
+          <Heading variant="h3" className="text-brand-primary mb-3">Like what you see?</Heading>
+          <Text className="text-brand-dark/60 italic mb-8 text-sm">
+            We&apos;ll fill in the {middlePanelCount} panels between opening and ending.
+          </Text>
+          <div className="flex flex-col gap-3 w-full max-w-[220px]">
+            <SketchyButton onClick={() => void onGenerate()} className="px-6 py-3 rounded-full text-sm w-full">
+              Generate Full Story
+            </SketchyButton>
+            <SketchyButton
+              variant="outline"
+              onClick={onStartOver}
+              className="px-6 py-3 rounded-full text-sm w-full"
+            >
+              Start Over
+            </SketchyButton>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -210,6 +227,8 @@ function PreviewView({
   onEditPanelImage,
   onGenerate,
   onStartOver,
+  isReadOnly = false,
+  ownerUserId = null,
 }: PreviewViewProps): JSX.Element | null {
   const { t } = useTranslation();
   const [previewPage, setPreviewPage] = useState(0);
@@ -222,6 +241,7 @@ function PreviewView({
   ];
   const currentPageLabel = pageLabels[previewPage] || '';
   const middlePanelCount = Math.max(0, story.panels.length - 2);
+  const backHref = ownerUserId ? `/friends/${ownerUserId}/library` : '/gallery';
 
   if (!firstPanel || !lastPanel) {
     return null;
@@ -270,6 +290,7 @@ function PreviewView({
         middlePanelCount={middlePanelCount}
         onGenerate={onGenerate}
         onStartOver={onStartOver}
+        isReadOnly={isReadOnly}
       />
     );
 
@@ -282,6 +303,8 @@ function PreviewView({
       onNextPage={showNextPage}
       leftPage={leftPage}
       rightPage={rightPage}
+      backHref={backHref}
+      isReadOnly={isReadOnly}
     />
   );
 }

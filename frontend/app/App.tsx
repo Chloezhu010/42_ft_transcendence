@@ -5,11 +5,13 @@
 import { useEffect } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { LoginPage, SignupPage } from '@/pages/auth';
+import { FriendLibraryPage } from '@/pages/friend-library';
 import { GalleryPage } from '@/pages/gallery';
 import { LandingPage } from '@/pages/landing';
 import { LegalPage } from '@/pages/legal';
 import { ProfilePage } from '@/pages/profile';
 import { StoryPage } from '@/pages/story';
+import { FriendsPage } from '@/pages/friends';
 import AppLayout from './AppLayout';
 import ProtectedRoute from './ProtectedRoute';
 
@@ -37,6 +39,9 @@ export function App(): JSX.Element {
             <Route path="/book/:id" element={<StoryPage />} />
             <Route path="/gallery" element={<GalleryPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/friends" element={<FriendsPage />} />
+            <Route path="/friends/:userId/library" element={<FriendLibraryPage />} />
+            <Route path="/friends/:userId/library/:id" element={<StoryPage />} />
           </Route>
         </Route>
         <Route path="/login" element={<LoginPage />} />

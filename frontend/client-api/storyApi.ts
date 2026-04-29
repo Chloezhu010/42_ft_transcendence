@@ -2,6 +2,9 @@
  * Typed client calls for story persistence endpoints.
  */
 import { API_BASE, apiFetch } from './apiClient';
+import { buildApiError } from './apiErrors';
+
+export type StoryVisibility = 'private' | 'shared_with_friends';
 
 export interface KidProfileResponse {
   id: number;
@@ -32,6 +35,7 @@ export interface StoryDetailResponse {
   character_description: string | null;
   cover_image_prompt: string | null;
   cover_image_url: string | null;
+  visibility: StoryVisibility;
   is_unlocked: boolean;
   created_at: string;
   updated_at: string;
@@ -43,6 +47,7 @@ export interface StoryListItem {
   id: number;
   title: string | null;
   cover_image_url: string | null;
+  visibility: StoryVisibility;
   is_unlocked: boolean;
   created_at: string;
   profile: KidProfileResponse;
@@ -112,8 +117,26 @@ export async function updateStory(accessToken: string, storyId: number, params: 
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to update story: ${response.statusText}`);
+    throw await buildApiError(response, 'Failed to update story');
   }
+}
+
+export async function updateStoryVisibility(
+  accessToken: string,
+  storyId: number,
+  visibility: StoryVisibility
+): Promise<StoryDetailResponse> {
+  const response = await apiFetch(`${API_BASE}/stories/${storyId}/visibility`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ visibility }),
+  });
+
+  if (!response.ok) {
+    throw await buildApiError(response, 'Failed to update story visibility');
+  }
+
+  return (await response.json()) as StoryDetailResponse;
 }
 
 /**
@@ -145,7 +168,7 @@ export async function getStories(accessToken: string): Promise<StoryListItem[]> 
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch stories: ${response.statusText}`);
+    throw await buildApiError(response, 'Failed to fetch stories');
   }
 
   return (await response.json()) as StoryListItem[];
@@ -160,7 +183,35 @@ export async function getStory(accessToken: string, storyId: number): Promise<St
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch story: ${response.statusText}`);
+    throw await buildApiError(response, 'Failed to fetch story');
+  }
+
+  return (await response.json()) as StoryDetailResponse;
+}
+
+export async function getFriendSharedStories(accessToken: string, userId: number): Promise<StoryListItem[]> {
+  const response = await apiFetch(`${API_BASE}/friends/${userId}/stories`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  if (!response.ok) {
+    throw await buildApiError(response, 'Failed to fetch friend library');
+  }
+
+  return (await response.json()) as StoryListItem[];
+}
+
+export async function getFriendSharedStory(
+  accessToken: string,
+  userId: number,
+  storyId: number
+): Promise<StoryDetailResponse> {
+  const response = await apiFetch(`${API_BASE}/friends/${userId}/stories/${storyId}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  if (!response.ok) {
+    throw await buildApiError(response, 'Failed to fetch shared story');
   }
 
   return (await response.json()) as StoryDetailResponse;
@@ -176,6 +227,6 @@ export async function deleteStory(accessToken: string, storyId: number): Promise
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to delete story: ${response.statusText}`);
+    throw await buildApiError(response, 'Failed to delete story');
   }
 }

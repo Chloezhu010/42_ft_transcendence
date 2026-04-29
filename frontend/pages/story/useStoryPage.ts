@@ -22,16 +22,18 @@ import {
 import { editStoryPanelImage } from './story.editor';
 import {
   generateFullStoryState,
+  loadFriendSharedStoryState,
   generatePreviewState,
   loadStoryState,
 } from './story.workflow';
-import { StoryPageView, type PendingGeneration } from './story.types';
+import { StoryPageView, type PendingGeneration, type StoryPageAccessContext } from './story.types';
 
 interface UseStoryPageResult {
   view: StoryPageView;
   introStream: typeof INITIAL_INTRO_STREAM_STATE;
   story: Story | null;
   profile: KidProfile | null;
+  access: StoryPageAccessContext;
   wizard: {
     step: number;
     profile: KidProfile;
@@ -50,10 +52,12 @@ interface UseStoryPageResult {
 }
 
 export function useStoryPage(): UseStoryPageResult {
-  const { id: rawStoryId } = useParams<{ id?: string }>();
+  const { id: rawStoryId, userId: rawOwnerUserId } = useParams<{ id?: string; userId?: string }>();
   const navigate = useNavigate();
   const { accessToken } = useAuth();
   const introHoldTimerRef = useRef<number | null>(null);
+  const ownerUserId = rawOwnerUserId ? parseStoryId(rawOwnerUserId) : null;
+  const isReadOnly = ownerUserId !== null;
 
   const [view, setView] = useState<StoryPageView>(StoryPageView.Onboarding);
   const [introStream, setIntroStream] = useState(INITIAL_INTRO_STREAM_STATE);
@@ -92,12 +96,10 @@ export function useStoryPage(): UseStoryPageResult {
     setView(StoryPageView.GeneratingStory);
 
     try {
-      const {
-        nextPendingGeneration,
-        nextProfile,
-        nextStory,
-        nextView,
-      } = await loadStoryState(accessToken, storyId);
+      const loader = isReadOnly && ownerUserId
+        ? loadFriendSharedStoryState(accessToken, ownerUserId, storyId)
+        : loadStoryState(accessToken, storyId);
+      const { nextPendingGeneration, nextProfile, nextStory, nextView } = await loader;
 
       setProfile(nextProfile);
       setSavedStoryId(storyId);
@@ -106,10 +108,16 @@ export function useStoryPage(): UseStoryPageResult {
       setView(nextView);
     } catch (error) {
       console.error('Failed to load story:', error);
-      toast.error('Failed to load story.');
+      const message = error instanceof Error ? error.message : 'Failed to load story.';
+      toast.error(message);
+      if (isReadOnly && ownerUserId) {
+        navigate(`/friends/${ownerUserId}/library`, { replace: true });
+        return;
+      }
+
       resetToOnboarding();
     }
-  }, [accessToken, resetToOnboarding]);
+  }, [accessToken, isReadOnly, navigate, ownerUserId, resetToOnboarding]);
 
   useEffect(() => {
     const storyId = parseStoryId(rawStoryId);
@@ -120,14 +128,14 @@ export function useStoryPage(): UseStoryPageResult {
 
     if (!storyId) {
       toast.error('Invalid story id.');
-      navigate('/create', { replace: true });
+      navigate(isReadOnly && ownerUserId ? `/friends/${ownerUserId}/library` : '/create', { replace: true });
       return;
     }
 
     queueMicrotask(() => {
       void loadSavedStory(storyId);
     });
-  }, [loadSavedStory, navigate, rawStoryId]);
+  }, [isReadOnly, loadSavedStory, navigate, ownerUserId, rawStoryId]);
 
   useEffect(() => cancelIntroHoldTimer, [cancelIntroHoldTimer]);
 
@@ -235,6 +243,10 @@ export function useStoryPage(): UseStoryPageResult {
   }, [resetToOnboarding]);
 
   const handlePanelImageEdit = useCallback(async (panel: ComicPanelData, editPrompt: string) => {
+    if (isReadOnly) {
+      return;
+    }
+
     if (!accessToken) return;
     if (!story?.characterDescription || !panel.imageUrl) {
       return;
@@ -268,13 +280,17 @@ export function useStoryPage(): UseStoryPageResult {
       toast.error('Failed to update the panel image.');
       throw error;
     }
-  }, [accessToken, profile, savedStoryId, story]);
+  }, [accessToken, isReadOnly, profile, savedStoryId, story]);
 
   return {
     view,
     introStream,
     story,
     profile,
+    access: {
+      ownerUserId,
+      isReadOnly,
+    },
     wizard: {
       step: wizardStep,
       profile: draftProfile,

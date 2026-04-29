@@ -7,6 +7,7 @@ services:
     depends_on:
       - frontend
       - backend
+      - grafana
 
   backend:
     build: ./backend
@@ -33,13 +34,39 @@ services:
     depends_on:
       - backend
 
+  node_exporter:
+    image: prom/node-exporter:v1.9.1
+    expose:
+      - "9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--path.rootfs=/rootfs"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    expose:
+      - "9093"
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager_data:/alertmanager
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
+
   prometheus:
     image: docker.io/prom/prometheus:v3.5.1
     container_name: prometheus
-    ports:
-      - "9090:9090"
+    expose:
+      - "9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./alerts.rules.yml:/etc/prometheus/alerts.rules.yml:ro
       - prometheus_data:/prometheus
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
@@ -48,13 +75,20 @@ services:
       - "--storage.tsdb.retention.size=1GB"
     depends_on:
       - backend
+      - node_exporter
+      - alertmanager
 
   grafana:
     image: docker.io/grafana/grafana:11.6.1
-    ports:
-      - "3001:3000"
+    expose:
+      - "3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+      - GF_SERVER_ROOT_URL=https://localhost/grafana/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_AUTH_BASIC_ENABLED=true
     volumes:
       - grafana_data:/var/lib/grafana
       - ./backend/grafana/provisioning:/etc/grafana/provisioning
@@ -63,5 +97,6 @@ services:
 
 volumes:
   backend_images:
-  grafana_data:
+  alertmanager_data:
   prometheus_data:
+  grafana_data:

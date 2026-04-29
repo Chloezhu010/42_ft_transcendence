@@ -180,6 +180,82 @@ def test_list_pending_requires_auth(client):
 
 
 # ---------------------------------------------------------------------------
+# GET /api/friends/outgoing  — outgoing pending requests
+# ---------------------------------------------------------------------------
+
+
+def test_list_outgoing_empty(client, alice):
+    _, alice_h = alice
+    r = client.get("/api/friends/outgoing", headers=alice_h)
+    assert r.status_code == 200
+    assert r.json() == []
+
+
+def test_list_outgoing_returns_sent_request(client, alice, bob):
+    """After alice -> bob, alice's /outgoing contains bob."""
+    _, alice_h = alice
+    bob_id, _ = bob
+
+    client.post(f"/api/friends/{bob_id}", headers=alice_h)
+
+    r = client.get("/api/friends/outgoing", headers=alice_h)
+    assert r.status_code == 200
+    outgoing = r.json()
+    assert len(outgoing) == 1
+    assert outgoing[0]["username"] == "bob"
+    assert outgoing[0]["friendship_status"] == "pending"
+    assert outgoing[0]["is_requester"] is True
+
+
+def test_list_outgoing_excludes_incoming(client, alice, bob):
+    """A request sent *to* alice must not appear in her /outgoing."""
+    alice_id, _ = alice
+    _, bob_h = bob
+
+    client.post(f"/api/friends/{alice_id}", headers=bob_h)
+
+    _, alice_h = alice
+    r = client.get("/api/friends/outgoing", headers=alice_h)
+    assert r.status_code == 200
+    assert r.json() == []
+
+
+def test_list_outgoing_excludes_accepted(client, alice, bob):
+    """Once the request is accepted, it leaves /outgoing."""
+    alice_id, alice_h = alice
+    bob_id, bob_h = bob
+
+    client.post(f"/api/friends/{bob_id}", headers=alice_h)
+    client.post(f"/api/friends/{alice_id}/accept", headers=bob_h)
+
+    r = client.get("/api/friends/outgoing", headers=alice_h)
+    assert r.status_code == 200
+    assert r.json() == []
+
+
+def test_list_outgoing_and_pending_are_symmetric(client, alice, bob):
+    """After alice sends bob a request, /outgoing and /pending are mirror images."""
+    alice_id, alice_h = alice
+    bob_id, bob_h = bob
+
+    client.post(f"/api/friends/{bob_id}", headers=alice_h)
+
+    outgoing = client.get("/api/friends/outgoing", headers=alice_h).json()
+    pending = client.get("/api/friends/pending", headers=bob_h).json()
+
+    assert len(outgoing) == 1 and len(pending) == 1
+    assert outgoing[0]["username"] == "bob"
+    assert pending[0]["username"] == "alice"
+    assert outgoing[0]["is_requester"] is True
+    assert pending[0]["is_requester"] is False
+
+
+def test_list_outgoing_requires_auth(client):
+    r = client.get("/api/friends/outgoing")
+    assert r.status_code == 401
+
+
+# ---------------------------------------------------------------------------
 # POST /api/friends/{user_id}  — send a friend request
 # ---------------------------------------------------------------------------
 

@@ -322,3 +322,125 @@ def test_get_public_profile_requires_no_auth(client, alice):
 def test_get_public_profile_not_found(client):
     r = client.get("/api/users/9999")
     assert r.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# GET /api/users/search
+# ---------------------------------------------------------------------------
+
+
+def _signup(client, username: str, email: str | None = None, password: str = "Password123!") -> None:
+    """Helper: sign up an extra user. Used to seed search results."""
+    email = email or f"{username}@example.com"
+    r = client.post("/api/auth/signup", json={"username": username, "email": email, "password": password})
+    assert r.status_code == 200, r.text
+
+
+def test_search_requires_auth(client):
+    r = client.get("/api/users/search", params={"q": "ali"})
+    assert r.status_code == 401
+
+
+def test_search_rejects_empty_q(client, alice):
+    """min_length=1 on the Query validator → FastAPI returns 422 before the handler runs."""
+    r = client.get("/api/users/search", params={"q": ""}, headers=alice)
+    assert r.status_code == 422
+
+
+def test_search_rejects_missing_q(client, alice):
+    """q is required (Query(...))."""
+    r = client.get("/api/users/search", headers=alice)
+    assert r.status_code == 422
+
+
+def test_search_rejects_too_long_q(client, alice):
+    """max_length=50 → 51-char query is rejected."""
+    r = client.get("/api/users/search", params={"q": "a" * 51}, headers=alice)
+    assert r.status_code == 422
+
+
+def test_search_accepts_boundary_lengths(client, alice):
+    """Length 1 and length 50 are both inside the allowed range."""
+    r1 = client.get("/api/users/search", params={"q": "a"}, headers=alice)
+    assert r1.status_code == 200
+    r50 = client.get("/api/users/search", params={"q": "a" * 50}, headers=alice)
+    assert r50.status_code == 200
+
+
+def test_search_finds_substring_match(client, alice, bob):
+    r = client.get("/api/users/search", params={"q": "bo"}, headers=alice)
+    assert r.status_code == 200
+    usernames = [u["username"] for u in r.json()]
+    assert "bob" in usernames
+
+
+def test_search_is_case_insensitive(client, alice, bob):
+    """SQL uses COLLATE NOCASE → uppercase query still matches lowercase username."""
+    r = client.get("/api/users/search", params={"q": "BOB"}, headers=alice)
+    assert r.status_code == 200
+    assert any(u["username"] == "bob" for u in r.json())
+
+
+def test_search_excludes_caller(client, alice):
+    """Searching for the caller's own username must not return the caller."""
+    r = client.get("/api/users/search", params={"q": "ali"}, headers=alice)
+    assert r.status_code == 200
+    assert all(u["username"] != "alice" for u in r.json())
+
+
+def test_search_no_match_returns_empty_list(client, alice):
+    """No results is a 200 with [] — not a 404."""
+    r = client.get("/api/users/search", params={"q": "zzzzznomatch"}, headers=alice)
+    assert r.status_code == 200
+    assert r.json() == []
+
+
+def test_search_response_is_public_shape(client, alice, bob):
+    """Response must match PublicUserResponse — no email leakage."""
+    r = client.get("/api/users/search", params={"q": "bob"}, headers=alice)
+    assert r.status_code == 200
+    body = r.json()
+    assert len(body) == 1
+    entry = body[0]
+    assert set(entry.keys()) == {"id", "username", "avatar_url", "is_online", "created_at"}
+    assert "email" not in entry
+    assert "password_hash" not in entry
+
+
+def test_search_results_are_alpha_sorted(client, alice):
+    """ORDER BY username COLLATE NOCASE ASC — mixed-case usernames sort case-insensitively."""
+    _signup(client, "Charlie_test")
+    _signup(client, "bravo_test")
+    _signup(client, "alpha_test")
+    r = client.get("/api/users/search", params={"q": "_test"}, headers=alice)
+    assert r.status_code == 200
+    usernames = [u["username"] for u in r.json()]
+    assert usernames == sorted(usernames, key=str.lower)
+
+
+def test_search_limit_caps_at_ten(client, alice):
+    """Default limit in crud is 10 — seeding 12 matches must return at most 10."""
+    for i in range(12):
+        _signup(client, f"matcher{i:02d}", email=f"matcher{i:02d}@example.com")
+    r = client.get("/api/users/search", params={"q": "matcher"}, headers=alice)
+    assert r.status_code == 200
+    assert len(r.json()) == 10
+
+
+def test_search_escapes_like_wildcards(client, alice, bob):
+    """'%' and '_' in the query must be treated as literal characters, not SQL wildcards.
+
+    Without escaping, q='%' would match every username. The CRUD escapes %, _, and \\
+    and uses ESCAPE '\\' in the LIKE clause.
+    """
+    r = client.get("/api/users/search", params={"q": "%"}, headers=alice)
+    assert r.status_code == 200
+    # bob has no '%' in his username → should NOT appear
+    assert all(u["username"] != "bob" for u in r.json())
+
+
+def test_search_strips_whitespace(client, alice, bob):
+    """The CRUD strips whitespace from q before running the LIKE query."""
+    r = client.get("/api/users/search", params={"q": "   bob   "}, headers=alice)
+    assert r.status_code == 200
+    assert any(u["username"] == "bob" for u in r.json())

@@ -138,12 +138,16 @@ class StoryCreate(BaseModel):
     panels: list[PanelCreate] = []
 
 
+StoryVisibility = Literal["private", "shared_with_friends"]
+
+
 class StoryListItem(BaseModel):
     """Story summary for list view."""
 
     id: int
     title: str | None = None
     cover_image_url: str | None = None
+    visibility: StoryVisibility = "private"
     is_unlocked: bool = True
     created_at: datetime
     # Nested profile info
@@ -159,6 +163,7 @@ class StoryResponse(BaseModel):
     character_description: str | None = None
     cover_image_prompt: str | None = None
     cover_image_url: str | None = None
+    visibility: StoryVisibility = "private"
     is_unlocked: bool = True
     created_at: datetime
     updated_at: datetime
@@ -179,6 +184,12 @@ class UpdatePanelImageRequest(BaseModel):
     """Request to update a single panel's image."""
 
     image_base64: str
+
+
+class StoryVisibilityUpdateRequest(BaseModel):
+    """Request to update story sharing visibility."""
+
+    visibility: StoryVisibility
 
 
 # --- Generation Request/Response Models ---

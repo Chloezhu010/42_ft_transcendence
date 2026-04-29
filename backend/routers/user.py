@@ -2,10 +2,10 @@
 
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile
 
 from auth_utils import get_current_user
-from db.crud_users import get_user_by_id, update_user
+from db.crud_users import get_user_by_id, search_users_by_username, update_user
 from db.database import get_db
 from models import PublicUserResponse, UserResponse, UserUpdateRequest
 from services.avatar_upload import AvatarUploadError, replace_user_avatar
@@ -66,6 +66,17 @@ async def upload_avatar(file: UploadFile, current_user=Depends(get_current_user)
     except AvatarUploadError as exc:
         raise HTTPException(status_code=exc.status_code, detail=exc.detail) from exc
     return _to_user_response(updated_row)
+
+
+@router.get("/search", response_model=list[PublicUserResponse])
+async def search_users(
+    q: str = Query(..., min_length=1, max_length=50, description="Username fragment to search for"),
+    current_user=Depends(get_current_user),
+    db=Depends(get_db),
+):
+    """Search users by username for friend discovery. Excludes the caller. Auth required."""
+    rows = await search_users_by_username(db, q, current_user["id"])
+    return [_to_public_user_response(row) for row in rows]
 
 
 @router.get("/{user_id}", response_model=PublicUserResponse)
