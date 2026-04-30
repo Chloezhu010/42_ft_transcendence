@@ -87,8 +87,18 @@ async def get_current_user(
     except (InvalidTokenError, ValueError, TypeError):
         raise unauthorized
 
-    async with db.execute("SELECT id, username, email FROM users WHERE id = ?", (user_id_int,)) as cursor:
+    async with db.execute("SELECT id, username, email, is_admin FROM users WHERE id = ?", (user_id_int,)) as cursor:
         user = await cursor.fetchone()
         if user is None:
             raise unauthorized
         return dict(user)
+
+
+async def require_admin(current_user: dict = Depends(get_current_user)) -> dict:
+    """Dependency that restricts access to admin users (is_admin=1)."""
+    if not current_user.get("is_admin"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required",
+        )
+    return current_user

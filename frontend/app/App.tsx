@@ -9,6 +9,7 @@ import { FriendLibraryPage } from '@/pages/friend-library';
 import { GalleryPage } from '@/pages/gallery';
 import { LandingPage } from '@/pages/landing';
 import { LegalPage } from '@/pages/legal';
+import { StatusPage } from '@/pages/status';
 import { ProfilePage } from '@/pages/profile';
 import { StoryPage } from '@/pages/story';
 import { FriendsPage } from '@/pages/friends';
@@ -34,6 +35,7 @@ export function App(): JSX.Element {
           <Route path="/" element={<LandingPage />} />
           <Route path="/privacy" element={<LegalPage documentKey="privacy" />} />
           <Route path="/terms" element={<LegalPage documentKey="terms" />} />
+          <Route path="/status" element={<StatusPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/create" element={<StoryPage />} />
             <Route path="/book/:id" element={<StoryPage />} />

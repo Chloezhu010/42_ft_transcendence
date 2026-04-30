@@ -40,6 +40,7 @@ class UserResponse(BaseModel):
     username: str
     avatar_url: str | None
     is_online: bool
+    is_admin: bool
     created_at: datetime
 
 

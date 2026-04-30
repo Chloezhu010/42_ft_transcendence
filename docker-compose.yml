@@ -16,6 +16,7 @@ services:
     volumes:
       - ./backend:/app
       - backend_images:/app/images
+      - backend_backups:/app/backups
     environment:
       - PYTHONUNBUFFERED=1
       - GEMINI_API_KEY=${GEMINI_API_KEY}
@@ -97,6 +98,7 @@ services:
 
 volumes:
   backend_images:
+  backend_backups:
   alertmanager_data:
   prometheus_data:
   grafana_data:

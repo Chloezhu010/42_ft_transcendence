@@ -2,30 +2,47 @@
 FastAPI main application with CORS and API routes.
 """
 
+import asyncio
+import contextlib
 import shutil
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-import aiosqlite
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from prometheus_fastapi_instrumentator import Instrumentator
 
 from config import get_config
-from db.database import get_db, init_db
-from routers import auth, friend, generation, monitoring, stories, user
+from db.backup import create_backup
+from db.database import init_db
+from routers import auth, backup, friend, generation, health, monitoring, stories, user
+
+_BACKUP_INTERVAL_SECONDS = 24 * 60 * 60
+
+
+async def _schedule_backups() -> None:
+    """Run a backup immediately on startup, then repeat every 24 hours."""
+    while True:
+        try:
+            await create_backup()
+        except Exception as exc:
+            print(f"Scheduled backup failed: {exc}")
+        await asyncio.sleep(_BACKUP_INTERVAL_SECONDS)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Manage database lifecycle."""
+    """Manage database lifecycle and scheduled backup task."""
     config = get_config()
     print(f"Starting WonderComic API with frontend URL: {config.frontend_url}")
 
     await init_db()
+    backup_task = asyncio.create_task(_schedule_backups())
     yield
+    backup_task.cancel()
+    with contextlib.suppress(asyncio.CancelledError):
+        await backup_task
 
 
 app = FastAPI(title="WonderComic API", version="1.0.0", lifespan=lifespan)
@@ -75,34 +92,9 @@ app.include_router(friend.router)
 app.include_router(generation.router)
 app.include_router(stories.router)
 app.include_router(monitoring.router)
+app.include_router(backup.router)
+app.include_router(health.router)
 
 # Expose /metrics endpoint for Prometheus scraping
 # Exclude internal endpoints to avoid noise in dashboards
 Instrumentator(excluded_handlers=["/metrics", "/health"]).instrument(app).expose(app)
-
-
-# --- Health Check ---
-@app.get("/health")
-async def health_check(db: aiosqlite.Connection = Depends(get_db)):
-    """Health check for uptime monitoring."""
-    checks = {}
-    healthy = True
-
-    try:
-        cursor = await db.execute("SELECT 1")
-        await cursor.fetchone()
-        checks["database"] = "ok"
-    except Exception as e:
-        print(f"Health check database error: {e}")
-        checks["database"] = "unavailable"
-        healthy = False
-
-    status_code = 200 if healthy else 503
-    return JSONResponse(
-        status_code=status_code,
-        content={
-            "status": "healthy" if healthy else "unhealthy",
-            "version": "1.0.0",
-            "checks": checks,
-        },
-    )

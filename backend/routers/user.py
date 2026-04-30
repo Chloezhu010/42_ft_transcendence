@@ -22,6 +22,7 @@ def _to_user_response(row) -> UserResponse:
         username=row["username"],
         avatar_url=row["avatar_path"],  # frontend resolves to full url via getImageUrl()
         is_online=bool(row["is_online"]),
+        is_admin=bool(row["is_admin"]),
         created_at=row["created_at"],
     )
 
