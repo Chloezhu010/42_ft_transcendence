@@ -1,5 +1,5 @@
 """
-Auth router (handle signup, login, logout)
+Auth router (local auth + OAuth entrypoints)
 """
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -9,21 +9,28 @@ from auth_utils import (
     get_current_user,
     verify_password,
 )
+from config import get_config
 from db.crud_users import (
     create_user,
+    create_oauth_user,
     get_user_by_email,
     get_user_by_username,
     set_online_status,
 )
+from db.crud_oauth import (
+    delete_oauth_result,
+    get_oauth_result,
+)
 from db.database import get_db
 from models import (
     LoginRequest,
+    OauthExchangeRequest,
     SignupRequest,
     TokenResponse,
 )
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
-
+config = get_config()
 
 @router.post("/signup", response_model=TokenResponse)
 async def signup(body: SignupRequest, db=Depends(get_db)):

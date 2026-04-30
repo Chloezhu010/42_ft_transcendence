@@ -12,6 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from prometheus_fastapi_instrumentator import Instrumentator
+from starlette.middleware.sessions import SessionMiddleware
 
 from config import get_config
 from db.database import get_db, init_db
@@ -47,6 +48,12 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization"],
+)
+
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=config.session_secret_key,
+    https_only=config.session_cookie_secure,
 )
 
 # Serve images as static files

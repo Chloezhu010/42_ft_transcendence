@@ -8,18 +8,12 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt.exceptions import InvalidTokenError
 
+from config import get_config
 from db.database import get_db
 
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_HOURS = 24
 DEFAULT_BCRYPT_ROUNDS = 12
-
-
-def _get_secret_key() -> str:
-    key = os.getenv("JWT_SECRET_KEY")
-    if not key or not key.strip():
-        raise ValueError("JWT_SECRET_KEY environment variable is not set or is empty")
-    return key
 
 
 def _get_bcrypt_rounds() -> int:
@@ -62,7 +56,7 @@ def create_access_token(user_id: int) -> str:
         "sub": str(user_id),
         "exp": datetime.now(UTC) + timedelta(hours=TOKEN_EXPIRE_HOURS),
     }
-    return jwt.encode(payload, _get_secret_key(), algorithm=ALGORITHM)
+    return jwt.encode(payload, get_config().secret_key, algorithm=ALGORITHM)
 
 
 # --- get_current_user dependency ---
@@ -78,7 +72,7 @@ async def get_current_user(
     if credentials is None:
         raise unauthorized
     try:
-        payload = jwt.decode(credentials.credentials, _get_secret_key(), algorithms=[ALGORITHM])
+        payload = jwt.decode(credentials.credentials, get_config().secret_key, algorithms=[ALGORITHM])
         user_id: str | None = payload.get("sub")
         if user_id is None:
             raise unauthorized
