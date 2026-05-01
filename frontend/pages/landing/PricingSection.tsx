@@ -43,8 +43,8 @@ function PricingSection(): JSX.Element {
 
         <SketchyCard
           className="w-full max-w-sm bg-white p-10 relative transform rotate-1 transition-all hover:rotate-0 z-10"
-          style={{ borderRadius: '32px', border: '4px solid #9D6BCF' }}
-          shadowColor="rgba(157, 107, 207, 0.4)"
+          style={{ borderRadius: '32px', border: '4px solid var(--color-brand-primary)' }}
+          shadowColor="rgba(242, 201, 76, 0.4)"
         >
           <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-brand-accent/80 backdrop-blur-sm transform -rotate-1 border-2 border-brand-primary/10 shadow-sm rounded-lg" />
 

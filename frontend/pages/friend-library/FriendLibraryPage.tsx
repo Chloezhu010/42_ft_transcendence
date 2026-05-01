@@ -16,7 +16,7 @@ export function FriendLibraryPage(): JSX.Element {
   if (isLoading) {
     return (
       <div className="flex justify-center py-20">
-        <div className="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-yellow-200 border-t-yellow-500 rounded-full animate-spin" />
       </div>
     );
   }
@@ -77,7 +77,7 @@ export function FriendLibraryPage(): JSX.Element {
                   {getStoryDisplayTitle(story.title, fallbackTitle)}
                 </h2>
                 <div className="flex flex-wrap gap-2 mb-4">
-                  <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full uppercase tracking-wide">
+                  <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-bold rounded-full uppercase tracking-wide">
                     {story.profile.name}
                   </span>
                 </div>

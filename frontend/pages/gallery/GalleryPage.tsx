@@ -47,13 +47,13 @@ function SharingControl({ storyTitle, value, onChange }: SharingControlProps): J
       <legend className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400">
         {t('galleryPage.sharing.label')}
       </legend>
-      <div className="inline-grid grid-cols-2 gap-0.5 rounded-full border border-purple-100 bg-purple-50 p-0.5 shadow-inner">
+      <div className="inline-grid grid-cols-2 gap-0.5 rounded-full border border-yellow-100 bg-yellow-50 p-0.5 shadow-inner">
         {sharingOptions.map((option) => {
           const isSelected = value === option;
           const visibleLabel = getVisibilityLabel(option);
           const selectedClassName = isSelected
-            ? 'bg-white text-purple-900 shadow-sm'
-            : 'text-purple-500 hover:bg-white/60 hover:text-purple-800';
+            ? 'bg-white text-yellow-900 shadow-sm'
+            : 'text-yellow-700 hover:bg-white/60 hover:text-yellow-800';
 
           return (
             <button
@@ -62,7 +62,7 @@ function SharingControl({ storyTitle, value, onChange }: SharingControlProps): J
               aria-label={`${getVisibilityLabel(option)} sharing for ${storyTitle}`}
               aria-pressed={isSelected}
               onClick={() => void onChange(option)}
-              className={`min-h-8 min-w-16 rounded-full px-3 py-1 text-center text-[10px] font-black uppercase leading-none transition-colors focus:outline-none focus:ring-2 focus:ring-purple-300 ${selectedClassName}`}
+              className={`min-h-8 min-w-16 rounded-full px-3 py-1 text-center text-[10px] font-black uppercase leading-none transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-300 ${selectedClassName}`}
             >
               {visibleLabel}
             </button>
@@ -81,7 +81,7 @@ function StoryCard({ story, onDeleteStory, onUpdateVisibility }: StoryCardProps)
     ? getArchetypeLabel(story.profile.archetype, t)
     : null;
   return (
-    <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden group border-2 border-gray-100 hover:border-purple-200 transition-all hover:-translate-y-1 relative">
+    <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden group border-2 border-gray-100 hover:border-yellow-200 transition-all hover:-translate-y-1 relative">
       <button
         type="button"
         onClick={() => void onDeleteStory(story.id)}
@@ -105,7 +105,7 @@ function StoryCard({ story, onDeleteStory, onUpdateVisibility }: StoryCardProps)
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
           <Link
             to={`/book/${story.id}`}
-            className="px-8 py-3 bg-white text-purple-900 font-black rounded-full shadow-xl transform scale-90 group-hover:scale-100 transition-all"
+            className="px-8 py-3 bg-white text-yellow-900 font-black rounded-full shadow-xl transform scale-90 group-hover:scale-100 transition-all"
           >
             {t('galleryPage.readNow')}
           </Link>
@@ -124,7 +124,7 @@ function StoryCard({ story, onDeleteStory, onUpdateVisibility }: StoryCardProps)
         />
 
         <div className="flex flex-wrap gap-2">
-          <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full uppercase tracking-wide">
+          <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-bold rounded-full uppercase tracking-wide">
             {story.profile.name}
           </span>
 
@@ -155,7 +155,7 @@ function GalleryPage(): JSX.Element {
 
       {isLoading ? (
         <div className="flex justify-center py-20">
-          <div className="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
+          <div className="w-12 h-12 border-4 border-yellow-200 border-t-yellow-500 rounded-full animate-spin" />
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
