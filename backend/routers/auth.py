@@ -32,7 +32,6 @@ from services.oauth.result_store import (
 )
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
-config = get_config()
 
 
 @router.post("/signup", response_model=TokenResponse)
@@ -80,8 +79,7 @@ async def logout(current_user=Depends(get_current_user), db=Depends(get_db)):
 async def start_google_oauth(request: Request):
     """Start Google OAuth flow by redirecting to provider's auth page."""
     google_client = get_google_oauth_client()
-    redirect_uri = config.google_redirect_uri
-    return await google_client.authorize_redirect(request, redirect_uri)
+    return await google_client.authorize_redirect(request, get_config().google_redirect_uri)
 
 
 @router.get("/oauth/google/callback")
@@ -95,11 +93,12 @@ async def google_callback(request: Request, db=Depends(get_db)):
         app_user_id = oauth_profile["id"]
         await set_online_status(db, app_user_id, True)
         result_code = await issue_oauth_result_code(db, app_user_id)
-        redirect_url = f"{config.frontend_url}/auth/callback?code={result_code}"
+        frontend_url = get_config().frontend_url
+        redirect_url = f"{frontend_url}/auth/callback?code={result_code}"
     except HTTPException as e:
         # For known errors like link conflicts, redirect with error details
         if e.status_code == 409 and "link_conflict" in e.detail:
-            redirect_url = f"{config.frontend_url}/auth/callback?error=link_conflict"
+            redirect_url = f"{get_config().frontend_url}/auth/callback?error=link_conflict"
         else:
             raise
     return RedirectResponse(redirect_url)
