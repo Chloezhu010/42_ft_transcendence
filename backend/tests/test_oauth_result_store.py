@@ -31,7 +31,9 @@ async def db(tmp_path, monkeypatch):
     await conn.close()
 
 
-async def create_oauth_only_user(db: aiosqlite.Connection, email: str = "oauth@example.com", username: str = "oauth-user") -> int:
+async def create_oauth_only_user(
+    db: aiosqlite.Connection, email: str = "oauth@example.com", username: str = "oauth-user"
+) -> int:
     cursor = await db.execute(
         """
         INSERT INTO users (email, username, password_hash)

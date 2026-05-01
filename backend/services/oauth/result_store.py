@@ -12,9 +12,7 @@ _CODE_TTL_MINUTES = 10
 async def issue_oauth_result_code(db: aiosqlite.Connection, user_id: int) -> str:
     """Generate a secure one-time code, store it, and return it."""
     code = secrets.token_urlsafe(32)
-    expires_at = (datetime.now(UTC) + timedelta(minutes=_CODE_TTL_MINUTES)).strftime(
-        "%Y-%m-%d %H:%M:%S"
-    )
+    expires_at = (datetime.now(UTC) + timedelta(minutes=_CODE_TTL_MINUTES)).strftime("%Y-%m-%d %H:%M:%S")
     await create_oauth_result(db, code, user_id, expires_at)
     return code
 

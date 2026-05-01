@@ -4,7 +4,8 @@ from config import get_config
 
 _GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
 
-_oauth: OAuth | None = None 
+_oauth: OAuth | None = None
+
 
 def _get_oauth() -> OAuth:
     """Build and cache the oauth registry on first call."""
@@ -20,6 +21,7 @@ def _get_oauth() -> OAuth:
             client_kwargs={"scope": "openid email profile"},
         )
     return _oauth
+
 
 def get_google_oauth_client():
     """Get the registered OAuth client for Google."""
