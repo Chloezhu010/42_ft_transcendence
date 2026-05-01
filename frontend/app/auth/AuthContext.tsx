@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import { getMe, login as apiLogin, logout as apiLogout, signup as apiSignup } from '@api';
+import { getMe, login as apiLogin, logout as apiLogout, signup as apiSignup, exchangeOAuthCode} from '@api';
 import type { UserResponse } from '@api';
 import type { AuthContextValue } from './auth.types';
 
@@ -38,14 +38,9 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
     }
 
     async function establishSession(token: string): Promise<void> {
+        const user = await loadCurrentUser(token);
         saveToken(token);
-        try {
-            const user = await loadCurrentUser(token);
-            setCurrentUser(user);
-        } catch (error) {
-            clearAuthState();
-            throw error;
-        }
+        setCurrentUser(user);
     }
 
     // Actions
@@ -86,6 +81,11 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
         } finally {
             clearAuthState();
         }
+    }
+
+    async function completeGoogleOAuth(code: string): Promise<void> {
+        const response = await exchangeOAuthCode(code);
+        await establishSession(response.access_token);
     }
 
     // Session restore
@@ -132,6 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
         signup,
         logout,
         refreshMe,
+        completeGoogleOAuth,
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

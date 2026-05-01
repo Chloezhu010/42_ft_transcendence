@@ -23,7 +23,7 @@ A multi-user web application where users create personalized AI-powered comic bo
 ## Quick Start
 
 ```bash
-cp .env.example .env    # fill in GEMINI_API_KEY
+cp .env.example .env    # fill in required secrets
 docker compose up --build
 ```
 
@@ -36,6 +36,8 @@ Copy `.env.example` to `.env` and fill in required values:
 | Variable | Description | Required |
 |----------|-------------|----------|
 | `GEMINI_API_KEY` | Google Gemini API key | **Yes** |
+| `JWT_SECRET_KEY` | Secret used to sign JWT access tokens | **Yes** |
+| `SESSION_SECRET_KEY` | Secret used to sign backend session cookies | **Yes** |
 | `VITE_API_BASE_URL` | Backend URL seen by browser (default: `http://localhost:8000`) | No |
 | `FRONTEND_URL` | CORS allowed origin (default: `http://localhost:3000`) | No |
 | `DB_PATH` | SQLite database file path (default: `wondercomic.db`) | No |
