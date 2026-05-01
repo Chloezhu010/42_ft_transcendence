@@ -2,13 +2,24 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/app/auth';
 
+const OAUTH_REDIRECT_PATH_KEY = 'auth.oauthRedirectPath';
 type CallbackStatus = 'processing' | 'failed';
 
-function getDestination(nextParam: string | null): string {
-    if (!nextParam || !nextParam.startsWith('/')) {
-        return '/';
+function getSavedOAuthRedirectPath(): string | null {
+    const savedPath = sessionStorage.getItem(OAUTH_REDIRECT_PATH_KEY);
+    sessionStorage.removeItem(OAUTH_REDIRECT_PATH_KEY);
+
+    if (!savedPath || !savedPath.startsWith('/')) {
+        return null;
     }
-    return nextParam;
+    return savedPath;
+}
+
+function getDestination(nextParam: string | null): string {
+    if (nextParam?.startsWith('/')) {
+        return nextParam;
+    }
+    return getSavedOAuthRedirectPath() ?? '/';
 }
 
 function getOAuthErrorMessage(errorParam: string): string {
@@ -27,7 +38,7 @@ export function GoogleOAuthCallbackPage(): JSX.Element {
 
     const code = searchParams.get('code');
     const errorParam = searchParams.get('error');
-    const destination = getDestination(searchParams.get('next'));
+    const [destination] = useState(() => getDestination(searchParams.get('next')));
 
     useEffect(() => {
         if (errorParam) {
@@ -69,7 +80,7 @@ export function GoogleOAuthCallbackPage(): JSX.Element {
                         to="/login"
                         className="mt-6 inline-flex rounded-full bg-brand-dark px-5 py-3 text-sm font-semibold text-white"
                     >
-                        Back to Home
+                        Back to login
                     </Link>
                 </div>
             ) : (
