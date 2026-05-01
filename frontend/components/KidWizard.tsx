@@ -109,11 +109,11 @@ function getWizardStepContainerClassName(stepState: WizardStepState): string {
 
 function getWizardStepBadgeClassName(stepState: WizardStepState): string {
   if (stepState === 'active') {
-    return 'w-10 h-10 rounded-full flex items-center justify-center text-lg mb-1 transition-all duration-300 bg-purple-600 text-white shadow-lg ring-4 ring-purple-200';
+    return 'w-10 h-10 rounded-full flex items-center justify-center text-lg mb-1 transition-all duration-300 bg-yellow-500 text-white shadow-lg ring-4 ring-yellow-200';
   }
 
   if (stepState === 'complete') {
-    return 'w-10 h-10 rounded-full flex items-center justify-center text-lg mb-1 transition-all duration-300 bg-yellow-400 text-purple-900';
+    return 'w-10 h-10 rounded-full flex items-center justify-center text-lg mb-1 transition-all duration-300 bg-yellow-400 text-yellow-900';
   }
 
   return 'w-10 h-10 rounded-full flex items-center justify-center text-lg mb-1 transition-all duration-300 bg-gray-100 text-gray-400';
@@ -121,7 +121,7 @@ function getWizardStepBadgeClassName(stepState: WizardStepState): string {
 
 function getWizardStepLabelClassName(stepState: WizardStepState): string {
   if (stepState === 'active') {
-    return 'text-xs font-bold uppercase tracking-wide transition-colors text-purple-600';
+    return 'text-xs font-bold uppercase tracking-wide transition-colors text-yellow-700';
   }
 
   if (stepState === 'complete') {
@@ -313,7 +313,7 @@ function ArchetypeStepSection({
       <div className="grid grid-cols-2 gap-4">
         {ARCHETYPES.map((archetype) => {
           const isSelected = profile.archetype === archetype.label;
-          const iconColor = isSelected ? '#9D6BCF' : '#7D6391';
+          const iconColor = isSelected ? '#F2C94C' : '#A27400';
 
           return (
             <button
@@ -409,12 +409,12 @@ function WizardFooter({
   const isLastStep = step === totalSteps;
 
   return (
-    <div className="flex justify-between items-center mt-auto pt-8 border-t border-purple-50">
+    <div className="flex justify-between items-center mt-auto pt-8 border-t border-yellow-50">
       {step > 1 ? (
         <button
           type="button"
           onClick={onPreviousStep}
-          className="flex items-center gap-2 px-6 py-3 font-black text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-xl uppercase tracking-widest text-sm transition-all"
+          className="flex items-center gap-2 px-6 py-3 font-black text-yellow-700 hover:text-yellow-800 hover:bg-yellow-50 rounded-xl uppercase tracking-widest text-sm transition-all"
         >
           <span className="text-lg">←</span> {t('kidWizard.back')}
         </button>
@@ -423,7 +423,7 @@ function WizardFooter({
       <button
         type="button"
         onClick={onContinue}
-        className="flex items-center gap-2 px-8 py-4 font-black rounded-2xl shadow-lg transition-all bg-yellow-400 text-purple-900 hover:-translate-y-1 hover:shadow-xl"
+        className="flex items-center gap-2 px-8 py-4 font-black rounded-2xl shadow-lg transition-all bg-yellow-400 text-yellow-900 hover:-translate-y-1 hover:shadow-xl"
       >
         {isLastStep ? <>{t('kidWizard.createStory')}</> : <>{t('kidWizard.continue')} <span className="text-lg">→</span></>}
       </button>
@@ -489,14 +489,14 @@ function KidWizard({
   return (
     <div className="max-w-3xl mx-auto px-4">
       <div className="mb-4">
-        <div className="h-2 bg-purple-100 rounded-full overflow-hidden">
+        <div className="h-2 bg-yellow-100 rounded-full overflow-hidden">
           <div className="h-full bg-yellow-400 transition-all duration-500" style={{ width: progressWidth }} />
         </div>
       </div>
 
       <WizardProgress currentStep={step} steps={STEP_LABELS} />
 
-      <div className="bg-white rounded-[2rem] shadow-xl border-2 border-purple-900/5 p-8 md:p-12 min-h-[500px] flex flex-col">
+      <div className="bg-white rounded-[2rem] shadow-xl border-2 border-yellow-900/10 p-8 md:p-12 min-h-[500px] flex flex-col">
         {renderCurrentStepContent()}
 
         <WizardFooter
