@@ -118,9 +118,7 @@ async def test_resolve_google_login_rejects_existing_local_email_conflict(db):
 async def test_resolve_google_login_creates_new_oauth_user_when_identity_is_new(db):
     user = await resolve_google_login(db, make_google_userinfo())
 
-    linked_user = await (
-        await db.execute("SELECT * FROM users WHERE id = ?", (user["id"],))
-    ).fetchone()
+    linked_user = await (await db.execute("SELECT * FROM users WHERE id = ?", (user["id"],))).fetchone()
     oauth_row = await (
         await db.execute(
             """
