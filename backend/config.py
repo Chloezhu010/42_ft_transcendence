@@ -17,16 +17,17 @@ class Config:
 
     # Required
     gemini_api_key: str
-    secret_key: str # For signing JWTs, separate from session secret
-    session_secret_key: str # For signing session cookies, separate from JWT secret
-    google_client_id: str # credentials from google cloud console for OAuth
-    google_client_secret: str # credentials from google cloud console for OAuth
+    secret_key: str  # For signing JWTs, separate from session secret
+    session_secret_key: str  # For signing session cookies, separate from JWT secret
+    google_client_id: str  # credentials from google cloud console for OAuth
+    google_client_secret: str  # credentials from google cloud console for OAuth
 
     # Optional with defaults
     db_path: str = "wondercomic.db"
     frontend_url: str = "http://localhost:3000"
-    google_redirect_uri: str = "http://localhost:8000/api/auth/google/callback" # the exact callback URL google redirects the user back to after login
-    session_cookie_secure: bool = False # a boolean flag passed to SessionMiddleware
+    # must match the URI registered in Google Cloud Console exactly
+    google_redirect_uri: str = "http://localhost:8000/api/auth/google/callback"
+    session_cookie_secure: bool = False  # a boolean flag passed to SessionMiddleware
     debug_mode: bool = False
 
 
@@ -80,9 +81,7 @@ def validate_environment() -> Config:
         google_client_secret=google_client_secret,
         db_path=get_env_or_default("DB_PATH", "wondercomic.db"),
         frontend_url=get_env_or_default("FRONTEND_URL", "http://localhost:3000"),
-        google_redirect_uri=get_env_or_default(
-            "GOOGLE_REDIRECT_URI", "http://localhost:8000/api/auth/google/callback"
-        ),
+        google_redirect_uri=get_env_or_default("GOOGLE_REDIRECT_URI", "http://localhost:8000/api/auth/google/callback"),
         session_cookie_secure=os.getenv("SESSION_COOKIE_SECURE", "").lower() in ("true", "1", "yes"),
         debug_mode=os.getenv("DEBUG", "").lower() in ("true", "1", "yes"),
     )

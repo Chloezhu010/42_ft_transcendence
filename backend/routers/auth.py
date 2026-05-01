@@ -17,24 +17,23 @@ from db.crud_users import (
     get_user_by_username,
     set_online_status,
 )
-
 from db.database import get_db
-from services.oauth.client import get_google_oauth_client
-from services.oauth.account_linking import resolve_google_login
-from services.oauth.result_store import (
-    consume_oauth_result_code,
-    issue_oauth_result_code,
-)
-
 from models import (
     LoginRequest,
     OauthExchangeRequest,
     SignupRequest,
     TokenResponse,
 )
+from services.oauth.account_linking import resolve_google_login
+from services.oauth.client import get_google_oauth_client
+from services.oauth.result_store import (
+    consume_oauth_result_code,
+    issue_oauth_result_code,
+)
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 config = get_config()
+
 
 @router.post("/signup", response_model=TokenResponse)
 async def signup(body: SignupRequest, db=Depends(get_db)):
@@ -76,12 +75,14 @@ async def logout(current_user=Depends(get_current_user), db=Depends(get_db)):
     await set_online_status(db, current_user["id"], False)
     return {"message": "Logged out successfully"}
 
+
 @router.get("/oauth/google/start")
 async def start_google_oauth(request: Request):
     """Start Google OAuth flow by redirecting to provider's auth page."""
     google_client = get_google_oauth_client()
     redirect_uri = config.google_redirect_uri
     return await google_client.authorize_redirect(request, redirect_uri)
+
 
 @router.get("/oauth/google/callback")
 async def google_callback(request: Request, db=Depends(get_db)):
@@ -102,6 +103,7 @@ async def google_callback(request: Request, db=Depends(get_db)):
         else:
             raise
     return RedirectResponse(redirect_url)
+
 
 @router.post("/oauth/exchange", response_model=TokenResponse)
 async def oauth_exchange(body: OauthExchangeRequest, db=Depends(get_db)):
