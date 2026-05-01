@@ -9,7 +9,8 @@
         "library": "图书馆",
         "privacy": "隐私政策",
         "terms": "服务条款",
-        "repository": "仓库"
+        "repository": "仓库",
+        "status": "状态"
       }
     }
   },
@@ -301,10 +302,43 @@
     "links": {
       "privacy": "隐私",
       "terms": "条款",
-      "repository": "仓库"
+      "repository": "仓库",
+      "status": "状态"
     },
     "madeFor": "为小小梦想家而作",
     "copyright": "© 2026 Funova"
+  },
+  "statusPage": {
+    "title": "系统状态",
+    "loading": "加载中…",
+    "loadingAria": "正在加载系统状态",
+    "health": {
+      "title": "健康检查",
+      "healthy": "正常",
+      "unhealthy": "异常",
+      "checks": {
+        "database": "数据库"
+      },
+      "results": {
+        "ok": "正常",
+        "unavailable": "不可用"
+      }
+    },
+    "backups": {
+      "title": "备份",
+      "snapshotCount_zero": "暂无备份快照",
+      "snapshotCount_other": "共有 {{count}} 个备份快照",
+      "lastBackup": "最近备份：",
+      "empty": "还没有可用备份。",
+      "actions": {
+        "backUpNow": "立即备份",
+        "backingUp": "备份中…"
+      }
+    },
+    "errors": {
+      "loadFailed": "加载系统状态失败",
+      "triggerFailed": "触发备份失败"
+    }
   },
   "legal": {
     "backToHome": "← 返回首页",

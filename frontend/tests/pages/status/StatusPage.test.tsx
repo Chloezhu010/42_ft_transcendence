@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -26,6 +26,46 @@ vi.mock('@api', () => ({
 vi.mock('@/app/auth/useAuth', () => ({
   useAuth: mockUseAuth,
 }));
+
+interface TranslationOptions {
+  count?: number;
+  defaultValue?: string;
+}
+
+vi.mock('react-i18next', () => {
+  const t = (key: string, options?: TranslationOptions): string => {
+    const translations: Record<string, string> = {
+      'statusPage.title': 'System Status',
+      'statusPage.loading': 'Loading…',
+      'statusPage.loadingAria': 'Loading status',
+      'statusPage.health.title': 'Health',
+      'statusPage.health.healthy': 'Healthy',
+      'statusPage.health.unhealthy': 'Unhealthy',
+      'statusPage.health.checks.database': 'Database',
+      'statusPage.health.results.ok': 'ok',
+      'statusPage.health.results.unavailable': 'unavailable',
+      'statusPage.backups.title': 'Backups',
+      'statusPage.backups.lastBackup': 'Last backup:',
+      'statusPage.backups.empty': 'No backups available yet.',
+      'statusPage.backups.actions.backUpNow': 'Back up now',
+      'statusPage.backups.actions.backingUp': 'Backing up…',
+      'statusPage.errors.loadFailed': 'Failed to load status',
+      'statusPage.errors.triggerFailed': 'Failed to trigger backup',
+    };
+
+    if (key === 'statusPage.backups.snapshotCount') {
+      const count = options?.count ?? 0;
+      const snapshotLabel = count === 1 ? 'snapshot' : 'snapshots';
+      return `${count} ${snapshotLabel} available`;
+    }
+
+    return translations[key] ?? options?.defaultValue ?? key;
+  };
+
+  return {
+    useTranslation: () => ({ t }),
+  };
+});
 
 const HEALTHY_STATUS = {
   status: 'healthy' as const,
@@ -243,7 +283,9 @@ describe('StatusPage', () => {
         expect(screen.getByRole('button', { name: /backing up/i })).toBeDisabled();
       });
 
-      resolveBackup!(TRIGGER_BACKUP_STATUS);
+      await act(async () => {
+        resolveBackup!(TRIGGER_BACKUP_STATUS);
+      });
     });
   });
 
