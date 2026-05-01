@@ -9,7 +9,8 @@
         "library": "Library",
         "privacy": "Privacy Policy",
         "terms": "Terms of Service",
-        "repository": "Repository"
+        "repository": "Repository",
+        "status": "Status"
       }
     }
   },
@@ -408,10 +409,44 @@
     "links": {
       "privacy": "Privacy",
       "terms": "Terms",
-      "repository": "Repository"
+      "repository": "Repository",
+      "status": "Status"
     },
     "madeFor": "Made for little dreamers",
     "copyright": "© 2026 Funova"
+  },
+  "statusPage": {
+    "title": "System Status",
+    "loading": "Loading…",
+    "loadingAria": "Loading status",
+    "health": {
+      "title": "Health",
+      "healthy": "Healthy",
+      "unhealthy": "Unhealthy",
+      "checks": {
+        "database": "Database"
+      },
+      "results": {
+        "ok": "ok",
+        "unavailable": "unavailable"
+      }
+    },
+    "backups": {
+      "title": "Backups",
+      "snapshotCount_zero": "No snapshots available",
+      "snapshotCount_one": "{{count}} snapshot available",
+      "snapshotCount_other": "{{count}} snapshots available",
+      "lastBackup": "Last backup:",
+      "empty": "No backups available yet.",
+      "actions": {
+        "backUpNow": "Back up now",
+        "backingUp": "Backing up…"
+      }
+    },
+    "errors": {
+      "loadFailed": "Failed to load status",
+      "triggerFailed": "Failed to trigger backup"
+    }
   },
   "legal": {
     "backToHome": "← Back to Home",
