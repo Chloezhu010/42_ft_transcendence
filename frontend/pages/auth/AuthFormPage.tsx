@@ -1,11 +1,17 @@
+/**
+ * Shared shell for LoginPage and SignupPage. Owns the cross-cutting concerns:
+ * AuthFormPage owns the title, error alert, submit button, and footer chrome.
+ */
 import { useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import type { UserResponse } from '@api';
+import { startGoogleOAuth } from '@api';
 import { SketchyButton } from '@/components/design-system/Primitives';
 
+const OAUTH_REDIRECT_PATH_KEY = 'auth.oauthRedirectPath';
 interface AuthFormPageProps {
     currentUser: UserResponse | null;
     footerLinkLabel: string;
@@ -17,6 +23,10 @@ interface AuthFormPageProps {
     submittingLabel: string;
     title: string;
     onSubmit: () => Promise<void>;
+}
+
+function saveOAuthRedirectPath(path: string): void {
+    sessionStorage.setItem(OAUTH_REDIRECT_PATH_KEY, path);
 }
 
 export function AuthFormPage({
@@ -58,6 +68,11 @@ export function AuthFormPage({
         }
     }
 
+    function handleGoogleSignIn(): void {
+        saveOAuthRedirectPath(redirectPath);
+        startGoogleOAuth();
+    }
+
     if (isLoadingSession) {
         return (
             <div className="flex flex-1 items-center justify-center">
@@ -86,6 +101,20 @@ export function AuthFormPage({
                     )}
                     <SketchyButton type="submit" disabled={isSubmitting} className="mt-6 w-full">
                         {isSubmitting ? submittingLabel : submitLabel}
+                    </SketchyButton>
+                    <div className="mt-6 flex items-center gap-3 text-xs uppercase tracking-wide text-brand-muted">
+                        <span className="h-px flex-1 bg-brand-muted/30" />
+                        <span>or</span>
+                        <span className="h-px flex-1 bg-brand-muted/30" />
+                    </div>
+                    <SketchyButton
+                        type="button"
+                        variant="outline"
+                        disabled={isSubmitting}
+                        onClick={handleGoogleSignIn}
+                        className="mt-6 w-full"
+                    >
+                        Continue with Google
                     </SketchyButton>
                 </form>
                 <p className="mt-6 text-center text-sm text-brand-muted">
