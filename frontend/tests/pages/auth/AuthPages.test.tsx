@@ -73,6 +73,7 @@ function buildAuthValue() {
 describe('auth pages', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    sessionStorage.clear();
     mockUseAuth.mockReturnValue(buildAuthValue());
   });
 
@@ -125,6 +126,26 @@ describe('auth pages', () => {
 
     expect(mockStartGoogleOAuth).toHaveBeenCalledTimes(1);
     expect(sessionStorage.getItem('auth.oauthRedirectPath')).toBe('/');
+  });
+
+  it('preserves the protected-route redirect (location.state.from) when starting Google OAuth', () => {
+    render(
+      <MemoryRouter
+        initialEntries={[
+          {
+            pathname: '/login',
+            state: { from: { pathname: '/create', search: '', hash: '' } },
+          },
+        ]}
+      >
+        <LoginPage />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /continue with google/i }));
+
+    expect(mockStartGoogleOAuth).toHaveBeenCalledTimes(1);
+    expect(sessionStorage.getItem('auth.oauthRedirectPath')).toBe('/create');
   });
 
   it('navigates home after signup succeeds', async () => {

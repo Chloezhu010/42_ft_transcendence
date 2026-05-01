@@ -1,22 +1,28 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/app/auth';
 
 const OAUTH_REDIRECT_PATH_KEY = 'auth.oauthRedirectPath';
 type CallbackStatus = 'processing' | 'failed';
 
+function isSafeInternalPath(path: string | null | undefined): path is string {
+    if (!path) return false;
+    if (!path.startsWith('/')) return false;
+    // Reject protocol-relative ("//host") and backslash variants ("/\\host"),
+    // which browsers resolve to external origins.
+    if (path.startsWith('//') || path.startsWith('/\\')) return false;
+    return true;
+}
+
 function getSavedOAuthRedirectPath(): string | null {
     const savedPath = sessionStorage.getItem(OAUTH_REDIRECT_PATH_KEY);
     sessionStorage.removeItem(OAUTH_REDIRECT_PATH_KEY);
 
-    if (!savedPath || !savedPath.startsWith('/')) {
-        return null;
-    }
-    return savedPath;
+    return isSafeInternalPath(savedPath) ? savedPath : null;
 }
 
 function getDestination(nextParam: string | null): string {
-    if (nextParam?.startsWith('/')) {
+    if (isSafeInternalPath(nextParam)) {
         return nextParam;
     }
     return getSavedOAuthRedirectPath() ?? '/';
@@ -35,6 +41,7 @@ export function GoogleOAuthCallbackPage(): JSX.Element {
     const [searchParams] = useSearchParams();
     const [status, setStatus] = useState<CallbackStatus>('processing');
     const [error, setError] = useState<string | null>(null);
+    const exchangeStarted = useRef(false);
 
     const code = searchParams.get('code');
     const errorParam = searchParams.get('error');
@@ -51,6 +58,10 @@ export function GoogleOAuthCallbackPage(): JSX.Element {
             setError('No authorization code found. Please try signing in with Google again.');
             return;
         }
+        // Guard against StrictMode double-invocation and stale re-runs: the backend
+        // issues one-time OAuth codes, so a second exchange call would always fail.
+        if (exchangeStarted.current) return;
+        exchangeStarted.current = true;
 
         completeGoogleOAuth(code)
             .then(() => navigate(destination, { replace: true }))

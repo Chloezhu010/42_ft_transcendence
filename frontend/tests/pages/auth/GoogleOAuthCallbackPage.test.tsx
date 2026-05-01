@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 import { render, screen, waitFor } from '@testing-library/react';
+import { StrictMode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -29,6 +30,7 @@ function renderCallback(search: string): void {
 describe('GoogleOAuthCallbackPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    sessionStorage.clear();
     mockUseAuth.mockReturnValue({ completeGoogleOAuth: mockCompleteGoogleOAuth });
   });
 
@@ -99,6 +101,53 @@ describe('GoogleOAuthCallbackPage', () => {
     });
 
     expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('navigates to the saved redirect path (with query + hash) and clears it from sessionStorage', async () => {
+    sessionStorage.setItem('auth.oauthRedirectPath', '/create?x=1#top');
+    mockCompleteGoogleOAuth.mockResolvedValue(undefined);
+
+    renderCallback('?code=abc');
+
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith('/create?x=1#top', { replace: true });
+    });
+
+    expect(sessionStorage.getItem('auth.oauthRedirectPath')).toBeNull();
+  });
+
+  it('falls back to / when next is a protocol-relative URL (open-redirect guard)', async () => {
+    mockCompleteGoogleOAuth.mockResolvedValue(undefined);
+
+    renderCallback('?code=abc&next=%2F%2Fevil.example');
+
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true });
+    });
+
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      expect.stringContaining('evil.example'),
+      expect.anything(),
+    );
+  });
+
+  it('calls completeGoogleOAuth exactly once under React StrictMode (one-time code guard)', async () => {
+    mockCompleteGoogleOAuth.mockResolvedValue(undefined);
+
+    render(
+      <StrictMode>
+        <MemoryRouter initialEntries={['/auth/callback?code=strict-code']}>
+          <GoogleOAuthCallbackPage />
+        </MemoryRouter>
+      </StrictMode>,
+    );
+
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true });
+    });
+
+    expect(mockCompleteGoogleOAuth).toHaveBeenCalledTimes(1);
+    expect(mockCompleteGoogleOAuth).toHaveBeenCalledWith('strict-code');
   });
 
   it('shows a specific message for link conflict errors from the backend redirect', async () => {

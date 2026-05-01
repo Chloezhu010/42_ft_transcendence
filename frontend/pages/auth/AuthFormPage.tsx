@@ -51,6 +51,7 @@ export function AuthFormPage({
         ? `${redirectTo.pathname ?? '/'}${redirectTo.search ?? ''}${redirectTo.hash ?? ''}`
         : '/';
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isOAuthStarting, setIsOAuthStarting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
@@ -69,6 +70,7 @@ export function AuthFormPage({
     }
 
     function handleGoogleSignIn(): void {
+        setIsOAuthStarting(true);
         saveOAuthRedirectPath(redirectPath);
         startGoogleOAuth();
     }
@@ -110,11 +112,11 @@ export function AuthFormPage({
                     <SketchyButton
                         type="button"
                         variant="outline"
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || isOAuthStarting}
                         onClick={handleGoogleSignIn}
                         className="mt-6 w-full"
                     >
-                        Continue with Google
+                        {isOAuthStarting ? 'Redirecting to Google…' : 'Continue with Google'}
                     </SketchyButton>
                 </form>
                 <p className="mt-6 text-center text-sm text-brand-muted">
