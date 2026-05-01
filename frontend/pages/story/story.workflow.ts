@@ -91,7 +91,7 @@ async function buildPreviewStory(
   script: Awaited<ReturnType<typeof streamStoryScript>>,
 ): Promise<Story> {
   if (!script.panels.length) {
-    throw new Error('Story generation failed: no panels returned.');
+    throw new Error(i18n.t('story.errors.noPanels'));
   }
 
   const lastPanelIndex = script.panels.length - 1;
@@ -195,7 +195,7 @@ export async function generateFullStoryState(accessToken: string, pendingGenerat
   const panelImagePromises = previewStory.panels.map(async (panel, index) => {
     if (index === 0 || index === lastPanelIndex) {
       if (!panel.imageUrl) {
-        throw new Error('Preview images are missing. Please regenerate the preview.');
+        throw new Error(i18n.t('story.errors.previewImagesMissing'));
       }
 
       return imageSourceToPureBase64(panel.imageUrl);

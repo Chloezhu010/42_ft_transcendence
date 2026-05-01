@@ -97,10 +97,13 @@ function isConflictError(error: unknown): boolean {
     && error.status === 409;
 }
 
-export function getSendRequestErrorMessage(error: unknown): string {
+export function getSendRequestErrorMessage(
+  error: unknown,
+  t: (key: string) => string,
+): string {
   if (isConflictError(error)) {
-    return 'Friend request already exists.';
+    return t('friends.notifications.requestExists');
   }
 
-  return 'Could not send friend request.';
+  return t('friends.notifications.requestFailed');
 }

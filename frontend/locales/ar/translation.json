@@ -30,11 +30,28 @@
     "readNow": "اقرأ الآن",
     "untitledMasterpiece": "تحفة فنية بدون عنوان",
     "deleteStory": "هل أنت متأكد أنك تريد حذف هذه القصة؟ لا يمكن التراجع عن هذا.",
+    "notifications": {
+      "storyDeleted": "تم حذف القصة.",
+      "deleteFailed": "تعذر حذف القصة.",
+      "sharedWithFriends": "تمت مشاركة القصة مع الأصدقاء.",
+      "setPrivate": "تم تعيين القصة كخاصة.",
+      "shareFailed": "تعذر تحديث مشاركة القصة."
+    },
     "sharing": {
       "label": "المشاركة",
       "private": "خاص",
       "friends": "الأصدقاء"
     }
+  },
+  "friendLibrary": {
+    "sharedLibrary": "المكتبة المشتركة",
+    "backToFriends": "العودة إلى الأصدقاء",
+    "backToFriendsArrow": "<- العودة إلى الأصدقاء",
+    "title": "المكتبة المشتركة لـ {{name}}",
+    "fallbackName": "صديق",
+    "description": "تصفح القصص المصورة التي اختار هذا الصديق مشاركتها مع الأصدقاء المقبولين.",
+    "empty": "لا توجد قصص مصورة مشتركة بعد.",
+    "readShared": "اقرأ القصة المصورة المشتركة"
   },
   "friends": {
     "title": "الأصدقاء",
@@ -73,6 +90,17 @@
     "badges": {
       "alreadyFriends": "أصدقاء",
       "respondPending": "الرد في قسم المعلّقة"
+    },
+    "notifications": {
+      "requestSent": "تم إرسال طلب الصداقة.",
+      "requestAccepted": "تم قبول طلب الصداقة.",
+      "requestDeclined": "تم رفض طلب الصداقة.",
+      "friendRemoved": "تمت إزالة الصديق.",
+      "requestAcceptFailed": "تعذر قبول طلب الصداقة.",
+      "requestDeclineFailed": "تعذر رفض طلب الصداقة.",
+      "friendRemoveFailed": "تعذر إزالة الصديق.",
+      "requestExists": "طلب الصداقة موجود بالفعل.",
+      "requestFailed": "تعذر إرسال طلب الصداقة."
     },
     "panels": {
       "friends": {
@@ -215,6 +243,20 @@
       "reread": "اقرأ القصة مرة اخرى",
       "backToLibrary": "العودة الى المكتبة",
       "storyCompleteBodyShared": "جاهزة للاستمتاع بها في هذه المكتبة المشتركة في اي وقت."
+    },
+    "notifications": {
+      "previewCreated": "تم إنشاء مسودة القصة.",
+      "storyUpdated": "تم تحديث القصة.",
+      "panelImageUpdated": "تم تحديث صورة اللوحة.",
+      "panelImageUpdateFailed": "تعذر تحديث صورة اللوحة."
+    },
+    "errors": {
+      "loadFailed": "تعذر تحميل القصة.",
+      "invalidStoryId": "معرّف القصة غير صالح.",
+      "previewExpired": "انتهت صلاحية المعاينة. يرجى إعادة الإنشاء.",
+      "generationFailed": "فشل توليد القصة.",
+      "noPanels": "فشل توليد القصة: لم يتم إرجاع أي لوحات.",
+      "previewImagesMissing": "صور المعاينة مفقودة. يرجى إعادة توليد المعاينة."
     }
   },
   "auth": {

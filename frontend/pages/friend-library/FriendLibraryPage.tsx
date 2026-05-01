@@ -25,13 +25,13 @@ export function FriendLibraryPage(): JSX.Element {
     return (
       <div className="max-w-3xl mx-auto py-12">
         <div className="rounded-[2rem] border-2 border-red-200 bg-white p-8 shadow-xl">
-          <h1 className="text-3xl font-black text-gray-800">Shared Library</h1>
+          <h1 className="text-3xl font-black text-gray-800">{t('friendLibrary.sharedLibrary')}</h1>
           <p className="mt-4 text-base font-medium text-red-600">{errorMessage}</p>
           <Link
             to="/friends"
             className="inline-flex mt-6 rounded-full border border-brand-primary/20 px-5 py-3 text-sm font-semibold text-brand-primary transition-colors hover:bg-brand-light"
           >
-            Back to Friends
+            {t('friendLibrary.backToFriends')}
           </Link>
         </div>
       </div>
@@ -43,18 +43,20 @@ export function FriendLibraryPage(): JSX.Element {
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         <div>
           <Link to="/friends" className="text-sm font-bold text-brand-muted hover:text-brand-primary transition-colors">
-            ← Back to Friends
+            {t('friendLibrary.backToFriendsArrow')}
           </Link>
-          <h1 className="mt-3 text-4xl font-black text-gray-800">{friend?.username}&apos;s Shared Library</h1>
+          <h1 className="mt-3 text-4xl font-black text-gray-800">
+            {t('friendLibrary.title', { name: friend?.username ?? t('friendLibrary.fallbackName') })}
+          </h1>
           <p className="mt-2 text-sm font-medium text-gray-500">
-            Browse the comics this friend chose to share with accepted friends.
+            {t('friendLibrary.description')}
           </p>
         </div>
       </div>
 
       {stories.length === 0 ? (
         <div className="rounded-[2rem] border-2 border-dashed border-gray-200 bg-white px-6 py-16 text-center text-gray-400 shadow-sm">
-          <p className="text-xl font-medium italic">No shared comics yet.</p>
+          <p className="text-xl font-medium italic">{t('friendLibrary.empty')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
@@ -86,7 +88,7 @@ export function FriendLibraryPage(): JSX.Element {
                   to={`/friends/${friendUserId}/library/${story.id}`}
                   className="inline-flex w-full items-center justify-center rounded-full bg-brand-primary px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-brand-dark"
                 >
-                  Read Shared Comic
+                  {t('friendLibrary.readShared')}
                 </Link>
               </div>
             </div>

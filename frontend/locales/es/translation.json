@@ -30,11 +30,28 @@
     "readNow": "LEER AHORA",
     "untitledMasterpiece": "Obra Maestra sin Título",
     "deleteStory": "¿Está seguro de que desea eliminar esta historia? Esto no se puede deshacer.",
+    "notifications": {
+      "storyDeleted": "Historia eliminada.",
+      "deleteFailed": "No se pudo eliminar la historia.",
+      "sharedWithFriends": "Historia compartida con amigos.",
+      "setPrivate": "Historia marcada como privada.",
+      "shareFailed": "No se pudo actualizar el uso compartido de la historia."
+    },
     "sharing": {
       "label": "Compartir",
       "private": "Privado",
       "friends": "Amigos"
     }
+  },
+  "friendLibrary": {
+    "sharedLibrary": "Biblioteca compartida",
+    "backToFriends": "Volver a Amigos",
+    "backToFriendsArrow": "<- Volver a Amigos",
+    "title": "Biblioteca compartida de {{name}}",
+    "fallbackName": "Amigo",
+    "description": "Explora los cómics que este amigo eligió compartir con sus amigos aceptados.",
+    "empty": "Aún no hay cómics compartidos.",
+    "readShared": "Leer cómic compartido"
   },
   "friends": {
     "title": "Amigos",
@@ -73,6 +90,17 @@
     "badges": {
       "alreadyFriends": "Amigos",
       "respondPending": "Responde en Pendientes"
+    },
+    "notifications": {
+      "requestSent": "Solicitud de amistad enviada.",
+      "requestAccepted": "Solicitud de amistad aceptada.",
+      "requestDeclined": "Solicitud de amistad rechazada.",
+      "friendRemoved": "Amigo eliminado.",
+      "requestAcceptFailed": "No se pudo aceptar la solicitud de amistad.",
+      "requestDeclineFailed": "No se pudo rechazar la solicitud de amistad.",
+      "friendRemoveFailed": "No se pudo eliminar al amigo.",
+      "requestExists": "La solicitud de amistad ya existe.",
+      "requestFailed": "No se pudo enviar la solicitud de amistad."
     },
     "panels": {
       "friends": {
@@ -215,6 +243,20 @@
       "reread": "Releer historia",
       "backToLibrary": "Volver a la biblioteca",
       "storyCompleteBodyShared": "esta lista para disfrutarse cuando quieras en esta biblioteca compartida."
+    },
+    "notifications": {
+      "previewCreated": "Borrador de historia creado.",
+      "storyUpdated": "Historia actualizada.",
+      "panelImageUpdated": "Imagen del panel actualizada.",
+      "panelImageUpdateFailed": "No se pudo actualizar la imagen del panel."
+    },
+    "errors": {
+      "loadFailed": "No se pudo cargar la historia.",
+      "invalidStoryId": "ID de historia no válido.",
+      "previewExpired": "La vista previa ha expirado. Por favor, genera de nuevo.",
+      "generationFailed": "La generación de la historia falló.",
+      "noPanels": "La generación de la historia falló: no se devolvieron paneles.",
+      "previewImagesMissing": "Faltan las imágenes de vista previa. Por favor, vuelve a generar la vista previa."
     }
   },
   "auth": {

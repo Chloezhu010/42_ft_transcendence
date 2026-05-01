@@ -30,11 +30,28 @@
     "readNow": "现在阅读",
     "untitledMasterpiece": "无标题杰作",
     "deleteStory": "您确定要删除此故事吗？这将无法撤消。",
+    "notifications": {
+      "storyDeleted": "故事已删除。",
+      "deleteFailed": "无法删除故事。",
+      "sharedWithFriends": "故事已与好友共享。",
+      "setPrivate": "故事已设为私密。",
+      "shareFailed": "无法更新故事分享设置。"
+    },
     "sharing": {
       "label": "分享",
       "private": "私密",
       "friends": "好友"
     }
+  },
+  "friendLibrary": {
+    "sharedLibrary": "共享图书馆",
+    "backToFriends": "返回好友",
+    "backToFriendsArrow": "<- 返回好友",
+    "title": "{{name}}的共享图书馆",
+    "fallbackName": "好友",
+    "description": "浏览此好友选择与已接受好友分享的漫画。",
+    "empty": "还没有共享的漫画。",
+    "readShared": "阅读共享漫画"
   },
   "friends": {
     "title": "好友",
@@ -73,6 +90,17 @@
     "badges": {
       "alreadyFriends": "好友",
       "respondPending": "在待处理中回应"
+    },
+    "notifications": {
+      "requestSent": "已发送好友请求。",
+      "requestAccepted": "已接受好友请求。",
+      "requestDeclined": "已拒绝好友请求。",
+      "friendRemoved": "已移除好友。",
+      "requestAcceptFailed": "无法接受好友请求。",
+      "requestDeclineFailed": "无法拒绝好友请求。",
+      "friendRemoveFailed": "无法移除好友。",
+      "requestExists": "好友请求已存在。",
+      "requestFailed": "无法发送好友请求。"
     },
     "panels": {
       "friends": {
@@ -215,6 +243,20 @@
       "reread": "再读一遍",
       "backToLibrary": "返回图书馆",
       "storyCompleteBodyShared": "已经准备好在这个共享图书馆中随时享受。"
+    },
+    "notifications": {
+      "previewCreated": "已创建故事草稿。",
+      "storyUpdated": "故事已更新。",
+      "panelImageUpdated": "分镜图像已更新。",
+      "panelImageUpdateFailed": "无法更新分镜图像。"
+    },
+    "errors": {
+      "loadFailed": "无法加载故事。",
+      "invalidStoryId": "故事ID无效。",
+      "previewExpired": "预览已过期，请重新生成。",
+      "generationFailed": "故事生成失败。",
+      "noPanels": "故事生成失败：未返回分镜。",
+      "previewImagesMissing": "预览图像缺失，请重新生成预览。"
     }
   },
   "auth": {
