@@ -51,9 +51,10 @@ export function useGalleryPage(): UseGalleryPageResult {
     try {
       await deleteStory(accessToken, storyId);
       setStories((previousStories) => previousStories.filter((story) => story.id !== storyId));
+      toast.success(t('galleryPage.notifications.storyDeleted'));
     } catch (error) {
       console.error('Failed to delete story:', error);
-      toast.error('Failed to delete story.');
+      toast.error(t('galleryPage.notifications.deleteFailed'));
     }
   }, [accessToken, t]);
 
@@ -74,12 +75,16 @@ export function useGalleryPage(): UseGalleryPageResult {
       setStories((currentStories) => currentStories.map((story) => (
         story.id === storyId ? { ...story, visibility: updatedStory.visibility } : story
       )));
+      const successMessage = visibility === 'shared_with_friends'
+        ? t('galleryPage.notifications.sharedWithFriends')
+        : t('galleryPage.notifications.setPrivate');
+      toast.success(successMessage);
     } catch (error) {
       console.error('Failed to update story visibility:', error);
       setStories((currentStories) => currentStories.map((story) => (
         story.id === storyId ? { ...story, visibility: previousStory.visibility } : story
       )));
-      toast.error('Failed to update story sharing.');
+      toast.error(t('galleryPage.notifications.shareFailed'));
     }
   }, [accessToken, stories]);
 

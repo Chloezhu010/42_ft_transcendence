@@ -5,6 +5,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { FriendsPage } from '@/pages/friends';
 
+const translations: Record<string, string> = {
+  'friends.tabs.friends': 'Friends',
+  'friends.tabs.pending': 'Pending',
+  'friends.tabs.discover': 'Discover',
+  'friends.panels.discover.searchLabel': 'Search users',
+  'friends.buttons.viewLibrary': 'View Library',
+  'friends.buttons.addFriend': 'Add Friend',
+  'friends.buttons.requestSent': 'Request Sent',
+  'friends.badges.respondPending': 'Respond in Pending',
+};
+
 const {
   mockUseAuth,
   mockGetFriends,
@@ -23,6 +34,12 @@ const {
 
 vi.mock('@/app/auth', () => ({
   useAuth: mockUseAuth,
+}));
+
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => translations[key] ?? key,
+  }),
 }));
 
 vi.mock('@api', () => ({

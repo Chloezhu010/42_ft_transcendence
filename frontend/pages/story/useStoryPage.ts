@@ -6,6 +6,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useAuth } from '@/app/auth';
 import type { ComicPanelData, KidProfile, Story } from '@/types';
@@ -52,6 +53,7 @@ interface UseStoryPageResult {
 }
 
 export function useStoryPage(): UseStoryPageResult {
+  const { t } = useTranslation();
   const { id: rawStoryId, userId: rawOwnerUserId } = useParams<{ id?: string; userId?: string }>();
   const navigate = useNavigate();
   const { accessToken } = useAuth();
@@ -108,7 +110,7 @@ export function useStoryPage(): UseStoryPageResult {
       setView(nextView);
     } catch (error) {
       console.error('Failed to load story:', error);
-      const message = error instanceof Error ? error.message : 'Failed to load story.';
+      const message = error instanceof Error ? error.message : t('story.errors.loadFailed');
       toast.error(message);
       if (isReadOnly && ownerUserId) {
         navigate(`/friends/${ownerUserId}/library`, { replace: true });
@@ -117,7 +119,7 @@ export function useStoryPage(): UseStoryPageResult {
 
       resetToOnboarding();
     }
-  }, [accessToken, isReadOnly, navigate, ownerUserId, resetToOnboarding]);
+  }, [accessToken, isReadOnly, navigate, ownerUserId, resetToOnboarding, t]);
 
   useEffect(() => {
     const storyId = parseStoryId(rawStoryId);
@@ -127,7 +129,7 @@ export function useStoryPage(): UseStoryPageResult {
     }
 
     if (!storyId) {
-      toast.error('Invalid story id.');
+      toast.error(t('story.errors.invalidStoryId'));
       navigate(isReadOnly && ownerUserId ? `/friends/${ownerUserId}/library` : '/create', { replace: true });
       return;
     }
@@ -135,7 +137,7 @@ export function useStoryPage(): UseStoryPageResult {
     queueMicrotask(() => {
       void loadSavedStory(storyId);
     });
-  }, [isReadOnly, loadSavedStory, navigate, ownerUserId, rawStoryId]);
+  }, [isReadOnly, loadSavedStory, navigate, ownerUserId, rawStoryId, t]);
 
   useEffect(() => cancelIntroHoldTimer, [cancelIntroHoldTimer]);
 
@@ -205,20 +207,21 @@ export function useStoryPage(): UseStoryPageResult {
       setPendingGeneration(nextPendingGeneration);
       setStory(nextPendingGeneration.previewStory);
       setView(StoryPageView.Preview);
+      toast.success(t('story.notifications.previewCreated'));
     } catch (error) {
       cancelIntroHoldTimer();
       setIntroStream(INITIAL_INTRO_STREAM_STATE);
 
-      const message = error instanceof Error ? error.message : 'Story generation failed.';
+      const message = error instanceof Error ? error.message : t('story.errors.generationFailed');
       toast.error(message);
       setView(StoryPageView.Onboarding);
     }
-  }, [accessToken, cancelIntroHoldTimer, draftProfile, handleIntroDelta]);
+  }, [accessToken, cancelIntroHoldTimer, draftProfile, handleIntroDelta, t]);
 
   const handleGenerateFullStory = useCallback(async () => {
     if (!accessToken) return;
     if (!pendingGeneration) {
-      toast.error('Preview expired. Please generate again.');
+      toast.error(t('story.errors.previewExpired'));
       resetToOnboarding();
       return;
     }
@@ -231,12 +234,13 @@ export function useStoryPage(): UseStoryPageResult {
       setPendingGeneration(null);
       setSavedStoryId(pendingGeneration.previewStoryId);
       setView(StoryPageView.Storyboard);
+      toast.success(t('story.notifications.storyUpdated'));
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Story generation failed.';
+      const message = error instanceof Error ? error.message : t('story.errors.generationFailed');
       toast.error(message);
       setView(StoryPageView.Preview);
     }
-  }, [accessToken, pendingGeneration, resetToOnboarding]);
+  }, [accessToken, pendingGeneration, resetToOnboarding, t]);
 
   const handleStartOver = useCallback(() => {
     resetToOnboarding();
@@ -275,12 +279,13 @@ export function useStoryPage(): UseStoryPageResult {
           previewStory: replaceStoryPanel(previousPendingGeneration.previewStory, updatedPanel),
         };
       });
+      toast.success(t('story.notifications.panelImageUpdated'));
     } catch (error) {
       console.error('Failed to edit panel image:', error);
-      toast.error('Failed to update the panel image.');
+      toast.error(t('story.notifications.panelImageUpdateFailed'));
       throw error;
     }
-  }, [accessToken, isReadOnly, profile, savedStoryId, story]);
+  }, [accessToken, isReadOnly, profile, savedStoryId, story, t]);
 
   return {
     view,
