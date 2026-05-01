@@ -1,6 +1,6 @@
 from authlib.integrations.starlette_client import OAuth
 
-from config import get_config
+from config import get_google_oauth_config
 
 _GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
 
@@ -11,12 +11,12 @@ def _get_oauth() -> OAuth:
     """Build and cache the oauth registry on first call."""
     global _oauth
     if _oauth is None:
-        config = get_config()
+        google_client_id, google_client_secret, _ = get_google_oauth_config()
         _oauth = OAuth()
         _oauth.register(
             name="google",
-            client_id=config.google_client_id,
-            client_secret=config.google_client_secret,
+            client_id=google_client_id,
+            client_secret=google_client_secret,
             server_metadata_url=_GOOGLE_DISCOVERY_URL,
             client_kwargs={"scope": "openid email profile"},
         )

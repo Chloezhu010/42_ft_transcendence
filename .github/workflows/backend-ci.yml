@@ -40,4 +40,10 @@ jobs:
         run: uv tool run ruff format --check .
 
       - name: Run pytest
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || 'ci-dummy-gemini-key' }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY || 'ci-dummy-jwt-secret-key-32chars-xx' }}
+          SESSION_SECRET_KEY: ci-dummy-session-secret-key-32chars
+          GOOGLE_CLIENT_ID: ci-dummy-google-client-id
+          GOOGLE_CLIENT_SECRET: ci-dummy-google-client-secret
         run: uv run pytest

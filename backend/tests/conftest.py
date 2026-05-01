@@ -1,6 +1,11 @@
 import os
 
+os.environ.setdefault("GEMINI_API_KEY", "test-gemini-key")
 os.environ.setdefault("JWT_SECRET_KEY", "test-secret-key-that-is-long-enough-for-hs256")
+os.environ.setdefault("SESSION_SECRET_KEY", "test-session-secret-key")
+os.environ.setdefault("GOOGLE_CLIENT_ID", "test-google-client-id")
+os.environ.setdefault("GOOGLE_CLIENT_SECRET", "test-google-client-secret")
+os.environ.setdefault("GOOGLE_REDIRECT_URI", "http://localhost:8000/api/auth/oauth/google/callback")
 os.environ.setdefault("BCRYPT_ROUNDS", "4")
 
 import aiosqlite
