@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -243,7 +243,9 @@ describe('StatusPage', () => {
         expect(screen.getByRole('button', { name: /backing up/i })).toBeDisabled();
       });
 
-      resolveBackup!(TRIGGER_BACKUP_STATUS);
+      await act(async () => {
+        resolveBackup!(TRIGGER_BACKUP_STATUS);
+      });
     });
   });
 

@@ -45,3 +45,18 @@ export async function logout(accessToken: string): Promise<void> {
         throw await buildApiError(response, 'Logout failed');
     }
 }
+
+export function startGoogleOAuth(): void {
+    window.location.href = `${API_BASE}/auth/oauth/google/start`;
+}
+
+export async function exchangeOAuthCode(code: string): Promise<TokenResponse> {
+    const response = await apiFetch(`${API_BASE}/auth/oauth/exchange`, {
+        method: 'POST',
+        body: JSON.stringify({ code }),
+    });
+    if (!response.ok) {
+        throw await buildApiError(response, 'OAuth code exchange failed');
+    }
+    return (await response.json()) as TokenResponse;
+}

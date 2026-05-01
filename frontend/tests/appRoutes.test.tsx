@@ -2,11 +2,24 @@
  * Route coverage for the public landing and legal screens.
  */
 import '@testing-library/jest-dom/vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from '@/app';
 import { AuthProvider } from '@/app/auth';
+
+const { mockExchangeOAuthCode, mockGetMe } = vi.hoisted(() => ({
+  mockExchangeOAuthCode: vi.fn(),
+  mockGetMe: vi.fn(),
+}));
+
+vi.mock('@api', () => ({
+  exchangeOAuthCode: mockExchangeOAuthCode,
+  getMe: mockGetMe,
+  login: vi.fn(),
+  logout: vi.fn(),
+  signup: vi.fn(),
+}));
 
 function renderApp(initialEntry: string): void {
   render(
@@ -20,6 +33,15 @@ function renderApp(initialEntry: string): void {
 
 beforeEach(() => {
   window.scrollTo = vi.fn();
+  mockExchangeOAuthCode.mockResolvedValue({ access_token: 'oauth-token', token_type: 'bearer' });
+  mockGetMe.mockResolvedValue({
+    id: 1,
+    email: 'alice@example.com',
+    username: 'alice',
+    avatar_url: null,
+    is_online: true,
+    created_at: '2026-04-17T10:00:00Z',
+  });
 });
 
 describe('App public routes', () => {
@@ -58,5 +80,21 @@ describe('App public routes', () => {
       'href',
       'https://github.com/Chloezhu010/42_ft_transcendence/issues',
     );
+  });
+
+  it('renders the Google OAuth callback page at /auth/callback', async () => {
+    renderApp('/auth/callback?code=test-code');
+    await waitFor(() => {
+      expect(screen.getByTestId('google-oauth-callback')).toBeInTheDocument();
+    });
+  });
+
+  it('redirects unknown routes to the landing page', async () => {
+    renderApp('/this-does-not-exist');
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', { name: /your child's imagination,\s*sketched to life/i }),
+      ).toBeInTheDocument();
+    });
   });
 });
