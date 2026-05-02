@@ -31,7 +31,10 @@ describe('GoogleOAuthCallbackPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     sessionStorage.clear();
-    mockUseAuth.mockReturnValue({ completeGoogleOAuth: mockCompleteGoogleOAuth });
+    mockUseAuth.mockReturnValue({
+      completeGoogleOAuth: mockCompleteGoogleOAuth,
+      isLoadingSession: false,
+    });
   });
 
   it('calls completeGoogleOAuth with the code param and navigates home on success', async () => {
@@ -158,5 +161,36 @@ describe('GoogleOAuthCallbackPage', () => {
     });
 
     expect(mockCompleteGoogleOAuth).not.toHaveBeenCalled();
+  });
+
+  it('waits for session restore before exchanging the OAuth code', async () => {
+    mockCompleteGoogleOAuth.mockResolvedValue(undefined);
+    mockUseAuth
+      .mockReturnValueOnce({
+        completeGoogleOAuth: mockCompleteGoogleOAuth,
+        isLoadingSession: true,
+      })
+      .mockReturnValue({
+        completeGoogleOAuth: mockCompleteGoogleOAuth,
+        isLoadingSession: false,
+      });
+
+    const { rerender } = render(
+      <MemoryRouter initialEntries={['/auth/callback?code=abc123']}>
+        <GoogleOAuthCallbackPage />
+      </MemoryRouter>,
+    );
+
+    expect(mockCompleteGoogleOAuth).not.toHaveBeenCalled();
+
+    rerender(
+      <MemoryRouter initialEntries={['/auth/callback?code=abc123']}>
+        <GoogleOAuthCallbackPage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(mockCompleteGoogleOAuth).toHaveBeenCalledWith('abc123');
+    });
   });
 });

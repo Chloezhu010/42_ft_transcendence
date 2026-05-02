@@ -32,10 +32,18 @@ async def _users_password_hash_is_not_null(db: aiosqlite.Connection) -> bool:
     return bool(password_hash[3])
 
 
+async def _users_table_has_column(db: aiosqlite.Connection, column_name: str) -> bool:
+    """Return True if the live users table contains the named column."""
+    async with db.execute("PRAGMA table_info(users)") as cursor:
+        rows = await cursor.fetchall()
+    return any(row[1] == column_name for row in rows)
+
+
 async def _migrate_users_password_hash_nullable(db: aiosqlite.Connection) -> None:
     """Relax the NOT NULL constraint on users.password_hash for OAuth users."""
     if not await _users_password_hash_is_not_null(db):
         return  # already nullable, no migration needed
+    is_admin_select = "is_admin" if await _users_table_has_column(db, "is_admin") else "0"
     await db.execute("PRAGMA foreign_keys=OFF")
     try:
         await db.execute(
@@ -47,18 +55,19 @@ async def _migrate_users_password_hash_nullable(db: aiosqlite.Connection) -> Non
                 password_hash TEXT,
                 avatar_path TEXT DEFAULT 'default-avatar.png',
                 is_online BOOLEAN NOT NULL DEFAULT 0,
+                is_admin BOOLEAN NOT NULL DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
             """
         )
         await db.execute(
-            """
+            f"""
             INSERT INTO users_new (
-                id, email, username, password_hash, avatar_path, is_online, created_at, updated_at
+                id, email, username, password_hash, avatar_path, is_online, is_admin, created_at, updated_at
             )
             SELECT
-                id, email, username, password_hash, avatar_path, is_online, created_at, updated_at
+                id, email, username, password_hash, avatar_path, is_online, {is_admin_select}, created_at, updated_at
             FROM users
             """
         )
