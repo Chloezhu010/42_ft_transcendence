@@ -29,9 +29,28 @@
   "galleryPage": {
     "mySavedBooks": "保存された書籍",
     "noStoriesFound": "まだストーリーが見つかりません。",
+    "noMatches": "検索条件に一致するストーリーがありません。",
     "readNow": "今読む",
     "untitledMasterpiece": "無題の傑作",
     "deleteStory": "このストーリーを削除してもよろしいですか？これは元に戻すことはできません。",
+    "resultsCount": "{{count}} 件",
+    "resultsCount_plural": "{{count}} 件",
+    "pagination": {
+      "previous": "前へ",
+      "next": "次へ",
+      "pageOf": "{{page}} / {{total}} ページ"
+    },
+    "filters": {
+      "searchLabel": "タイトルで検索",
+      "searchPlaceholder": "タイトルで検索",
+      "fromDateLabel": "開始日",
+      "toDateLabel": "終了日",
+      "sortLabel": "並び替え",
+      "sortDate": "日付",
+      "sortTitle": "タイトル",
+      "sortDesc": "降順",
+      "sortAsc": "昇順"
+    },
     "notifications": {
       "storyDeleted": "ストーリーを削除しました。",
       "deleteFailed": "ストーリーを削除できませんでした。",

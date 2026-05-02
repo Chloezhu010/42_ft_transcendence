@@ -29,9 +29,28 @@
   "galleryPage": {
     "mySavedBooks": "كتبي المحفوظة",
     "noStoriesFound": "لم يتم العثور على قصص بعد.",
+    "noMatches": "لا توجد قصص تطابق بحثك.",
     "readNow": "اقرأ الآن",
     "untitledMasterpiece": "تحفة فنية بدون عنوان",
     "deleteStory": "هل أنت متأكد أنك تريد حذف هذه القصة؟ لا يمكن التراجع عن هذا.",
+    "resultsCount": "{{count}} نتيجة",
+    "resultsCount_plural": "{{count}} نتائج",
+    "pagination": {
+      "previous": "السابق",
+      "next": "التالي",
+      "pageOf": "الصفحة {{page}} من {{total}}"
+    },
+    "filters": {
+      "searchLabel": "ابحث بالعنوان",
+      "searchPlaceholder": "ابحث بالعنوان",
+      "fromDateLabel": "من تاريخ",
+      "toDateLabel": "إلى تاريخ",
+      "sortLabel": "ترتيب",
+      "sortDate": "التاريخ",
+      "sortTitle": "العنوان",
+      "sortDesc": "تنازلي",
+      "sortAsc": "تصاعدي"
+    },
     "notifications": {
       "storyDeleted": "تم حذف القصة.",
       "deleteFailed": "تعذر حذف القصة.",

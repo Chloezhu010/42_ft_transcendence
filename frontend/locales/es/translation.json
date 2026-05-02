@@ -29,9 +29,28 @@
   "galleryPage": {
     "mySavedBooks": "Mis Libros Guardados",
     "noStoriesFound": "Ninguna historia encontrada aún.",
+    "noMatches": "Ninguna historia coincide con tu búsqueda.",
     "readNow": "LEER AHORA",
     "untitledMasterpiece": "Obra Maestra sin Título",
     "deleteStory": "¿Está seguro de que desea eliminar esta historia? Esto no se puede deshacer.",
+    "resultsCount": "{{count}} resultado",
+    "resultsCount_plural": "{{count}} resultados",
+    "pagination": {
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "pageOf": "Página {{page}} de {{total}}"
+    },
+    "filters": {
+      "searchLabel": "Buscar por título",
+      "searchPlaceholder": "Buscar por título",
+      "fromDateLabel": "Desde la fecha",
+      "toDateLabel": "Hasta la fecha",
+      "sortLabel": "Ordenar",
+      "sortDate": "Fecha",
+      "sortTitle": "Título",
+      "sortDesc": "Desc",
+      "sortAsc": "Asc"
+    },
     "notifications": {
       "storyDeleted": "Historia eliminada.",
       "deleteFailed": "No se pudo eliminar la historia.",

@@ -7,6 +7,8 @@ import type { StoryListItem, StoryVisibility } from '@api';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import StorageImage from '@/components/StorageImage';
+import { SketchyInput } from '@/components/design-system/Forms';
+import { SketchyButton } from '@/components/design-system/Primitives';
 import { formatStoryDate, getStoryDisplayTitle } from './gallery.helpers';
 import { useGalleryPage } from './useGalleryPage';
 import { ARCHETYPES } from '@/components/kidWizard.constants';
@@ -144,8 +146,29 @@ function StoryCard({ story, onDeleteStory, onUpdateVisibility }: StoryCardProps)
 }
 
 function GalleryPage(): JSX.Element {
-  const { isLoading, onDeleteStory, onUpdateVisibility, stories } = useGalleryPage();
+  const {
+    isLoading,
+    stories,
+    filteredStories,
+    pagedStories,
+    page,
+    totalPages,
+    searchQuery,
+    dateFrom,
+    dateTo,
+    sortKey,
+    sortDir,
+    setSearchQuery,
+    setDateFrom,
+    setDateTo,
+    setSortKey,
+    setSortDir,
+    setPage,
+    onDeleteStory,
+    onUpdateVisibility,
+  } = useGalleryPage();
   const { t } = useTranslation();
+  const resultsCount = filteredStories.length;
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 animate-in fade-in duration-700">
@@ -153,27 +176,127 @@ function GalleryPage(): JSX.Element {
         <h2 className="text-4xl font-black text-gray-800">{t('galleryPage.mySavedBooks')}</h2>
       </div>
 
+      <div className="mb-8 grid grid-cols-1 gap-4 rounded-[2rem] border-2 border-gray-100 bg-white p-4 shadow-sm md:grid-cols-2 lg:grid-cols-4">
+        <div className="flex flex-col gap-2">
+          <label className="text-xs font-bold uppercase tracking-wide text-gray-400">
+            {t('galleryPage.filters.searchLabel')}
+          </label>
+          <SketchyInput
+            type="search"
+            placeholder={t('galleryPage.filters.searchPlaceholder')}
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            className="text-base px-4 py-2"
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="text-xs font-bold uppercase tracking-wide text-gray-400">
+            {t('galleryPage.filters.fromDateLabel')}
+          </label>
+          <SketchyInput
+            type="date"
+            value={dateFrom}
+            onChange={(event) => setDateFrom(event.target.value)}
+            className="text-base px-4 py-2"
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="text-xs font-bold uppercase tracking-wide text-gray-400">
+            {t('galleryPage.filters.toDateLabel')}
+          </label>
+          <SketchyInput
+            type="date"
+            value={dateTo}
+            onChange={(event) => setDateTo(event.target.value)}
+            className="text-base px-4 py-2"
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="text-xs font-bold uppercase tracking-wide text-gray-400">
+            {t('galleryPage.filters.sortLabel')}
+          </label>
+          <div className="flex gap-2">
+            <select
+              value={sortKey}
+              onChange={(event) => setSortKey(event.target.value as 'created_at' | 'title')}
+              className="w-full rounded-full border-2 border-purple-100 bg-purple-50 px-3 py-2 text-sm font-semibold text-purple-900"
+            >
+              <option value="created_at">{t('galleryPage.filters.sortDate')}</option>
+              <option value="title">{t('galleryPage.filters.sortTitle')}</option>
+            </select>
+            <select
+              value={sortDir}
+              onChange={(event) => setSortDir(event.target.value as 'asc' | 'desc')}
+              className="w-full rounded-full border-2 border-purple-100 bg-purple-50 px-3 py-2 text-sm font-semibold text-purple-900"
+            >
+              <option value="desc">{t('galleryPage.filters.sortDesc')}</option>
+              <option value="asc">{t('galleryPage.filters.sortAsc')}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       {isLoading ? (
         <div className="flex justify-center py-20">
           <div className="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          {stories.map((story) => (
-            <StoryCard
-              key={story.id}
-              story={story}
-              onDeleteStory={onDeleteStory}
-              onUpdateVisibility={onUpdateVisibility}
-            />
-          ))}
-
-          {stories.length === 0 && (
-            <div className="col-span-full text-center py-20 text-gray-400">
-              <p className="text-xl font-medium italic">{t('galleryPage.noStoriesFound')}</p>
+        <>
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+            <div className="text-sm font-semibold text-gray-500">
+              {t('galleryPage.resultsCount', { count: resultsCount })}
             </div>
-          )}
-        </div>
+            <div className="flex items-center gap-3">
+              <SketchyButton
+                type="button"
+                variant="outline"
+                onClick={() => setPage(page - 1)}
+                disabled={page <= 1}
+                className="text-sm px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {t('galleryPage.pagination.previous')}
+              </SketchyButton>
+              <span className="text-sm font-semibold text-gray-600">
+                {t('galleryPage.pagination.pageOf', { page, total: totalPages })}
+              </span>
+              <SketchyButton
+                type="button"
+                variant="outline"
+                onClick={() => setPage(page + 1)}
+                disabled={page >= totalPages}
+                className="text-sm px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {t('galleryPage.pagination.next')}
+              </SketchyButton>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            {pagedStories.map((story) => (
+              <StoryCard
+                key={story.id}
+                story={story}
+                onDeleteStory={onDeleteStory}
+                onUpdateVisibility={onUpdateVisibility}
+              />
+            ))}
+
+            {stories.length === 0 && (
+              <div className="col-span-full text-center py-20 text-gray-400">
+                <p className="text-xl font-medium italic">{t('galleryPage.noStoriesFound')}</p>
+              </div>
+            )}
+
+            {stories.length > 0 && filteredStories.length === 0 && (
+              <div className="col-span-full text-center py-20 text-gray-400">
+                <p className="text-xl font-medium italic">{t('galleryPage.noMatches')}</p>
+              </div>
+            )}
+          </div>
+        </>
       )}
     </div>
   );

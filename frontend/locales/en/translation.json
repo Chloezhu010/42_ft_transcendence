@@ -29,9 +29,28 @@
   "galleryPage": {
     "mySavedBooks": "My Saved Books",
     "noStoriesFound": "No stories found yet.",
+    "noMatches": "No stories match your search.",
     "readNow": "READ NOW",
     "untitledMasterpiece": "Untitled Masterpiece",
     "deleteStory": "Are you sure you want to delete this story? This cannot be undone.",
+    "resultsCount": "{{count}} result",
+    "resultsCount_plural": "{{count}} results",
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "pageOf": "Page {{page}} of {{total}}"
+    },
+    "filters": {
+      "searchLabel": "Search title",
+      "searchPlaceholder": "Search by title",
+      "fromDateLabel": "From date",
+      "toDateLabel": "To date",
+      "sortLabel": "Sort",
+      "sortDate": "Date",
+      "sortTitle": "Title",
+      "sortDesc": "Desc",
+      "sortAsc": "Asc"
+    },
     "notifications": {
       "storyDeleted": "Story deleted.",
       "deleteFailed": "Failed to delete story.",

@@ -29,9 +29,28 @@
   "galleryPage": {
     "mySavedBooks": "Mes Livres Sauvegardés",
     "noStoriesFound": "Aucune histoire trouvée pour le moment.",
+    "noMatches": "Aucune histoire ne correspond à votre recherche.",
     "readNow": "LIRE MAINTENANT",
     "untitledMasterpiece": "Chef-d'œuvre sans titre",
     "deleteStory": "Êtes-vous sûr de vouloir supprimer cette histoire? Cela ne peut pas être annulé.",
+    "resultsCount": "{{count}} résultat",
+    "resultsCount_plural": "{{count}} résultats",
+    "pagination": {
+      "previous": "Précédent",
+      "next": "Suivant",
+      "pageOf": "Page {{page}} sur {{total}}"
+    },
+    "filters": {
+      "searchLabel": "Rechercher par titre",
+      "searchPlaceholder": "Rechercher par titre",
+      "fromDateLabel": "Date de début",
+      "toDateLabel": "Date de fin",
+      "sortLabel": "Trier",
+      "sortDate": "Date",
+      "sortTitle": "Titre",
+      "sortDesc": "Desc",
+      "sortAsc": "Asc"
+    },
     "notifications": {
       "storyDeleted": "Histoire supprimée.",
       "deleteFailed": "Impossible de supprimer l'histoire.",

@@ -29,9 +29,28 @@
   "galleryPage": {
     "mySavedBooks": "我保存的书籍",
     "noStoriesFound": "还没有找到任何故事。",
+    "noMatches": "没有符合搜索条件的故事。",
     "readNow": "现在阅读",
     "untitledMasterpiece": "无标题杰作",
     "deleteStory": "您确定要删除此故事吗？这将无法撤消。",
+    "resultsCount": "{{count}} 个结果",
+    "resultsCount_plural": "{{count}} 个结果",
+    "pagination": {
+      "previous": "上一页",
+      "next": "下一页",
+      "pageOf": "第 {{page}} / {{total}} 页"
+    },
+    "filters": {
+      "searchLabel": "按标题搜索",
+      "searchPlaceholder": "按标题搜索",
+      "fromDateLabel": "开始日期",
+      "toDateLabel": "结束日期",
+      "sortLabel": "排序",
+      "sortDate": "日期",
+      "sortTitle": "标题",
+      "sortDesc": "降序",
+      "sortAsc": "升序"
+    },
     "notifications": {
       "storyDeleted": "故事已删除。",
       "deleteFailed": "无法删除故事。",
