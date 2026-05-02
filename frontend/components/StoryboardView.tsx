@@ -7,9 +7,11 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ComicPanel from '@/components/ComicPanel';
 import StorageImage from '@/components/StorageImage';
+import StoryReadAloudControl from '@/components/StoryReadAloudControl';
 import { SketchyButton } from '@/components/design-system/Primitives';
 import { Heading, Label, Text } from '@/components/design-system/Typography';
 import type { ComicPanelData, KidProfile, Story } from '@/types';
+import { getStoryReadAloudText } from '@/utils';
 
 interface StoryboardViewProps {
   story: Story;
@@ -166,6 +168,7 @@ function StoryboardView({
   const { leftPanelIndex, rightPanelIndex } = getSpreadPanelIndexes(currentPage);
   const leftPanel = story.panels[leftPanelIndex]!;
   const rightPanel = story.panels[rightPanelIndex]!;
+  const readAloudText = getStoryReadAloudText(story);
 
   const navigate = (direction: number) => {
     setCurrentPage((previousPage) => Math.max(0, Math.min(totalStates - 1, previousPage + direction)));
@@ -219,13 +222,14 @@ function StoryboardView({
         </Link>
       </div>
 
-      {isReadOnly ? (
-        <div className="absolute top-4 right-4 z-30">
+      <div className="absolute top-4 right-4 z-30 flex items-center gap-3">
+        <StoryReadAloudControl text={readAloudText} />
+        {isReadOnly ? (
           <div className="bg-white/90 backdrop-blur-sm py-2 px-4 rounded-full shadow-soft border border-brand-secondary/20">
             <Label className="text-brand-primary uppercase tracking-widest">Read Only</Label>
           </div>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
 
       <StoryboardNavButton direction="previous" disabled={isFrontCover} onClick={() => navigate(-1)} />
       <StoryboardNavButton direction="next" disabled={isBackCover} onClick={() => navigate(1)} />

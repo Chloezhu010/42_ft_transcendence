@@ -11,14 +11,14 @@ from auth_utils import (
     verify_password,
 )
 from config import get_config
-from db.crud_users import (
+from db.database import get_db
+from db.users_crud import (
     create_user,
     get_user_by_email,
     get_user_by_username,
     set_online_status,
 )
-from db.database import get_db
-from models import (
+from schemas import (
     LoginRequest,
     OauthExchangeRequest,
     SignupRequest,

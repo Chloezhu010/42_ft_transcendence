@@ -17,7 +17,7 @@ from google.genai import types
 
 from llm.streaming import StoryIntroStreamer
 from metrics import gemini_failures_total, gemini_request_duration_seconds
-from models import GenerateStoryScriptResponse, KidProfileCreate
+from schemas import GenerateStoryScriptResponse, KidProfileCreate
 
 STORY_SCRIPT_MODEL = "gemini-3-flash-preview"
 INTRO_FIELDS: tuple[str, ...] = ("title", "foreword")

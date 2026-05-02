@@ -5,9 +5,9 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile
 
 from auth_utils import get_current_user
-from db.crud_users import get_user_by_id, search_users_by_username, update_user
 from db.database import get_db
-from models import PublicUserResponse, UserResponse, UserUpdateRequest
+from db.users_crud import get_user_by_id, search_users_by_username, update_user
+from schemas import PublicUserResponse, UserResponse, UserUpdateRequest
 from services.avatar_upload import AvatarUploadError, replace_user_avatar
 
 router = APIRouter(prefix="/api/users", tags=["users"])

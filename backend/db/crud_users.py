@@ -1,7 +1,12 @@
-import aiosqlite  # for async SQLite access
-from aiosqlite import Row  # for type hinting database rows
+"""Compatibility exports for the old `db.crud_users` module.
 
-from auth_utils import hash_password  # for password hashing and token creation
+New code should import from `db.users_crud` or `db.friendships_crud`.
+"""
+
+import aiosqlite
+from aiosqlite import Row
+
+from auth_utils import hash_password
 
 
 # --- User identity ---

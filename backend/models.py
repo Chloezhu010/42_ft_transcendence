@@ -1,5 +1,6 @@
-"""
-Pydantic models for request/response validation.
+"""Compatibility exports for the old `models` module.
+
+New code should import request and response contracts from `schemas`.
 """
 
 from datetime import datetime
