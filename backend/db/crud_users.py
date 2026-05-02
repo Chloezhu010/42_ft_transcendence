@@ -3,6 +3,11 @@
 New code should import from `db.users_crud` or `db.friendships_crud`.
 """
 
+import aiosqlite
+from aiosqlite import Row
+
+from auth_utils import hash_password
+
 # --- User identity ---
 async def create_oauth_user(db: aiosqlite.Connection, username: str, email: str) -> int:
     """Create a new OAuth-only user (no password) and return their ID."""
