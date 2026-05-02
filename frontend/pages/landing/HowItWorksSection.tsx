@@ -26,7 +26,7 @@ function HowItWorksSection(): JSX.Element {
             <div key={step.number} className="contents">
               <div className="relative group">
                 <SketchyCard
-                  shadowColor="rgba(242, 201, 76, 0.25)"
+                  shadowColor="rgba(157, 107, 207, 0.2)"
                   className="w-72 flex flex-col items-center relative group-hover:scale-105 overflow-hidden p-0 h-full"
                   style={{ borderRadius: '32px' }}
                 >
