@@ -1,5 +1,6 @@
 import asyncio
 import os
+from types import SimpleNamespace
 
 import pytest
 from fastapi import HTTPException
@@ -11,11 +12,12 @@ os.environ.setdefault("JWT_SECRET_KEY", "test-secret-key-that-is-long-enough-for
 os.environ.setdefault("SESSION_SECRET_KEY", "test-session-secret-key")
 os.environ.setdefault("GOOGLE_CLIENT_ID", "test-google-client-id")
 os.environ.setdefault("GOOGLE_CLIENT_SECRET", "test-google-client-secret")
-os.environ.setdefault("GOOGLE_REDIRECT_URI", "http://localhost:8000/api/auth/oauth/google/callback")
-os.environ.setdefault("FRONTEND_URL", "http://localhost:3000")
 
 from routers.auth import router
 from tests.conftest import _init_test_db, make_test_app
+
+EXPECTED_FRONTEND_URL = "http://localhost:3000"
+EXPECTED_GOOGLE_REDIRECT_URI = "http://localhost:8000/api/auth/oauth/google/callback"
 
 required_paths = {
     "/api/auth/oauth/google/start",
@@ -26,6 +28,18 @@ existing_paths = {route.path for route in router.routes}
 missing_paths = required_paths - existing_paths
 if missing_paths:
     pytest.skip(f"OAuth auth routes are not implemented yet: {sorted(missing_paths)}", allow_module_level=True)
+
+
+@pytest.fixture(autouse=True)
+def fixed_oauth_config(monkeypatch):
+    """Keep route tests independent from local .env values."""
+    monkeypatch.setattr(
+        "routers.auth.get_config",
+        lambda: SimpleNamespace(
+            frontend_url=EXPECTED_FRONTEND_URL,
+            google_redirect_uri=EXPECTED_GOOGLE_REDIRECT_URI,
+        ),
+    )
 
 
 @pytest.fixture
@@ -59,7 +73,7 @@ def test_google_oauth_start_redirects_to_provider(client, monkeypatch):
     assert response.status_code in (302, 307)
     assert response.headers["location"] == "https://accounts.google.com/o/oauth2/auth"
     assert captured_request["value"] is not None
-    assert captured_redirect_uri["value"] == os.environ["GOOGLE_REDIRECT_URI"]
+    assert captured_redirect_uri["value"] == EXPECTED_GOOGLE_REDIRECT_URI
 
 
 def test_google_oauth_callback_redirects_to_frontend_with_one_time_code(client, monkeypatch):
@@ -82,7 +96,7 @@ def test_google_oauth_callback_redirects_to_frontend_with_one_time_code(client, 
     response = client.get("/api/auth/oauth/google/callback?code=provider-code&state=test", follow_redirects=False)
 
     assert response.status_code in (302, 307)
-    assert response.headers["location"] == "http://localhost:3000/auth/callback?code=code-123"
+    assert response.headers["location"] == f"{EXPECTED_FRONTEND_URL}/auth/callback?code=code-123"
 
 
 def test_google_oauth_callback_redirects_link_conflict_error(client, monkeypatch):

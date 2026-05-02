@@ -27,7 +27,6 @@ class Config:
     # Optional with defaults
     db_path: str = "wondercomic.db"
     frontend_url: str = "http://localhost:3000"
-    # must match the URI registered in Google Cloud Console exactly
     google_redirect_uri: str = "http://localhost:8000/api/auth/oauth/google/callback"
     session_cookie_secure: bool = False  # a boolean flag passed to SessionMiddleware
     debug_mode: bool = False
