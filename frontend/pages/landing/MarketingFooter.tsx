@@ -12,26 +12,39 @@ function MarketingFooter(): JSX.Element {
             <img src="/logo-highres.png" alt="Funova logo" className="h-40 w-auto object-contain" />
           </div>
           <p className="text-brand-muted text-lg max-w-sm text-center md:text-left font-medium">
-            {t('footer.tagline')}
+            {t('footer.tagline', {
+              defaultValue: 'Empowering the next generation of storytellers with a little bit of magic and AI.',
+            })}
           </p>
         </div>
 
         <div className="flex gap-8 font-bold text-xl">
-          <Link to="/privacy" className="hover:text-brand-primary transition-colors">{t('footer.links.privacy')}</Link>
-          <Link to="/terms" className="hover:text-brand-primary transition-colors">{t('footer.links.terms')}</Link>
+          <Link to="/privacy" className="hover:text-brand-primary transition-colors">
+            {t('footer.links.privacy', { defaultValue: 'Privacy' })}
+          </Link>
+          <Link to="/terms" className="hover:text-brand-primary transition-colors">
+            {t('footer.links.terms', { defaultValue: 'Terms' })}
+          </Link>
+          <Link to="/status" className="hover:text-brand-primary transition-colors">
+            {t('footer.links.status', { defaultValue: 'Status' })}
+          </Link>
           <a
             href="https://github.com/Chloezhu010/42_ft_transcendence"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-brand-primary transition-colors"
           >
-            {t('footer.links.repository')}
+            {t('footer.links.repository', { defaultValue: 'Repository' })}
           </a>
         </div>
 
         <div className="text-center md:text-right">
-          <p className="font-bold text-2xl mb-2 text-brand-primary">{t('footer.madeFor')}</p>
-          <p className="text-sm text-brand-muted font-bold">{t('footer.copyright')}</p>
+          <p className="font-bold text-2xl mb-2 text-brand-primary">
+            {t('footer.madeFor', { defaultValue: 'Made for little dreamers' })}
+          </p>
+          <p className="text-sm text-brand-muted font-bold">
+            {t('footer.copyright', { defaultValue: '© 2026 Funova' })}
+          </p>
         </div>
       </div>
     </footer>

@@ -46,7 +46,7 @@ function AppLayout(): JSX.Element {
                 to="/create"
                 className="text-brand-primary hover:text-brand-dark transition-colors px-4 py-2 rounded-full hover:bg-brand-light"
               >
-                {t('app.createStory')}
+                {t('app.createStory', { defaultValue: 'Create Story' })}
               </Link>
             ) : null}
             <Link
@@ -59,7 +59,7 @@ function AppLayout(): JSX.Element {
               to="/friends"
               className="text-brand-muted hover:text-brand-primary transition-colors px-4 py-2 rounded-full hover:bg-brand-light"
             >
-              {t('friends.title')}
+              {t('app.friends', { defaultValue: 'Friends' })}
             </Link>
             {currentUser ? (
               <Link
@@ -93,22 +93,23 @@ function AppLayout(): JSX.Element {
           <div className="max-w-xl">
             <div className="font-rounded text-2xl text-brand-primary">Funova</div>
             <p className="mt-2 text-sm leading-6 text-brand-muted">
-              {t('app.footer.tagline')}
+              {t('app.footer.tagline', { defaultValue: 'AI comic book generator.' })}
             </p>
           </div>
 
           <div className="flex flex-wrap gap-4 text-sm font-semibold text-brand-primary">
-            <Link className="hover:text-brand-dark" to="/create">{t('app.footer.links.create')}</Link>
-            <Link className="hover:text-brand-dark" to="/gallery">{t('app.footer.links.library')}</Link>
-            <Link className="hover:text-brand-dark" to="/privacy">{t('app.footer.links.privacy')}</Link>
-            <Link className="hover:text-brand-dark" to="/terms">{t('app.footer.links.terms')}</Link>
+            <Link className="hover:text-brand-dark" to="/create">{t('app.footer.links.create', { defaultValue: 'Create' })}</Link>
+            <Link className="hover:text-brand-dark" to="/gallery">{t('app.footer.links.library', { defaultValue: 'Library' })}</Link>
+            <Link className="hover:text-brand-dark" to="/privacy">{t('app.footer.links.privacy', { defaultValue: 'Privacy Policy' })}</Link>
+            <Link className="hover:text-brand-dark" to="/terms">{t('app.footer.links.terms', { defaultValue: 'Terms of Service' })}</Link>
+            <Link className="hover:text-brand-dark" to="/status">{t('app.footer.links.status', { defaultValue: 'Status' })}</Link>
             <a
               className="hover:text-brand-dark"
               href="https://github.com/Chloezhu010/42_ft_transcendence"
               rel="noreferrer"
               target="_blank"
             >
-              {t('app.footer.links.repository')}
+              {t('app.footer.links.repository', { defaultValue: 'Repository' })}
             </a>
           </div>
         </div>

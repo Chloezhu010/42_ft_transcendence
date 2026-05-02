@@ -11,7 +11,8 @@
         "terms": "服务条款",
         "repository": "仓库"
       }
-    }
+    },
+    "friends": "好友"
   },
   "comicPanel": {
     "paintingScene": "绘制场景...",
