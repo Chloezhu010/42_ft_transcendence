@@ -2,6 +2,7 @@
 
 New code should import request and response contracts from `schemas`.
 """
+
 from datetime import datetime
 from typing import Literal
 

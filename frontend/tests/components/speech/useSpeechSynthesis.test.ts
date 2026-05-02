@@ -25,12 +25,20 @@ class MockSpeechSynthesisUtterance {
   }
 }
 
-interface MockSpeechSynthesis extends SpeechSynthesis {
+interface MockSpeechSynthesis {
+  speaking: boolean;
+  pending: boolean;
+  paused: boolean;
+  currentUtterance: MockUtterance | null;
   cancel: ReturnType<typeof vi.fn>;
   pause: ReturnType<typeof vi.fn>;
   resume: ReturnType<typeof vi.fn>;
   speak: ReturnType<typeof vi.fn>;
-  currentUtterance: MockUtterance | null;
+  getVoices: ReturnType<typeof vi.fn>;
+  onvoiceschanged: SpeechSynthesis['onvoiceschanged'];
+  addEventListener: ReturnType<typeof vi.fn>;
+  removeEventListener: ReturnType<typeof vi.fn>;
+  dispatchEvent: ReturnType<typeof vi.fn>;
 }
 
 const originalSpeechSynthesis = Object.getOwnPropertyDescriptor(window, 'speechSynthesis');
@@ -45,7 +53,7 @@ function restoreSpeechSynthesis(): void {
 }
 
 function installSpeechSynthesisMock(): MockSpeechSynthesis {
-  const synthesis = {
+  const synthesis: MockSpeechSynthesis = {
     speaking: false,
     pending: false,
     paused: false,
@@ -74,7 +82,7 @@ function installSpeechSynthesisMock(): MockSpeechSynthesis {
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(() => true),
-  } as MockSpeechSynthesis;
+  };
 
   Object.defineProperty(window, 'speechSynthesis', {
     configurable: true,

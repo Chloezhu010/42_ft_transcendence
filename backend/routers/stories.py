@@ -8,9 +8,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from auth_utils import get_current_user
 from db import stories_crud
 from db.database import get_db
-from metrics import story_funnel_total
 from db.friendships_crud import has_accepted_friendship
 from db.users_crud import get_user_by_id
+from metrics import story_funnel_total
 from schemas import (
     StoryCreate,
     StoryListItem,
