@@ -9,7 +9,8 @@
         "library": "Biblioteca",
         "privacy": "Política de privacidad",
         "terms": "Términos de servicio",
-        "repository": "Repositorio"
+        "repository": "Repositorio",
+        "status": "Estado"
       }
     },
     "friends": "Amigos"
@@ -409,10 +410,44 @@
     "links": {
       "privacy": "Privacidad",
       "terms": "Terminos",
-      "repository": "Repositorio"
+      "repository": "Repositorio",
+      "status": "Estado"
     },
     "madeFor": "Hecho para pequenos sonadores",
     "copyright": "© 2026 Funova"
+  },
+  "statusPage": {
+    "title": "Estado del sistema",
+    "loading": "Cargando…",
+    "loadingAria": "Cargando estado del sistema",
+    "health": {
+      "title": "Salud",
+      "healthy": "Correcto",
+      "unhealthy": "Con problemas",
+      "checks": {
+        "database": "Base de datos"
+      },
+      "results": {
+        "ok": "ok",
+        "unavailable": "no disponible"
+      }
+    },
+    "backups": {
+      "title": "Copias de seguridad",
+      "snapshotCount_zero": "No hay instantáneas disponibles",
+      "snapshotCount_one": "{{count}} instantánea disponible",
+      "snapshotCount_other": "{{count}} instantáneas disponibles",
+      "lastBackup": "Última copia:",
+      "empty": "Todavía no hay copias de seguridad disponibles.",
+      "actions": {
+        "backUpNow": "Hacer copia ahora",
+        "backingUp": "Creando copia…"
+      }
+    },
+    "errors": {
+      "loadFailed": "No se pudo cargar el estado",
+      "triggerFailed": "No se pudo iniciar la copia de seguridad"
+    }
   },
   "legal": {
     "backToHome": "← Volver al inicio",

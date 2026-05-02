@@ -9,7 +9,8 @@
         "library": "ライブラリ",
         "privacy": "プライバシーポリシー",
         "terms": "利用規約",
-        "repository": "リポジトリ"
+        "repository": "リポジトリ",
+        "status": "ステータス"
       }
     },
     "friends": "友達"
@@ -409,10 +410,43 @@
     "links": {
       "privacy": "プライバシー",
       "terms": "利用規約",
-      "repository": "リポジトリ"
+      "repository": "リポジトリ",
+      "status": "ステータス"
     },
     "madeFor": "小さな夢見る人たちへ",
     "copyright": "© 2026 Funova"
+  },
+  "statusPage": {
+    "title": "システムステータス",
+    "loading": "読み込み中…",
+    "loadingAria": "システムステータスを読み込み中",
+    "health": {
+      "title": "ヘルス",
+      "healthy": "正常",
+      "unhealthy": "異常",
+      "checks": {
+        "database": "データベース"
+      },
+      "results": {
+        "ok": "正常",
+        "unavailable": "利用不可"
+      }
+    },
+    "backups": {
+      "title": "バックアップ",
+      "snapshotCount_zero": "利用可能なスナップショットはありません",
+      "snapshotCount_other": "{{count}} 件のスナップショットが利用可能",
+      "lastBackup": "最終バックアップ:",
+      "empty": "まだ利用可能なバックアップはありません。",
+      "actions": {
+        "backUpNow": "今すぐバックアップ",
+        "backingUp": "バックアップ中…"
+      }
+    },
+    "errors": {
+      "loadFailed": "ステータスの読み込みに失敗しました",
+      "triggerFailed": "バックアップの開始に失敗しました"
+    }
   },
   "legal": {
     "backToHome": "← ホームへ戻る",

@@ -9,7 +9,8 @@
         "library": "المكتبة",
         "privacy": "سياسة الخصوصية",
         "terms": "شروط الخدمة",
-        "repository": "المستودع"
+        "repository": "المستودع",
+        "status": "الحالة"
       }
     },
     "friends": "الأصدقاء"
@@ -409,10 +410,47 @@
     "links": {
       "privacy": "الخصوصية",
       "terms": "الشروط",
-      "repository": "المستودع"
+      "repository": "المستودع",
+      "status": "الحالة"
     },
     "madeFor": "صنع من أجل الحالمين الصغار",
     "copyright": "© 2026 Funova"
+  },
+  "statusPage": {
+    "title": "حالة النظام",
+    "loading": "جارٍ التحميل…",
+    "loadingAria": "جارٍ تحميل حالة النظام",
+    "health": {
+      "title": "الصحة",
+      "healthy": "سليم",
+      "unhealthy": "غير سليم",
+      "checks": {
+        "database": "قاعدة البيانات"
+      },
+      "results": {
+        "ok": "سليم",
+        "unavailable": "غير متاح"
+      }
+    },
+    "backups": {
+      "title": "النسخ الاحتياطية",
+      "snapshotCount_zero": "لا توجد لقطات متاحة",
+      "snapshotCount_one": "تتوفر لقطة واحدة",
+      "snapshotCount_two": "تتوفر لقطتان",
+      "snapshotCount_few": "تتوفر {{count}} لقطات",
+      "snapshotCount_many": "تتوفر {{count}} لقطة",
+      "snapshotCount_other": "تتوفر {{count}} لقطة",
+      "lastBackup": "آخر نسخة احتياطية:",
+      "empty": "لا توجد نسخ احتياطية متاحة بعد.",
+      "actions": {
+        "backUpNow": "نسخ احتياطي الآن",
+        "backingUp": "جارٍ النسخ الاحتياطي…"
+      }
+    },
+    "errors": {
+      "loadFailed": "تعذر تحميل الحالة",
+      "triggerFailed": "تعذر بدء النسخ الاحتياطي"
+    }
   },
   "legal": {
     "backToHome": "← العودة إلى الرئيسية",

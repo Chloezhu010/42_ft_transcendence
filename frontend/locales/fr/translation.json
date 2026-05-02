@@ -9,7 +9,8 @@
         "library": "Bibliothèque",
         "privacy": "Politique de confidentialité",
         "terms": "Conditions d'utilisation",
-        "repository": "Dépôt"
+        "repository": "Dépôt",
+        "status": "État"
       }
     },
     "friends": "Amis"
@@ -409,10 +410,44 @@
     "links": {
       "privacy": "Confidentialite",
       "terms": "Conditions",
-      "repository": "Depot"
+      "repository": "Depot",
+      "status": "Etat"
     },
     "madeFor": "Concu pour les petits reveurs",
     "copyright": "© 2026 Funova"
+  },
+  "statusPage": {
+    "title": "État du système",
+    "loading": "Chargement…",
+    "loadingAria": "Chargement de l'état du système",
+    "health": {
+      "title": "Santé",
+      "healthy": "Opérationnel",
+      "unhealthy": "Dégradé",
+      "checks": {
+        "database": "Base de données"
+      },
+      "results": {
+        "ok": "ok",
+        "unavailable": "indisponible"
+      }
+    },
+    "backups": {
+      "title": "Sauvegardes",
+      "snapshotCount_zero": "Aucun instantané disponible",
+      "snapshotCount_one": "{{count}} instantané disponible",
+      "snapshotCount_other": "{{count}} instantanés disponibles",
+      "lastBackup": "Dernière sauvegarde :",
+      "empty": "Aucune sauvegarde disponible pour le moment.",
+      "actions": {
+        "backUpNow": "Sauvegarder maintenant",
+        "backingUp": "Sauvegarde en cours…"
+      }
+    },
+    "errors": {
+      "loadFailed": "Impossible de charger l'état",
+      "triggerFailed": "Impossible de lancer la sauvegarde"
+    }
   },
   "legal": {
     "backToHome": "← Retour a l'accueil",
