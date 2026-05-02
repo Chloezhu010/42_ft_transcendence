@@ -3,7 +3,6 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/app/auth';
 
 const OAUTH_REDIRECT_PATH_KEY = 'auth.oauthRedirectPath';
-type CallbackStatus = 'processing' | 'failed';
 
 function isSafeInternalPath(path: string | null | undefined): path is string {
     if (!path) return false;
@@ -39,39 +38,35 @@ export function GoogleOAuthCallbackPage(): JSX.Element {
     const { completeGoogleOAuth } = useAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const [status, setStatus] = useState<CallbackStatus>('processing');
-    const [error, setError] = useState<string | null>(null);
+    const [exchangeError, setExchangeError] = useState<string | null>(null);
     const exchangeStarted = useRef(false);
 
     const code = searchParams.get('code');
     const errorParam = searchParams.get('error');
     const [destination] = useState(() => getDestination(searchParams.get('next')));
 
+    const urlError = errorParam
+        ? getOAuthErrorMessage(errorParam)
+        : !code
+          ? 'No authorization code found. Please try signing in with Google again.'
+          : null;
+
     useEffect(() => {
-        if (errorParam) {
-            setStatus('failed');
-            setError(getOAuthErrorMessage(errorParam));
-            return;
-        }
-        if (!code) {
-            setStatus('failed');
-            setError('No authorization code found. Please try signing in with Google again.');
-            return;
-        }
+        if (urlError) return;
         // Guard against StrictMode double-invocation and stale re-runs: the backend
         // issues one-time OAuth codes, so a second exchange call would always fail.
         if (exchangeStarted.current) return;
         exchangeStarted.current = true;
 
-        completeGoogleOAuth(code)
+        completeGoogleOAuth(code!)
             .then(() => navigate(destination, { replace: true }))
             .catch((err: unknown) => {
-                setStatus('failed');
-                setError(err instanceof Error ? err.message : 'Sign-in failed. Please try again.');
+                setExchangeError(err instanceof Error ? err.message : 'Sign-in failed. Please try again.');
             });
-    }, [code, completeGoogleOAuth, destination, errorParam, navigate]);
+    }, [code, completeGoogleOAuth, destination, navigate, urlError]);
 
-    const isFailed = status === 'failed';
+    const error = urlError ?? exchangeError;
+    const isFailed = error !== null;
 
     return (
         <div

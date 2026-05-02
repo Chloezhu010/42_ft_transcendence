@@ -89,6 +89,26 @@ async def get_oauth_result(
         return await cursor.fetchone()
 
 
+async def consume_oauth_result(
+    db: aiosqlite.Connection,
+    code: str,
+) -> Row | None:
+    """Atomically delete and return a one-time OAuth result by its code."""
+    cursor = await db.execute(
+        """
+        DELETE FROM oauth_results
+        WHERE code = ? AND expires_at > CURRENT_TIMESTAMP
+        RETURNING user_id, expires_at
+        """,
+        (code,),
+    )
+    row = await cursor.fetchone()
+    await db.commit()
+    if row is None:
+        return None
+    return {"user_id": row[0], "expires_at": row[1]}
+
+
 async def delete_oauth_result(
     db: aiosqlite.Connection,
     code: str,
