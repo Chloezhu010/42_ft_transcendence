@@ -5,6 +5,13 @@ from auth_utils import hash_password  # for password hashing and token creation
 
 
 # --- User identity ---
+async def create_oauth_user(db: aiosqlite.Connection, username: str, email: str) -> int:
+    """Create a new OAuth-only user (no password) and return their ID."""
+    cursor = await db.execute("INSERT INTO users (username, email) VALUES (?, ?)", (username, email))
+    await db.commit()
+    return cursor.lastrowid
+
+
 async def create_user(db: aiosqlite.Connection, username: str, email: str, password: str) -> int:
     """Create a new user and return their ID."""
     hashed_pwd = hash_password(password)  # hash the password before storing

@@ -31,6 +31,13 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
 
 
+# --- Oauth Model ---
+class OauthExchangeRequest(BaseModel):
+    """Request body for exchanging OAuth code for JWT token."""
+
+    code: str = Field(min_length=1)
+
+
 # --- User Models ---
 class UserResponse(BaseModel):
     """User data in responses."""

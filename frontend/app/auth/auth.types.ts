@@ -11,4 +11,5 @@ export interface AuthContextValue {
     signup: (email: string, username: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
     refreshMe: () => Promise<void>;
+    completeGoogleOAuth: (code: string) => Promise<void>;
 }
