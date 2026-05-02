@@ -35,7 +35,7 @@ function getOAuthErrorMessage(errorParam: string): string {
 }
 
 export function GoogleOAuthCallbackPage(): JSX.Element {
-    const { completeGoogleOAuth } = useAuth();
+    const { completeGoogleOAuth, isLoadingSession } = useAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [exchangeError, setExchangeError] = useState<string | null>(null);
@@ -53,6 +53,7 @@ export function GoogleOAuthCallbackPage(): JSX.Element {
 
     useEffect(() => {
         if (urlError) return;
+        if (isLoadingSession) return;
         // Guard against StrictMode double-invocation and stale re-runs: the backend
         // issues one-time OAuth codes, so a second exchange call would always fail.
         if (exchangeStarted.current) return;
@@ -63,7 +64,7 @@ export function GoogleOAuthCallbackPage(): JSX.Element {
             .catch((err: unknown) => {
                 setExchangeError(err instanceof Error ? err.message : 'Sign-in failed. Please try again.');
             });
-    }, [code, completeGoogleOAuth, destination, navigate, urlError]);
+    }, [code, completeGoogleOAuth, destination, isLoadingSession, navigate, urlError]);
 
     const error = urlError ?? exchangeError;
     const isFailed = error !== null;
