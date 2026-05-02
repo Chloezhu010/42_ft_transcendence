@@ -197,3 +197,48 @@ async def test_init_db_migrates_legacy_users_password_hash_not_null(tmp_path, mo
         password_hash = next(row for row in rows if row["name"] == "password_hash")
 
         assert password_hash["notnull"] == 0
+
+
+@pytest.mark.asyncio
+async def test_init_db_preserves_admin_flags_when_migrating_legacy_users(tmp_path, monkeypatch):
+    db_path = tmp_path / "legacy-admin.db"
+    monkeypatch.setenv("DB_PATH", str(db_path))
+
+    async with aiosqlite.connect(str(db_path)) as db:
+        await db.executescript(
+            """
+            CREATE TABLE users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email TEXT NOT NULL UNIQUE,
+                username TEXT NOT NULL UNIQUE,
+                password_hash TEXT NOT NULL,
+                avatar_path TEXT DEFAULT 'default-avatar.png',
+                is_online BOOLEAN NOT NULL DEFAULT 0,
+                is_admin BOOLEAN NOT NULL DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+
+            INSERT INTO users (id, email, username, password_hash, is_admin)
+            VALUES
+                (1, 'local@dev', 'local-user', 'none', 1),
+                (2, 'admin@example.com', 'admin-user', 'hash', 1),
+                (3, 'regular@example.com', 'regular-user', 'hash', 0);
+            """
+        )
+        await db.commit()
+
+    import db.database as database
+
+    database.DB_PATH = str(db_path)
+    await init_db()
+
+    async with aiosqlite.connect(str(db_path)) as db:
+        db.row_factory = aiosqlite.Row
+        rows = await (await db.execute("SELECT id, is_admin FROM users ORDER BY id")).fetchall()
+
+        assert {row["id"]: row["is_admin"] for row in rows} == {
+            1: 1,
+            2: 1,
+            3: 0,
+        }
