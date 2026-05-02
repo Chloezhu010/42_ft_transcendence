@@ -47,7 +47,7 @@ function SketchyCard({
   children,
   className = '',
   style,
-  shadowColor = 'rgba(242, 201, 76, 0.25)',
+  shadowColor = 'rgba(157, 107, 207, 0.2)',
   disableHoverEffect = false,
   ...props
 }: SketchyCardProps): JSX.Element {

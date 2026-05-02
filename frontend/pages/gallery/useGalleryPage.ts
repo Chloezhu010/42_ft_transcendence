@@ -86,7 +86,7 @@ export function useGalleryPage(): UseGalleryPageResult {
       )));
       toast.error(t('galleryPage.notifications.shareFailed'));
     }
-  }, [accessToken, stories]);
+  }, [accessToken, stories, t]);
 
   return {
     isLoading,
