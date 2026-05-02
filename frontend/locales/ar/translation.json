@@ -11,7 +11,8 @@
         "terms": "شروط الخدمة",
         "repository": "المستودع"
       }
-    }
+    },
+    "friends": "الأصدقاء"
   },
   "comicPanel": {
     "paintingScene": "رسم المشهد...",
@@ -29,7 +30,97 @@
     "noStoriesFound": "لم يتم العثور على قصص بعد.",
     "readNow": "اقرأ الآن",
     "untitledMasterpiece": "تحفة فنية بدون عنوان",
-    "deleteStory": "هل أنت متأكد أنك تريد حذف هذه القصة؟ لا يمكن التراجع عن هذا."
+    "deleteStory": "هل أنت متأكد أنك تريد حذف هذه القصة؟ لا يمكن التراجع عن هذا.",
+    "notifications": {
+      "storyDeleted": "تم حذف القصة.",
+      "deleteFailed": "تعذر حذف القصة.",
+      "sharedWithFriends": "تمت مشاركة القصة مع الأصدقاء.",
+      "setPrivate": "تم تعيين القصة كخاصة.",
+      "shareFailed": "تعذر تحديث مشاركة القصة."
+    },
+    "sharing": {
+      "label": "المشاركة",
+      "private": "خاص",
+      "friends": "الأصدقاء"
+    }
+  },
+  "friendLibrary": {
+    "sharedLibrary": "المكتبة المشتركة",
+    "backToFriends": "العودة إلى الأصدقاء",
+    "backToFriendsArrow": "<- العودة إلى الأصدقاء",
+    "title": "المكتبة المشتركة لـ {{name}}",
+    "fallbackName": "صديق",
+    "description": "تصفح القصص المصورة التي اختار هذا الصديق مشاركتها مع الأصدقاء المقبولين.",
+    "empty": "لا توجد قصص مصورة مشتركة بعد.",
+    "readShared": "اقرأ القصة المصورة المشتركة"
+  },
+  "friends": {
+    "title": "الأصدقاء",
+    "loading": "جارٍ التحميل…",
+    "header": {
+      "eyebrow": "المجتمع",
+      "description": "بدّل بين دائرتك الحالية والطلبات المعلّقة والاكتشاف."
+    },
+    "tabs": {
+      "friends": "الأصدقاء",
+      "pending": "معلّقة",
+      "discover": "اكتشف",
+      "ariaLabel": "أقسام الأصدقاء"
+    },
+    "actions": {
+      "dismiss": "إغلاق"
+    },
+    "errors": {
+      "loadHint": "تحقق من الجلسة وطلبات الشبكة ثم أعد تحميل الصفحة."
+    },
+    "status": {
+      "online": "متصل",
+      "offline": "غير متصل"
+    },
+    "buttons": {
+      "viewLibrary": "عرض المكتبة",
+      "remove": "إزالة",
+      "removing": "جارٍ الإزالة...",
+      "decline": "رفض",
+      "accept": "قبول",
+      "working": "جارٍ المعالجة...",
+      "requestSent": "تم إرسال الطلب",
+      "addFriend": "إضافة صديق",
+      "sending": "جارٍ الإرسال..."
+    },
+    "badges": {
+      "alreadyFriends": "أصدقاء",
+      "respondPending": "الرد في قسم المعلّقة"
+    },
+    "notifications": {
+      "requestSent": "تم إرسال طلب الصداقة.",
+      "requestAccepted": "تم قبول طلب الصداقة.",
+      "requestDeclined": "تم رفض طلب الصداقة.",
+      "friendRemoved": "تمت إزالة الصديق.",
+      "requestAcceptFailed": "تعذر قبول طلب الصداقة.",
+      "requestDeclineFailed": "تعذر رفض طلب الصداقة.",
+      "friendRemoveFailed": "تعذر إزالة الصديق.",
+      "requestExists": "طلب الصداقة موجود بالفعل.",
+      "requestFailed": "تعذر إرسال طلب الصداقة."
+    },
+    "panels": {
+      "friends": {
+        "eyebrow": "دائرتك",
+        "empty": "لم تقم بإضافة أي أصدقاء بعد."
+      },
+      "pending": {
+        "eyebrow": "بحاجة إلى انتباه",
+        "empty": "لا توجد طلبات صداقة معلّقة بعد."
+      },
+      "discover": {
+        "eyebrow": "وسّع القائمة",
+        "searchLabel": "ابحث عن مستخدمين",
+        "searchPlaceholder": "ابحث باسم المستخدم",
+        "emptyPrompt": "اكتب اسم مستخدم لاكتشاف مستخدمين آخرين.",
+        "searching": "جارٍ البحث…",
+        "noResults": "لم يتم العثور على مستخدمين."
+      }
+    }
   },
   "kidWizard": {
     "heroQuestion": "من هو البطل؟",
@@ -120,6 +211,9 @@
     "preview": {
       "backToLibrary": "العودة الى المكتبة",
       "label": "معاينة",
+      "readOnly": "للقراءة فقط",
+      "sharedTitle": "معاينة مشتركة",
+      "sharedDescription": "تتم مشاركة هذا الكوميك للقراءة فقط. تم تعطيل التوليد والتعديل.",
       "pageLabels": {
         "opening": "البداية",
         "ending": "النهاية"
@@ -150,6 +244,20 @@
       "reread": "اقرأ القصة مرة اخرى",
       "backToLibrary": "العودة الى المكتبة",
       "storyCompleteBodyShared": "جاهزة للاستمتاع بها في هذه المكتبة المشتركة في اي وقت."
+    },
+    "notifications": {
+      "previewCreated": "تم إنشاء مسودة القصة.",
+      "storyUpdated": "تم تحديث القصة.",
+      "panelImageUpdated": "تم تحديث صورة اللوحة.",
+      "panelImageUpdateFailed": "تعذر تحديث صورة اللوحة."
+    },
+    "errors": {
+      "loadFailed": "تعذر تحميل القصة.",
+      "invalidStoryId": "معرّف القصة غير صالح.",
+      "previewExpired": "انتهت صلاحية المعاينة. يرجى إعادة الإنشاء.",
+      "generationFailed": "فشل توليد القصة.",
+      "noPanels": "فشل توليد القصة: لم يتم إرجاع أي لوحات.",
+      "previewImagesMissing": "صور المعاينة مفقودة. يرجى إعادة توليد المعاينة."
     }
   },
   "auth": {

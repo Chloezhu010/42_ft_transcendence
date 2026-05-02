@@ -11,7 +11,8 @@
         "terms": "Términos de servicio",
         "repository": "Repositorio"
       }
-    }
+    },
+    "friends": "Amigos"
   },
   "comicPanel": {
     "paintingScene": "Pintando Escena...",
@@ -29,7 +30,97 @@
     "noStoriesFound": "Ninguna historia encontrada aún.",
     "readNow": "LEER AHORA",
     "untitledMasterpiece": "Obra Maestra sin Título",
-    "deleteStory": "¿Está seguro de que desea eliminar esta historia? Esto no se puede deshacer."
+    "deleteStory": "¿Está seguro de que desea eliminar esta historia? Esto no se puede deshacer.",
+    "notifications": {
+      "storyDeleted": "Historia eliminada.",
+      "deleteFailed": "No se pudo eliminar la historia.",
+      "sharedWithFriends": "Historia compartida con amigos.",
+      "setPrivate": "Historia marcada como privada.",
+      "shareFailed": "No se pudo actualizar el uso compartido de la historia."
+    },
+    "sharing": {
+      "label": "Compartir",
+      "private": "Privado",
+      "friends": "Amigos"
+    }
+  },
+  "friendLibrary": {
+    "sharedLibrary": "Biblioteca compartida",
+    "backToFriends": "Volver a Amigos",
+    "backToFriendsArrow": "<- Volver a Amigos",
+    "title": "Biblioteca compartida de {{name}}",
+    "fallbackName": "Amigo",
+    "description": "Explora los cómics que este amigo eligió compartir con sus amigos aceptados.",
+    "empty": "Aún no hay cómics compartidos.",
+    "readShared": "Leer cómic compartido"
+  },
+  "friends": {
+    "title": "Amigos",
+    "loading": "Cargando…",
+    "header": {
+      "eyebrow": "Comunidad",
+      "description": "Cambia entre tu círculo actual, solicitudes pendientes y descubrimiento."
+    },
+    "tabs": {
+      "friends": "Amigos",
+      "pending": "Pendientes",
+      "discover": "Descubrir",
+      "ariaLabel": "Secciones de amigos"
+    },
+    "actions": {
+      "dismiss": "Cerrar"
+    },
+    "errors": {
+      "loadHint": "Revisa tu sesión y las solicitudes de red, luego recarga la página."
+    },
+    "status": {
+      "online": "En línea",
+      "offline": "Desconectado"
+    },
+    "buttons": {
+      "viewLibrary": "Ver biblioteca",
+      "remove": "Eliminar",
+      "removing": "Eliminando...",
+      "decline": "Rechazar",
+      "accept": "Aceptar",
+      "working": "Procesando...",
+      "requestSent": "Solicitud enviada",
+      "addFriend": "Agregar amigo",
+      "sending": "Enviando..."
+    },
+    "badges": {
+      "alreadyFriends": "Amigos",
+      "respondPending": "Responde en Pendientes"
+    },
+    "notifications": {
+      "requestSent": "Solicitud de amistad enviada.",
+      "requestAccepted": "Solicitud de amistad aceptada.",
+      "requestDeclined": "Solicitud de amistad rechazada.",
+      "friendRemoved": "Amigo eliminado.",
+      "requestAcceptFailed": "No se pudo aceptar la solicitud de amistad.",
+      "requestDeclineFailed": "No se pudo rechazar la solicitud de amistad.",
+      "friendRemoveFailed": "No se pudo eliminar al amigo.",
+      "requestExists": "La solicitud de amistad ya existe.",
+      "requestFailed": "No se pudo enviar la solicitud de amistad."
+    },
+    "panels": {
+      "friends": {
+        "eyebrow": "Tu círculo",
+        "empty": "Aún no has agregado amigos."
+      },
+      "pending": {
+        "eyebrow": "Necesita atención",
+        "empty": "Aún no hay solicitudes de amistad pendientes."
+      },
+      "discover": {
+        "eyebrow": "Ampliar la lista",
+        "searchLabel": "Buscar usuarios",
+        "searchPlaceholder": "Buscar por nombre de usuario",
+        "emptyPrompt": "Escribe un nombre de usuario para descubrir otros usuarios.",
+        "searching": "Buscando…",
+        "noResults": "No se encontraron usuarios."
+      }
+    }
   },
   "kidWizard": {
     "heroQuestion": "¿Quién es el Héroe?",
@@ -120,6 +211,9 @@
     "preview": {
       "backToLibrary": "Volver a la biblioteca",
       "label": "Vista previa",
+      "readOnly": "Solo lectura",
+      "sharedTitle": "Vista previa compartida",
+      "sharedDescription": "Este cómic se comparte en modo solo lectura. La generación y la edición están desactivadas.",
       "pageLabels": {
         "opening": "Apertura",
         "ending": "Final"
@@ -150,6 +244,20 @@
       "reread": "Releer historia",
       "backToLibrary": "Volver a la biblioteca",
       "storyCompleteBodyShared": "esta lista para disfrutarse cuando quieras en esta biblioteca compartida."
+    },
+    "notifications": {
+      "previewCreated": "Borrador de historia creado.",
+      "storyUpdated": "Historia actualizada.",
+      "panelImageUpdated": "Imagen del panel actualizada.",
+      "panelImageUpdateFailed": "No se pudo actualizar la imagen del panel."
+    },
+    "errors": {
+      "loadFailed": "No se pudo cargar la historia.",
+      "invalidStoryId": "ID de historia no válido.",
+      "previewExpired": "La vista previa ha expirado. Por favor, genera de nuevo.",
+      "generationFailed": "La generación de la historia falló.",
+      "noPanels": "La generación de la historia falló: no se devolvieron paneles.",
+      "previewImagesMissing": "Faltan las imágenes de vista previa. Por favor, vuelve a generar la vista previa."
     }
   },
   "auth": {
@@ -190,7 +298,7 @@
       "startCreating": "Empezar a crear"
     },
     "hero": {
-      "titleLine1": "La imaginacion de tu hijo,",
+      "titleLine1": "La imaginacion de su hijo,",
       "titleLine2": "cobrando vida.",
       "subtitle": "Transforma ideas simples en comics de IA personalizados, dibujados a mano.",
       "ctaCreate": "Crear una historia",

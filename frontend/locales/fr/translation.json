@@ -11,7 +11,8 @@
         "terms": "Conditions d'utilisation",
         "repository": "Dépôt"
       }
-    }
+    },
+    "friends": "Amis"
   },
   "comicPanel": {
     "paintingScene": "Peindre une Scène...",
@@ -29,7 +30,97 @@
     "noStoriesFound": "Aucune histoire trouvée pour le moment.",
     "readNow": "LIRE MAINTENANT",
     "untitledMasterpiece": "Chef-d'œuvre sans titre",
-    "deleteStory": "Êtes-vous sûr de vouloir supprimer cette histoire? Cela ne peut pas être annulé."
+    "deleteStory": "Êtes-vous sûr de vouloir supprimer cette histoire? Cela ne peut pas être annulé.",
+    "notifications": {
+      "storyDeleted": "Histoire supprimée.",
+      "deleteFailed": "Impossible de supprimer l'histoire.",
+      "sharedWithFriends": "Histoire partagée avec les amis.",
+      "setPrivate": "Histoire définie comme privée.",
+      "shareFailed": "Impossible de mettre à jour le partage de l'histoire."
+    },
+    "sharing": {
+      "label": "Partage",
+      "private": "Privé",
+      "friends": "Amis"
+    }
+  },
+  "friendLibrary": {
+    "sharedLibrary": "Bibliothèque partagée",
+    "backToFriends": "Retour aux amis",
+    "backToFriendsArrow": "<- Retour aux amis",
+    "title": "Bibliothèque partagée de {{name}}",
+    "fallbackName": "Ami",
+    "description": "Parcourez les bandes dessinées que cet ami a choisi de partager avec ses amis acceptés.",
+    "empty": "Aucune BD partagée pour le moment.",
+    "readShared": "Lire la BD partagée"
+  },
+  "friends": {
+    "title": "Amis",
+    "loading": "Chargement…",
+    "header": {
+      "eyebrow": "Communauté",
+      "description": "Basculez entre votre cercle actuel, les demandes en attente et la découverte."
+    },
+    "tabs": {
+      "friends": "Amis",
+      "pending": "En attente",
+      "discover": "Découvrir",
+      "ariaLabel": "Sections des amis"
+    },
+    "actions": {
+      "dismiss": "Fermer"
+    },
+    "errors": {
+      "loadHint": "Vérifiez votre session et vos requêtes réseau, puis rechargez la page."
+    },
+    "status": {
+      "online": "En ligne",
+      "offline": "Hors ligne"
+    },
+    "buttons": {
+      "viewLibrary": "Voir la bibliothèque",
+      "remove": "Supprimer",
+      "removing": "Suppression...",
+      "decline": "Refuser",
+      "accept": "Accepter",
+      "working": "Traitement...",
+      "requestSent": "Demande envoyée",
+      "addFriend": "Ajouter un ami",
+      "sending": "Envoi..."
+    },
+    "badges": {
+      "alreadyFriends": "Amis",
+      "respondPending": "Répondre dans En attente"
+    },
+    "notifications": {
+      "requestSent": "Demande d'ami envoyée.",
+      "requestAccepted": "Demande d'ami acceptée.",
+      "requestDeclined": "Demande d'ami refusée.",
+      "friendRemoved": "Ami supprimé.",
+      "requestAcceptFailed": "Impossible d'accepter la demande d'ami.",
+      "requestDeclineFailed": "Impossible de refuser la demande d'ami.",
+      "friendRemoveFailed": "Impossible de supprimer l'ami.",
+      "requestExists": "La demande d'ami existe déjà.",
+      "requestFailed": "Impossible d'envoyer la demande d'ami."
+    },
+    "panels": {
+      "friends": {
+        "eyebrow": "Votre cercle",
+        "empty": "Vous n'avez pas encore ajouté d'amis."
+      },
+      "pending": {
+        "eyebrow": "À traiter",
+        "empty": "Aucune demande d'ami en attente."
+      },
+      "discover": {
+        "eyebrow": "Élargir la liste",
+        "searchLabel": "Rechercher des utilisateurs",
+        "searchPlaceholder": "Rechercher par nom d'utilisateur",
+        "emptyPrompt": "Tapez un nom d'utilisateur pour découvrir d'autres utilisateurs.",
+        "searching": "Recherche…",
+        "noResults": "Aucun utilisateur trouvé."
+      }
+    }
   },
   "kidWizard": {
     "heroQuestion": "Qui est le Héros?",
@@ -120,6 +211,9 @@
     "preview": {
       "backToLibrary": "Retour à la bibliothèque",
       "label": "Aperçu",
+      "readOnly": "Lecture seule",
+      "sharedTitle": "Aperçu partagé",
+      "sharedDescription": "Cette BD est partagée en lecture seule. La génération et l'édition sont désactivées.",
       "pageLabels": {
         "opening": "Ouverture",
         "ending": "Conclusion"
@@ -150,6 +244,20 @@
       "reread": "Relire l'histoire",
       "backToLibrary": "Retour à la bibliothèque",
       "storyCompleteBodyShared": "est prête à être relue à tout moment dans cette bibliothèque partagée."
+    },
+    "notifications": {
+      "previewCreated": "Brouillon de l'histoire créé.",
+      "storyUpdated": "Histoire mise à jour.",
+      "panelImageUpdated": "Image de la case mise à jour.",
+      "panelImageUpdateFailed": "Impossible de mettre à jour l'image de la case."
+    },
+    "errors": {
+      "loadFailed": "Impossible de charger l'histoire.",
+      "invalidStoryId": "Identifiant d'histoire invalide.",
+      "previewExpired": "L'aperçu a expiré. Veuillez régénérer.",
+      "generationFailed": "La génération de l'histoire a échoué.",
+      "noPanels": "La génération de l'histoire a échoué : aucune planche renvoyée.",
+      "previewImagesMissing": "Les images d'aperçu sont manquantes. Veuillez régénérer l'aperçu."
     }
   },
   "auth": {

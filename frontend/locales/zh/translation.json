@@ -11,7 +11,8 @@
         "terms": "服务条款",
         "repository": "仓库"
       }
-    }
+    },
+    "friends": "好友"
   },
   "comicPanel": {
     "paintingScene": "绘制场景...",
@@ -29,7 +30,97 @@
     "noStoriesFound": "还没有找到任何故事。",
     "readNow": "现在阅读",
     "untitledMasterpiece": "无标题杰作",
-    "deleteStory": "您确定要删除此故事吗？这将无法撤消。"
+    "deleteStory": "您确定要删除此故事吗？这将无法撤消。",
+    "notifications": {
+      "storyDeleted": "故事已删除。",
+      "deleteFailed": "无法删除故事。",
+      "sharedWithFriends": "故事已与好友共享。",
+      "setPrivate": "故事已设为私密。",
+      "shareFailed": "无法更新故事分享设置。"
+    },
+    "sharing": {
+      "label": "分享",
+      "private": "私密",
+      "friends": "好友"
+    }
+  },
+  "friendLibrary": {
+    "sharedLibrary": "共享图书馆",
+    "backToFriends": "返回好友",
+    "backToFriendsArrow": "<- 返回好友",
+    "title": "{{name}}的共享图书馆",
+    "fallbackName": "好友",
+    "description": "浏览此好友选择与已接受好友分享的漫画。",
+    "empty": "还没有共享的漫画。",
+    "readShared": "阅读共享漫画"
+  },
+  "friends": {
+    "title": "好友",
+    "loading": "加载中…",
+    "header": {
+      "eyebrow": "社区",
+      "description": "在当前好友、待处理请求和发现之间切换。"
+    },
+    "tabs": {
+      "friends": "好友",
+      "pending": "待处理",
+      "discover": "发现",
+      "ariaLabel": "好友分区"
+    },
+    "actions": {
+      "dismiss": "关闭"
+    },
+    "errors": {
+      "loadHint": "检查你的会话和网络请求，然后刷新页面。"
+    },
+    "status": {
+      "online": "在线",
+      "offline": "离线"
+    },
+    "buttons": {
+      "viewLibrary": "查看图书馆",
+      "remove": "移除",
+      "removing": "正在移除...",
+      "decline": "拒绝",
+      "accept": "接受",
+      "working": "处理中...",
+      "requestSent": "请求已发送",
+      "addFriend": "添加好友",
+      "sending": "正在发送..."
+    },
+    "badges": {
+      "alreadyFriends": "好友",
+      "respondPending": "在待处理中回应"
+    },
+    "notifications": {
+      "requestSent": "已发送好友请求。",
+      "requestAccepted": "已接受好友请求。",
+      "requestDeclined": "已拒绝好友请求。",
+      "friendRemoved": "已移除好友。",
+      "requestAcceptFailed": "无法接受好友请求。",
+      "requestDeclineFailed": "无法拒绝好友请求。",
+      "friendRemoveFailed": "无法移除好友。",
+      "requestExists": "好友请求已存在。",
+      "requestFailed": "无法发送好友请求。"
+    },
+    "panels": {
+      "friends": {
+        "eyebrow": "你的圈子",
+        "empty": "你还没有添加任何好友。"
+      },
+      "pending": {
+        "eyebrow": "需要处理",
+        "empty": "还没有待处理的好友请求。"
+      },
+      "discover": {
+        "eyebrow": "扩展列表",
+        "searchLabel": "搜索用户",
+        "searchPlaceholder": "按用户名搜索",
+        "emptyPrompt": "输入用户名以发现其他用户。",
+        "searching": "搜索中…",
+        "noResults": "未找到用户。"
+      }
+    }
   },
   "kidWizard": {
     "heroQuestion": "谁是英雄？",
@@ -120,6 +211,9 @@
     "preview": {
       "backToLibrary": "返回图书馆",
       "label": "预览",
+      "readOnly": "只读",
+      "sharedTitle": "共享预览",
+      "sharedDescription": "此漫画以只读方式共享，生成与编辑已禁用。",
       "pageLabels": {
         "opening": "开篇",
         "ending": "结尾"
@@ -150,6 +244,20 @@
       "reread": "再读一遍",
       "backToLibrary": "返回图书馆",
       "storyCompleteBodyShared": "已经准备好在这个共享图书馆中随时享受。"
+    },
+    "notifications": {
+      "previewCreated": "已创建故事草稿。",
+      "storyUpdated": "故事已更新。",
+      "panelImageUpdated": "分镜图像已更新。",
+      "panelImageUpdateFailed": "无法更新分镜图像。"
+    },
+    "errors": {
+      "loadFailed": "无法加载故事。",
+      "invalidStoryId": "故事ID无效。",
+      "previewExpired": "预览已过期，请重新生成。",
+      "generationFailed": "故事生成失败。",
+      "noPanels": "故事生成失败：未返回分镜。",
+      "previewImagesMissing": "预览图像缺失，请重新生成预览。"
     }
   },
   "auth": {
@@ -184,7 +292,7 @@
   },
   "landing": {
     "nav": {
-      "howItWorks": "工作原理",
+      "howItWorks": "如何运作",
       "gallery": "画廊",
       "explore": "探索",
       "startCreating": "开始创作"
@@ -221,7 +329,7 @@
       ]
     },
     "howItWorks": {
-      "title": "工作原理",
+      "title": "如何运作",
       "steps": [
         {
           "number": "1",
@@ -268,7 +376,7 @@
           "image": "/alice.png"
         }
       ],
-      "disclaimer": "* 所有展示图片均为 AI 生成的示意，不代表真实儿童。"
+      "disclaimer": "* 所有展示图片均为 AI 生成，不代表真实儿童。"
     },
     "pricing": {
       "title": "开始探索",
@@ -278,7 +386,7 @@
         "description": "从角色想法开始创建新漫画",
         "features": [
           "角色档案流程",
-          "标题与序言流式生成",
+          "标题与序言流生成",
           "可编辑的漫画分镜"
         ],
         "cta": "开始创作"
@@ -331,7 +439,7 @@
             "blocks": [
               {
                 "paragraphs": [
-                  "Funova 是为 42 ft_transcendence 项目打造的学生应用。它将孩子英雄的档案转化为 AI 生成的漫画书，提供预览流程、可编辑分镜和保存画廊。",
+                  "Funova 是为 42 ft_transcendence 项目打造的学生项目。它将孩子英雄的档案转化为 AI 生成的漫画书，提供预览流程、可编辑分镜和保存画廊。",
                   "本隐私政策说明当前版本处理哪些信息、如何使用这些信息，以及该项目部署适用的实际限制。"
                 ]
               }
@@ -344,7 +452,7 @@
               {
                 "heading": "2.1 故事输入数据",
                 "paragraphs": [
-                  "当你创建故事时，Funova 可能会处理你在创建流程中输入的信息，包括："
+                  "当你创建故事时，Funova 可能会处理在创建流程中输入的信息，包括："
                 ],
                 "bullets": [
                   "角色档案细节，如英雄姓名、外观特征、喜欢的颜色、原型以及自由梦想提示。",
@@ -369,7 +477,7 @@
           },
           {
             "id": "use",
-            "title": "3. 我们如何使用你的信息",
+            "title": "3. 我们如何使用信息",
             "blocks": [
               {
                 "paragraphs": [

@@ -2,6 +2,7 @@
  * Story page container.
  * Selects the active screen and feeds pure props into presentational components.
  */
+import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import KidWizard from '@/components/KidWizard';
 import MagicLoader from '@/components/MagicLoader';
@@ -11,6 +12,10 @@ import StoryboardView from '@/components/StoryboardView';
 import { Heading, Text } from '@/components/design-system/Typography';
 import { useStoryPage } from './useStoryPage';
 import { StoryPageView } from './story.types';
+
+function AccentSpan({ i18nIsDynamicList: _, ...props }: Record<string, unknown>) {
+  return <span className="text-brand-primary underline decoration-brand-accent decoration-8" {...(props as React.HTMLAttributes<HTMLSpanElement>)} />;
+}
 
 function StoryPage(): JSX.Element | null {
   const { access, actions, introStream, profile, story, view, wizard } = useStoryPage();
@@ -23,9 +28,7 @@ function StoryPage(): JSX.Element | null {
           <Heading variant="h1" className="mb-4 text-brand-dark">
             <Trans
               i18nKey="mainPage.title"
-              components={{
-                accent: <span className="text-brand-primary underline decoration-brand-accent decoration-8" />
-              }}
+              components={{ accent: <AccentSpan /> }}
             />
           </Heading>
           <Text className="text-brand-muted italic">

@@ -76,7 +76,9 @@ function PreviewBookFrame({
 
       <div className="absolute top-4 right-4 z-30">
         <div className="bg-white/90 backdrop-blur-sm py-2 px-4 rounded-full shadow-soft border border-brand-secondary/20">
-          <Label className="text-brand-primary uppercase tracking-widest">{isReadOnly ? 'Read Only' : t('story.preview.label')}</Label>
+          <Label className="text-brand-primary uppercase tracking-widest">
+            {isReadOnly ? t('story.preview.readOnly') : t('story.preview.label')}
+          </Label>
         </div>
       </div>
 
@@ -187,32 +189,36 @@ function PreviewGeneratePage({
   onStartOver,
   isReadOnly,
 }: PreviewGeneratePageProps): JSX.Element {
+  const { t } = useTranslation();
+
   return (
     <div className="h-full flex flex-col items-center justify-center p-12 text-center bg-gradient-to-br from-brand-accent/10 to-white">
       <div className="text-5xl mb-6">✨</div>
       {isReadOnly ? (
         <>
-          <Heading variant="h3" className="text-brand-primary mb-3">Shared Preview</Heading>
+          <Heading variant="h3" className="text-brand-primary mb-3">
+            {t('story.preview.sharedTitle')}
+          </Heading>
           <Text className="text-brand-dark/60 italic text-sm">
-            This comic is shared as read-only. Generation and editing are disabled.
+            {t('story.preview.sharedDescription')}
           </Text>
         </>
       ) : (
         <>
-          <Heading variant="h3" className="text-brand-primary mb-3">Like what you see?</Heading>
+          <Heading variant="h3" className="text-brand-primary mb-3">{t('story.preview.ctaTitle')}</Heading>
           <Text className="text-brand-dark/60 italic mb-8 text-sm">
-            We&apos;ll fill in the {middlePanelCount} panels between opening and ending.
+            {t('story.preview.ctaDescription', { count: middlePanelCount })}
           </Text>
           <div className="flex flex-col gap-3 w-full max-w-[220px]">
             <SketchyButton onClick={() => void onGenerate()} className="px-6 py-3 rounded-full text-sm w-full">
-              Generate Full Story
+              {t('story.preview.generateFull')}
             </SketchyButton>
             <SketchyButton
               variant="outline"
               onClick={onStartOver}
               className="px-6 py-3 rounded-full text-sm w-full"
             >
-              Start Over
+              {t('story.preview.startOver')}
             </SketchyButton>
           </div>
         </>

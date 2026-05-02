@@ -4,6 +4,8 @@
  * handlers to accept/decline requests and remove friends.
  */
 import { useEffect, useMemo, useState, useCallback } from "react";
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { useAuth } from "@/app/auth";
 import type { FriendResponse, PublicUserResponse } from "@api";
 import {
@@ -72,6 +74,7 @@ interface UseFriendsPageResult {
 // Hook
 // ----------------------------------------------------
 export function useFriendsPage(): UseFriendsPageResult {
+    const { t } = useTranslation();
     const { accessToken } = useAuth();
     const [friends, setFriends] = useState<FriendResponse[]>(USE_FRIENDS_MOCK_DATA ? MOCK_FRIENDS : []);
     const [pendingIncoming, setPendingIncoming] = useState<FriendResponse[]>(USE_FRIENDS_MOCK_DATA ? MOCK_PENDING_FRIENDS : []);
@@ -193,13 +196,16 @@ export function useFriendsPage(): UseFriendsPageResult {
             if (!accessToken) throw new Error('No session');
             const confirmed = await sendFriendRequest(accessToken, userId);
             setPendingOutgoing(prev => replaceFriendById(prev, userId, confirmed));
+            toast.success(t('friends.notifications.requestSent'));
         } catch (err) {
             setPendingOutgoing(prev => removeFriendById(prev, userId));
-            setActionError(getSendRequestErrorMessage(err));
+            const message = getSendRequestErrorMessage(err, t);
+            setActionError(message);
+            toast.error(message);
         } finally {
             setSendingIds(prev => removeIdFromSet(prev, userId));
         }
-    }, [accessToken, friendsIds, pendingIncomingIds, pendingOutgoingIds, searchResults, sendingIds]);
+    }, [accessToken, friendsIds, pendingIncomingIds, pendingOutgoingIds, searchResults, sendingIds, t]);
 
     // Accept an incoming pending friend request from `userId`
     const acceptRequest = useCallback(async (userId: number) => {
@@ -217,14 +223,17 @@ export function useFriendsPage(): UseFriendsPageResult {
                 const confirmed = await acceptFriendRequest(accessToken, userId);
                 setFriends(prev => replaceFriendById(prev, userId, confirmed));
             }
+            toast.success(t('friends.notifications.requestAccepted'));
         } catch {
             setFriends(prev => removeFriendById(prev, userId));
             setPendingIncoming(prev => [...prev, target]);
-            setActionError('Could not accept friend request.');
+            const message = t('friends.notifications.requestAcceptFailed');
+            setActionError(message);
+            toast.error(message);
         } finally {
             setPendingActionIds(prev => removeIdFromSet(prev, userId));
         }
-    }, [accessToken, pendingIncoming]);
+    }, [accessToken, pendingIncoming, t]);
 
     // Decline (reject) an incoming pending friend request from `userId`
     const declineRequest = useCallback(async (userId: number) => {
@@ -239,13 +248,16 @@ export function useFriendsPage(): UseFriendsPageResult {
                 if (!accessToken) throw new Error('No session');
                 await removeFriendApi(accessToken, userId);
             }
+            toast.success(t('friends.notifications.requestDeclined'));
         } catch {
             setPendingIncoming(prev => [...prev, target]);
-            setActionError('Could not decline friend request.');
+            const message = t('friends.notifications.requestDeclineFailed');
+            setActionError(message);
+            toast.error(message);
         } finally {
             setPendingActionIds(prev => removeIdFromSet(prev, userId));
         }
-    }, [accessToken, pendingIncoming]);
+    }, [accessToken, pendingIncoming, t]);
 
     // Remove an accepted friend by `friendId`
     const removeFriend = useCallback(async (friendId: number) => {
@@ -260,13 +272,16 @@ export function useFriendsPage(): UseFriendsPageResult {
                 if (!accessToken) throw new Error('No session');
                 await removeFriendApi(accessToken, friendId);
             }
+            toast.success(t('friends.notifications.friendRemoved'));
         } catch {
             setFriends(prev => [...prev, target]);
-            setActionError('Could not remove friend.');
+            const message = t('friends.notifications.friendRemoveFailed');
+            setActionError(message);
+            toast.error(message);
         } finally {
             setPendingActionIds(prev => removeIdFromSet(prev, friendId));
         }
-    }, [accessToken, friends]);
+    }, [accessToken, friends, t]);
 
     const clearActionError = useCallback((): void => {
         setActionError(null);

@@ -11,7 +11,8 @@
         "terms": "Terms of Service",
         "repository": "Repository"
       }
-    }
+    },
+    "friends": "Friends"
   },
   "comicPanel": {
     "paintingScene": "Painting Scene...",
@@ -29,7 +30,97 @@
     "noStoriesFound": "No stories found yet.",
     "readNow": "READ NOW",
     "untitledMasterpiece": "Untitled Masterpiece",
-    "deleteStory": "Are you sure you want to delete this story? This cannot be undone."
+    "deleteStory": "Are you sure you want to delete this story? This cannot be undone.",
+    "notifications": {
+      "storyDeleted": "Story deleted.",
+      "deleteFailed": "Failed to delete story.",
+      "sharedWithFriends": "Story shared with friends.",
+      "setPrivate": "Story set to private.",
+      "shareFailed": "Failed to update story sharing."
+    },
+    "sharing": {
+      "label": "Sharing",
+      "private": "Private",
+      "friends": "Friends"
+    }
+  },
+  "friendLibrary": {
+    "sharedLibrary": "Shared Library",
+    "backToFriends": "Back to Friends",
+    "backToFriendsArrow": "<- Back to Friends",
+    "title": "{{name}}'s Shared Library",
+    "fallbackName": "Friend",
+    "description": "Browse the comics this friend chose to share with accepted friends.",
+    "empty": "No shared comics yet.",
+    "readShared": "Read Shared Comic"
+  },
+  "friends": {
+    "title": "Friends",
+    "loading": "Loading…",
+    "header": {
+      "eyebrow": "Community",
+      "description": "Switch between your current circle, pending requests, and discovery."
+    },
+    "tabs": {
+      "friends": "Friends",
+      "pending": "Pending",
+      "discover": "Discover",
+      "ariaLabel": "Friends sections"
+    },
+    "actions": {
+      "dismiss": "Dismiss"
+    },
+    "errors": {
+      "loadHint": "Check your session and network requests, then try reloading the page."
+    },
+    "status": {
+      "online": "Online",
+      "offline": "Offline"
+    },
+    "buttons": {
+      "viewLibrary": "View Library",
+      "remove": "Remove",
+      "removing": "Removing...",
+      "decline": "Decline",
+      "accept": "Accept",
+      "working": "Working...",
+      "requestSent": "Request Sent",
+      "addFriend": "Add Friend",
+      "sending": "Sending..."
+    },
+    "badges": {
+      "alreadyFriends": "Friends",
+      "respondPending": "Respond in Pending"
+    },
+    "notifications": {
+      "requestSent": "Friend request sent.",
+      "requestAccepted": "Friend request accepted.",
+      "requestDeclined": "Friend request declined.",
+      "friendRemoved": "Friend removed.",
+      "requestAcceptFailed": "Could not accept friend request.",
+      "requestDeclineFailed": "Could not decline friend request.",
+      "friendRemoveFailed": "Could not remove friend.",
+      "requestExists": "Friend request already exists.",
+      "requestFailed": "Could not send friend request."
+    },
+    "panels": {
+      "friends": {
+        "eyebrow": "Your circle",
+        "empty": "You have no friends added yet."
+      },
+      "pending": {
+        "eyebrow": "Needs attention",
+        "empty": "No pending friend requests yet."
+      },
+      "discover": {
+        "eyebrow": "Grow the list",
+        "searchLabel": "Search users",
+        "searchPlaceholder": "Search by username",
+        "emptyPrompt": "Type a username to discover other users.",
+        "searching": "Searching…",
+        "noResults": "No users found."
+      }
+    }
   },
   "kidWizard": {
     "heroQuestion": "Who is the Hero?",
@@ -120,6 +211,9 @@
     "preview": {
       "backToLibrary": "Back to Library",
       "label": "Preview",
+      "readOnly": "Read Only",
+      "sharedTitle": "Shared Preview",
+      "sharedDescription": "This comic is shared as read-only. Generation and editing are disabled.",
       "pageLabels": {
         "opening": "Opening",
         "ending": "Ending"
@@ -150,6 +244,20 @@
       "reread": "Re-read Tale",
       "backToLibrary": "Back to Library",
       "storyCompleteBodyShared": "is ready to enjoy anytime in this shared library."
+    },
+    "notifications": {
+      "previewCreated": "Story draft created.",
+      "storyUpdated": "Story updated.",
+      "panelImageUpdated": "Panel image updated.",
+      "panelImageUpdateFailed": "Failed to update the panel image."
+    },
+    "errors": {
+      "loadFailed": "Failed to load story.",
+      "invalidStoryId": "Invalid story id.",
+      "previewExpired": "Preview expired. Please generate again.",
+      "generationFailed": "Story generation failed.",
+      "noPanels": "Story generation failed: no panels returned.",
+      "previewImagesMissing": "Preview images are missing. Please regenerate the preview."
     }
   },
   "auth": {
