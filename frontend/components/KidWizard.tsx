@@ -286,7 +286,7 @@ function AppearanceStepSection({
 
           {photoPreview && (
             <div className="flex-1 relative rounded-3xl overflow-hidden border-4 border-brand-accent">
-              <img src={photoPreview} alt="Preview" className="w-full h-32 object-cover" />
+              <img src={photoPreview} alt={t('kidWizard.photoPreviewAlt')} className="w-full h-32 object-cover" />
               <button
                 type="button"
                 onClick={onPhotoRemove}

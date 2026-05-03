@@ -14,7 +14,11 @@
       }
     },
     "friends": "友達",
-    "profileAriaLabel": "プロフィール"
+    "profileAriaLabel": "プロフィール",
+    "logoAlt": "Funova ロゴ",
+    "status": {
+      "loading": "読み込み中…"
+    }
   },
   "comicPanel": {
     "paintingScene": "シーンを描画中...",
@@ -25,7 +29,8 @@
     "editScene": "シーンを編集",
     "editPlaceholder": "例 好奇心旺盛な小さなロボットが地図を見ています...",
     "close": "閉じる",
-    "applyMagic": "魔法を適用✨"
+    "applyMagic": "魔法を適用✨",
+    "sceneAlt": "コミックの場面"
   },
   "galleryPage": {
     "mySavedBooks": "保存された書籍",
@@ -38,14 +43,18 @@
       "deleteFailed": "ストーリーを削除できませんでした。",
       "sharedWithFriends": "ストーリーをフレンドと共有しました。",
       "setPrivate": "ストーリーを非公開にしました。",
-      "shareFailed": "ストーリーの共有設定を更新できませんでした。"
+      "shareFailed": "ストーリーの共有設定を更新できませんでした。",
+      "loadFailed": "ストーリーを読み込めませんでした: {{message}}"
     },
     "sharing": {
       "label": "共有",
       "private": "非公開",
       "friends": "フレンド"
     },
-    "deleteStoryTitle": "物語を削除"
+    "deleteStoryTitle": "物語を削除",
+    "errors": {
+      "unknown": "不明なエラーです。"
+    }
   },
   "friendLibrary": {
     "sharedLibrary": "共有ライブラリ",
@@ -203,7 +212,8 @@
         "languageNotSupported": "この音声認識言語はサポートされていません。",
         "unexpected": "音声認識が予期せず停止しました。"
       }
-    }
+    },
+    "photoPreviewAlt": "選択した子どもの写真プレビュー"
   },
   "magicLoader": {
     "bindingTale": "物語を結合中...",
@@ -807,7 +817,8 @@
     },
     "avatar": {
       "uploading": "アップロード中…",
-      "change": "アバターを変更"
+      "change": "アバターを変更",
+      "alt": "{{username}} のアバター"
     },
     "cropper": {
       "previewAlt": "アバターのプレビュー",

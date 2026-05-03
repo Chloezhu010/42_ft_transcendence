@@ -14,7 +14,11 @@
       }
     },
     "friends": "Friends",
-    "profileAriaLabel": "Your profile"
+    "profileAriaLabel": "Your profile",
+    "logoAlt": "Funova logo",
+    "status": {
+      "loading": "Loading…"
+    }
   },
   "comicPanel": {
     "paintingScene": "Painting Scene...",
@@ -25,7 +29,8 @@
     "editScene": "Edit Scene",
     "editPlaceholder": "e.g. Add a curious little robot looking at the map...",
     "close": "Close",
-    "applyMagic": "Apply Magic ✨"
+    "applyMagic": "Apply Magic ✨",
+    "sceneAlt": "Comic scene"
   },
   "galleryPage": {
     "mySavedBooks": "My Saved Books",
@@ -38,14 +43,18 @@
       "deleteFailed": "Failed to delete story.",
       "sharedWithFriends": "Story shared with friends.",
       "setPrivate": "Story set to private.",
-      "shareFailed": "Failed to update story sharing."
+      "shareFailed": "Failed to update story sharing.",
+      "loadFailed": "Failed to load stories: {{message}}"
     },
     "sharing": {
       "label": "Sharing",
       "private": "Private",
       "friends": "Friends"
     },
-    "deleteStoryTitle": "Delete story"
+    "deleteStoryTitle": "Delete story",
+    "errors": {
+      "unknown": "Unknown error."
+    }
   },
   "friendLibrary": {
     "sharedLibrary": "Shared Library",
@@ -203,7 +212,8 @@
         "languageNotSupported": "This speech recognition language is not supported.",
         "unexpected": "Speech recognition stopped unexpectedly."
       }
-    }
+    },
+    "photoPreviewAlt": "Selected child photo preview"
   },
   "magicLoader": {
     "bindingTale": "Binding the Tale...",
@@ -807,7 +817,8 @@
     },
     "avatar": {
       "uploading": "Uploading…",
-      "change": "Change avatar"
+      "change": "Change avatar",
+      "alt": "{{username}}'s avatar"
     },
     "cropper": {
       "previewAlt": "Avatar preview",

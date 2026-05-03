@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 
 import type { UserResponse } from '@api';
 import { startGoogleOAuth } from '@api';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { SketchyButton } from '@/components/design-system/Primitives';
 
 const OAUTH_REDIRECT_PATH_KEY = 'auth.oauthRedirectPath';
@@ -44,6 +45,19 @@ function getLocalizedAuthErrorMessage(error: unknown, t: (key: string) => string
     }
 
     return error.message;
+}
+
+function AuthPageShell({ children }: { children: ReactNode }): JSX.Element {
+    return (
+        <div className="flex min-h-screen flex-col">
+            <header className="flex justify-end px-6 py-4">
+                <LanguageSwitcher />
+            </header>
+            <main className="flex flex-1 items-center justify-center px-6 py-12">
+                {children}
+            </main>
+        </div>
+    );
 }
 
 export function AuthFormPage({
@@ -97,9 +111,9 @@ export function AuthFormPage({
 
     if (isLoadingSession) {
         return (
-            <div className="flex flex-1 items-center justify-center">
+            <AuthPageShell>
                 <p className="font-rounded text-xl text-brand-muted">{t('auth.status.loading')}</p>
-            </div>
+            </AuthPageShell>
         );
     }
 
@@ -108,7 +122,7 @@ export function AuthFormPage({
     }
 
     return (
-        <div className="flex flex-1 items-center justify-center py-12">
+        <AuthPageShell>
             <div className="w-full max-w-md rounded-2xl border-4 border-brand-primary/20 bg-white p-10 shadow-soft">
                 <h1 className="mb-8 text-center font-sans text-3xl font-bold text-brand-dark">{title}</h1>
                 <form onSubmit={handleSubmit}>
@@ -142,6 +156,6 @@ export function AuthFormPage({
                     </Link>
                 </p>
             </div>
-        </div>
+        </AuthPageShell>
     );
 }

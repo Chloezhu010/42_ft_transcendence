@@ -14,7 +14,11 @@
       }
     },
     "friends": "好友",
-    "profileAriaLabel": "你的个人资料"
+    "profileAriaLabel": "你的个人资料",
+    "logoAlt": "Funova 标志",
+    "status": {
+      "loading": "正在加载…"
+    }
   },
   "comicPanel": {
     "paintingScene": "绘制场景...",
@@ -25,7 +29,8 @@
     "editScene": "编辑场景",
     "editPlaceholder": "例如 添加一个好奇的小机器人查看地图...",
     "close": "关闭",
-    "applyMagic": "应用魔法 ✨"
+    "applyMagic": "应用魔法 ✨",
+    "sceneAlt": "漫画场景"
   },
   "galleryPage": {
     "mySavedBooks": "我保存的书籍",
@@ -38,14 +43,18 @@
       "deleteFailed": "无法删除故事。",
       "sharedWithFriends": "故事已与好友共享。",
       "setPrivate": "故事已设为私密。",
-      "shareFailed": "无法更新故事分享设置。"
+      "shareFailed": "无法更新故事分享设置。",
+      "loadFailed": "无法加载故事：{{message}}"
     },
     "sharing": {
       "label": "分享",
       "private": "私密",
       "friends": "好友"
     },
-    "deleteStoryTitle": "删除故事"
+    "deleteStoryTitle": "删除故事",
+    "errors": {
+      "unknown": "未知错误。"
+    }
   },
   "friendLibrary": {
     "sharedLibrary": "共享图书馆",
@@ -203,7 +212,8 @@
         "languageNotSupported": "不支持此语音识别语言。",
         "unexpected": "语音识别意外停止。"
       }
-    }
+    },
+    "photoPreviewAlt": "已选择儿童照片预览"
   },
   "magicLoader": {
     "bindingTale": "绑定故事...",
@@ -807,7 +817,8 @@
     },
     "avatar": {
       "uploading": "上传中…",
-      "change": "更换头像"
+      "change": "更换头像",
+      "alt": "{{username}} 的头像"
     },
     "cropper": {
       "previewAlt": "头像预览",
