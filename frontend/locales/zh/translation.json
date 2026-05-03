@@ -809,6 +809,11 @@
       "uploading": "上传中…",
       "change": "更换头像"
     },
+    "cropper": {
+      "previewAlt": "头像预览",
+      "zoom": "缩放",
+      "usePhoto": "使用此照片"
+    },
     "fields": {
       "username": "用户名",
       "email": "邮箱"

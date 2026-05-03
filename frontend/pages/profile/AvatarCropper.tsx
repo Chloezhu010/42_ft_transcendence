@@ -4,6 +4,7 @@
  * Uses only <canvas> + pointer events — no external crop library.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { SketchyButton } from '@/components/design-system/Primitives';
 
 const OUTPUT_SIZE = 512; // final square size sent to backend
@@ -18,6 +19,7 @@ interface AvatarCropperProps {
 }
 
 export function AvatarCropper({ file, onCancel, onCropComplete }: AvatarCropperProps): JSX.Element {
+  const { t } = useTranslation();
   const [zoom, setZoom] = useState(1);
   const imgRef = useRef<HTMLImageElement | null>(null);
   const imageUrl = useMemo(() => URL.createObjectURL(file), [file]);
@@ -64,7 +66,7 @@ export function AvatarCropper({ file, onCancel, onCropComplete }: AvatarCropperP
         <img
           ref={imgRef}
           src={imageUrl}
-          alt="Avatar preview"
+          alt={t('profile.cropper.previewAlt')}
           style={{
             width: '100%',
             height: '100%',
@@ -75,7 +77,7 @@ export function AvatarCropper({ file, onCancel, onCropComplete }: AvatarCropperP
         />
       </div>
       <label className="flex items-center gap-3 text-sm text-brand-muted">
-        Zoom
+        {t('profile.cropper.zoom')}
         <input
           type="range"
           min={1}
@@ -87,10 +89,10 @@ export function AvatarCropper({ file, onCancel, onCropComplete }: AvatarCropperP
       </label>
       <div className="flex gap-3">
         <SketchyButton type="button" variant="outline" onClick={onCancel}>
-          Cancel
+          {t('profile.actions.cancel')}
         </SketchyButton>
         <SketchyButton type="button" onClick={handleConfirm}>
-          Use photo
+          {t('profile.cropper.usePhoto')}
         </SketchyButton>
       </div>
     </div>
