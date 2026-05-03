@@ -828,6 +828,11 @@
       "uploading": "アップロード中…",
       "change": "アバターを変更"
     },
+    "cropper": {
+      "previewAlt": "アバターのプレビュー",
+      "zoom": "ズーム",
+      "usePhoto": "この写真を使う"
+    },
     "fields": {
       "username": "ユーザー名",
       "email": "メール"

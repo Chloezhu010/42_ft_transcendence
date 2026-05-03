@@ -828,6 +828,11 @@
       "uploading": "Uploading…",
       "change": "Change avatar"
     },
+    "cropper": {
+      "previewAlt": "Avatar preview",
+      "zoom": "Zoom",
+      "usePhoto": "Use photo"
+    },
     "fields": {
       "username": "Username",
       "email": "Email"

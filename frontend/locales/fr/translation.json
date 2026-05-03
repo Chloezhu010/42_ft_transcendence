@@ -828,6 +828,11 @@
       "uploading": "Téléversement…",
       "change": "Changer l'avatar"
     },
+    "cropper": {
+      "previewAlt": "Aperçu de l'avatar",
+      "zoom": "Zoom",
+      "usePhoto": "Utiliser cette photo"
+    },
     "fields": {
       "username": "Nom d'utilisateur",
       "email": "E-mail"
