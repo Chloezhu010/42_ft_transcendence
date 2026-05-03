@@ -29,7 +29,7 @@ from services.image_storage import IMAGES_DIR
 BACKUP_DIR = Path("backups")
 MAX_BACKUPS = 7  # keep at most 7 daily snapshots
 
-_REQUIRED_TABLES = frozenset({"users", "stories", "panels"})
+_REQUIRED_TABLES = frozenset({"users", "friendships", "kid_profiles", "stories", "panels"})
 
 
 class SchemaNotReadyError(RuntimeError):

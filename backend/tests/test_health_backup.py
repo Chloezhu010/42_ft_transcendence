@@ -30,6 +30,8 @@ def _make_app_db(path) -> None:
     """Create a SQLite DB with the minimum schema required by create_backup()."""
     with sqlite3.connect(str(path)) as conn:
         conn.execute("CREATE TABLE users (id INTEGER PRIMARY KEY)")
+        conn.execute("CREATE TABLE friendships (id INTEGER PRIMARY KEY)")
+        conn.execute("CREATE TABLE kid_profiles (id INTEGER PRIMARY KEY)")
         conn.execute("CREATE TABLE stories (id INTEGER PRIMARY KEY)")
         conn.execute("CREATE TABLE panels (id INTEGER PRIMARY KEY)")
 
