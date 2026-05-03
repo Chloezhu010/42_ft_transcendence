@@ -40,7 +40,12 @@ async def health_check():
                 else:
                     checks["database"] = "corrupted"
                     healthy = False
+    except Exception as e:
+        print(f"Health check database error: {e}")
+        checks["database"] = "unavailable"
+        healthy = False
 
+    try:
         last_backup = get_last_backup_time()
         if last_backup is None:
             checks["backup"] = "never"
@@ -48,8 +53,8 @@ async def health_check():
             age = (datetime.now(UTC) - datetime.fromisoformat(last_backup)).total_seconds()
             checks["backup"] = "ok" if age <= STALE_THRESHOLD else "stale"
     except Exception as e:
-        print(f"Health check database error: {e}")
-        checks["database"] = "unavailable"
+        print(f"Health check backup error: {e}")
+        checks["backup"] = "unavailable"
         healthy = False
 
     return JSONResponse(

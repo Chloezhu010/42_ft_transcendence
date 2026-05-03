@@ -161,6 +161,12 @@ class TestHealthEndpoint:
         _os.utime(stale_zip, (old_mtime, old_mtime))
         assert health_client.get("/health").json()["checks"]["backup"] == "stale"
 
+    def test_database_check_is_ok_when_only_backup_check_fails(self, health_client):
+        with patch("routers.health.get_last_backup_time", side_effect=OSError("permission denied")):
+            data = health_client.get("/health").json()
+        assert data["checks"]["database"] == "ok"
+        assert data["checks"]["backup"] == "unavailable"
+
     def test_returns_503_when_database_is_unavailable(self, failing_health_client):
         assert failing_health_client.get("/health").status_code == 503
 
