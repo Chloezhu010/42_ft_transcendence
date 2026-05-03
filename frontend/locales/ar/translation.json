@@ -14,7 +14,11 @@
       }
     },
     "friends": "الأصدقاء",
-    "profileAriaLabel": "ملفك الشخصي"
+    "profileAriaLabel": "ملفك الشخصي",
+    "logoAlt": "شعار Funova",
+    "status": {
+      "loading": "جارٍ التحميل…"
+    }
   },
   "comicPanel": {
     "paintingScene": "رسم المشهد...",
@@ -25,7 +29,8 @@
     "editScene": "تعديل المشهد",
     "editPlaceholder": "مثال: أضف روبوت صغير فضولي ينظر إلى الخريطة...",
     "close": "إغلاق",
-    "applyMagic": "تطبيق السحر ✨"
+    "applyMagic": "تطبيق السحر ✨",
+    "sceneAlt": "مشهد قصصي مصور"
   },
   "galleryPage": {
     "mySavedBooks": "كتبي المحفوظة",
@@ -57,14 +62,18 @@
       "deleteFailed": "تعذر حذف القصة.",
       "sharedWithFriends": "تمت مشاركة القصة مع الأصدقاء.",
       "setPrivate": "تم تعيين القصة كخاصة.",
-      "shareFailed": "تعذر تحديث مشاركة القصة."
+      "shareFailed": "تعذر تحديث مشاركة القصة.",
+      "loadFailed": "تعذر تحميل القصص: {{message}}"
     },
     "sharing": {
       "label": "المشاركة",
       "private": "خاص",
       "friends": "الأصدقاء"
     },
-    "deleteStoryTitle": "حذف القصة"
+    "deleteStoryTitle": "حذف القصة",
+    "errors": {
+      "unknown": "خطأ غير معروف."
+    }
   },
   "friendLibrary": {
     "sharedLibrary": "المكتبة المشتركة",
@@ -222,7 +231,8 @@
         "languageNotSupported": "لغة التعرف على الكلام هذه غير مدعومة.",
         "unexpected": "توقف التعرف على الكلام بشكل غير متوقع."
       }
-    }
+    },
+    "photoPreviewAlt": "معاينة صورة الطفل المحددة"
   },
   "magicLoader": {
     "bindingTale": "ربط الحكاية...",
@@ -829,7 +839,8 @@
     },
     "avatar": {
       "uploading": "جارٍ الرفع…",
-      "change": "تغيير الصورة"
+      "change": "تغيير الصورة",
+      "alt": "الصورة الرمزية لـ {{username}}"
     },
     "cropper": {
       "previewAlt": "معاينة الصورة الرمزية",

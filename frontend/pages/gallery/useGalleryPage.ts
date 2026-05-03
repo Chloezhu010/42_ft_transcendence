@@ -66,12 +66,12 @@ export function useGalleryPage(): UseGalleryPageResult {
       setStories(nextStories);
     } catch (error) {
       console.error('Failed to load stories:', error);
-      const message = error instanceof Error ? error.message : 'Unknown error.';
-      toast.error(`Failed to load stories: ${message}`);
+      const message = error instanceof Error ? error.message : t('galleryPage.errors.unknown');
+      toast.error(t('galleryPage.notifications.loadFailed', { message }));
     } finally {
       setIsLoading(false);
     }
-  }, [accessToken]);
+  }, [accessToken, t]);
 
   useEffect(() => {
     void loadStories();

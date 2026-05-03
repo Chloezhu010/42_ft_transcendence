@@ -64,7 +64,7 @@ function ComicPanel({ panel, onEditImage }: ComicPanelProps): JSX.Element {
           </div>
         ) : resolvedImageUrl ? (
           <>
-            <img src={resolvedImageUrl} alt="Comic scene" className="w-full h-full object-cover block transition-opacity duration-500" />
+            <img src={resolvedImageUrl} alt={t('comicPanel.sceneAlt')} className="w-full h-full object-cover block transition-opacity duration-500" />
             {isEditable && (
               <button
                 type="button"

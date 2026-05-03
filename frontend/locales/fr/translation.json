@@ -14,7 +14,11 @@
       }
     },
     "friends": "Amis",
-    "profileAriaLabel": "Votre profil"
+    "profileAriaLabel": "Votre profil",
+    "logoAlt": "Logo Funova",
+    "status": {
+      "loading": "Chargement…"
+    }
   },
   "comicPanel": {
     "paintingScene": "Peindre une Scène...",
@@ -25,7 +29,8 @@
     "editScene": "Modifier la Scène",
     "editPlaceholder": "p.ex. Ajouter un petit robot curieux regardant la carte...",
     "close": "Fermer",
-    "applyMagic": "Appliquer la Magie ✨"
+    "applyMagic": "Appliquer la Magie ✨",
+    "sceneAlt": "Scène de bande dessinée"
   },
   "galleryPage": {
     "mySavedBooks": "Mes Livres Sauvegardés",
@@ -57,14 +62,18 @@
       "deleteFailed": "Impossible de supprimer l'histoire.",
       "sharedWithFriends": "Histoire partagée avec les amis.",
       "setPrivate": "Histoire définie comme privée.",
-      "shareFailed": "Impossible de mettre à jour le partage de l'histoire."
+      "shareFailed": "Impossible de mettre à jour le partage de l'histoire.",
+      "loadFailed": "Impossible de charger les histoires : {{message}}"
     },
     "sharing": {
       "label": "Partage",
       "private": "Privé",
       "friends": "Amis"
     },
-    "deleteStoryTitle": "Supprimer l'histoire"
+    "deleteStoryTitle": "Supprimer l'histoire",
+    "errors": {
+      "unknown": "Erreur inconnue."
+    }
   },
   "friendLibrary": {
     "sharedLibrary": "Bibliothèque partagée",
@@ -222,7 +231,8 @@
         "languageNotSupported": "Cette langue de reconnaissance vocale n'est pas prise en charge.",
         "unexpected": "La reconnaissance vocale s'est arretee de maniere inattendue."
       }
-    }
+    },
+    "photoPreviewAlt": "Aperçu de la photo d'enfant sélectionnée"
   },
   "magicLoader": {
     "bindingTale": "Lier l'Histoire...",
@@ -826,7 +836,8 @@
     },
     "avatar": {
       "uploading": "Téléversement…",
-      "change": "Changer l'avatar"
+      "change": "Changer l'avatar",
+      "alt": "Avatar de {{username}}"
     },
     "cropper": {
       "previewAlt": "Aperçu de l'avatar",

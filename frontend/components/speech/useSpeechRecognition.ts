@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type SpeechRecognitionErrorCode =
   | 'aborted'
@@ -130,10 +130,10 @@ export function useSpeechRecognition({
   onTranscript,
   errorMessages: customErrorMessages,
 }: UseSpeechRecognitionOptions = {}): UseSpeechRecognitionResult {
-  const errorMessages = {
+  const errorMessages = useMemo(() => ({
     ...defaultErrorMessages,
     ...customErrorMessages,
-  };
+  }), [customErrorMessages]);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const [transcript, setTranscript] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');
@@ -211,13 +211,7 @@ export function useSpeechRecognition({
     recognition.start();
   }, [
     continuous,
-    errorMessages.languageNotSupported,
-    errorMessages.network,
-    errorMessages.noMicrophone,
-    errorMessages.noSpeech,
-    errorMessages.permissionDenied,
-    errorMessages.unexpected,
-    errorMessages.unsupported,
+    errorMessages,
     interimResults,
     lang,
     onTranscript,

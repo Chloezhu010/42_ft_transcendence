@@ -14,7 +14,11 @@
       }
     },
     "friends": "Amigos",
-    "profileAriaLabel": "Tu perfil"
+    "profileAriaLabel": "Tu perfil",
+    "logoAlt": "Logotipo de Funova",
+    "status": {
+      "loading": "Cargando…"
+    }
   },
   "comicPanel": {
     "paintingScene": "Pintando Escena...",
@@ -25,7 +29,8 @@
     "editScene": "Editar Escena",
     "editPlaceholder": "p.ej. Añadir un pequeño robot curioso mirando el mapa...",
     "close": "Cerrar",
-    "applyMagic": "Aplicar Magia ✨"
+    "applyMagic": "Aplicar Magia ✨",
+    "sceneAlt": "Escena de cómic"
   },
   "galleryPage": {
     "mySavedBooks": "Mis Libros Guardados",
@@ -57,14 +62,18 @@
       "deleteFailed": "No se pudo eliminar la historia.",
       "sharedWithFriends": "Historia compartida con amigos.",
       "setPrivate": "Historia marcada como privada.",
-      "shareFailed": "No se pudo actualizar el uso compartido de la historia."
+      "shareFailed": "No se pudo actualizar el uso compartido de la historia.",
+      "loadFailed": "No se pudieron cargar las historias: {{message}}"
     },
     "sharing": {
       "label": "Compartir",
       "private": "Privado",
       "friends": "Amigos"
     },
-    "deleteStoryTitle": "Eliminar historia"
+    "deleteStoryTitle": "Eliminar historia",
+    "errors": {
+      "unknown": "Error desconocido."
+    }
   },
   "friendLibrary": {
     "sharedLibrary": "Biblioteca compartida",
@@ -222,7 +231,8 @@
         "languageNotSupported": "Este idioma de reconocimiento de voz no es compatible.",
         "unexpected": "El reconocimiento de voz se detuvo inesperadamente."
       }
-    }
+    },
+    "photoPreviewAlt": "Vista previa de la foto infantil seleccionada"
   },
   "magicLoader": {
     "bindingTale": "Vinculando la Historia...",
@@ -826,7 +836,8 @@
     },
     "avatar": {
       "uploading": "Subiendo…",
-      "change": "Cambiar avatar"
+      "change": "Cambiar avatar",
+      "alt": "Avatar de {{username}}"
     },
     "cropper": {
       "previewAlt": "Vista previa del avatar",
