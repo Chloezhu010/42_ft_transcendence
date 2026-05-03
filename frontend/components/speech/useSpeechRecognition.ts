@@ -56,6 +56,7 @@ export interface UseSpeechRecognitionOptions {
   continuous?: boolean;
   interimResults?: boolean;
   onTranscript?: (transcript: string) => void;
+  errorMessages?: Partial<SpeechRecognitionErrorMessages>;
 }
 
 export interface UseSpeechRecognitionResult {
@@ -70,6 +71,26 @@ export interface UseSpeechRecognitionResult {
   resetTranscript: () => void;
 }
 
+interface SpeechRecognitionErrorMessages {
+  unsupported: string;
+  permissionDenied: string;
+  noMicrophone: string;
+  noSpeech: string;
+  network: string;
+  languageNotSupported: string;
+  unexpected: string;
+}
+
+const defaultErrorMessages: SpeechRecognitionErrorMessages = {
+  unsupported: 'Speech recognition is not supported in this browser.',
+  permissionDenied: 'Microphone permission was denied.',
+  noMicrophone: 'No microphone was detected.',
+  noSpeech: 'No speech was detected.',
+  network: 'Speech recognition is unavailable because of a network error.',
+  languageNotSupported: 'This speech recognition language is not supported.',
+  unexpected: 'Speech recognition stopped unexpectedly.',
+};
+
 function getSpeechRecognitionConstructor(): SpeechRecognitionConstructor | undefined {
   if (typeof window === 'undefined') {
     return undefined;
@@ -79,24 +100,27 @@ function getSpeechRecognitionConstructor(): SpeechRecognitionConstructor | undef
   return speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition;
 }
 
-function getReadableSpeechError(error: SpeechRecognitionErrorCode): string {
+function getReadableSpeechError(
+  error: SpeechRecognitionErrorCode,
+  errorMessages: SpeechRecognitionErrorMessages,
+): string {
   if (error === 'not-allowed' || error === 'service-not-allowed') {
-    return 'Microphone permission was denied.';
+    return errorMessages.permissionDenied;
   }
   if (error === 'audio-capture') {
-    return 'No microphone was detected.';
+    return errorMessages.noMicrophone;
   }
   if (error === 'no-speech') {
-    return 'No speech was detected.';
+    return errorMessages.noSpeech;
   }
   if (error === 'network') {
-    return 'Speech recognition is unavailable because of a network error.';
+    return errorMessages.network;
   }
   if (error === 'language-not-supported') {
-    return 'This speech recognition language is not supported.';
+    return errorMessages.languageNotSupported;
   }
 
-  return 'Speech recognition stopped unexpectedly.';
+  return errorMessages.unexpected;
 }
 
 export function useSpeechRecognition({
@@ -104,7 +128,12 @@ export function useSpeechRecognition({
   continuous = false,
   interimResults = true,
   onTranscript,
+  errorMessages: customErrorMessages,
 }: UseSpeechRecognitionOptions = {}): UseSpeechRecognitionResult {
+  const errorMessages = {
+    ...defaultErrorMessages,
+    ...customErrorMessages,
+  };
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const [transcript, setTranscript] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');
@@ -128,7 +157,7 @@ export function useSpeechRecognition({
 
     if (!SpeechRecognition) {
       setStatus('unsupported');
-      setError('Speech recognition is not supported in this browser.');
+      setError(errorMessages.unsupported);
       return;
     }
 
@@ -167,7 +196,7 @@ export function useSpeechRecognition({
 
     recognition.onerror = (event) => {
       setStatus('error');
-      setError(getReadableSpeechError(event.error));
+      setError(getReadableSpeechError(event.error, errorMessages));
     };
 
     recognition.onend = () => {
@@ -180,7 +209,19 @@ export function useSpeechRecognition({
     setInterimTranscript('');
     setStatus('listening');
     recognition.start();
-  }, [continuous, interimResults, lang, onTranscript]);
+  }, [
+    continuous,
+    errorMessages.languageNotSupported,
+    errorMessages.network,
+    errorMessages.noMicrophone,
+    errorMessages.noSpeech,
+    errorMessages.permissionDenied,
+    errorMessages.unexpected,
+    errorMessages.unsupported,
+    interimResults,
+    lang,
+    onTranscript,
+  ]);
 
   useEffect(() => {
     return () => {

@@ -13,7 +13,8 @@
         "status": "Estado"
       }
     },
-    "friends": "Amigos"
+    "friends": "Amigos",
+    "profileAriaLabel": "Tu perfil"
   },
   "comicPanel": {
     "paintingScene": "Pintando Escena...",
@@ -43,7 +44,8 @@
       "label": "Compartir",
       "private": "Privado",
       "friends": "Amigos"
-    }
+    },
+    "deleteStoryTitle": "Eliminar historia"
   },
   "friendLibrary": {
     "sharedLibrary": "Biblioteca compartida",
@@ -188,7 +190,20 @@
         "description": "Moderno y atrevido"
       }
     },
-    "back": "Atrás"
+    "back": "Atrás",
+    "voiceInput": {
+      "start": "Iniciar entrada de voz",
+      "stop": "Detener entrada de voz",
+      "errors": {
+        "unsupported": "El reconocimiento de voz no es compatible con este navegador.",
+        "permissionDenied": "Se denego el permiso del microfono.",
+        "noMicrophone": "No se detecto ningun microfono.",
+        "noSpeech": "No se detecto voz.",
+        "network": "El reconocimiento de voz no esta disponible por un error de red.",
+        "languageNotSupported": "Este idioma de reconocimiento de voz no es compatible.",
+        "unexpected": "El reconocimiento de voz se detuvo inesperadamente."
+      }
+    }
   },
   "magicLoader": {
     "bindingTale": "Vinculando la Historia...",
@@ -259,6 +274,17 @@
       "generationFailed": "La generación de la historia falló.",
       "noPanels": "La generación de la historia falló: no se devolvieron paneles.",
       "previewImagesMissing": "Faltan las imágenes de vista previa. Por favor, vuelve a generar la vista previa."
+    },
+    "readAloud": {
+      "read": "Leer historia en voz alta",
+      "pause": "Pausar audio de la historia",
+      "resume": "Reanudar audio de la historia",
+      "stop": "Detener audio de la historia",
+      "errors": {
+        "unsupported": "La sintesis de voz no es compatible con este navegador.",
+        "empty": "No hay texto de historia para leer en voz alta.",
+        "playbackFailed": "Fallo la reproduccion de audio."
+      }
     }
   },
   "auth": {
@@ -806,5 +832,9 @@
       "uploadFailed": "Error al subir",
       "logoutFailed": "Error al cerrar sesión"
     }
+  },
+  "languageSwitcher": {
+    "selectLanguage": "Seleccionar idioma",
+    "languageOptions": "Opciones de idioma"
   }
 }

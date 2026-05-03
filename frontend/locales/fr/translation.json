@@ -13,7 +13,8 @@
         "status": "État"
       }
     },
-    "friends": "Amis"
+    "friends": "Amis",
+    "profileAriaLabel": "Votre profil"
   },
   "comicPanel": {
     "paintingScene": "Peindre une Scène...",
@@ -43,7 +44,8 @@
       "label": "Partage",
       "private": "Privé",
       "friends": "Amis"
-    }
+    },
+    "deleteStoryTitle": "Supprimer l'histoire"
   },
   "friendLibrary": {
     "sharedLibrary": "Bibliothèque partagée",
@@ -188,7 +190,20 @@
         "description": "Moderne et audacieux"
       }
     },
-    "back": "Retour"
+    "back": "Retour",
+    "voiceInput": {
+      "start": "Demarrer la saisie vocale",
+      "stop": "Arreter la saisie vocale",
+      "errors": {
+        "unsupported": "La reconnaissance vocale n'est pas prise en charge par ce navigateur.",
+        "permissionDenied": "L'autorisation du microphone a ete refusee.",
+        "noMicrophone": "Aucun microphone n'a ete detecte.",
+        "noSpeech": "Aucune parole n'a ete detectee.",
+        "network": "La reconnaissance vocale est indisponible en raison d'une erreur reseau.",
+        "languageNotSupported": "Cette langue de reconnaissance vocale n'est pas prise en charge.",
+        "unexpected": "La reconnaissance vocale s'est arretee de maniere inattendue."
+      }
+    }
   },
   "magicLoader": {
     "bindingTale": "Lier l'Histoire...",
@@ -259,6 +274,17 @@
       "generationFailed": "La génération de l'histoire a échoué.",
       "noPanels": "La génération de l'histoire a échoué : aucune planche renvoyée.",
       "previewImagesMissing": "Les images d'aperçu sont manquantes. Veuillez régénérer l'aperçu."
+    },
+    "readAloud": {
+      "read": "Lire l'histoire a voix haute",
+      "pause": "Mettre l'audio en pause",
+      "resume": "Reprendre l'audio",
+      "stop": "Arreter l'audio",
+      "errors": {
+        "unsupported": "La synthese vocale n'est pas prise en charge par ce navigateur.",
+        "empty": "Aucun texte d'histoire a lire.",
+        "playbackFailed": "La lecture audio a echoue."
+      }
     }
   },
   "auth": {
@@ -806,5 +832,9 @@
       "uploadFailed": "Échec du téléversement",
       "logoutFailed": "Échec de la déconnexion"
     }
+  },
+  "languageSwitcher": {
+    "selectLanguage": "Choisir la langue",
+    "languageOptions": "Options de langue"
   }
 }

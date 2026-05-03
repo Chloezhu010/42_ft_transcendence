@@ -64,7 +64,7 @@ function AppLayout(): JSX.Element {
             {currentUser ? (
               <Link
                 to="/profile"
-                aria-label="Your profile"
+                aria-label={t('app.profileAriaLabel')}
                 className="w-10 h-10 rounded-full overflow-hidden border-2 border-brand-primary/20 bg-brand-light hover:border-brand-primary transition-colors"
               >
                 {currentUser.avatar_url ? (

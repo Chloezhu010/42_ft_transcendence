@@ -13,7 +13,8 @@
         "status": "الحالة"
       }
     },
-    "friends": "الأصدقاء"
+    "friends": "الأصدقاء",
+    "profileAriaLabel": "ملفك الشخصي"
   },
   "comicPanel": {
     "paintingScene": "رسم المشهد...",
@@ -43,7 +44,8 @@
       "label": "المشاركة",
       "private": "خاص",
       "friends": "الأصدقاء"
-    }
+    },
+    "deleteStoryTitle": "حذف القصة"
   },
   "friendLibrary": {
     "sharedLibrary": "المكتبة المشتركة",
@@ -188,7 +190,20 @@
         "description": "حديث وجريء"
       }
     },
-    "back": "رجوع"
+    "back": "رجوع",
+    "voiceInput": {
+      "start": "بدء الإدخال الصوتي",
+      "stop": "إيقاف الإدخال الصوتي",
+      "errors": {
+        "unsupported": "التعرف على الكلام غير مدعوم في هذا المتصفح.",
+        "permissionDenied": "تم رفض إذن الميكروفون.",
+        "noMicrophone": "لم يتم العثور على ميكروفون.",
+        "noSpeech": "لم يتم اكتشاف أي كلام.",
+        "network": "التعرف على الكلام غير متاح بسبب خطأ في الشبكة.",
+        "languageNotSupported": "لغة التعرف على الكلام هذه غير مدعومة.",
+        "unexpected": "توقف التعرف على الكلام بشكل غير متوقع."
+      }
+    }
   },
   "magicLoader": {
     "bindingTale": "ربط الحكاية...",
@@ -259,6 +274,17 @@
       "generationFailed": "فشل توليد القصة.",
       "noPanels": "فشل توليد القصة: لم يتم إرجاع أي لوحات.",
       "previewImagesMissing": "صور المعاينة مفقودة. يرجى إعادة توليد المعاينة."
+    },
+    "readAloud": {
+      "read": "قراءة القصة بصوت عال",
+      "pause": "إيقاف صوت القصة مؤقتا",
+      "resume": "استئناف صوت القصة",
+      "stop": "إيقاف صوت القصة",
+      "errors": {
+        "unsupported": "تحويل النص إلى كلام غير مدعوم في هذا المتصفح.",
+        "empty": "لا يوجد نص قصة لقراءته بصوت عال.",
+        "playbackFailed": "فشل تشغيل تحويل النص إلى كلام."
+      }
     }
   },
   "auth": {
@@ -809,5 +835,9 @@
       "uploadFailed": "فشل الرفع",
       "logoutFailed": "فشل تسجيل الخروج"
     }
+  },
+  "languageSwitcher": {
+    "selectLanguage": "اختر اللغة",
+    "languageOptions": "خيارات اللغة"
   }
 }

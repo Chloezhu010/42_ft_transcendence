@@ -7,6 +7,16 @@ export interface SpeakOptions {
   volume?: number;
 }
 
+interface SpeechSynthesisErrorMessages {
+  unsupported: string;
+  empty: string;
+  playbackFailed: string;
+}
+
+interface UseSpeechSynthesisOptions {
+  errorMessages?: Partial<SpeechSynthesisErrorMessages>;
+}
+
 export interface UseSpeechSynthesisResult {
   isSpeaking: boolean;
   isPaused: boolean;
@@ -17,6 +27,12 @@ export interface UseSpeechSynthesisResult {
   resume: () => void;
   stop: () => void;
 }
+
+const defaultErrorMessages: SpeechSynthesisErrorMessages = {
+  unsupported: 'Text-to-speech is not supported in this browser.',
+  empty: 'There is no story text to read aloud.',
+  playbackFailed: 'Text-to-speech playback failed.',
+};
 
 function getSpeechSynthesis(): SpeechSynthesis | null {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
@@ -35,7 +51,11 @@ function isExpectedCancellationError(event: SpeechSynthesisErrorEvent): boolean 
   return event.error === 'canceled' || event.error === 'interrupted';
 }
 
-export function useSpeechSynthesis(): UseSpeechSynthesisResult {
+export function useSpeechSynthesis(options: UseSpeechSynthesisOptions = {}): UseSpeechSynthesisResult {
+  const errorMessages = {
+    ...defaultErrorMessages,
+    ...options.errorMessages,
+  };
   const currentUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const ignoredUtteranceErrorsRef = useRef<WeakSet<SpeechSynthesisUtterance>>(new WeakSet());
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -72,12 +92,12 @@ export function useSpeechSynthesis(): UseSpeechSynthesisResult {
     const content = text.trim();
 
     if (!synthesis) {
-      setError('Text-to-speech is not supported in this browser.');
+      setError(errorMessages.unsupported);
       return;
     }
 
     if (!content) {
-      setError('There is no story text to read aloud.');
+      setError(errorMessages.empty);
       return;
     }
 
@@ -109,7 +129,7 @@ export function useSpeechSynthesis(): UseSpeechSynthesisResult {
         return;
       }
 
-      setError('Text-to-speech playback failed.');
+      setError(errorMessages.playbackFailed);
       setIsSpeaking(false);
       setIsPaused(false);
     };
@@ -124,7 +144,7 @@ export function useSpeechSynthesis(): UseSpeechSynthesisResult {
     };
 
     synthesis.speak(utterance);
-  }, [resetCurrentSpeech]);
+  }, [errorMessages.empty, errorMessages.playbackFailed, errorMessages.unsupported, resetCurrentSpeech]);
 
   const pause = useCallback(() => {
     const synthesis = getSpeechSynthesis();

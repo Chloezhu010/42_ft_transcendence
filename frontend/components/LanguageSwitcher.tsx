@@ -11,7 +11,7 @@ function getLanguageLabel(languageCode: string): string {
 }
 
 function LanguageSwitcher(): JSX.Element {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const resolvedLanguage = i18n.resolvedLanguage || i18n.language || defaultLanguage;
@@ -54,7 +54,7 @@ function LanguageSwitcher(): JSX.Element {
         type="button"
         aria-haspopup="menu"
         aria-expanded={isOpen}
-        aria-label="Select language"
+        aria-label={t('languageSwitcher.selectLanguage')}
         onClick={() => setIsOpen((previous) => !previous)}
         className="min-w-[7.5rem] rounded-full border border-brand-primary/15 bg-white/85 px-4 py-2 pr-9 text-sm font-bold text-brand-primary shadow-sm backdrop-blur-sm transition-colors hover:border-brand-primary/35 hover:bg-white focus:outline-none focus:ring-2 focus:ring-brand-accent/60"
       >
@@ -70,7 +70,7 @@ function LanguageSwitcher(): JSX.Element {
       {isOpen ? (
         <div
           role="menu"
-          aria-label="Language options"
+          aria-label={t('languageSwitcher.languageOptions')}
           className="absolute right-0 top-[calc(100%+0.5rem)] z-50 min-w-full overflow-hidden rounded-[1.35rem] border border-brand-primary/15 bg-white/95 p-2 shadow-[0_16px_40px_rgba(74,43,106,0.16)] backdrop-blur-md"
         >
           {supportedLanguages.map((supportedLanguage) => {

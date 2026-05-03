@@ -343,6 +343,15 @@ function DreamStepSection({
   const { t } = useTranslation();
 
   const speech = useSpeechRecognition({
+    errorMessages: {
+      unsupported: t('kidWizard.voiceInput.errors.unsupported'),
+      permissionDenied: t('kidWizard.voiceInput.errors.permissionDenied'),
+      noMicrophone: t('kidWizard.voiceInput.errors.noMicrophone'),
+      noSpeech: t('kidWizard.voiceInput.errors.noSpeech'),
+      network: t('kidWizard.voiceInput.errors.network'),
+      languageNotSupported: t('kidWizard.voiceInput.errors.languageNotSupported'),
+      unexpected: t('kidWizard.voiceInput.errors.unexpected'),
+    },
     onTranscript: (transcript) => {
       const nextDream = profile.dream
         ? `${profile.dream.trim()} ${transcript}`
@@ -367,8 +376,8 @@ function DreamStepSection({
         <Heading className="text-brand-dark">{t('kidWizard.grandDream')}</Heading>
         <button
           type="button"
-          aria-label={speech.isListening ? 'Stop voice input' : 'Start voice input'}
-          title={speech.isListening ? 'Stop voice input' : 'Start voice input'}
+          aria-label={speech.isListening ? t('kidWizard.voiceInput.stop') : t('kidWizard.voiceInput.start')}
+          title={speech.isListening ? t('kidWizard.voiceInput.stop') : t('kidWizard.voiceInput.start')}
           onClick={handleSpeechToggle}
           disabled={!speech.isSupported}
           className="w-12 h-12 shrink-0 rounded-full border-4 border-brand-primary/20 bg-white text-xl shadow-soft hover:bg-brand-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
