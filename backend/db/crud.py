@@ -2,6 +2,8 @@
 CRUD operations for database entities (async SQLite).
 """
 
+import asyncio
+
 import aiosqlite
 
 from models import (
@@ -226,9 +228,11 @@ async def delete_story(db: aiosqlite.Connection, story_id: int, user_id: int) ->
     await db.execute("DELETE FROM stories WHERE id = ? AND user_id = ?", (story_id, user_id))
     await db.commit()
 
-    # Delete local image files
+    # Run image deletions off the event loop — delete_local_image acquires
+    # a shared flock which can block if a backup is in progress.
+    loop = asyncio.get_running_loop()
     for path in image_paths:
-        delete_local_image(path)
+        await loop.run_in_executor(None, delete_local_image, path)
 
     return True
 

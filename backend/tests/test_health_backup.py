@@ -97,7 +97,10 @@ def isolate_backup_dir(tmp_path, monkeypatch):
     """Redirect BACKUP_DIR and LOCK_FILE to a temp directory for every test."""
     backup_path = tmp_path / "backups"
     monkeypatch.setattr("db.backup.BACKUP_DIR", backup_path)
+    # Patch LOCK_FILE in both modules: backup.py uses the imported name directly;
+    # backup_lock.py is the source used by image_delete_lock().
     monkeypatch.setattr("db.backup.LOCK_FILE", backup_path / ".backup.lock")
+    monkeypatch.setattr("db.backup_lock.LOCK_FILE", backup_path / ".backup.lock")
     monkeypatch.setattr("routers.backup.BACKUP_DIR", backup_path, raising=False)
     yield backup_path
 
@@ -499,6 +502,67 @@ class TestScheduledBackup:
         import asyncio as _asyncio
 
         assert _asyncio.iscoroutinefunction(create_backup)
+
+
+# ===========================================================================
+# Unit tests: db.backup_lock
+# ===========================================================================
+
+
+class TestImageDeleteLock:
+    def test_lock_file_is_created_on_first_use(self, isolate_backup_dir):
+        from db.backup_lock import image_delete_lock
+
+        with image_delete_lock():
+            pass
+        assert (isolate_backup_dir / ".backup.lock").exists()
+
+    def test_shared_lock_is_released_after_context_exits(self, isolate_backup_dir):
+        import fcntl
+
+        from db.backup_lock import image_delete_lock
+
+        with image_delete_lock():
+            pass
+
+        lock_path = isolate_backup_dir / ".backup.lock"
+        with open(lock_path) as fh:
+            # If shared lock was released, exclusive lock acquisition must succeed.
+            fcntl.flock(fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            fcntl.flock(fh, fcntl.LOCK_UN)
+
+    def test_multiple_shared_locks_do_not_block_each_other(self, isolate_backup_dir):
+        import fcntl
+
+        from db.backup_lock import image_delete_lock
+
+        with image_delete_lock():
+            # A second LOCK_SH should be granted immediately while first is held.
+            lock_path = isolate_backup_dir / ".backup.lock"
+            with open(lock_path) as fh:
+                fcntl.flock(fh, fcntl.LOCK_SH | fcntl.LOCK_NB)
+                fcntl.flock(fh, fcntl.LOCK_UN)
+
+    def test_exclusive_lock_blocks_shared_acquisition(self, isolate_backup_dir):
+        import fcntl
+
+        isolate_backup_dir.mkdir(parents=True, exist_ok=True)
+        lock_path = isolate_backup_dir / ".backup.lock"
+        lock_path.touch()
+
+        with open(lock_path) as fh:
+            fcntl.flock(fh, fcntl.LOCK_EX)
+            try:
+                # Shared lock with LOCK_NB must fail while exclusive is held.
+                with open(lock_path) as fh2:
+                    try:
+                        fcntl.flock(fh2, fcntl.LOCK_SH | fcntl.LOCK_NB)
+                        fcntl.flock(fh2, fcntl.LOCK_UN)
+                        assert False, "Expected BlockingIOError"
+                    except BlockingIOError:
+                        pass
+            finally:
+                fcntl.flock(fh, fcntl.LOCK_UN)
 
 
 # ===========================================================================

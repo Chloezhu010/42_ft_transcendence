@@ -5,6 +5,8 @@ import binascii
 import uuid
 from pathlib import Path
 
+from db.backup_lock import image_delete_lock
+
 IMAGES_DIR = Path(__file__).resolve().parent.parent / "images"
 IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -32,7 +34,8 @@ def delete_local_image(filename: str | None) -> None:
         return
 
     safe_name = Path(filename).name
-    try:
-        (IMAGES_DIR / safe_name).unlink()
-    except FileNotFoundError:
-        pass
+    with image_delete_lock():
+        try:
+            (IMAGES_DIR / safe_name).unlink()
+        except FileNotFoundError:
+            pass

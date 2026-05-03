@@ -22,11 +22,11 @@ import zipfile
 from datetime import UTC, datetime
 from pathlib import Path
 
+from db.backup_lock import LOCK_FILE
 from db.database import DB_PATH
 from services.image_storage import IMAGES_DIR
 
 BACKUP_DIR = Path("backups")
-LOCK_FILE = BACKUP_DIR / ".backup.lock"
 MAX_BACKUPS = 7  # keep at most 7 daily snapshots
 
 _REQUIRED_TABLES = frozenset({"users", "stories", "panels"})
