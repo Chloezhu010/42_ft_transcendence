@@ -6,6 +6,8 @@ from db.database import DB_PATH
 
 router = APIRouter(tags=["health"])
 
+_REQUIRED_TABLES = {"users", "stories", "panels"}
+
 
 @router.get("/health")
 async def health_check():
@@ -17,9 +19,24 @@ async def health_check():
         async with aiosqlite.connect(DB_PATH) as db:
             await db.execute("PRAGMA journal_mode=WAL")
             await db.execute("PRAGMA foreign_keys=ON")
-            cursor = await db.execute("SELECT 1")
-            await cursor.fetchone()
-        checks["database"] = "ok"
+
+            cursor = await db.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('users','stories','panels')"
+            )
+            rows = await cursor.fetchall()
+            found = {row[0] for row in rows}
+            missing = _REQUIRED_TABLES - found
+            if missing:
+                checks["database"] = f"schema_incomplete: missing {', '.join(sorted(missing))}"
+                healthy = False
+            else:
+                cursor = await db.execute("PRAGMA quick_check")
+                result = await cursor.fetchone()
+                if result and result[0] == "ok":
+                    checks["database"] = "ok"
+                else:
+                    checks["database"] = "corrupted"
+                    healthy = False
     except Exception as e:
         print(f"Health check database error: {e}")
         checks["database"] = "unavailable"

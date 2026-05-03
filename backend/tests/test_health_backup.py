@@ -21,7 +21,6 @@ from fastapi.testclient import TestClient
 
 from auth_utils import get_current_user
 from db.backup import MAX_BACKUPS, create_backup, get_last_backup_time, list_backups
-from db.database import get_db  # still used by backup_client dependency override
 from routers.backup import router as backup_router
 from routers.health import router as health_router
 from tests.conftest import _init_test_db, make_test_app
@@ -350,7 +349,6 @@ class TestCreateBackup:
         with patch("db.backup.DB_PATH", str(src)):
             filename = asyncio.run(create_backup())
 
-        import io
 
         zip_path = isolate_backup_dir / filename
         with zipfile.ZipFile(zip_path) as zf:
@@ -422,3 +420,77 @@ class TestScheduledBackup:
         import asyncio as _asyncio
 
         assert _asyncio.iscoroutinefunction(create_backup)
+
+
+# ===========================================================================
+# GET /health — schema and integrity checks
+# ===========================================================================
+
+
+@pytest.fixture
+def empty_db_health_client(tmp_path):
+    """TestClient where the DB exists but has no application tables (bare SQLite file)."""
+    db_path = str(tmp_path / "empty.db")
+    # Create an empty SQLite file without any schema.
+    import sqlite3
+
+    sqlite3.connect(db_path).close()
+    with patch("routers.health.DB_PATH", db_path):
+        with TestClient(make_test_app(db_path, health_router)) as c:
+            yield c
+
+
+class TestHealthSchemaAndIntegrity:
+    def test_returns_503_when_required_tables_are_missing(self, empty_db_health_client):
+        assert empty_db_health_client.get("/health").status_code == 503
+
+    def test_status_is_unhealthy_when_schema_is_missing(self, empty_db_health_client):
+        assert empty_db_health_client.get("/health").json()["status"] == "unhealthy"
+
+    def test_database_check_reports_schema_incomplete(self, empty_db_health_client):
+        check = empty_db_health_client.get("/health").json()["checks"]["database"]
+        assert check.startswith("schema_incomplete")
+
+    def _make_corrupted_db_mock(self):
+        """Return an aiosqlite.connect mock whose quick_check reports corruption.
+
+        health_check calls db.execute four times in order:
+          1. PRAGMA journal_mode=WAL   (result unused)
+          2. PRAGMA foreign_keys=ON    (result unused)
+          3. SELECT name FROM sqlite_master  → all three tables present
+          4. PRAGMA quick_check        → non-ok result
+        """
+        from unittest.mock import AsyncMock, MagicMock
+
+        pragma_cursor = AsyncMock()
+
+        mock_cursor_tables = AsyncMock()
+        mock_cursor_tables.fetchall = AsyncMock(return_value=[("users",), ("stories",), ("panels",)])
+        mock_cursor_qc = AsyncMock()
+        mock_cursor_qc.fetchone = AsyncMock(return_value=("*** index corruption detected",))
+
+        mock_db = AsyncMock()
+        mock_db.execute = AsyncMock(
+            side_effect=[
+                pragma_cursor,  # PRAGMA journal_mode=WAL
+                pragma_cursor,  # PRAGMA foreign_keys=ON
+                mock_cursor_tables,  # sqlite_master query
+                mock_cursor_qc,  # quick_check
+            ]
+        )
+        mock_db.__aenter__ = AsyncMock(return_value=mock_db)
+        mock_db.__aexit__ = AsyncMock(return_value=False)
+        return MagicMock(return_value=mock_db)
+
+    def test_returns_503_when_quick_check_fails(self, health_client):
+        with patch("routers.health.aiosqlite.connect", self._make_corrupted_db_mock()):
+            response = health_client.get("/health")
+
+        assert response.status_code == 503
+
+    def test_database_check_is_corrupted_when_quick_check_fails(self, health_client):
+        with patch("routers.health.aiosqlite.connect", self._make_corrupted_db_mock()):
+            data = health_client.get("/health").json()
+
+        assert data["checks"]["database"] == "corrupted"
+        assert data["status"] == "unhealthy"
