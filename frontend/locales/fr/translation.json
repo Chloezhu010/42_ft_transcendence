@@ -293,7 +293,10 @@
       "submit": "S'inscrire",
       "submitting": "Inscription…",
       "footerText": "Vous avez déjà un compte ?",
-      "footerLink": "Se connecter"
+      "footerLink": "Se connecter",
+      "notifications": {
+        "accountCreated": "Compte créé."
+      }
     },
     "fields": {
       "emailLabel": "E-mail",
@@ -306,8 +309,30 @@
     "status": {
       "loading": "Chargement…"
     },
+    "oauth": {
+      "separator": "ou",
+      "continueWithGoogle": "Continuer avec Google",
+      "redirectingToGoogle": "Redirection vers Google…",
+      "callback": {
+        "signingInTitle": "Connexion en cours",
+        "signingInDescription": "Finalisation de votre connexion Google et preparation de votre session.",
+        "failedTitle": "Echec de la connexion Google",
+        "retryDescription": "Veuillez relancer la connexion Google depuis la page de connexion.",
+        "backToLogin": "Retour a la connexion"
+      },
+      "errors": {
+        "linkConflict": "Ce compte Google correspond a une adresse e-mail qui utilise deja la connexion par mot de passe. Connectez-vous avec l'e-mail et le mot de passe.",
+        "cancelled": "La connexion Google a ete annulee ou a echoue. Veuillez reessayer.",
+        "missingCode": "Aucun code d'autorisation trouve. Veuillez reessayer la connexion Google."
+      },
+      "notifications": {
+        "signInComplete": "Connexion Google terminee.",
+        "signInFailed": "Echec de la connexion Google. Veuillez reessayer."
+      }
+    },
     "errors": {
-      "authFailed": "Échec de l'authentification"
+      "authFailed": "Échec de l'authentification",
+      "oauthPasswordLogin": "Ce compte utilise la connexion Google. Continuez avec Google."
     }
   },
   "landing": {

@@ -293,7 +293,10 @@
       "submit": "Registrarse",
       "submitting": "Registrando…",
       "footerText": "¿Ya tienes una cuenta?",
-      "footerLink": "Inicia sesión"
+      "footerLink": "Inicia sesión",
+      "notifications": {
+        "accountCreated": "Cuenta creada."
+      }
     },
     "fields": {
       "emailLabel": "Correo electrónico",
@@ -306,8 +309,30 @@
     "status": {
       "loading": "Cargando…"
     },
+    "oauth": {
+      "separator": "o",
+      "continueWithGoogle": "Continuar con Google",
+      "redirectingToGoogle": "Redirigiendo a Google…",
+      "callback": {
+        "signingInTitle": "Iniciando sesion",
+        "signingInDescription": "Completando el inicio de sesion con Google y preparando tu sesion.",
+        "failedTitle": "Error al iniciar sesion con Google",
+        "retryDescription": "Vuelve a intentar el inicio de sesion con Google desde la pagina de inicio.",
+        "backToLogin": "Volver al inicio de sesion"
+      },
+      "errors": {
+        "linkConflict": "Esta cuenta de Google coincide con un correo que ya usa inicio de sesion con contrasena. Inicia sesion con correo y contrasena.",
+        "cancelled": "El inicio de sesion con Google se cancelo o fallo. Intentalo de nuevo.",
+        "missingCode": "No se encontro codigo de autorizacion. Intenta iniciar sesion con Google de nuevo."
+      },
+      "notifications": {
+        "signInComplete": "Inicio de sesion con Google completado.",
+        "signInFailed": "Error al iniciar sesion con Google. Intentalo de nuevo."
+      }
+    },
     "errors": {
-      "authFailed": "Error de autenticación"
+      "authFailed": "Error de autenticación",
+      "oauthPasswordLogin": "Esta cuenta usa inicio de sesion con Google. Continua con Google."
     }
   },
   "landing": {

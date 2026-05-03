@@ -293,7 +293,10 @@
       "submit": "登録する",
       "submitting": "登録中…",
       "footerText": "すでにアカウントをお持ちですか？",
-      "footerLink": "ログイン"
+      "footerLink": "ログイン",
+      "notifications": {
+        "accountCreated": "アカウントを作成しました。"
+      }
     },
     "fields": {
       "emailLabel": "メールアドレス",
@@ -306,8 +309,30 @@
     "status": {
       "loading": "読み込み中…"
     },
+    "oauth": {
+      "separator": "または",
+      "continueWithGoogle": "Googleで続行",
+      "redirectingToGoogle": "Googleへ移動しています…",
+      "callback": {
+        "signingInTitle": "ログインしています",
+        "signingInDescription": "Googleログインを完了し、セッションを準備しています。",
+        "failedTitle": "Googleログインに失敗しました",
+        "retryDescription": "ログインページからGoogleログインをもう一度お試しください。",
+        "backToLogin": "ログインに戻る"
+      },
+      "errors": {
+        "linkConflict": "このGoogleアカウントのメールアドレスは、すでにパスワードログインで使用されています。メールアドレスとパスワードでログインしてください。",
+        "cancelled": "Googleログインがキャンセルされたか失敗しました。もう一度お試しください。",
+        "missingCode": "認証コードが見つかりません。Googleログインをもう一度お試しください。"
+      },
+      "notifications": {
+        "signInComplete": "Googleログインが完了しました。",
+        "signInFailed": "Googleログインに失敗しました。もう一度お試しください。"
+      }
+    },
     "errors": {
-      "authFailed": "認証に失敗しました"
+      "authFailed": "認証に失敗しました",
+      "oauthPasswordLogin": "このアカウントはGoogleログインを使用しています。Googleで続行してください。"
     }
   },
   "landing": {
