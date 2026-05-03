@@ -14,14 +14,14 @@ import asyncio
 import sqlite3
 import time
 import zipfile
-from unittest.mock import AsyncMock, patch
+from unittest.mock import patch
 
 import pytest
 from fastapi.testclient import TestClient
 
 from auth_utils import get_current_user
 from db.backup import MAX_BACKUPS, create_backup, get_last_backup_time, list_backups
-from db.database import get_db
+from db.database import get_db  # still used by backup_client dependency override
 from routers.backup import router as backup_router
 from routers.health import router as health_router
 from tests.conftest import _init_test_db, make_test_app
@@ -36,26 +36,20 @@ def health_client(tmp_path):
     """TestClient running the real health router against a temp DB."""
     db_path = str(tmp_path / "test.db")
     asyncio.run(_init_test_db(db_path))
-    with TestClient(make_test_app(db_path, health_router)) as c:
-        yield c
+    with patch("routers.health.DB_PATH", db_path):
+        with TestClient(make_test_app(db_path, health_router)) as c:
+            yield c
 
 
 @pytest.fixture
 def failing_health_client(tmp_path):
-    """TestClient running the real health router with a DB that always fails on execute."""
+    """TestClient where the DB connection itself fails, covering dependency setup failures."""
     db_path = str(tmp_path / "test.db")
     asyncio.run(_init_test_db(db_path))
     app = make_test_app(db_path, health_router)
-
-    mock_db = AsyncMock()
-    mock_db.execute.side_effect = Exception("Connection refused")
-
-    async def failing_db():
-        yield mock_db
-
-    app.dependency_overrides[get_db] = failing_db
-    with TestClient(app) as c:
-        yield c
+    with patch("routers.health.DB_PATH", "/nonexistent/path/wondercomic.db"):
+        with TestClient(app) as c:
+            yield c
 
 
 @pytest.fixture

@@ -1,21 +1,24 @@
 import aiosqlite
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
-from db.database import get_db
+from db.database import DB_PATH
 
 router = APIRouter(tags=["health"])
 
 
 @router.get("/health")
-async def health_check(db: aiosqlite.Connection = Depends(get_db)):
+async def health_check():
     """Health check for uptime monitoring."""
     checks: dict[str, str] = {}
     healthy = True
 
     try:
-        cursor = await db.execute("SELECT 1")
-        await cursor.fetchone()
+        async with aiosqlite.connect(DB_PATH) as db:
+            await db.execute("PRAGMA journal_mode=WAL")
+            await db.execute("PRAGMA foreign_keys=ON")
+            cursor = await db.execute("SELECT 1")
+            await cursor.fetchone()
         checks["database"] = "ok"
     except Exception as e:
         print(f"Health check database error: {e}")
