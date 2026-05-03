@@ -85,9 +85,10 @@ def non_admin_backup_client(tmp_path):
 
 @pytest.fixture(autouse=True)
 def isolate_backup_dir(tmp_path, monkeypatch):
-    """Redirect BACKUP_DIR to a temp directory for every test."""
+    """Redirect BACKUP_DIR and LOCK_FILE to a temp directory for every test."""
     backup_path = tmp_path / "backups"
     monkeypatch.setattr("db.backup.BACKUP_DIR", backup_path)
+    monkeypatch.setattr("db.backup.LOCK_FILE", backup_path / ".backup.lock")
     monkeypatch.setattr("routers.backup.BACKUP_DIR", backup_path, raising=False)
     yield backup_path
 
@@ -446,6 +447,22 @@ class TestCreateBackup:
             asyncio.run(create_backup())
 
         assert isolate_backup_dir.exists()
+
+    def test_lock_file_is_released_after_backup(self, isolate_backup_dir, tmp_path):
+        import fcntl
+
+        src = tmp_path / "source.db"
+        with sqlite3.connect(str(src)) as conn:
+            conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY)")
+
+        with patch("db.backup.DB_PATH", str(src)):
+            asyncio.run(create_backup())
+
+        lock_file = isolate_backup_dir / ".backup.lock"
+        assert lock_file.exists()
+        with open(lock_file) as fh:
+            fcntl.flock(fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            fcntl.flock(fh, fcntl.LOCK_UN)
 
 
 # ===========================================================================

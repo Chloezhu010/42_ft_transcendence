@@ -3,17 +3,19 @@ SQLite online-backup utilities — includes generated images.
 
 Each backup is a zip archive containing:
   - wondercomic.db   — a consistent SQLite snapshot via Connection.backup()
-  - images/          — all files from the backend/images directory
+  - images/          — all files under the backend/images directory (recursive)
 
 Using zip means the DB and its referenced image files travel together, so
 restoring a backup restores user content end-to-end.
 
-create_backup() is serialized by _backup_lock so that concurrent callers
-(scheduled task + manual trigger) never race on filename generation or
-the rotation glob/unlink.
+create_backup() acquires an exclusive POSIX file lock (LOCK_FILE) before
+writing, so concurrent callers from different processes (backup-worker +
+manual API trigger) are serialized and never race on filename generation,
+zip writes, or rotation.
 """
 
 import asyncio
+import fcntl
 import sqlite3
 import tempfile
 import zipfile
@@ -24,10 +26,8 @@ from db.database import DB_PATH
 from services.image_storage import IMAGES_DIR
 
 BACKUP_DIR = Path("backups")
+LOCK_FILE = BACKUP_DIR / ".backup.lock"
 MAX_BACKUPS = 7  # keep at most 7 daily snapshots
-
-# Serializes concurrent create_backup() calls within the process.
-_backup_lock = asyncio.Lock()
 
 
 def _sync_backup(db_path: str, dest_zip: str) -> None:
@@ -46,30 +46,36 @@ def _sync_backup(db_path: str, dest_zip: str) -> None:
                         zf.write(img_file, f"images/{img_file.relative_to(images_dir)}")
 
 
+def _locked_backup(db_path: str) -> str:
+    """Acquire the cross-process file lock, then run backup + rotation.
+
+    Blocks until any concurrent backup (worker or API) finishes.
+    Returns the filename of the newly created archive.
+    """
+    BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+    with open(LOCK_FILE, "w") as fh:
+        fcntl.flock(fh, fcntl.LOCK_EX)
+        try:
+            # Microsecond precision avoids filename collisions on back-to-back calls.
+            timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S_%f")
+            filename = f"wondercomic_{timestamp}.zip"
+            _sync_backup(db_path, str(BACKUP_DIR / filename))
+            existing = sorted(BACKUP_DIR.glob("wondercomic_*.zip"))
+            for old in existing[:-MAX_BACKUPS]:
+                old.unlink(missing_ok=True)
+            return filename
+        finally:
+            fcntl.flock(fh, fcntl.LOCK_UN)
+
+
 async def create_backup() -> str:
     """Create a timestamped backup archive of the database and images.
 
     Returns:
         The filename (not full path) of the new backup.
     """
-    async with _backup_lock:
-        BACKUP_DIR.mkdir(parents=True, exist_ok=True)
-
-        # Microsecond precision avoids filename collisions on rapid or
-        # concurrent calls that land in the same wall-clock second.
-        timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S_%f")
-        filename = f"wondercomic_{timestamp}.zip"
-        dest = BACKUP_DIR / filename
-
-        loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, _sync_backup, DB_PATH, str(dest))
-
-        # Rotate: drop oldest when over the limit
-        existing = sorted(BACKUP_DIR.glob("wondercomic_*.zip"))
-        for old in existing[:-MAX_BACKUPS]:
-            old.unlink(missing_ok=True)
-
-        return filename
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, _locked_backup, DB_PATH)
 
 
 def list_backups() -> list[dict]:
