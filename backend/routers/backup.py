@@ -27,8 +27,10 @@ class BackupStatusResponse(BaseModel):
 
 
 @router.get("/status", response_model=BackupStatusResponse)
-async def backup_status():
-    """Return backup inventory and the timestamp of the last backup."""
+async def backup_status(
+    _: dict = Depends(require_admin),
+):
+    """Return backup inventory and the timestamp of the last backup. Requires admin."""
     backups = list_backups()
     return {
         "last_backup": get_last_backup_time(),

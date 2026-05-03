@@ -425,11 +425,15 @@
       "healthy": "سليم",
       "unhealthy": "غير سليم",
       "checks": {
-        "database": "قاعدة البيانات"
+        "database": "قاعدة البيانات",
+        "backup": "النسخ الاحتياطي"
       },
       "results": {
         "ok": "سليم",
-        "unavailable": "غير متاح"
+        "unavailable": "غير متاح",
+        "never": "لم يتم أبدًا",
+        "corrupted": "تالف",
+        "schema_incomplete": "المخطط غير مكتمل"
       }
     },
     "backups": {

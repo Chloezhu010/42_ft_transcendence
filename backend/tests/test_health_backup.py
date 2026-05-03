@@ -122,6 +122,17 @@ class TestHealthEndpoint:
     def test_database_check_is_ok_when_connected(self, health_client):
         assert health_client.get("/health").json()["checks"]["database"] == "ok"
 
+    def test_backup_check_is_present_in_health_response(self, health_client):
+        assert "backup" in health_client.get("/health").json()["checks"]
+
+    def test_backup_check_is_never_when_no_backups_exist(self, health_client):
+        assert health_client.get("/health").json()["checks"]["backup"] == "never"
+
+    def test_backup_check_is_ok_when_backup_exists(self, health_client, isolate_backup_dir):
+        isolate_backup_dir.mkdir(parents=True, exist_ok=True)
+        _make_fake_zip(isolate_backup_dir / "wondercomic_20260101_000000.zip")
+        assert health_client.get("/health").json()["checks"]["backup"] == "ok"
+
     def test_returns_503_when_database_is_unavailable(self, failing_health_client):
         assert failing_health_client.get("/health").status_code == 503
 
@@ -142,6 +153,15 @@ class TestHealthEndpoint:
 
 
 class TestBackupStatusEndpoint:
+    def test_returns_401_without_authentication(self, tmp_path):
+        db_path = str(tmp_path / "test.db")
+        asyncio.run(_init_test_db(db_path))
+        with TestClient(make_test_app(db_path, backup_router)) as c:
+            assert c.get("/api/backup/status").status_code == 401
+
+    def test_returns_403_for_non_admin_user(self, non_admin_backup_client):
+        assert non_admin_backup_client.get("/api/backup/status").status_code == 403
+
     def test_returns_200(self, backup_client):
         assert backup_client.get("/api/backup/status").status_code == 200
 
@@ -348,7 +368,6 @@ class TestCreateBackup:
 
         with patch("db.backup.DB_PATH", str(src)):
             filename = asyncio.run(create_backup())
-
 
         zip_path = isolate_backup_dir / filename
         with zipfile.ZipFile(zip_path) as zf:

@@ -27,8 +27,11 @@ export async function getHealthStatus(): Promise<HealthCheck> {
   throw await buildApiError(response, 'Health check failed');
 }
 
-export async function getBackupStatus(): Promise<BackupStatus> {
-  const response = await apiFetch(`${API_BASE}/backup/status`, { method: 'GET' });
+export async function getBackupStatus(accessToken: string): Promise<BackupStatus> {
+  const response = await apiFetch(`${API_BASE}/backup/status`, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
   if (!response.ok) {
     throw await buildApiError(response, 'Failed to fetch backup status');
   }

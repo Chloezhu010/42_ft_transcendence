@@ -425,11 +425,15 @@
       "healthy": "Correcto",
       "unhealthy": "Con problemas",
       "checks": {
-        "database": "Base de datos"
+        "database": "Base de datos",
+        "backup": "Copia de seguridad"
       },
       "results": {
         "ok": "ok",
-        "unavailable": "no disponible"
+        "unavailable": "no disponible",
+        "never": "nunca",
+        "corrupted": "corrompido",
+        "schema_incomplete": "esquema incompleto"
       }
     },
     "backups": {

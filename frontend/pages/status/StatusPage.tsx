@@ -133,18 +133,18 @@ export function StatusPage(): JSX.Element {
   const loadData = useCallback(async (): Promise<void> => {
     try {
       setError(null);
-      const [healthData, backupData] = await Promise.all([
-        getHealthStatus(),
-        getBackupStatus(),
-      ]);
+      const healthData = await getHealthStatus();
       setHealth(healthData);
-      setBackupStatus(backupData);
+      if (accessToken && currentUser?.is_admin) {
+        const backupData = await getBackupStatus(accessToken);
+        setBackupStatus(backupData);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : t('statusPage.errors.loadFailed'));
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, [t, accessToken, currentUser?.is_admin]);
 
   useEffect(() => {
     void loadData();
