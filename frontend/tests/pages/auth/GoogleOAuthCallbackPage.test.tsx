@@ -6,13 +6,43 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { GoogleOAuthCallbackPage } from '@/pages/auth';
 
-const { mockNavigate, mockUseAuth, mockCompleteGoogleOAuth } = vi.hoisted(() => ({
+const { mockNavigate, mockUseAuth, mockCompleteGoogleOAuth, mockToastError, mockToastSuccess } = vi.hoisted(() => ({
   mockNavigate: vi.fn(),
   mockUseAuth: vi.fn(),
   mockCompleteGoogleOAuth: vi.fn(),
+  mockToastError: vi.fn(),
+  mockToastSuccess: vi.fn(),
 }));
 
 vi.mock('@/app/auth', () => ({ useAuth: mockUseAuth }));
+
+vi.mock('sonner', () => ({
+  toast: {
+    error: mockToastError,
+    success: mockToastSuccess,
+  },
+}));
+
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'auth.oauth.callback.backToLogin': 'Back to login',
+        'auth.oauth.callback.failedTitle': 'Google sign-in failed',
+        'auth.oauth.callback.retryDescription': 'Please retry the Google sign-in flow from the login page.',
+        'auth.oauth.callback.signingInDescription': 'Completing your Google sign-in and preparing your session.',
+        'auth.oauth.callback.signingInTitle': 'Signing you in',
+        'auth.oauth.errors.cancelled': 'Google sign-in was cancelled or failed. Please try again.',
+        'auth.oauth.errors.linkConflict': 'This Google account matches an email that already uses password login. Sign in with email and password instead.',
+        'auth.oauth.errors.missingCode': 'No authorization code found. Please try signing in with Google again.',
+        'auth.oauth.notifications.signInComplete': 'Google sign-in complete.',
+        'auth.oauth.notifications.signInFailed': 'Google sign-in failed. Please try again.',
+      };
+
+      return translations[key] ?? key;
+    },
+  }),
+}));
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');

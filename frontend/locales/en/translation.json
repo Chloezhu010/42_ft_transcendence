@@ -274,7 +274,10 @@
       "submit": "Sign up",
       "submitting": "Signing up…",
       "footerText": "Already have an account?",
-      "footerLink": "Log in"
+      "footerLink": "Log in",
+      "notifications": {
+        "accountCreated": "Account created."
+      }
     },
     "fields": {
       "emailLabel": "Email",
@@ -287,8 +290,30 @@
     "status": {
       "loading": "Loading…"
     },
+    "oauth": {
+      "separator": "or",
+      "continueWithGoogle": "Continue with Google",
+      "redirectingToGoogle": "Redirecting to Google…",
+      "callback": {
+        "signingInTitle": "Signing you in",
+        "signingInDescription": "Completing your Google sign-in and preparing your session.",
+        "failedTitle": "Google sign-in failed",
+        "retryDescription": "Please retry the Google sign-in flow from the login page.",
+        "backToLogin": "Back to login"
+      },
+      "errors": {
+        "linkConflict": "This Google account matches an email that already uses password login. Sign in with email and password instead.",
+        "cancelled": "Google sign-in was cancelled or failed. Please try again.",
+        "missingCode": "No authorization code found. Please try signing in with Google again."
+      },
+      "notifications": {
+        "signInComplete": "Google sign-in complete.",
+        "signInFailed": "Google sign-in failed. Please try again."
+      }
+    },
     "errors": {
-      "authFailed": "Authentication failed"
+      "authFailed": "Authentication failed",
+      "oauthPasswordLogin": "This account uses Google sign-in. Continue with Google instead."
     }
   },
   "landing": {

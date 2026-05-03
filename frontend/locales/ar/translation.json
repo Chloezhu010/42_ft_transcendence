@@ -274,7 +274,10 @@
       "submit": "إنشاء حساب",
       "submitting": "جارٍ إنشاء الحساب…",
       "footerText": "لديك حساب بالفعل؟",
-      "footerLink": "تسجيل الدخول"
+      "footerLink": "تسجيل الدخول",
+      "notifications": {
+        "accountCreated": "تم إنشاء الحساب."
+      }
     },
     "fields": {
       "emailLabel": "البريد الإلكتروني",
@@ -287,8 +290,30 @@
     "status": {
       "loading": "جارٍ التحميل…"
     },
+    "oauth": {
+      "separator": "أو",
+      "continueWithGoogle": "المتابعة باستخدام Google",
+      "redirectingToGoogle": "جارٍ التحويل إلى Google…",
+      "callback": {
+        "signingInTitle": "جارٍ تسجيل دخولك",
+        "signingInDescription": "جارٍ إكمال تسجيل الدخول عبر Google وتجهيز جلستك.",
+        "failedTitle": "فشل تسجيل الدخول عبر Google",
+        "retryDescription": "يرجى إعادة محاولة تسجيل الدخول عبر Google من صفحة تسجيل الدخول.",
+        "backToLogin": "العودة إلى تسجيل الدخول"
+      },
+      "errors": {
+        "linkConflict": "حساب Google هذا يطابق بريدًا إلكترونيًا يستخدم تسجيل الدخول بكلمة مرور بالفعل. سجّل الدخول بالبريد الإلكتروني وكلمة المرور بدلاً من ذلك.",
+        "cancelled": "تم إلغاء تسجيل الدخول عبر Google أو فشل. حاول مرة أخرى.",
+        "missingCode": "لم يتم العثور على رمز تفويض. يرجى محاولة تسجيل الدخول عبر Google مرة أخرى."
+      },
+      "notifications": {
+        "signInComplete": "اكتمل تسجيل الدخول عبر Google.",
+        "signInFailed": "فشل تسجيل الدخول عبر Google. حاول مرة أخرى."
+      }
+    },
     "errors": {
-      "authFailed": "فشل المصادقة"
+      "authFailed": "فشل المصادقة",
+      "oauthPasswordLogin": "يستخدم هذا الحساب تسجيل الدخول عبر Google. تابع باستخدام Google."
     }
   },
   "landing": {

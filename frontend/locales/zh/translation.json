@@ -274,7 +274,10 @@
       "submit": "注册",
       "submitting": "正在注册…",
       "footerText": "已经有账号？",
-      "footerLink": "登录"
+      "footerLink": "登录",
+      "notifications": {
+        "accountCreated": "账号已创建。"
+      }
     },
     "fields": {
       "emailLabel": "邮箱",
@@ -287,8 +290,30 @@
     "status": {
       "loading": "加载中…"
     },
+    "oauth": {
+      "separator": "或",
+      "continueWithGoogle": "使用 Google 继续",
+      "redirectingToGoogle": "正在跳转到 Google…",
+      "callback": {
+        "signingInTitle": "正在登录",
+        "signingInDescription": "正在完成 Google 登录并准备你的会话。",
+        "failedTitle": "Google 登录失败",
+        "retryDescription": "请从登录页面重新尝试 Google 登录。",
+        "backToLogin": "返回登录"
+      },
+      "errors": {
+        "linkConflict": "此 Google 账号的邮箱已使用密码登录。请改用邮箱和密码登录。",
+        "cancelled": "Google 登录已取消或失败。请重试。",
+        "missingCode": "未找到授权码。请重新尝试使用 Google 登录。"
+      },
+      "notifications": {
+        "signInComplete": "Google 登录已完成。",
+        "signInFailed": "Google 登录失败，请重试。"
+      }
+    },
     "errors": {
-      "authFailed": "认证失败"
+      "authFailed": "认证失败",
+      "oauthPasswordLogin": "此账号使用 Google 登录。请改用 Google 继续。"
     }
   },
   "landing": {
