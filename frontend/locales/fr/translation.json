@@ -433,7 +433,8 @@
         "unavailable": "indisponible",
         "never": "jamais",
         "corrupted": "corrompu",
-        "schema_incomplete": "schéma incomplet"
+        "schema_incomplete": "schéma incomplet",
+        "stale": "obsolète"
       }
     },
     "backups": {

@@ -16,6 +16,7 @@ zip writes, or rotation.
 
 import asyncio
 import fcntl
+import os
 import sqlite3
 import tempfile
 import zipfile
@@ -28,6 +29,10 @@ from services.image_storage import IMAGES_DIR
 
 BACKUP_DIR = Path("backups")
 MAX_BACKUPS = 7  # keep at most 7 daily snapshots
+BACKUP_INTERVAL = int(os.getenv("BACKUP_INTERVAL_SECONDS", str(24 * 60 * 60)))
+# A backup is considered stale when it is older than 1.5× the scheduled interval.
+# This gives the worker one extra half-cycle of grace (restarts, schema retries, …).
+STALE_THRESHOLD = BACKUP_INTERVAL * 1.5
 
 
 class SchemaNotReadyError(RuntimeError):

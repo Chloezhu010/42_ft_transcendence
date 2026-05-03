@@ -15,12 +15,11 @@ backup succeeds the normal interval takes over.
 
 import asyncio
 import logging
-import os
 import time
 
-from db.backup import SchemaNotReadyError, create_backup
+from db.backup import BACKUP_INTERVAL, SchemaNotReadyError, create_backup
 
-INTERVAL = int(os.getenv("BACKUP_INTERVAL_SECONDS", str(24 * 60 * 60)))
+INTERVAL = BACKUP_INTERVAL
 SCHEMA_RETRY = 30  # seconds between retries while schema is not yet ready
 
 logging.basicConfig(

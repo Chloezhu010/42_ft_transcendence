@@ -433,7 +433,8 @@
         "unavailable": "利用不可",
         "never": "なし",
         "corrupted": "破損",
-        "schema_incomplete": "スキーマ不完全"
+        "schema_incomplete": "スキーマ不完全",
+        "stale": "期限切れ"
       }
     },
     "backups": {

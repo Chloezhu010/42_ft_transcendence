@@ -148,6 +148,19 @@ class TestHealthEndpoint:
         _make_fake_zip(isolate_backup_dir / "wondercomic_20260101_000000.zip")
         assert health_client.get("/health").json()["checks"]["backup"] == "ok"
 
+    def test_backup_check_is_stale_when_last_backup_is_too_old(self, health_client, isolate_backup_dir):
+        import os as _os
+        import time as _time
+
+        from db.backup import STALE_THRESHOLD
+
+        isolate_backup_dir.mkdir(parents=True, exist_ok=True)
+        stale_zip = isolate_backup_dir / "wondercomic_20260101_000000.zip"
+        _make_fake_zip(stale_zip)
+        old_mtime = _time.time() - STALE_THRESHOLD - 60
+        _os.utime(stale_zip, (old_mtime, old_mtime))
+        assert health_client.get("/health").json()["checks"]["backup"] == "stale"
+
     def test_returns_503_when_database_is_unavailable(self, failing_health_client):
         assert failing_health_client.get("/health").status_code == 503
 

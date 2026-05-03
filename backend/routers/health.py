@@ -1,8 +1,10 @@
+from datetime import UTC, datetime
+
 import aiosqlite
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
-from db.backup import get_last_backup_time
+from db.backup import STALE_THRESHOLD, get_last_backup_time
 from db.database import DB_PATH, REQUIRED_TABLES
 
 router = APIRouter(tags=["health"])
@@ -39,7 +41,12 @@ async def health_check():
                     checks["database"] = "corrupted"
                     healthy = False
 
-        checks["backup"] = "ok" if get_last_backup_time() else "never"
+        last_backup = get_last_backup_time()
+        if last_backup is None:
+            checks["backup"] = "never"
+        else:
+            age = (datetime.now(UTC) - datetime.fromisoformat(last_backup)).total_seconds()
+            checks["backup"] = "ok" if age <= STALE_THRESHOLD else "stale"
     except Exception as e:
         print(f"Health check database error: {e}")
         checks["database"] = "unavailable"

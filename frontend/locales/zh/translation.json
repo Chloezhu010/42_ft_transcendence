@@ -433,7 +433,8 @@
         "unavailable": "不可用",
         "never": "从未",
         "corrupted": "已损坏",
-        "schema_incomplete": "结构不完整"
+        "schema_incomplete": "结构不完整",
+        "stale": "已过期"
       }
     },
     "backups": {

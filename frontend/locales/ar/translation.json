@@ -433,7 +433,8 @@
         "unavailable": "غير متاح",
         "never": "لم يتم أبدًا",
         "corrupted": "تالف",
-        "schema_incomplete": "المخطط غير مكتمل"
+        "schema_incomplete": "المخطط غير مكتمل",
+        "stale": "قديم"
       }
     },
     "backups": {
