@@ -83,7 +83,7 @@ describe('getHealthStatus', () => {
 });
 
 describe('getBackupStatus', () => {
-  it('sends GET to /backup/status and returns backup data', async () => {
+  it('sends GET to /backup/status with Authorization header', async () => {
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       new Response(JSON.stringify(BACKUP_STATUS_RESPONSE), {
         status: 200,
@@ -91,12 +91,15 @@ describe('getBackupStatus', () => {
       }),
     );
 
-    const result = await getBackupStatus();
+    const result = await getBackupStatus('admin-token');
 
     expect(result).toEqual(BACKUP_STATUS_RESPONSE);
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining('/api/backup/status'),
-      expect.objectContaining({ method: 'GET' }),
+      expect.objectContaining({
+        method: 'GET',
+        headers: expect.objectContaining({ Authorization: 'Bearer admin-token' }),
+      }),
     );
   });
 
@@ -109,7 +112,7 @@ describe('getBackupStatus', () => {
       }),
     );
 
-    const result = await getBackupStatus();
+    const result = await getBackupStatus('admin-token');
 
     expect(result.backups).toEqual([]);
     expect(result.last_backup).toBeNull();
@@ -125,13 +128,13 @@ describe('getBackupStatus', () => {
       }),
     );
 
-    await expect(getBackupStatus()).rejects.toThrow('Internal server error');
+    await expect(getBackupStatus('admin-token')).rejects.toThrow('Internal server error');
   });
 
   it('throws a network error when fetch fails', async () => {
     vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('Network error'));
 
-    await expect(getBackupStatus()).rejects.toThrow('Network error');
+    await expect(getBackupStatus('admin-token')).rejects.toThrow('Network error');
   });
 });
 
