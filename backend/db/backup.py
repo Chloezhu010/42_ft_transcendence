@@ -29,6 +29,32 @@ BACKUP_DIR = Path("backups")
 LOCK_FILE = BACKUP_DIR / ".backup.lock"
 MAX_BACKUPS = 7  # keep at most 7 daily snapshots
 
+_REQUIRED_TABLES = frozenset({"users", "stories", "panels"})
+
+
+class SchemaNotReadyError(RuntimeError):
+    """Raised when the database is missing required application tables.
+
+    This happens if the backup worker races with the backend on startup
+    before init_db() has run.  Callers should skip the backup and retry
+    on the next scheduled interval rather than treating this as a hard
+    failure.
+    """
+
+
+def _check_schema(db_path: str) -> None:
+    """Raise SchemaNotReadyError if any required table is absent."""
+    with sqlite3.connect(db_path) as conn:
+        placeholders = ",".join("?" * len(_REQUIRED_TABLES))
+        rows = conn.execute(
+            f"SELECT name FROM sqlite_master WHERE type='table' AND name IN ({placeholders})",
+            tuple(_REQUIRED_TABLES),
+        ).fetchall()
+        found = {row[0] for row in rows}
+        missing = _REQUIRED_TABLES - found
+        if missing:
+            raise SchemaNotReadyError(f"missing tables: {', '.join(sorted(missing))}")
+
 
 def _sync_backup(db_path: str, dest_zip: str) -> None:
     """Write a zip archive with the SQLite backup and all images."""
@@ -56,6 +82,7 @@ def _locked_backup(db_path: str) -> str:
     with open(LOCK_FILE, "w") as fh:
         fcntl.flock(fh, fcntl.LOCK_EX)
         try:
+            _check_schema(db_path)
             # Microsecond precision avoids filename collisions on back-to-back calls.
             timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S_%f")
             filename = f"wondercomic_{timestamp}.zip"

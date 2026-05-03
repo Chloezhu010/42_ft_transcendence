@@ -13,7 +13,7 @@ import logging
 import os
 import time
 
-from db.backup import create_backup
+from db.backup import SchemaNotReadyError, create_backup
 
 INTERVAL = int(os.getenv("BACKUP_INTERVAL_SECONDS", str(24 * 60 * 60)))
 
@@ -30,6 +30,8 @@ def _run_once() -> None:
     try:
         asyncio.run(create_backup())
         log.info("Backup complete")
+    except SchemaNotReadyError as exc:
+        log.warning("DB schema not ready, backup skipped: %s", exc)
     except Exception:
         log.exception("Backup failed")
 

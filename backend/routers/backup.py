@@ -5,11 +5,11 @@ GET  /backup/status  — list available backups and last backup timestamp
 POST /backup/trigger — run an immediate backup and return the full status after rotation
 """
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from auth_utils import require_admin
-from db.backup import create_backup, get_last_backup_time, list_backups
+from db.backup import SchemaNotReadyError, create_backup, get_last_backup_time, list_backups
 
 router = APIRouter(prefix="/api/backup", tags=["backup"])
 
@@ -44,7 +44,10 @@ async def trigger_backup(
     _: dict = Depends(require_admin),
 ):
     """Run an immediate database backup and return the full status after rotation. Requires admin."""
-    await create_backup()
+    try:
+        await create_backup()
+    except SchemaNotReadyError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
     backups = list_backups()
     return {
         "last_backup": get_last_backup_time(),

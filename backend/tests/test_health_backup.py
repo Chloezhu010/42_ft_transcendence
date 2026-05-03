@@ -20,10 +20,19 @@ import pytest
 from fastapi.testclient import TestClient
 
 from auth_utils import get_current_user
-from db.backup import MAX_BACKUPS, create_backup, get_last_backup_time, list_backups
+from db.backup import MAX_BACKUPS, SchemaNotReadyError, create_backup, get_last_backup_time, list_backups
 from routers.backup import router as backup_router
 from routers.health import router as health_router
 from tests.conftest import _init_test_db, make_test_app
+
+
+def _make_app_db(path) -> None:
+    """Create a SQLite DB with the minimum schema required by create_backup()."""
+    with sqlite3.connect(str(path)) as conn:
+        conn.execute("CREATE TABLE users (id INTEGER PRIMARY KEY)")
+        conn.execute("CREATE TABLE stories (id INTEGER PRIMARY KEY)")
+        conn.execute("CREATE TABLE panels (id INTEGER PRIMARY KEY)")
+
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -251,6 +260,15 @@ class TestBackupTriggerEndpoint:
     def test_returns_403_for_non_admin_user(self, non_admin_backup_client):
         assert non_admin_backup_client.post("/api/backup/trigger").status_code == 403
 
+    def test_returns_503_when_schema_is_not_ready(self, backup_client):
+        from unittest.mock import AsyncMock
+
+        with patch(
+            "routers.backup.create_backup",
+            AsyncMock(side_effect=SchemaNotReadyError("missing tables: panels")),
+        ):
+            assert backup_client.post("/api/backup/trigger").status_code == 503
+
 
 # ===========================================================================
 # Unit tests: db.backup utility functions
@@ -341,31 +359,25 @@ class TestGetLastBackupTime:
 class TestCreateBackup:
     def test_creates_a_backup_file_in_backup_dir(self, isolate_backup_dir, tmp_path):
         src = tmp_path / "source.db"
-        with sqlite3.connect(str(src)) as conn:
-            conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY)")
-
+        _make_app_db(src)
         with patch("db.backup.DB_PATH", str(src)):
             filename = asyncio.run(create_backup())
-
         assert (isolate_backup_dir / filename).exists()
 
     def test_returns_filename_string(self, isolate_backup_dir, tmp_path):
         src = tmp_path / "source.db"
-        with sqlite3.connect(str(src)) as conn:
-            conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY)")
-
+        _make_app_db(src)
         with patch("db.backup.DB_PATH", str(src)):
             filename = asyncio.run(create_backup())
-
         assert isinstance(filename, str)
         assert filename.startswith("wondercomic_")
         assert filename.endswith(".zip")
 
     def test_backup_zip_contains_valid_sqlite_database(self, isolate_backup_dir, tmp_path):
         src = tmp_path / "source.db"
+        _make_app_db(src)
         with sqlite3.connect(str(src)) as conn:
-            conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY)")
-            conn.execute("INSERT INTO t VALUES (42)")
+            conn.execute("INSERT INTO users VALUES (42)")
 
         with patch("db.backup.DB_PATH", str(src)):
             filename = asyncio.run(create_backup())
@@ -375,18 +387,15 @@ class TestCreateBackup:
             assert "wondercomic.db" in zf.namelist()
             db_bytes = zf.read("wondercomic.db")
 
-        # Load the extracted bytes into an in-memory SQLite connection and verify content.
         conn = sqlite3.connect(":memory:")
         conn.deserialize(db_bytes)
-        row = conn.execute("SELECT id FROM t").fetchone()
+        row = conn.execute("SELECT id FROM users").fetchone()
         assert row == (42,)
         conn.close()
 
     def test_backup_zip_contains_images_directory(self, isolate_backup_dir, tmp_path):
         src = tmp_path / "source.db"
-        with sqlite3.connect(str(src)) as conn:
-            conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY)")
-
+        _make_app_db(src)
         fake_images = tmp_path / "images"
         fake_images.mkdir()
         (fake_images / "panel_abc12345.png").write_bytes(b"\x89PNG\r\n\x1a\n")
@@ -401,9 +410,7 @@ class TestCreateBackup:
 
     def test_backup_zip_includes_avatars_subdirectory(self, isolate_backup_dir, tmp_path):
         src = tmp_path / "source.db"
-        with sqlite3.connect(str(src)) as conn:
-            conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY)")
-
+        _make_app_db(src)
         fake_images = tmp_path / "images"
         avatars_dir = fake_images / "avatars"
         avatars_dir.mkdir(parents=True)
@@ -416,16 +423,12 @@ class TestCreateBackup:
         zip_path = isolate_backup_dir / filename
         with zipfile.ZipFile(zip_path) as zf:
             names = zf.namelist()
-
         assert "images/panel_abc12345.png" in names
         assert "images/avatars/user_001.png" in names
 
     def test_rotates_oldest_backup_when_limit_is_exceeded(self, isolate_backup_dir, tmp_path):
         src = tmp_path / "source.db"
-        with sqlite3.connect(str(src)) as conn:
-            conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY)")
-
-        # Pre-fill with MAX_BACKUPS files so the next create should rotate.
+        _make_app_db(src)
         isolate_backup_dir.mkdir(parents=True, exist_ok=True)
         for i in range(MAX_BACKUPS):
             _make_fake_zip(isolate_backup_dir / f"wondercomic_2026010{i}_000000.zip")
@@ -438,23 +441,17 @@ class TestCreateBackup:
 
     def test_creates_backup_dir_if_it_does_not_exist(self, isolate_backup_dir, tmp_path):
         src = tmp_path / "source.db"
-        with sqlite3.connect(str(src)) as conn:
-            conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY)")
-
+        _make_app_db(src)
         assert not isolate_backup_dir.exists()
-
         with patch("db.backup.DB_PATH", str(src)):
             asyncio.run(create_backup())
-
         assert isolate_backup_dir.exists()
 
     def test_lock_file_is_released_after_backup(self, isolate_backup_dir, tmp_path):
         import fcntl
 
         src = tmp_path / "source.db"
-        with sqlite3.connect(str(src)) as conn:
-            conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY)")
-
+        _make_app_db(src)
         with patch("db.backup.DB_PATH", str(src)):
             asyncio.run(create_backup())
 
@@ -463,6 +460,32 @@ class TestCreateBackup:
         with open(lock_file) as fh:
             fcntl.flock(fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
             fcntl.flock(fh, fcntl.LOCK_UN)
+
+    def test_raises_schema_not_ready_on_empty_db(self, isolate_backup_dir, tmp_path):
+        src = tmp_path / "empty.db"
+        sqlite3.connect(str(src)).close()  # empty file, no tables
+        with patch("db.backup.DB_PATH", str(src)):
+            with pytest.raises(SchemaNotReadyError):
+                asyncio.run(create_backup())
+
+    def test_raises_schema_not_ready_when_only_some_tables_exist(self, isolate_backup_dir, tmp_path):
+        src = tmp_path / "partial.db"
+        with sqlite3.connect(str(src)) as conn:
+            conn.execute("CREATE TABLE users (id INTEGER PRIMARY KEY)")
+            # stories and panels are missing
+        with patch("db.backup.DB_PATH", str(src)):
+            with pytest.raises(SchemaNotReadyError, match="missing tables"):
+                asyncio.run(create_backup())
+
+    def test_no_zip_created_when_schema_is_not_ready(self, isolate_backup_dir, tmp_path):
+        src = tmp_path / "empty.db"
+        sqlite3.connect(str(src)).close()
+        with patch("db.backup.DB_PATH", str(src)):
+            try:
+                asyncio.run(create_backup())
+            except SchemaNotReadyError:
+                pass
+        assert list(isolate_backup_dir.glob("wondercomic_*.zip")) == []
 
 
 # ===========================================================================

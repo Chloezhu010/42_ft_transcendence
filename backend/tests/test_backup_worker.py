@@ -9,6 +9,7 @@ log, handle exceptions.  Tests here verify that contract.
 from unittest.mock import AsyncMock, patch
 
 import backup_worker
+from db.backup import SchemaNotReadyError
 
 
 class TestRunOnce:
@@ -20,4 +21,10 @@ class TestRunOnce:
 
     def test_does_not_raise_when_create_backup_raises(self):
         with patch.object(backup_worker, "create_backup", AsyncMock(side_effect=RuntimeError("disk full"))):
+            backup_worker._run_once()  # must not propagate
+
+    def test_does_not_raise_when_schema_not_ready(self):
+        with patch.object(
+            backup_worker, "create_backup", AsyncMock(side_effect=SchemaNotReadyError("missing tables: panels"))
+        ):
             backup_worker._run_once()  # must not propagate
