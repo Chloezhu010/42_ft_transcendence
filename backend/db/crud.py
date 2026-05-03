@@ -22,7 +22,7 @@ from services.image_storage import delete_local_image, save_base64_image
 
 # --- Kid Profile CRUD ---
 async def create_kid_profile(db: aiosqlite.Connection, profile: KidProfileCreate, user_id: int) -> int:
-    """Create a kid profile and return its ID."""
+    """Insert a kid profile row and return its ID. Does not commit — caller owns the transaction."""
     cursor = await db.execute(
         """
         INSERT INTO kid_profiles (
@@ -43,7 +43,6 @@ async def create_kid_profile(db: aiosqlite.Connection, profile: KidProfileCreate
             user_id,
         ),
     )
-    await db.commit()
     return cursor.lastrowid
 
 
@@ -71,7 +70,7 @@ async def get_kid_profile(db: aiosqlite.Connection, profile_id: int) -> KidProfi
 
 # --- Panel CRUD ---
 async def create_panels(db: aiosqlite.Connection, story_id: int, panels: list[PanelCreate]) -> None:
-    """Create panels for a story."""
+    """Insert panel rows for a story. Does not commit — caller owns the transaction."""
     for panel in panels:
         panel_filename = None
         if panel.image_base64:
@@ -84,7 +83,6 @@ async def create_panels(db: aiosqlite.Connection, story_id: int, panels: list[Pa
         """,
             (story_id, panel.panel_order, panel.text, panel.image_prompt, panel_filename),
         )
-    await db.commit()
 
 
 async def get_panels_for_story(db: aiosqlite.Connection, story_id: int) -> list[PanelResponse]:
@@ -129,7 +127,7 @@ def _build_story_response(row, profile: KidProfileResponse, panels: list[PanelRe
 
 
 async def create_story(db: aiosqlite.Connection, story: StoryCreate, user_id: int) -> StoryResponse:
-    """Create a story with profile and panels."""
+    """Create a story with profile and panels in a single transaction."""
     profile_id = await create_kid_profile(db, story.profile, user_id)
 
     cover_filename = None
@@ -153,11 +151,11 @@ async def create_story(db: aiosqlite.Connection, story: StoryCreate, user_id: in
             user_id,
         ),
     )
-    await db.commit()
-
     story_id = cursor.lastrowid
 
     await create_panels(db, story_id, story.panels)
+
+    await db.commit()
 
     return await get_story_by_id(db, story_id, user_id)
 
