@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+const PREFERRED_VOICE_NAMES = ['Google UK English Female', 'Google US English'];
 
 export interface SpeakOptions {
   lang?: string;
@@ -42,6 +44,25 @@ export function useSpeechSynthesis(): UseSpeechSynthesisResult {
   const [isPaused, setIsPaused] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSupported] = useState(() => getSpeechSynthesis() !== null);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+
+  useEffect(() => {
+    const synthesis = getSpeechSynthesis();
+    if (!synthesis) return;
+
+    const loadVoices = () => setVoices(synthesis.getVoices());
+    loadVoices();
+    synthesis.addEventListener('voiceschanged', loadVoices);
+    return () => synthesis.removeEventListener('voiceschanged', loadVoices);
+  }, []);
+
+  const preferredVoice = useMemo<SpeechSynthesisVoice | undefined>(() => {
+    for (const name of PREFERRED_VOICE_NAMES) {
+      const match = voices.find((voice) => voice.name === name);
+      if (match) return match;
+    }
+    return undefined;
+  }, [voices]);
 
   const resetCurrentSpeech = useCallback((synthesis: SpeechSynthesis) => {
     const currentUtterance = currentUtteranceRef.current;
@@ -85,9 +106,12 @@ export function useSpeechSynthesis(): UseSpeechSynthesisResult {
 
     const utterance = new SpeechSynthesisUtterance(content);
     currentUtteranceRef.current = utterance;
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
+    }
     utterance.lang = options.lang ?? 'en-US';
-    utterance.pitch = options.pitch ?? 1;
-    utterance.rate = options.rate ?? 1;
+    utterance.pitch = options.pitch ?? 1.1;
+    utterance.rate = options.rate ?? 0.95;
     utterance.volume = options.volume ?? 1;
 
     utterance.onstart = () => {
@@ -124,7 +148,7 @@ export function useSpeechSynthesis(): UseSpeechSynthesisResult {
     };
 
     synthesis.speak(utterance);
-  }, [resetCurrentSpeech]);
+  }, [resetCurrentSpeech, preferredVoice]);
 
   const pause = useCallback(() => {
     const synthesis = getSpeechSynthesis();
