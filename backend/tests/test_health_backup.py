@@ -13,6 +13,7 @@ Covers:
 import asyncio
 import sqlite3
 import time
+import zipfile
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -98,6 +99,12 @@ def isolate_backup_dir(tmp_path, monkeypatch):
     yield backup_path
 
 
+def _make_fake_zip(path) -> None:
+    """Write a minimal valid zip file (empty archive) at *path*."""
+    with zipfile.ZipFile(path, "w"):
+        pass
+
+
 # ===========================================================================
 # GET /health
 # ===========================================================================
@@ -167,8 +174,7 @@ class TestBackupStatusEndpoint:
         # Create a real backup file so the inventory has something to report.
         backup_dir = isolate_backup_dir
         backup_dir.mkdir(parents=True, exist_ok=True)
-        fake = backup_dir / "wondercomic_20260101_000000.db"
-        fake.write_bytes(b"SQLite format 3\x00" + b"\x00" * 84)
+        _make_fake_zip(backup_dir / "wondercomic_20260101_000000.zip")
 
         data = backup_client.get("/api/backup/status").json()
         assert data["total_backups"] == 1
@@ -180,7 +186,7 @@ class TestBackupStatusEndpoint:
     def test_last_backup_is_iso_timestamp_when_backups_exist(self, backup_client, isolate_backup_dir):
         backup_dir = isolate_backup_dir
         backup_dir.mkdir(parents=True, exist_ok=True)
-        (backup_dir / "wondercomic_20260101_000000.db").write_bytes(b"\x00" * 100)
+        _make_fake_zip(backup_dir / "wondercomic_20260101_000000.zip")
 
         last = backup_client.get("/api/backup/status").json()["last_backup"]
         assert last is not None
@@ -193,12 +199,12 @@ class TestBackupStatusEndpoint:
 
 
 def _make_backup_stub(backup_dir):
-    """Return an async callable that creates a fake backup file and returns its filename."""
-    filename = "wondercomic_20260427_000000.db"
+    """Return an async callable that creates a fake backup zip and returns its filename."""
+    filename = "wondercomic_20260427_000000.zip"
 
     async def _stub():
         backup_dir.mkdir(parents=True, exist_ok=True)
-        (backup_dir / filename).write_bytes(b"\x00" * 1024)
+        _make_fake_zip(backup_dir / filename)
         return filename
 
     return _stub
@@ -220,7 +226,7 @@ class TestBackupTriggerEndpoint:
         with patch("routers.backup.create_backup", side_effect=_make_backup_stub(isolate_backup_dir)):
             data = backup_client.post("/api/backup/trigger").json()
             filenames = [b["filename"] for b in data["backups"]]
-            assert "wondercomic_20260427_000000.db" in filenames
+            assert "wondercomic_20260427_000000.zip" in filenames
 
     def test_returns_401_without_authentication(self, tmp_path):
         db_path = str(tmp_path / "test.db")
@@ -247,43 +253,44 @@ class TestListBackups:
 
     def test_returns_one_entry_for_a_single_backup_file(self, isolate_backup_dir):
         isolate_backup_dir.mkdir()
-        (isolate_backup_dir / "wondercomic_20260101_000000.db").write_bytes(b"\x00" * 512)
+        _make_fake_zip(isolate_backup_dir / "wondercomic_20260101_000000.zip")
         result = list_backups()
         assert len(result) == 1
 
     def test_entry_contains_filename(self, isolate_backup_dir):
         isolate_backup_dir.mkdir()
-        (isolate_backup_dir / "wondercomic_20260101_000000.db").write_bytes(b"\x00" * 512)
+        _make_fake_zip(isolate_backup_dir / "wondercomic_20260101_000000.zip")
         entry = list_backups()[0]
-        assert entry["filename"] == "wondercomic_20260101_000000.db"
+        assert entry["filename"] == "wondercomic_20260101_000000.zip"
 
     def test_entry_contains_size_bytes(self, isolate_backup_dir):
         isolate_backup_dir.mkdir()
-        (isolate_backup_dir / "wondercomic_20260101_000000.db").write_bytes(b"\x00" * 512)
+        target = isolate_backup_dir / "wondercomic_20260101_000000.zip"
+        _make_fake_zip(target)
         entry = list_backups()[0]
-        assert entry["size_bytes"] == 512
+        assert entry["size_bytes"] == target.stat().st_size
 
     def test_entry_contains_created_at_iso_timestamp(self, isolate_backup_dir):
         isolate_backup_dir.mkdir()
-        (isolate_backup_dir / "wondercomic_20260101_000000.db").write_bytes(b"\x00" * 512)
+        _make_fake_zip(isolate_backup_dir / "wondercomic_20260101_000000.zip")
         entry = list_backups()[0]
         assert "created_at" in entry
         assert "T" in entry["created_at"]
 
     def test_returns_newest_first_when_multiple_files_exist(self, isolate_backup_dir):
         isolate_backup_dir.mkdir()
-        older = isolate_backup_dir / "wondercomic_20260101_000000.db"
-        newer = isolate_backup_dir / "wondercomic_20260102_000000.db"
-        older.write_bytes(b"\x00" * 100)
+        older = isolate_backup_dir / "wondercomic_20260101_000000.zip"
+        newer = isolate_backup_dir / "wondercomic_20260102_000000.zip"
+        _make_fake_zip(older)
         time.sleep(0.01)
-        newer.write_bytes(b"\x00" * 200)
+        _make_fake_zip(newer)
         result = list_backups()
-        assert result[0]["filename"] == "wondercomic_20260102_000000.db"
+        assert result[0]["filename"] == "wondercomic_20260102_000000.zip"
 
     def test_ignores_files_not_matching_pattern(self, isolate_backup_dir):
         isolate_backup_dir.mkdir()
-        (isolate_backup_dir / "not_a_backup.db").write_bytes(b"\x00" * 100)
-        (isolate_backup_dir / "wondercomic_20260101_000000.db").write_bytes(b"\x00" * 100)
+        _make_fake_zip(isolate_backup_dir / "not_a_backup.zip")
+        _make_fake_zip(isolate_backup_dir / "wondercomic_20260101_000000.zip")
         result = list_backups()
         assert len(result) == 1
 
@@ -298,18 +305,18 @@ class TestGetLastBackupTime:
 
     def test_returns_iso_string_when_backup_exists(self, isolate_backup_dir):
         isolate_backup_dir.mkdir()
-        (isolate_backup_dir / "wondercomic_20260101_000000.db").write_bytes(b"\x00" * 100)
+        _make_fake_zip(isolate_backup_dir / "wondercomic_20260101_000000.zip")
         result = get_last_backup_time()
         assert result is not None
         assert "T" in result
 
     def test_returns_timestamp_of_most_recent_file(self, isolate_backup_dir):
         isolate_backup_dir.mkdir()
-        older = isolate_backup_dir / "wondercomic_20260101_000000.db"
-        newer = isolate_backup_dir / "wondercomic_20260102_000000.db"
-        older.write_bytes(b"\x00" * 100)
+        older = isolate_backup_dir / "wondercomic_20260101_000000.zip"
+        newer = isolate_backup_dir / "wondercomic_20260102_000000.zip"
+        _make_fake_zip(older)
         time.sleep(0.02)
-        newer.write_bytes(b"\x00" * 100)
+        _make_fake_zip(newer)
         newer_mtime = newer.stat().st_mtime
         result = get_last_backup_time()
         assert result is not None
@@ -338,9 +345,9 @@ class TestCreateBackup:
 
         assert isinstance(filename, str)
         assert filename.startswith("wondercomic_")
-        assert filename.endswith(".db")
+        assert filename.endswith(".zip")
 
-    def test_backup_file_is_a_valid_sqlite_database(self, isolate_backup_dir, tmp_path):
+    def test_backup_zip_contains_valid_sqlite_database(self, isolate_backup_dir, tmp_path):
         src = tmp_path / "source.db"
         with sqlite3.connect(str(src)) as conn:
             conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY)")
@@ -349,9 +356,37 @@ class TestCreateBackup:
         with patch("db.backup.DB_PATH", str(src)):
             filename = asyncio.run(create_backup())
 
-        with sqlite3.connect(str(isolate_backup_dir / filename)) as backup_conn:
-            row = backup_conn.execute("SELECT id FROM t").fetchone()
-            assert row == (42,)
+        import io
+
+        zip_path = isolate_backup_dir / filename
+        with zipfile.ZipFile(zip_path) as zf:
+            assert "wondercomic.db" in zf.namelist()
+            db_bytes = zf.read("wondercomic.db")
+
+        # Load the extracted bytes into an in-memory SQLite connection and verify content.
+        conn = sqlite3.connect(":memory:")
+        conn.deserialize(db_bytes)
+        row = conn.execute("SELECT id FROM t").fetchone()
+        assert row == (42,)
+        conn.close()
+
+    def test_backup_zip_contains_images_directory(self, isolate_backup_dir, tmp_path):
+        src = tmp_path / "source.db"
+        with sqlite3.connect(str(src)) as conn:
+            conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY)")
+
+        # Create a fake images directory with one file.
+        fake_images = tmp_path / "images"
+        fake_images.mkdir()
+        (fake_images / "panel_abc12345.png").write_bytes(b"\x89PNG\r\n\x1a\n")
+
+        with patch("db.backup.DB_PATH", str(src)), patch("db.backup.IMAGES_DIR", fake_images):
+            filename = asyncio.run(create_backup())
+
+        zip_path = isolate_backup_dir / filename
+        with zipfile.ZipFile(zip_path) as zf:
+            names = zf.namelist()
+        assert "images/panel_abc12345.png" in names
 
     def test_rotates_oldest_backup_when_limit_is_exceeded(self, isolate_backup_dir, tmp_path):
         src = tmp_path / "source.db"
@@ -361,12 +396,12 @@ class TestCreateBackup:
         # Pre-fill with MAX_BACKUPS files so the next create should rotate.
         isolate_backup_dir.mkdir(parents=True, exist_ok=True)
         for i in range(MAX_BACKUPS):
-            (isolate_backup_dir / f"wondercomic_2026010{i}_000000.db").write_bytes(b"\x00" * 10)
+            _make_fake_zip(isolate_backup_dir / f"wondercomic_2026010{i}_000000.zip")
 
         with patch("db.backup.DB_PATH", str(src)):
             asyncio.run(create_backup())
 
-        remaining = list(isolate_backup_dir.glob("wondercomic_*.db"))
+        remaining = list(isolate_backup_dir.glob("wondercomic_*.zip"))
         assert len(remaining) == MAX_BACKUPS
 
     def test_creates_backup_dir_if_it_does_not_exist(self, isolate_backup_dir, tmp_path):

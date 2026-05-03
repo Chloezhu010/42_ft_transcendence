@@ -2,9 +2,14 @@
 
 ## Overview
 
-WonderComic stores all persistent data in a single SQLite database (`wondercomic.db`).
-The backup system creates timestamped snapshots using SQLite's built-in online-backup
-API, which is safe to run while the application is live (WAL mode).
+WonderComic stores persistent data in two locations:
+
+- **SQLite database** (`wondercomic.db`) — user accounts, stories, panel metadata, and image *paths*
+- **Image files** (`backend/images/`) — the actual PNG files referenced by those paths
+
+The backup system creates timestamped zip archives using SQLite's built-in online-backup API for
+the database and a directory snapshot for the images. Both components are bundled together so that
+restoring a backup restores user content end-to-end.
 
 ---
 
@@ -12,11 +17,12 @@ API, which is safe to run while the application is live (WAL mode).
 
 | Setting | Value |
 |---------|-------|
-| Mechanism | SQLite `Connection.backup()` (online, no downtime) |
+| Mechanism | zip archive: SQLite `Connection.backup()` + image directory snapshot |
 | Schedule | On startup + every 24 hours automatically |
 | Retention | Last 7 snapshots (oldest deleted automatically) |
 | Storage | `backend_backups` named Docker volume, mounted at `/app/backups` in the container (Compose prefixes the physical name with the project name, e.g. `tran_main1_backend_backups`) |
-| Filename format | `wondercomic_YYYYMMDD_HHMMSS_ffffff.db` (microsecond precision) |
+| Filename format | `wondercomic_YYYYMMDD_HHMMSS_ffffff.zip` (microsecond precision) |
+| Archive contents | `wondercomic.db` + `images/<filename>` for every file in `backend/images/` |
 
 ### Manual Backup (API)
 
@@ -52,7 +58,7 @@ for a visual backup inventory and a **Back up now** button.
 
 ## Restore Procedures
 
-### Scenario 1 — Corrupt or missing database (Docker deployment)
+### Scenario 1 — Corrupt or missing database and/or images (Docker deployment)
 
 1. **Stop the backend container.**
    ```bash
@@ -63,24 +69,40 @@ for a visual backup inventory and a **Back up now** button.
    ```bash
    docker compose run --rm --no-deps backend ls /app/backups
    ```
-   Pick the most recent `wondercomic_YYYYMMDD_HHMMSS_ffffff.db` file.
+   Pick the most recent `wondercomic_YYYYMMDD_HHMMSS_ffffff.zip` file.
 
-3. **Copy the backup over the live database.**
+3. **Extract the database from the backup archive.**
    ```bash
    docker compose run --rm --no-deps backend \
-     cp /app/backups/wondercomic_YYYYMMDD_HHMMSS_ffffff.db /app/wondercomic.db
+     python3 -c "
+   import zipfile, shutil
+   with zipfile.ZipFile('/app/backups/wondercomic_YYYYMMDD_HHMMSS_ffffff.zip') as z:
+       z.extract('wondercomic.db', '/app')
+   "
    ```
-   Replace `wondercomic_YYYYMMDD_HHMMSS_ffffff.db` with the chosen filename.
-   `docker compose run` starts a temporary container with the same volume mounts as
-   the backend service (both the named backup volume and the bind-mounted app
-   directory), so no manual volume name resolution is needed.
+   Replace `wondercomic_YYYYMMDD_HHMMSS_ffffff.zip` with the chosen filename.
 
-4. **Restart the backend.**
+4. **Restore the images from the backup archive.**
+   ```bash
+   docker compose run --rm --no-deps backend \
+     python3 -c "
+   import zipfile, pathlib
+   images_dir = pathlib.Path('/app/images')
+   images_dir.mkdir(exist_ok=True)
+   with zipfile.ZipFile('/app/backups/wondercomic_YYYYMMDD_HHMMSS_ffffff.zip') as z:
+       for name in z.namelist():
+           if name.startswith('images/') and not name.endswith('/'):
+               dest = images_dir / pathlib.Path(name).name
+               dest.write_bytes(z.read(name))
+   "
+   ```
+
+5. **Restart the backend.**
    ```bash
    docker compose start backend
    ```
 
-5. **Verify** by visiting `https://localhost/status` or running `curl -k https://localhost/health`.
+6. **Verify** by visiting `https://localhost/status` or running `curl -k https://localhost/health`.
 
 ---
 
@@ -88,12 +110,30 @@ for a visual backup inventory and a **Back up now** button.
 
 1. **Stop the running server** (Ctrl+C in the uvicorn terminal).
 
-2. **Replace the database.**
+2. **Extract the database.**
    ```bash
-   cp backend/backups/wondercomic_YYYYMMDD_HHMMSS_ffffff.db backend/wondercomic.db
+   python3 -c "
+   import zipfile
+   with zipfile.ZipFile('backend/backups/wondercomic_YYYYMMDD_HHMMSS_ffffff.zip') as z:
+       z.extract('wondercomic.db', 'backend')
+   "
    ```
 
-3. **Restart the server.**
+3. **Restore the images.**
+   ```bash
+   python3 -c "
+   import zipfile, pathlib
+   images_dir = pathlib.Path('backend/images')
+   images_dir.mkdir(exist_ok=True)
+   with zipfile.ZipFile('backend/backups/wondercomic_YYYYMMDD_HHMMSS_ffffff.zip') as z:
+       for name in z.namelist():
+           if name.startswith('images/') and not name.endswith('/'):
+               dest = images_dir / pathlib.Path(name).name
+               dest.write_bytes(z.read(name))
+   "
+   ```
+
+4. **Restart the server.**
    ```bash
    cd backend && uv run uvicorn main:app --reload
    ```
@@ -102,23 +142,33 @@ for a visual backup inventory and a **Back up now** button.
 
 ### Scenario 3 — Complete data loss (no backups available)
 
-If no backup exists the application will recreate an empty database with the
+If no backup exists, the application will recreate an empty database with the
 correct schema on next startup (handled by `init_db()` in `db/database.py`).
-User-generated images stored in the `backend/images/` folder are unaffected
-because they live in a separate Docker volume (`backend_images`).
+**User-generated images cannot be recovered** — both the database records and
+the image files in `backend/images/` are lost.
 
 ---
 
 ## Backup Verification
 
-SQLite backups produced by `Connection.backup()` are fully valid SQLite databases.
-Verify integrity at any time:
+Verify that a backup archive is intact and contains a healthy SQLite database:
 
 ```bash
-sqlite3 backend/backups/wondercomic_YYYYMMDD_HHMMSS_ffffff.db "PRAGMA integrity_check;"
-```
+python3 -c "
+import zipfile, sqlite3, io, sys
 
-Expected output: `ok`
+zip_path = 'backend/backups/wondercomic_YYYYMMDD_HHMMSS_ffffff.zip'
+with zipfile.ZipFile(zip_path) as z:
+    assert 'wondercomic.db' in z.namelist(), 'wondercomic.db missing from archive'
+    db_bytes = z.read('wondercomic.db')
+
+conn = sqlite3.connect(':memory:')
+conn.deserialize(db_bytes)
+result = conn.execute('PRAGMA integrity_check').fetchone()[0]
+conn.close()
+print(result)  # expected: ok
+"
+```
 
 ---
 
@@ -141,5 +191,6 @@ rclone sync /path/to/backend_backups s3:my-bucket/wondercomic-backups
 | `backend/db/backup.py` | Backup creation, rotation, and listing logic |
 | `backend/routers/backup.py` | `GET /api/backup/status` and `POST /api/backup/trigger` endpoints |
 | `backend/main.py` | Startup backup + 24-hour scheduled task |
-| `docker-compose.yml` | Declares `backend_backups` named volume, mounted at `/app/backups` in the backend service |
+| `backend/services/image_storage.py` | Defines `IMAGES_DIR` — the directory included in each backup |
+| `docker-compose.yml` | Declares `backend_backups` named volume (mounted at `/app/backups`) and `backend_images` named volume (mounted at `/app/images`) |
 | `frontend/pages/status/StatusPage.tsx` | `/status` page — shows backup inventory and manual trigger |
