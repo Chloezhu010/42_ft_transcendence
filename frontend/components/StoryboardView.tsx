@@ -226,7 +226,7 @@ function StoryboardView({
         <StoryReadAloudControl text={readAloudText} />
         {isReadOnly ? (
           <div className="bg-white/90 backdrop-blur-sm py-2 px-4 rounded-full shadow-soft border border-brand-secondary/20">
-            <Label className="text-brand-primary uppercase tracking-widest">Read Only</Label>
+            <Label className="text-brand-primary uppercase tracking-widest">{t('story.preview.readOnly')}</Label>
           </div>
         ) : null}
       </div>

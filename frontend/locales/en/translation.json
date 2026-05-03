@@ -13,7 +13,8 @@
         "status": "Status"
       }
     },
-    "friends": "Friends"
+    "friends": "Friends",
+    "profileAriaLabel": "Your profile"
   },
   "comicPanel": {
     "paintingScene": "Painting Scene...",
@@ -62,7 +63,8 @@
       "label": "Sharing",
       "private": "Private",
       "friends": "Friends"
-    }
+    },
+    "deleteStoryTitle": "Delete story"
   },
   "friendLibrary": {
     "sharedLibrary": "Shared Library",
@@ -207,7 +209,20 @@
         "description": "Modern and bold"
       }
     },
-    "back": "Back"
+    "back": "Back",
+    "voiceInput": {
+      "start": "Start voice input",
+      "stop": "Stop voice input",
+      "errors": {
+        "unsupported": "Speech recognition is not supported in this browser.",
+        "permissionDenied": "Microphone permission was denied.",
+        "noMicrophone": "No microphone was detected.",
+        "noSpeech": "No speech was detected.",
+        "network": "Speech recognition is unavailable because of a network error.",
+        "languageNotSupported": "This speech recognition language is not supported.",
+        "unexpected": "Speech recognition stopped unexpectedly."
+      }
+    }
   },
   "magicLoader": {
     "bindingTale": "Binding the Tale...",
@@ -278,6 +293,17 @@
       "generationFailed": "Story generation failed.",
       "noPanels": "Story generation failed: no panels returned.",
       "previewImagesMissing": "Preview images are missing. Please regenerate the preview."
+    },
+    "readAloud": {
+      "read": "Read story aloud",
+      "pause": "Pause story audio",
+      "resume": "Resume story audio",
+      "stop": "Stop story audio",
+      "errors": {
+        "unsupported": "Text-to-speech is not supported in this browser.",
+        "empty": "There is no story text to read aloud.",
+        "playbackFailed": "Text-to-speech playback failed."
+      }
     }
   },
   "auth": {
@@ -825,5 +851,9 @@
       "uploadFailed": "Upload failed",
       "logoutFailed": "Logout failed"
     }
+  },
+  "languageSwitcher": {
+    "selectLanguage": "Select language",
+    "languageOptions": "Language options"
   }
 }

@@ -13,7 +13,8 @@
         "status": "状态"
       }
     },
-    "friends": "好友"
+    "friends": "好友",
+    "profileAriaLabel": "你的个人资料"
   },
   "comicPanel": {
     "paintingScene": "绘制场景...",
@@ -62,7 +63,8 @@
       "label": "分享",
       "private": "私密",
       "friends": "好友"
-    }
+    },
+    "deleteStoryTitle": "删除故事"
   },
   "friendLibrary": {
     "sharedLibrary": "共享图书馆",
@@ -207,7 +209,20 @@
         "description": "摩登大胆"
       }
     },
-    "back": "返回"
+    "back": "返回",
+    "voiceInput": {
+      "start": "开始语音输入",
+      "stop": "停止语音输入",
+      "errors": {
+        "unsupported": "此浏览器不支持语音识别。",
+        "permissionDenied": "麦克风权限被拒绝。",
+        "noMicrophone": "未检测到麦克风。",
+        "noSpeech": "未检测到语音。",
+        "network": "由于网络错误，语音识别不可用。",
+        "languageNotSupported": "不支持此语音识别语言。",
+        "unexpected": "语音识别意外停止。"
+      }
+    }
   },
   "magicLoader": {
     "bindingTale": "绑定故事...",
@@ -278,6 +293,17 @@
       "generationFailed": "故事生成失败。",
       "noPanels": "故事生成失败：未返回分镜。",
       "previewImagesMissing": "预览图像缺失，请重新生成预览。"
+    },
+    "readAloud": {
+      "read": "朗读故事",
+      "pause": "暂停故事音频",
+      "resume": "继续故事音频",
+      "stop": "停止故事音频",
+      "errors": {
+        "unsupported": "此浏览器不支持文本转语音。",
+        "empty": "没有可朗读的故事文本。",
+        "playbackFailed": "文本转语音播放失败。"
+      }
     }
   },
   "auth": {
@@ -485,7 +511,8 @@
       "actions": {
         "backUpNow": "立即备份",
         "backingUp": "备份中…"
-      }
+      },
+      "snapshotCount_one": "{{count}} 个备份快照可用"
     },
     "errors": {
       "loadFailed": "加载系统状态失败",
@@ -824,5 +851,9 @@
       "uploadFailed": "上传失败",
       "logoutFailed": "退出登录失败"
     }
+  },
+  "languageSwitcher": {
+    "selectLanguage": "选择语言",
+    "languageOptions": "语言选项"
   }
 }

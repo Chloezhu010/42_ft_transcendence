@@ -13,7 +13,8 @@
         "status": "ステータス"
       }
     },
-    "friends": "友達"
+    "friends": "友達",
+    "profileAriaLabel": "プロフィール"
   },
   "comicPanel": {
     "paintingScene": "シーンを描画中...",
@@ -62,7 +63,8 @@
       "label": "共有",
       "private": "非公開",
       "friends": "フレンド"
-    }
+    },
+    "deleteStoryTitle": "物語を削除"
   },
   "friendLibrary": {
     "sharedLibrary": "共有ライブラリ",
@@ -207,7 +209,20 @@
         "description": "モダンで大胆"
       }
     },
-    "back": "戻る"
+    "back": "戻る",
+    "voiceInput": {
+      "start": "音声入力を開始",
+      "stop": "音声入力を停止",
+      "errors": {
+        "unsupported": "このブラウザは音声認識に対応していません。",
+        "permissionDenied": "マイクの使用が拒否されました。",
+        "noMicrophone": "マイクが検出されませんでした。",
+        "noSpeech": "音声が検出されませんでした。",
+        "network": "ネットワークエラーのため音声認識を利用できません。",
+        "languageNotSupported": "この音声認識言語はサポートされていません。",
+        "unexpected": "音声認識が予期せず停止しました。"
+      }
+    }
   },
   "magicLoader": {
     "bindingTale": "物語を結合中...",
@@ -278,6 +293,17 @@
       "generationFailed": "ストーリーの生成に失敗しました。",
       "noPanels": "ストーリー生成に失敗しました：パネルが返ってきませんでした。",
       "previewImagesMissing": "プレビュー画像がありません。プレビューを再生成してください。"
+    },
+    "readAloud": {
+      "read": "物語を読み上げる",
+      "pause": "物語の音声を一時停止",
+      "resume": "物語の音声を再開",
+      "stop": "物語の音声を停止",
+      "errors": {
+        "unsupported": "このブラウザはテキスト読み上げに対応していません。",
+        "empty": "読み上げる物語のテキストがありません。",
+        "playbackFailed": "テキスト読み上げの再生に失敗しました。"
+      }
     }
   },
   "auth": {
@@ -485,7 +511,8 @@
       "actions": {
         "backUpNow": "今すぐバックアップ",
         "backingUp": "バックアップ中…"
-      }
+      },
+      "snapshotCount_one": "{{count}} 件のスナップショットが利用可能"
     },
     "errors": {
       "loadFailed": "ステータスの読み込みに失敗しました",
@@ -824,5 +851,9 @@
       "uploadFailed": "アップロードに失敗しました",
       "logoutFailed": "ログアウトに失敗しました"
     }
+  },
+  "languageSwitcher": {
+    "selectLanguage": "言語を選択",
+    "languageOptions": "言語オプション"
   }
 }
