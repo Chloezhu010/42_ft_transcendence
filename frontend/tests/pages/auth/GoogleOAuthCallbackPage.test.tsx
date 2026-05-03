@@ -25,6 +25,11 @@ vi.mock('sonner', () => ({
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
+    i18n: {
+      resolvedLanguage: 'en',
+      language: 'en',
+      changeLanguage: vi.fn(),
+    },
     t: (key: string) => {
       const translations: Record<string, string> = {
         'auth.oauth.callback.backToLogin': 'Back to login',
@@ -37,6 +42,8 @@ vi.mock('react-i18next', () => ({
         'auth.oauth.errors.missingCode': 'No authorization code found. Please try signing in with Google again.',
         'auth.oauth.notifications.signInComplete': 'Google sign-in complete.',
         'auth.oauth.notifications.signInFailed': 'Google sign-in failed. Please try again.',
+        'languageSwitcher.languageOptions': 'Language options',
+        'languageSwitcher.selectLanguage': 'Select language',
       };
 
       return translations[key] ?? key;

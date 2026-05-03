@@ -28,6 +28,11 @@ vi.mock('sonner', () => ({
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
+    i18n: {
+      resolvedLanguage: 'en',
+      language: 'en',
+      changeLanguage: vi.fn(),
+    },
     t: (key: string) => {
       const translations: Record<string, string> = {
         'auth.errors.authFailed': 'Authentication failed',
@@ -53,6 +58,8 @@ vi.mock('react-i18next', () => ({
         'auth.signup.submitting': 'Creating account...',
         'auth.signup.title': 'Create your account',
         'auth.status.loading': 'Loading…',
+        'languageSwitcher.languageOptions': 'Language options',
+        'languageSwitcher.selectLanguage': 'Select language',
       };
 
       return translations[key] ?? key;
