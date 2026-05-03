@@ -41,9 +41,9 @@ def _sync_backup(db_path: str, dest_zip: str) -> None:
             zf.write(tmp_db, "wondercomic.db")
             images_dir = Path(IMAGES_DIR)
             if images_dir.exists():
-                for img_file in images_dir.iterdir():
+                for img_file in images_dir.rglob("*"):
                     if img_file.is_file():
-                        zf.write(img_file, f"images/{img_file.name}")
+                        zf.write(img_file, f"images/{img_file.relative_to(images_dir)}")
 
 
 async def create_backup() -> str:

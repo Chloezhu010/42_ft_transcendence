@@ -386,7 +386,6 @@ class TestCreateBackup:
         with sqlite3.connect(str(src)) as conn:
             conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY)")
 
-        # Create a fake images directory with one file.
         fake_images = tmp_path / "images"
         fake_images.mkdir()
         (fake_images / "panel_abc12345.png").write_bytes(b"\x89PNG\r\n\x1a\n")
@@ -398,6 +397,27 @@ class TestCreateBackup:
         with zipfile.ZipFile(zip_path) as zf:
             names = zf.namelist()
         assert "images/panel_abc12345.png" in names
+
+    def test_backup_zip_includes_avatars_subdirectory(self, isolate_backup_dir, tmp_path):
+        src = tmp_path / "source.db"
+        with sqlite3.connect(str(src)) as conn:
+            conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY)")
+
+        fake_images = tmp_path / "images"
+        avatars_dir = fake_images / "avatars"
+        avatars_dir.mkdir(parents=True)
+        (fake_images / "panel_abc12345.png").write_bytes(b"\x89PNG\r\n\x1a\n")
+        (avatars_dir / "user_001.png").write_bytes(b"\x89PNG\r\n\x1a\n")
+
+        with patch("db.backup.DB_PATH", str(src)), patch("db.backup.IMAGES_DIR", fake_images):
+            filename = asyncio.run(create_backup())
+
+        zip_path = isolate_backup_dir / filename
+        with zipfile.ZipFile(zip_path) as zf:
+            names = zf.namelist()
+
+        assert "images/panel_abc12345.png" in names
+        assert "images/avatars/user_001.png" in names
 
     def test_rotates_oldest_backup_when_limit_is_exceeded(self, isolate_backup_dir, tmp_path):
         src = tmp_path / "source.db"
