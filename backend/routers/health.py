@@ -3,11 +3,9 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
 from db.backup import get_last_backup_time
-from db.database import DB_PATH
+from db.database import DB_PATH, REQUIRED_TABLES
 
 router = APIRouter(tags=["health"])
-
-_REQUIRED_TABLES = {"users", "stories", "panels"}
 
 
 @router.get("/health")
@@ -21,12 +19,14 @@ async def health_check():
             await db.execute("PRAGMA journal_mode=WAL")
             await db.execute("PRAGMA foreign_keys=ON")
 
+            placeholders = ",".join("?" * len(REQUIRED_TABLES))
             cursor = await db.execute(
-                "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('users','stories','panels')"
+                f"SELECT name FROM sqlite_master WHERE type='table' AND name IN ({placeholders})",
+                tuple(REQUIRED_TABLES),
             )
             rows = await cursor.fetchall()
             found = {row[0] for row in rows}
-            missing = _REQUIRED_TABLES - found
+            missing = REQUIRED_TABLES - found
             if missing:
                 checks["database"] = f"schema_incomplete: missing {', '.join(sorted(missing))}"
                 healthy = False

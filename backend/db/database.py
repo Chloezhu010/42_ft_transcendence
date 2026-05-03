@@ -15,6 +15,8 @@ _db: aiosqlite.Connection | None = None
 
 DB_PATH = os.getenv("DB_PATH", "wondercomic.db")
 
+REQUIRED_TABLES = frozenset({"users", "friendships", "kid_profiles", "stories", "panels"})
+
 
 async def init_db():
     """Create tables on startup."""

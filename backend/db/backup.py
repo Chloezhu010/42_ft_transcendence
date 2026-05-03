@@ -23,13 +23,11 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from db.backup_lock import LOCK_FILE
-from db.database import DB_PATH
+from db.database import DB_PATH, REQUIRED_TABLES
 from services.image_storage import IMAGES_DIR
 
 BACKUP_DIR = Path("backups")
 MAX_BACKUPS = 7  # keep at most 7 daily snapshots
-
-_REQUIRED_TABLES = frozenset({"users", "friendships", "kid_profiles", "stories", "panels"})
 
 
 class SchemaNotReadyError(RuntimeError):
@@ -45,13 +43,13 @@ class SchemaNotReadyError(RuntimeError):
 def _check_schema(db_path: str) -> None:
     """Raise SchemaNotReadyError if any required table is absent."""
     with sqlite3.connect(db_path) as conn:
-        placeholders = ",".join("?" * len(_REQUIRED_TABLES))
+        placeholders = ",".join("?" * len(REQUIRED_TABLES))
         rows = conn.execute(
             f"SELECT name FROM sqlite_master WHERE type='table' AND name IN ({placeholders})",
-            tuple(_REQUIRED_TABLES),
+            tuple(REQUIRED_TABLES),
         ).fetchall()
         found = {row[0] for row in rows}
-        missing = _REQUIRED_TABLES - found
+        missing = REQUIRED_TABLES - found
         if missing:
             raise SchemaNotReadyError(f"missing tables: {', '.join(sorted(missing))}")
 

@@ -610,7 +610,9 @@ class TestHealthSchemaAndIntegrity:
         pragma_cursor = AsyncMock()
 
         mock_cursor_tables = AsyncMock()
-        mock_cursor_tables.fetchall = AsyncMock(return_value=[("users",), ("stories",), ("panels",)])
+        mock_cursor_tables.fetchall = AsyncMock(
+            return_value=[("users",), ("friendships",), ("kid_profiles",), ("stories",), ("panels",)]
+        )
         mock_cursor_qc = AsyncMock()
         mock_cursor_qc.fetchone = AsyncMock(return_value=("*** index corruption detected",))
 
