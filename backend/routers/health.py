@@ -17,10 +17,9 @@ async def health_check():
     healthy = True
 
     try:
-        async with aiosqlite.connect(DB_PATH) as db:
-            await db.execute("PRAGMA journal_mode=WAL")
-            await db.execute("PRAGMA foreign_keys=ON")
-
+        # Open read-only via SQLite URI: won't create the file if absent, and
+        # prevents any accidental write (including journal_mode changes).
+        async with aiosqlite.connect(f"file:{DB_PATH}?mode=ro", uri=True) as db:
             placeholders = ",".join("?" * len(REQUIRED_TABLES))
             cursor = await db.execute(
                 f"SELECT name FROM sqlite_master WHERE type='table' AND name IN ({placeholders})",

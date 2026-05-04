@@ -649,15 +649,11 @@ class TestHealthSchemaAndIntegrity:
     def _make_corrupted_db_mock(self):
         """Return an aiosqlite.connect mock whose quick_check reports corruption.
 
-        health_check calls db.execute four times in order:
-          1. PRAGMA journal_mode=WAL   (result unused)
-          2. PRAGMA foreign_keys=ON    (result unused)
-          3. SELECT name FROM sqlite_master  → all three tables present
-          4. PRAGMA quick_check        → non-ok result
+        health_check calls db.execute twice in order:
+          1. SELECT name FROM sqlite_master  → all five tables present
+          2. PRAGMA quick_check              → non-ok result
         """
         from unittest.mock import AsyncMock, MagicMock
-
-        pragma_cursor = AsyncMock()
 
         mock_cursor_tables = AsyncMock()
         mock_cursor_tables.fetchall = AsyncMock(
@@ -669,8 +665,6 @@ class TestHealthSchemaAndIntegrity:
         mock_db = AsyncMock()
         mock_db.execute = AsyncMock(
             side_effect=[
-                pragma_cursor,  # PRAGMA journal_mode=WAL
-                pragma_cursor,  # PRAGMA foreign_keys=ON
                 mock_cursor_tables,  # sqlite_master query
                 mock_cursor_qc,  # quick_check
             ]
