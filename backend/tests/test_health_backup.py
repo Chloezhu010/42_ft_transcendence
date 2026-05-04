@@ -691,3 +691,41 @@ class TestHealthSchemaAndIntegrity:
 
         assert data["checks"]["database"] == "corrupted"
         assert data["status"] == "unhealthy"
+
+
+class TestParsePositiveInt:
+    """Unit tests for db.backup._parse_positive_int."""
+
+    def test_returns_default_when_env_var_is_absent(self, monkeypatch):
+        monkeypatch.delenv("BACKUP_INTERVAL_SECONDS", raising=False)
+        from db.backup import _parse_positive_int
+        assert _parse_positive_int("BACKUP_INTERVAL_SECONDS", 86400) == 86400
+
+    def test_returns_parsed_value_when_env_var_is_valid(self, monkeypatch):
+        monkeypatch.setenv("BACKUP_INTERVAL_SECONDS", "3600")
+        from db.backup import _parse_positive_int
+        assert _parse_positive_int("BACKUP_INTERVAL_SECONDS", 86400) == 3600
+
+    def test_raises_on_non_integer_value(self, monkeypatch):
+        monkeypatch.setenv("BACKUP_INTERVAL_SECONDS", "daily")
+        from db.backup import _parse_positive_int
+        with pytest.raises(ValueError, match="BACKUP_INTERVAL_SECONDS"):
+            _parse_positive_int("BACKUP_INTERVAL_SECONDS", 86400)
+
+    def test_raises_on_float_string(self, monkeypatch):
+        monkeypatch.setenv("BACKUP_INTERVAL_SECONDS", "1.5")
+        from db.backup import _parse_positive_int
+        with pytest.raises(ValueError, match="BACKUP_INTERVAL_SECONDS"):
+            _parse_positive_int("BACKUP_INTERVAL_SECONDS", 86400)
+
+    def test_raises_on_zero(self, monkeypatch):
+        monkeypatch.setenv("BACKUP_INTERVAL_SECONDS", "0")
+        from db.backup import _parse_positive_int
+        with pytest.raises(ValueError, match="positive integer"):
+            _parse_positive_int("BACKUP_INTERVAL_SECONDS", 86400)
+
+    def test_raises_on_negative_value(self, monkeypatch):
+        monkeypatch.setenv("BACKUP_INTERVAL_SECONDS", "-3600")
+        from db.backup import _parse_positive_int
+        with pytest.raises(ValueError, match="positive integer"):
+            _parse_positive_int("BACKUP_INTERVAL_SECONDS", 86400)

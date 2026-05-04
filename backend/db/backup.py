@@ -29,7 +29,29 @@ from services.image_storage import IMAGES_DIR
 
 BACKUP_DIR = Path("backups")
 MAX_BACKUPS = 7  # keep at most 7 daily snapshots
-BACKUP_INTERVAL = int(os.getenv("BACKUP_INTERVAL_SECONDS", str(24 * 60 * 60)))
+
+
+def _parse_positive_int(env_name: str, default: int) -> int:
+    """Parse an environment variable as a positive integer.
+
+    Returns *default* when the variable is absent.  Raises ValueError with a
+    human-readable message when the value is present but not a valid integer or
+    is not strictly positive (0 would make the worker spin; negative values
+    crash time.sleep).
+    """
+    raw = os.getenv(env_name)
+    if raw is None:
+        return default
+    try:
+        value = int(raw)
+    except ValueError:
+        raise ValueError(f"{env_name}={raw!r} is not a valid integer") from None
+    if value <= 0:
+        raise ValueError(f"{env_name} must be a positive integer, got {value}")
+    return value
+
+
+BACKUP_INTERVAL = _parse_positive_int("BACKUP_INTERVAL_SECONDS", 24 * 60 * 60)
 # A backup is considered stale when it is older than 1.5× the scheduled interval.
 # This gives the worker one extra half-cycle of grace (restarts, schema retries, …).
 STALE_THRESHOLD = BACKUP_INTERVAL * 1.5
