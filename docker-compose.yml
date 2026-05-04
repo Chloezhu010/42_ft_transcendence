@@ -23,6 +23,7 @@ services:
       - FRONTEND_URL=${FRONTEND_URL:-https://localhost}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - DB_PATH=${DB_PATH:-wondercomic.db}
+      - BACKUP_INTERVAL_SECONDS=${BACKUP_INTERVAL_SECONDS:-86400}
 
   backup-worker:
     build: ./backend
