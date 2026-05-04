@@ -10,6 +10,7 @@ import hmac
 import os
 import sys
 import zipfile
+from datetime import datetime
 from pathlib import Path
 
 # scripts/ → backend/ → repo root
@@ -80,8 +81,12 @@ def main() -> None:
     db_path_env = os.environ.get("DB_PATH") or env.get("DB_PATH", "wondercomic.db")
     db_path = BACKEND_DIR / db_path_env
     images_dir = BACKEND_DIR / "images"
+    aside_name = "images_" + datetime.now().strftime("%Y%m%d_%H%M%S") + ".bak"
+    aside_dir = BACKEND_DIR / aside_name
 
-    print(f"\nThis will overwrite {db_path.name} and restore images from backup.")
+    print(f"\nThis will overwrite {db_path.name} and replace the images directory.")
+    if images_dir.exists():
+        print(f"  Existing images will be moved to: {aside_name}/")
     confirm = input("Continue? [y/N] ").strip().lower()
     if confirm != "y":
         print("Aborted.")
@@ -93,7 +98,12 @@ def main() -> None:
         if sidecar.exists():
             sidecar.unlink()
 
-    images_dir.mkdir(parents=True, exist_ok=True)
+    # Move existing images aside so the restored tree is an exact replica of the
+    # archive — no stale files from newer or deleted content survive the restore.
+    # The .bak directory remains as a safety net if extraction fails.
+    if images_dir.exists():
+        images_dir.rename(aside_dir)
+    images_dir.mkdir(parents=True)
     image_count = 0
 
     try:
@@ -127,6 +137,8 @@ def main() -> None:
     print(f"  Database restored to: {db_path}")
     print(f"  Images restored:      {image_count}")
     print(f"  Backup used:          {chosen.name}")
+    if aside_dir.exists():
+        print(f"  Old images kept at:   {aside_name}/  (remove when verified)")
 
 
 if __name__ == "__main__":
