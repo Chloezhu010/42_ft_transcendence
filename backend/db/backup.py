@@ -59,20 +59,40 @@ def _check_schema(db_path: str) -> None:
             raise SchemaNotReadyError(f"missing tables: {', '.join(sorted(missing))}")
 
 
-def _sync_backup(db_path: str, dest_zip: str) -> None:
-    """Write a zip archive with the SQLite backup and all images."""
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        tmp_db = Path(tmp_dir) / "wondercomic.db"
-        with sqlite3.connect(db_path) as src, sqlite3.connect(str(tmp_db)) as dst:
-            src.backup(dst)
+def _sync_backup(db_path: str, dest_zip: Path) -> None:
+    """Write a zip archive atomically: write to a temp file, verify, then rename.
 
-        with zipfile.ZipFile(dest_zip, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-            zf.write(tmp_db, "wondercomic.db")
-            images_dir = Path(IMAGES_DIR)
-            if images_dir.exists():
-                for img_file in images_dir.rglob("*"):
-                    if img_file.is_file():
-                        zf.write(img_file, f"images/{img_file.relative_to(images_dir)}")
+    The temp file lives in BACKUP_DIR (same filesystem as dest_zip) so the
+    final os.rename() is atomic.  On any failure the temp file is deleted and
+    dest_zip is never created, keeping the backup directory free of partial
+    archives that list_backups() or /health could mistake for valid snapshots.
+    """
+    fd, tmp_str = tempfile.mkstemp(dir=BACKUP_DIR, suffix=".zip.tmp")
+    tmp_path = Path(tmp_str)
+    try:
+        os.close(fd)
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_db = Path(tmp_dir) / "wondercomic.db"
+            with sqlite3.connect(db_path) as src, sqlite3.connect(str(tmp_db)) as dst:
+                src.backup(dst)
+
+            with zipfile.ZipFile(tmp_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+                zf.write(tmp_db, "wondercomic.db")
+                images_dir = Path(IMAGES_DIR)
+                if images_dir.exists():
+                    for img_file in images_dir.rglob("*"):
+                        if img_file.is_file():
+                            zf.write(img_file, f"images/{img_file.relative_to(images_dir)}")
+
+        with zipfile.ZipFile(tmp_path) as zf:
+            bad = zf.testzip()
+            if bad is not None:
+                raise zipfile.BadZipFile(f"corrupt entry in archive: {bad}")
+
+        tmp_path.rename(dest_zip)
+    except:
+        tmp_path.unlink(missing_ok=True)
+        raise
 
 
 def _locked_backup(db_path: str) -> str:
@@ -89,7 +109,7 @@ def _locked_backup(db_path: str) -> str:
             # Microsecond precision avoids filename collisions on back-to-back calls.
             timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S_%f")
             filename = f"wondercomic_{timestamp}.zip"
-            _sync_backup(db_path, str(BACKUP_DIR / filename))
+            _sync_backup(db_path, BACKUP_DIR / filename)
             existing = sorted(BACKUP_DIR.glob("wondercomic_*.zip"))
             for old in existing[:-MAX_BACKUPS]:
                 old.unlink(missing_ok=True)
