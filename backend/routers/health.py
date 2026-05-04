@@ -49,9 +49,14 @@ async def health_check():
         last_backup = get_last_backup_time()
         if last_backup is None:
             checks["backup"] = "never"
+            healthy = False
         else:
             age = (datetime.now(UTC) - datetime.fromisoformat(last_backup)).total_seconds()
-            checks["backup"] = "ok" if age <= STALE_THRESHOLD else "stale"
+            if age <= STALE_THRESHOLD:
+                checks["backup"] = "ok"
+            else:
+                checks["backup"] = "stale"
+                healthy = False
     except Exception as e:
         print(f"Health check backup error: {e}")
         checks["backup"] = "unavailable"

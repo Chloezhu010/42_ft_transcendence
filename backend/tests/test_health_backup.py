@@ -43,9 +43,13 @@ def _make_app_db(path) -> None:
 
 @pytest.fixture
 def health_client(tmp_path):
-    """TestClient running the real health router against a temp DB."""
+    """TestClient running the real health router against a temp DB with a fresh backup."""
     db_path = str(tmp_path / "test.db")
     asyncio.run(_init_test_db(db_path))
+    # Create a fresh backup so the backup check starts in the "ok" state.
+    backup_dir = tmp_path / "backups"
+    backup_dir.mkdir(parents=True, exist_ok=True)
+    _make_fake_zip(backup_dir / "wondercomic_20260101_000000.zip")
     with patch("routers.health.DB_PATH", db_path):
         with TestClient(make_test_app(db_path, health_router)) as c:
             yield c
@@ -141,12 +145,26 @@ class TestHealthEndpoint:
         assert "backup" in health_client.get("/health").json()["checks"]
 
     def test_backup_check_is_never_when_no_backups_exist(self, health_client):
-        assert health_client.get("/health").json()["checks"]["backup"] == "never"
+        with patch("routers.health.get_last_backup_time", return_value=None):
+            assert health_client.get("/health").json()["checks"]["backup"] == "never"
+
+    def test_returns_503_when_no_backups_exist(self, health_client):
+        with patch("routers.health.get_last_backup_time", return_value=None):
+            assert health_client.get("/health").status_code == 503
+
+    def test_status_is_unhealthy_when_no_backups_exist(self, health_client):
+        with patch("routers.health.get_last_backup_time", return_value=None):
+            assert health_client.get("/health").json()["status"] == "unhealthy"
 
     def test_backup_check_is_ok_when_backup_exists(self, health_client, isolate_backup_dir):
         isolate_backup_dir.mkdir(parents=True, exist_ok=True)
         _make_fake_zip(isolate_backup_dir / "wondercomic_20260101_000000.zip")
         assert health_client.get("/health").json()["checks"]["backup"] == "ok"
+
+    def test_returns_200_when_backup_is_fresh(self, health_client, isolate_backup_dir):
+        isolate_backup_dir.mkdir(parents=True, exist_ok=True)
+        _make_fake_zip(isolate_backup_dir / "wondercomic_20260101_000000.zip")
+        assert health_client.get("/health").status_code == 200
 
     def test_backup_check_is_stale_when_last_backup_is_too_old(self, health_client, isolate_backup_dir):
         import os as _os
@@ -160,6 +178,19 @@ class TestHealthEndpoint:
         old_mtime = _time.time() - STALE_THRESHOLD - 60
         _os.utime(stale_zip, (old_mtime, old_mtime))
         assert health_client.get("/health").json()["checks"]["backup"] == "stale"
+
+    def test_returns_503_when_backup_is_stale(self, health_client, isolate_backup_dir):
+        import os as _os
+        import time as _time
+
+        from db.backup import STALE_THRESHOLD
+
+        isolate_backup_dir.mkdir(parents=True, exist_ok=True)
+        stale_zip = isolate_backup_dir / "wondercomic_20260101_000000.zip"
+        _make_fake_zip(stale_zip)
+        old_mtime = _time.time() - STALE_THRESHOLD - 60
+        _os.utime(stale_zip, (old_mtime, old_mtime))
+        assert health_client.get("/health").status_code == 503
 
     def test_database_check_is_ok_when_only_backup_check_fails(self, health_client):
         with patch("routers.health.get_last_backup_time", side_effect=OSError("permission denied")):
