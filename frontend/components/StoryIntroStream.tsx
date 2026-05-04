@@ -32,7 +32,7 @@ function Caret(): JSX.Element {
   return (
     <span
       aria-hidden="true"
-      className="inline-block w-[0.12em] h-[0.9em] align-[-0.1em] ml-1 bg-brand-primary animate-[intro-caret_1s_steps(2,end)_infinite]"
+      className="inline-block w-[0.12em] h-[0.9em] align-[-0.1em] ms-1 bg-brand-primary animate-[intro-caret_1s_steps(2,end)_infinite]"
     />
   );
 }
@@ -74,7 +74,7 @@ function StoryIntroStream({
             {titleCaret && <Caret />}
           </Heading>
 
-          <div className="mt-10 border-l-4 border-brand-accent pl-6 text-left min-h-[4rem]">
+          <div className="mt-10 border-s-4 border-brand-accent ps-6 text-start min-h-[4rem]">
             <Text className="text-brand-dark/80 italic">
               {hasForeword ? `"${foreword}` : ''}
               {forewordCaret && <Caret />}

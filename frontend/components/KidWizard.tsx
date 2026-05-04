@@ -9,6 +9,7 @@ import { SketchyButton } from '@/components/design-system/Primitives';
 import { Heading, Label } from '@/components/design-system/Typography';
 import { SketchyInput, SketchyTextarea } from '@/components/design-system/Forms';
 import { useSpeechRecognition } from '@/components/speech/useSpeechRecognition';
+import { getDirectionalArrow, getLanguageDirection, getSpeechLocale } from '@/i18n.languages';
 import {
   ARCHETYPES,
   ART_STYLES,
@@ -290,7 +291,7 @@ function AppearanceStepSection({
               <button
                 type="button"
                 onClick={onPhotoRemove}
-                className="absolute top-2 right-2 bg-red-400 text-white rounded-full w-8 h-8 flex items-center justify-center font-semibold text-lg hover:bg-red-500 border border-white shadow-sm"
+                className="absolute top-2 end-2 bg-red-400 text-white rounded-full w-8 h-8 flex items-center justify-center font-semibold text-lg hover:bg-red-500 border border-white shadow-sm"
               >
                 ×
               </button>
@@ -321,7 +322,7 @@ function ArchetypeStepSection({
               key={archetype.id}
               type="button"
               onClick={() => onUpdateProfileField('archetype', archetype.label)}
-              className={getSelectionCardClassName(isSelected, 'text-left')}
+              className={getSelectionCardClassName(isSelected, 'text-start')}
             >
               <div className="mb-2">
                 <archetype.Icon className="w-10 h-10" color={iconColor} />
@@ -340,9 +341,11 @@ function DreamStepSection({
   profile,
   onUpdateProfileField,
 }: DreamStepSectionProps): JSX.Element {
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
+  const speechLocale = getSpeechLocale(i18n.resolvedLanguage || i18n.language);
 
   const speech = useSpeechRecognition({
+    lang: speechLocale,
     errorMessages: {
       unsupported: t('kidWizard.voiceInput.errors.unsupported'),
       permissionDenied: t('kidWizard.voiceInput.errors.permissionDenied'),
@@ -457,8 +460,11 @@ function WizardFooter({
   onPreviousStep,
   onContinue,
 }: WizardFooterProps): JSX.Element {
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
   const isLastStep = step === totalSteps;
+  const languageDirection = getLanguageDirection(i18n.resolvedLanguage || i18n.language);
+  const previousArrow = getDirectionalArrow('back', languageDirection);
+  const nextArrow = getDirectionalArrow('forward', languageDirection);
 
   return (
     <div className="flex justify-between items-center mt-auto pt-8 border-t border-purple-50">
@@ -468,7 +474,7 @@ function WizardFooter({
           onClick={onPreviousStep}
           className="flex items-center gap-2 px-6 py-3 font-black text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-xl uppercase tracking-widest text-sm transition-all"
         >
-          <span className="text-lg">←</span> {t('kidWizard.back')}
+          <span className="text-lg">{previousArrow}</span> {t('kidWizard.back')}
         </button>
       ) : <div className="w-24" />}
 
@@ -477,7 +483,7 @@ function WizardFooter({
         onClick={onContinue}
         className="flex items-center gap-2 px-8 py-4 font-black rounded-2xl shadow-lg transition-all bg-yellow-400 text-purple-900 hover:-translate-y-1 hover:shadow-xl"
       >
-        {isLastStep ? <>{t('kidWizard.createStory')}</> : <>{t('kidWizard.continue')} <span className="text-lg">→</span></>}
+        {isLastStep ? <>{t('kidWizard.createStory')}</> : <>{t('kidWizard.continue')} <span className="text-lg">{nextArrow}</span></>}
       </button>
     </div>
   );

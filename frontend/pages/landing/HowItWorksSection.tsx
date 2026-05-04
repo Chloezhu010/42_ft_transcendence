@@ -30,7 +30,7 @@ function HowItWorksSection(): JSX.Element {
                   className="w-72 flex flex-col items-center relative group-hover:scale-105 overflow-hidden p-0 h-full"
                   style={{ borderRadius: '32px' }}
                 >
-                  <div className="absolute top-2 left-2 w-10 h-10 bg-brand-accent border-2 border-brand-primary rounded-full flex items-center justify-center font-bold text-xl z-20 text-brand-dark shadow-sm">
+                  <div className="absolute top-2 start-2 w-10 h-10 bg-brand-accent border-2 border-brand-primary rounded-full flex items-center justify-center font-bold text-xl z-20 text-brand-dark shadow-sm">
                     {step.number}
                   </div>
 

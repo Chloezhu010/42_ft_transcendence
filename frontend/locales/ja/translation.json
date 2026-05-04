@@ -263,7 +263,7 @@
         "opening": "はじまり",
         "ending": "おわり"
       },
-      "turnPage": "ページをめくる →",
+      "turnPage": "ページをめくる",
       "ctaTitle": "気に入りましたか？",
       "ctaDescription": "はじまりとおわりの間の{{count}}枚のパネルを埋めます。",
       "generateFull": "完全な物語を生成",

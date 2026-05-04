@@ -1,5 +1,6 @@
 import { useSpeechSynthesis } from '@/components/speech/useSpeechSynthesis';
 import { useTranslation } from 'react-i18next';
+import { getSpeechLocale } from '@/i18n.languages';
 
 interface StoryReadAloudControlProps {
   text: string;
@@ -42,7 +43,8 @@ function StoryReadAloudControl({
   text,
   className = '',
 }: StoryReadAloudControlProps): JSX.Element {
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
+  const speechLocale = getSpeechLocale(i18n.resolvedLanguage || i18n.language);
   const speech = useSpeechSynthesis({
     errorMessages: {
       unsupported: t('story.readAloud.errors.unsupported'),
@@ -62,7 +64,7 @@ function StoryReadAloudControl({
       return;
     }
 
-    speech.speak(text);
+    speech.speak(text, { lang: speechLocale });
   };
 
   const label = getPrimaryControlLabel(speech.isSpeaking, speech.isPaused, {

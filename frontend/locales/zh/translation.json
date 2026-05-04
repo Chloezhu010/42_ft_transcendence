@@ -263,7 +263,7 @@
         "opening": "开篇",
         "ending": "结尾"
       },
-      "turnPage": "翻页 →",
+      "turnPage": "翻页",
       "ctaTitle": "喜欢现在的样子吗？",
       "ctaDescription": "我们会补全开篇与结尾之间的 {{count}} 个分镜。",
       "generateFull": "生成完整故事",
