@@ -138,6 +138,8 @@ export function StatusPage(): JSX.Element {
       if (accessToken && currentUser?.is_admin) {
         const backupData = await getBackupStatus(accessToken);
         setBackupStatus(backupData);
+      } else {
+        setBackupStatus(null);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : t('statusPage.errors.loadFailed'));
