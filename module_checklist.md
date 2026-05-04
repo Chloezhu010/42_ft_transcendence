@@ -8,7 +8,7 @@
 
 ## Proposed Modules to Implement
 
-> **Total proposed after dropping microservices: 17 pts** (14 required + 3 buffer — buffer protects against a module being rejected at evaluation)
+> **Total proposed after dropping microservices: 18 pts** (14 required + 4 buffer — buffer protects against a module being rejected at evaluation)
 
 | # | Category | Module | Type | Pts | Status | Risk | Notes |
 |---|----------|--------|------|-----|--------|------|-------|
@@ -18,26 +18,27 @@
 | 4 | Web | Custom design system (10+ reusable components) | Minor | 1 | ✅ Done | Low | 10+ reusable components now exist: buttons, card, inputs, typography, icons, loaders, storage image, etc. |
 | 5 | Web | Advanced search functionality (filters, sorting, pagination) | Minor | 1 | ❌ Not started | Low | Add search UI + backend query filtering for the gallery/library: filter by art style/language/kid profile, sort by created date, paginate results |
 | 6 | Accessibility | Multiple languages — i18n (3 languages) | Minor | 1 | ⚠️ Partial | Low | `i18next`, 6 locales, language switcher, and document `lang`/`dir` exist; finish remaining hardcoded UI text before claiming |
-| 7 | User Management | Standard user management and authentication | Major | 2 | ✅ Done | Low | Signup/login/logout, hashed passwords, JWT sessions, profile update, avatar upload, friends, online status, and profile page exist |
-| 8 | User Management | OAuth 2.0 (42 School / GitHub / Google) | Minor | 1 | ✅ Done | Low | Google OAuth flow exists; demo requires valid Google OAuth environment variables |
-| 9 | AI | LLM system interface (Gemini story + image generation) | Major | 2 | ✅ Done | Low | Text + image generation with retry; story-script streaming via NDJSON (`POST /api/generate/story-script/stream`) drives the live title/foreword intro |
-| 10 | AI | Voice / speech integration | Minor | 1 | ✅ Done | Low | Web Speech API hooks (`useSpeechSynthesis`, `useSpeechRecognition`); read-aloud control wired into Storyboard + Preview views; voice input wired into KidWizard |
-| 11 | DevOps | Prometheus + Grafana monitoring | Major | 2 | ✅ Done | Low | `/metrics`, Prometheus, Grafana, Alertmanager, node exporter, custom Gemini/story metrics, dashboards, and alert rules exist |
-| 12 | DevOps | Health check + status page + automated backups | Minor | 1 | ✅ Done | Low | `GET /health`, `/status` UI, startup + 24h backups, manual backup trigger, rotation, and recovery docs exist |
+| 7 | Accessibility | Right-to-left (RTL) language support | Minor | 1 | ✅ Done | Low | Arabic locale + `document.dir` synced via `i18n.dir()`; full layout mirroring (logical properties), RTL-specific UI adjustments, seamless LTR↔RTL switching through the language switcher |
+| 8 | User Management | Standard user management and authentication | Major | 2 | ✅ Done | Low | Signup/login/logout, hashed passwords, JWT sessions, profile update, avatar upload, friends, online status, and profile page exist |
+| 9 | User Management | OAuth 2.0 (42 School / GitHub / Google) | Minor | 1 | ✅ Done | Low | Google OAuth flow exists; demo requires valid Google OAuth environment variables |
+| 10 | AI | LLM system interface (Gemini story + image generation) | Major | 2 | ✅ Done | Low | Text + image generation with retry; story-script streaming via NDJSON (`POST /api/generate/story-script/stream`) drives the live title/foreword intro |
+| 11 | AI | Voice / speech integration | Minor | 1 | ✅ Done | Low | Web Speech API hooks (`useSpeechSynthesis`, `useSpeechRecognition`); read-aloud control wired into Storyboard + Preview views; voice input wired into KidWizard |
+| 12 | DevOps | Prometheus + Grafana monitoring | Major | 2 | ✅ Done | Low | `/metrics`, Prometheus, Grafana, Alertmanager, node exporter, custom Gemini/story metrics, dashboards, and alert rules exist |
+| 13 | DevOps | Health check + status page + automated backups | Minor | 1 | ✅ Done | Low | `GET /health`, `/status` UI, startup + 24h backups, manual backup trigger, rotation, and recovery docs exist |
 
 ### Point Breakdown
 
 | Category | Modules | Pts |
 |----------|---------|-----|
 | Web | Frameworks + Public API + Notification + Design system + Advanced search | 7 |
-| Accessibility | Multi-language | 1 |
+| Accessibility | Multi-language + RTL | 2 |
 | User Management | Standard auth + OAuth | 3 |
 | AI | LLM interface + Voice/speech | 3 |
 | DevOps | Prometheus/Grafana + Health check | 3 |
-| **Total proposed** | | **17** |
+| **Total proposed** | | **18** |
 
 | **Minimum required** | | **14** |
-| **Buffer** | Protects against 1 Major + 2 Minors being rejected | **+3** |
+| **Buffer** | Protects against 1 Major + 2 Minors being rejected | **+4** |
 
 ### Dependencies & Implementation Order
 
@@ -89,7 +90,7 @@ LLM interface (#9)       ──► streaming shipped — claimable now
 |--------|------|-----|--------|-------------|------------------------|
 | Complete accessibility (WCAG 2.1 AA) | Major | 2 | ❌ | Nothing audited | Screen reader support, keyboard navigation, ARIA labels, contrast ratios |
 | Multiple languages (i18n, 3 languages) | Minor | 1 | ⚠️ | `i18next`, browser language detection, 6 translation files (`en`, `fr`, `es`, `zh`, `ja`, `ar`), language switcher, and translated major flows | All user-facing text must be translatable; hardcoded strings remain in Status, Friends, OAuth callback, auth buttons, and some read-only labels |
-| RTL language support | Minor | 1 | ⚠️ | Arabic locale exists and `document.dir` is synced through i18n | Complete layout mirroring and RTL-specific UI checks/fixes are still needed before claiming |
+| RTL language support | Minor | 1 | ✅ | Arabic locale, `document.dir` synced through `i18n.dir()`, full layout mirroring via CSS logical properties, RTL-specific UI adjustments, and seamless LTR↔RTL switching from the language switcher | Nothing — fully claimable |
 | Additional browser support (2+ browsers) | Minor | 1 | ❌ | Nothing tested | Test + fix in Firefox, Safari, or Edge |
 
 ---
@@ -191,11 +192,11 @@ LLM interface (#9)       ──► streaming shipped — claimable now
 
 | Status | Proposed modules | Pts |
 |--------|-----------------|-----|
-| ✅ Done | Frameworks, Design system, Standard user management, OAuth, LLM interface, Voice/speech, Prometheus + Grafana, Health/status/backups | 12 |
+| ✅ Done | Frameworks, Design system, Standard user management, OAuth, LLM interface, Voice/speech, Prometheus + Grafana, Health/status/backups, RTL | 13 |
 | ⚠️ Partial — low effort to complete | Public API, Notification system, Multi-language | 4 |
 | ❌ Not started — low/medium effort | Advanced search | 1 |
 | 🚫 Dropped | Backend as microservices, User activity analytics | — |
-| **Total proposed** | | **17** |
+| **Total proposed** | | **18** |
 
 | Symbol | Meaning |
 |--------|---------|
