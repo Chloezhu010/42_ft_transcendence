@@ -7,10 +7,10 @@ create_backup() via a POSIX file lock, so concurrent callers (this
 worker + a manual API trigger) are safely serialized without any
 extra locking here.
 
-Schema-not-ready handling: if the backend has not yet run init_db()
-(startup race), _run_once() returns False and the loop retries after
-SCHEMA_RETRY_SECONDS instead of waiting a full day.  Once the first
-backup succeeds the normal interval takes over.
+Retry behaviour:
+  - Success              → sleep INTERVAL (normal cadence)
+  - SchemaNotReadyError  → sleep SCHEMA_RETRY (30 s); backend hasn't run init_db() yet
+  - Any other exception  → sleep FAILURE_RETRY (5 min); transient disk/permission issue
 """
 
 import asyncio
@@ -20,7 +20,8 @@ import time
 from db.backup import BACKUP_INTERVAL, SchemaNotReadyError, create_backup
 
 INTERVAL = BACKUP_INTERVAL
-SCHEMA_RETRY = 30  # seconds between retries while schema is not yet ready
+SCHEMA_RETRY = 30  # seconds — schema race on startup
+FAILURE_RETRY = 300  # seconds — transient disk / permission / write error
 
 logging.basicConfig(
     level=logging.INFO,
@@ -30,29 +31,29 @@ logging.basicConfig(
 log = logging.getLogger("backup-worker")
 
 
-def _run_once() -> bool:
-    """Run one backup cycle.
+def _run_once() -> int:
+    """Run one backup cycle and return the number of seconds to sleep next.
 
-    Returns True when the backup completed (or failed for an unrelated reason),
-    so the caller uses the normal interval.  Returns False when the DB schema
-    is not ready yet, so the caller should retry sooner.
+    Returns INTERVAL on success, SCHEMA_RETRY when the DB schema is not yet
+    initialized, and FAILURE_RETRY for any other exception so that transient
+    failures (disk full, permission error, corrupt write) are retried within
+    minutes rather than after a full day.
     """
     try:
         asyncio.run(create_backup())
         log.info("Backup complete")
-        return True
+        return INTERVAL
     except SchemaNotReadyError as exc:
         log.warning("DB schema not ready, will retry in %ds: %s", SCHEMA_RETRY, exc)
-        return False
+        return SCHEMA_RETRY
     except Exception:
-        log.exception("Backup failed")
-        return True
+        log.exception("Backup failed, will retry in %ds", FAILURE_RETRY)
+        return FAILURE_RETRY
 
 
 if __name__ == "__main__":
     log.info("Backup worker starting (interval=%ds)", INTERVAL)
     while True:
-        schema_ready = _run_once()
-        delay = INTERVAL if schema_ready else SCHEMA_RETRY
+        delay = _run_once()
         log.info("Next backup in %ds", delay)
         time.sleep(delay)
