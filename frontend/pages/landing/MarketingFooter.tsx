@@ -11,7 +11,7 @@ function MarketingFooter(): JSX.Element {
           <div className="flex items-center">
             <img src="/logo-highres.png" alt={t('app.logoAlt')} className="h-40 w-auto object-contain" />
           </div>
-          <p className="text-brand-muted text-lg max-w-sm text-center md:text-left font-medium">
+          <p className="text-brand-muted text-lg max-w-sm text-center md:text-start font-medium">
             {t('footer.tagline', {
               defaultValue: 'Empowering the next generation of storytellers with a little bit of magic and AI.',
             })}
@@ -38,7 +38,7 @@ function MarketingFooter(): JSX.Element {
           </a>
         </div>
 
-        <div className="text-center md:text-right">
+        <div className="text-center md:text-end">
           <p className="font-bold text-2xl mb-2 text-brand-primary">
             {t('footer.madeFor', { defaultValue: 'Made for little dreamers' })}
           </p>

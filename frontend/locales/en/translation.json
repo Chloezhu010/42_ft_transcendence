@@ -244,7 +244,7 @@
         "opening": "Opening",
         "ending": "Ending"
       },
-      "turnPage": "Turn page →",
+      "turnPage": "Turn page",
       "ctaTitle": "Like what you see?",
       "ctaDescription": "We'll fill in the {{count}} panels between opening and ending.",
       "generateFull": "Generate Full Story",

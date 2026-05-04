@@ -56,7 +56,7 @@ function ComicPanel({ panel, onEditImage }: ComicPanelProps): JSX.Element {
     <div className="relative h-full flex flex-col bg-white overflow-hidden group">
       <div className="relative flex-1 bg-brand-surface">
         {panel.isGenerating ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center space-y-4">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
             <div className="w-10 h-10 border-4 border-brand-surface border-t-brand-primary rounded-full animate-spin" />
             <p className="text-[10px] font-black text-brand-primary uppercase tracking-widest animate-pulse">
               {t('comicPanel.paintingScene')}
@@ -69,7 +69,7 @@ function ComicPanel({ panel, onEditImage }: ComicPanelProps): JSX.Element {
               <button
                 type="button"
                 onClick={() => setIsEditing(true)}
-                className="absolute top-3 right-3 bg-white/40 backdrop-blur-md p-2.5 rounded-full shadow-md opacity-0 group-hover:opacity-100 hover:bg-white/90 transition-all duration-200 text-lg border border-white/50 z-40"
+                className="absolute top-3 end-3 bg-white/40 backdrop-blur-md p-2.5 rounded-full shadow-md opacity-0 group-hover:opacity-100 hover:bg-white/90 transition-all duration-200 text-lg border border-white/50 z-40"
                 title={t('comicPanel.editScene')}
               >
                 🪄
@@ -83,7 +83,7 @@ function ComicPanel({ panel, onEditImage }: ComicPanelProps): JSX.Element {
         )}
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 p-6 pt-12 bg-gradient-to-t from-white via-white/90 to-transparent z-30 flex items-end justify-center min-h-[140px]">
+      <div className="absolute inset-x-0 bottom-0 p-6 pt-12 bg-gradient-to-t from-white via-white/90 to-transparent z-30 flex items-end justify-center min-h-[140px]">
         <p className="font-serif italic text-xl md:text-2xl text-brand-dark text-center leading-relaxed tracking-tight max-w-md drop-shadow-sm">
           {panel.text || '...'}
         </p>
@@ -102,7 +102,7 @@ function ComicPanel({ panel, onEditImage }: ComicPanelProps): JSX.Element {
               onChange={(event) => setEditPrompt(event.target.value)}
               disabled={isProcessing}
             />
-            <div className="flex space-x-4">
+            <div className="flex gap-4">
               <SketchyButton
                 variant="outline"
                 onClick={() => setIsEditing(false)}

@@ -244,7 +244,7 @@
         "opening": "Apertura",
         "ending": "Final"
       },
-      "turnPage": "Pasar pagina →",
+      "turnPage": "Pasar pagina",
       "ctaTitle": "Te gusta lo que ves?",
       "ctaDescription": "Rellenaremos los {{count}} paneles entre la apertura y el final.",
       "generateFull": "Generar historia completa",

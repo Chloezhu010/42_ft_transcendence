@@ -72,7 +72,7 @@ function LegalPage({ documentKey }: LegalPageProps): JSX.Element {
                     ))}
 
                     {block.bullets ? (
-                      <ul className="list-disc pl-6 space-y-2">
+                      <ul className="list-disc ps-6 space-y-2">
                         {block.bullets.map((bullet) => (
                           <li key={bullet}>{bullet}</li>
                         ))}
