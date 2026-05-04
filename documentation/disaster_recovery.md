@@ -124,7 +124,7 @@ every 30 seconds; once the schema is ready the first backup runs immediately.
    ```bash
    docker compose run --rm --no-deps backend \
      python3 -c "
-   import zipfile, shutil
+   import zipfile
    with zipfile.ZipFile('/app/backups/wondercomic_YYYYMMDD_HHMMSS_ffffff.zip') as z:
        z.extract('wondercomic.db', '/app')
    "
@@ -159,39 +159,25 @@ every 30 seconds; once the schema is ready the first backup runs immediately.
 
 ### Scenario 2 — Local development (no Docker)
 
+Use the `restore_backup.py` CLI — it handles WAL removal, DB extraction, and image
+restoration in one step.
+
+**Prerequisite:** `RESTORE_BACKUP_SECRET` must be set in `.env` (see `.env.example`).
+
 1. **Stop the running server** (Ctrl+C in the uvicorn terminal).
 
-2. **Remove WAL sidecar files.**
+2. **Run the restore script** from the repo root.
    ```bash
-   rm -f backend/wondercomic.db-wal backend/wondercomic.db-shm
+   python backend/scripts/restore_backup.py
    ```
+   The script will:
+   - Prompt for `RESTORE_BACKUP_SECRET`
+   - List available backups newest-first and ask you to choose one
+   - Ask for confirmation before writing anything
+   - Delete WAL/SHM sidecar files, restore `wondercomic.db`, then restore all images
+   - Print a summary: database path, image count, backup filename used
 
-3. **Extract the database.**
-   ```bash
-   python3 -c "
-   import zipfile
-   with zipfile.ZipFile('backend/backups/wondercomic_YYYYMMDD_HHMMSS_ffffff.zip') as z:
-       z.extract('wondercomic.db', 'backend')
-   "
-   ```
-
-4. **Restore the images.**
-   ```bash
-   python3 -c "
-   import zipfile, pathlib
-   images_dir = pathlib.Path('backend/images')
-   images_dir.mkdir(exist_ok=True)
-   with zipfile.ZipFile('backend/backups/wondercomic_YYYYMMDD_HHMMSS_ffffff.zip') as z:
-       for name in z.namelist():
-           if name.startswith('images/') and not name.endswith('/'):
-               rel = pathlib.Path(name).relative_to('images')
-               dest = images_dir / rel
-               dest.parent.mkdir(parents=True, exist_ok=True)
-               dest.write_bytes(z.read(name))
-   "
-   ```
-
-5. **Restart the server.**
+3. **Restart the server.**
    ```bash
    cd backend && uv run uvicorn main:app --reload
    ```
@@ -252,6 +238,7 @@ rclone sync /path/to/backend_backups s3:my-bucket/wondercomic-backups
 | `backend/routers/health.py` | `GET /health` — DB integrity check + backup staleness check; returns 503 when backup is `never` or `stale` |
 | `backend/backup_worker.py` | Standalone process: runs on startup then every `BACKUP_INTERVAL_SECONDS` seconds; retries after 30 s if DB schema is not yet initialized; POSIX flock prevents concurrent runs |
 | `backend/scripts/promote_admin.py` | CLI to promote an existing user to admin (required to obtain tokens for backup API) |
+| `backend/scripts/restore_backup.py` | CLI to restore a backup archive locally — lists snapshots, confirms, removes WAL sidecars, restores DB + images |
 | `backend/main.py` | App factory — database init only, no backup scheduling |
 | `backend/services/image_storage.py` | Defines `IMAGES_DIR`; acquires shared flock before deleting images |
 | `docker-compose.yml` | `backup-worker` service + `backend_backups` and `backend_images` named volumes |
