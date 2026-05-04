@@ -301,6 +301,40 @@ describe('StatusPage', () => {
   });
 
   describe('auth-state transitions', () => {
+    it('does not commit stale backup data when auth changes before the request resolves', async () => {
+      let resolveBackup!: (data: typeof BACKUP_STATUS_WITH_ENTRIES) => void;
+      mockGetBackupStatus.mockReturnValueOnce(
+        new Promise<typeof BACKUP_STATUS_WITH_ENTRIES>((res) => {
+          resolveBackup = res;
+        }),
+      );
+
+      const { rerender } = render(
+        <MemoryRouter>
+          <StatusPage />
+        </MemoryRouter>,
+      );
+
+      // Health resolves; backup request is still in flight.
+      await waitFor(() => expect(screen.getByText(/1\.0\.0/)).toBeInTheDocument());
+
+      // Auth changes to non-admin before backup resolves.
+      mockUseAuth.mockReturnValue({ accessToken: null, currentUser: null });
+      rerender(
+        <MemoryRouter>
+          <StatusPage />
+        </MemoryRouter>,
+      );
+
+      // Stale backup request resolves after auth was revoked.
+      resolveBackup(BACKUP_STATUS_WITH_ENTRIES);
+
+      // Backup filenames must not appear.
+      await waitFor(() => {
+        expect(screen.queryByText(/wondercomic_20260426_100000\.db/)).not.toBeInTheDocument();
+      });
+    });
+
     it('clears the backup section when the user loses admin access', async () => {
       const { rerender } = render(
         <MemoryRouter>

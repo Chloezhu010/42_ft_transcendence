@@ -2,7 +2,7 @@
  * System status page.
  * Shows live health check results, backup inventory, and a manual backup trigger.
  */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { BackupEntry, BackupStatus, HealthCheck } from '@api';
 import { getBackupStatus, getHealthStatus, triggerBackup } from '@api';
@@ -124,33 +124,54 @@ function BackupSection({ backupStatus, isTriggeringBackup, onTrigger }: BackupSe
 export function StatusPage(): JSX.Element {
   const { t } = useTranslation();
   const { accessToken, currentUser } = useAuth();
+  const isAdmin = currentUser?.is_admin ?? false;
+
+  // Always holds the freshest auth snapshot. Updated synchronously on every
+  // render so post-await checks see the current state, not the stale closure.
+  const authRef = useRef({ accessToken, isAdmin });
+  authRef.current = { accessToken, isAdmin };
+
   const [health, setHealth] = useState<HealthCheck | null>(null);
   const [backupStatus, setBackupStatus] = useState<BackupStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isTriggeringBackup, setIsTriggeringBackup] = useState(false);
 
-  const loadData = useCallback(async (): Promise<void> => {
+  const loadData = useCallback(async (signal: AbortSignal): Promise<void> => {
     try {
       setError(null);
-      const healthData = await getHealthStatus();
+      const healthData = await getHealthStatus({ signal });
+      if (signal.aborted) return;
       setHealth(healthData);
-      if (accessToken && currentUser?.is_admin) {
-        const backupData = await getBackupStatus(accessToken);
-        setBackupStatus(backupData);
+      // Show health immediately; backup fetch runs independently below.
+      setIsLoading(false);
+
+      const { accessToken: token, isAdmin: admin } = authRef.current;
+      if (token && admin) {
+        const backupData = await getBackupStatus(token, { signal });
+        if (signal.aborted) return;
+        // Re-read auth after the await: token/role may have changed while the
+        // request was in flight even if the signal was not yet aborted.
+        if (authRef.current.accessToken && authRef.current.isAdmin) {
+          setBackupStatus(backupData);
+        } else {
+          setBackupStatus(null);
+        }
       } else {
         setBackupStatus(null);
       }
     } catch (err) {
+      if (signal.aborted) return;
       setError(err instanceof Error ? err.message : t('statusPage.errors.loadFailed'));
-    } finally {
       setIsLoading(false);
     }
-  }, [t, accessToken, currentUser?.is_admin]);
+  }, [t]);
 
   useEffect(() => {
-    void loadData();
-  }, [loadData]);
+    const controller = new AbortController();
+    void loadData(controller.signal);
+    return () => controller.abort();
+  }, [loadData, accessToken, isAdmin]);
 
   const handleTriggerBackup = async (): Promise<void> => {
     if (!accessToken) return;
