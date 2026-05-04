@@ -18,15 +18,31 @@ restoring a backup restores user content end-to-end.
 | Setting | Value |
 |---------|-------|
 | Mechanism | zip archive: SQLite `Connection.backup()` + image directory snapshot |
-| Schedule | On startup + every 24 hours automatically |
+| Schedule | On startup + every `BACKUP_INTERVAL_SECONDS` seconds (default 24 h) via the `backup-worker` Compose service |
 | Retention | Last 7 snapshots (oldest deleted automatically) |
 | Storage | `backend_backups` named Docker volume, mounted at `/app/backups` in the container (Compose prefixes the physical name with the project name, e.g. `tran_main1_backend_backups`) |
 | Filename format | `wondercomic_YYYYMMDD_HHMMSS_ffffff.zip` (microsecond precision) |
-| Archive contents | `wondercomic.db` + `images/<filename>` for every file in `backend/images/` |
+| Archive contents | `wondercomic.db` + `images/…` for every file under `backend/images/` including subdirectories (e.g. `images/avatars/`) |
+
+### Granting Admin Access
+
+Both backup API endpoints require an **admin JWT token**. Use the `promote_admin.py` CLI
+to grant admin rights to an existing user — no code changes or API exposure needed.
+
+```bash
+# Run from the repo root
+python backend/scripts/promote_admin.py
+```
+
+The script prompts for `ADMIN_PROMOTION_SECRET` (set in `.env`) then the target username
+or email, and requires `y` confirmation before updating the database. It reads `DB_PATH`
+from `.env` and resolves it relative to `backend/`.
+
+After promotion, log in as that user through the web UI to obtain a fresh JWT.
 
 ### Manual Backup (API)
 
-Trigger an immediate backup without restarting:
+Both endpoints require an admin JWT token (see _Granting Admin Access_ above).
 
 ```bash
 # Docker deployment (through nginx on port 443)
@@ -40,10 +56,10 @@ curl -X POST -H "Authorization: Bearer <token>" http://localhost:8000/api/backup
 
 ```bash
 # Docker deployment
-curl -k https://localhost/api/backup/status
+curl -k -H "Authorization: Bearer <token>" https://localhost/api/backup/status
 
 # Local dev
-curl http://localhost:8000/api/backup/status
+curl -H "Authorization: Bearer <token>" http://localhost:8000/api/backup/status
 ```
 
 The response includes the last backup timestamp and a list of all available snapshots.
@@ -56,13 +72,36 @@ for a visual backup inventory and a **Back up now** button.
 
 ---
 
+## Health Check and Alerting
+
+`GET /health` (no auth required) reports both database and backup status:
+
+| `checks.backup` | Meaning | HTTP status |
+|-----------------|---------|-------------|
+| `ok` | Last backup is within `BACKUP_INTERVAL_SECONDS × 1.5` | 200 |
+| `stale` | Last backup exists but is older than the threshold | 503 |
+| `never` | No backup has ever been created | 503 |
+| `unavailable` | Backup metadata could not be read | 503 |
+
+```bash
+curl -k https://localhost/health
+# {"status":"healthy","version":"1.0.0","checks":{"database":"ok","backup":"ok"}}
+```
+
+A 503 response means uptime monitors / Prometheus alerts will fire. The most common
+cause after a fresh deployment is `never` — the `backup-worker` has not completed its
+first run yet. If the worker is still waiting for the DB schema to initialize it retries
+every 30 seconds; once the schema is ready the first backup runs immediately.
+
+---
+
 ## Restore Procedures
 
 ### Scenario 1 — Corrupt or missing database and/or images (Docker deployment)
 
-1. **Stop the backend container.**
+1. **Stop the backend and backup-worker containers.**
    ```bash
-   docker compose stop backend
+   docker compose stop backend backup-worker
    ```
 
 2. **Remove WAL sidecar files.**
@@ -102,14 +141,16 @@ for a visual backup inventory and a **Back up now** button.
    with zipfile.ZipFile('/app/backups/wondercomic_YYYYMMDD_HHMMSS_ffffff.zip') as z:
        for name in z.namelist():
            if name.startswith('images/') and not name.endswith('/'):
-               dest = images_dir / pathlib.Path(name).name
+               rel = pathlib.Path(name).relative_to('images')
+               dest = images_dir / rel
+               dest.parent.mkdir(parents=True, exist_ok=True)
                dest.write_bytes(z.read(name))
    "
    ```
 
-6. **Restart the backend.**
+6. **Restart the backend and backup-worker.**
    ```bash
-   docker compose start backend
+   docker compose start backend backup-worker
    ```
 
 7. **Verify** by visiting `https://localhost/status` or running `curl -k https://localhost/health`.
@@ -143,7 +184,9 @@ for a visual backup inventory and a **Back up now** button.
    with zipfile.ZipFile('backend/backups/wondercomic_YYYYMMDD_HHMMSS_ffffff.zip') as z:
        for name in z.namelist():
            if name.startswith('images/') and not name.endswith('/'):
-               dest = images_dir / pathlib.Path(name).name
+               rel = pathlib.Path(name).relative_to('images')
+               dest = images_dir / rel
+               dest.parent.mkdir(parents=True, exist_ok=True)
                dest.write_bytes(z.read(name))
    "
    ```
@@ -203,9 +246,13 @@ rclone sync /path/to/backend_backups s3:my-bucket/wondercomic-backups
 
 | Path | Purpose |
 |------|---------|
-| `backend/db/backup.py` | Backup creation, rotation, and listing logic |
-| `backend/routers/backup.py` | `GET /api/backup/status` and `POST /api/backup/trigger` endpoints |
-| `backend/main.py` | Startup backup + 24-hour scheduled task |
-| `backend/services/image_storage.py` | Defines `IMAGES_DIR` — the directory included in each backup |
-| `docker-compose.yml` | Declares `backend_backups` named volume (mounted at `/app/backups`) and `backend_images` named volume (mounted at `/app/images`) |
-| `frontend/pages/status/StatusPage.tsx` | `/status` page — shows backup inventory and manual trigger |
+| `backend/db/backup.py` | Backup creation, rotation, listing logic; defines `BACKUP_INTERVAL` and `STALE_THRESHOLD` |
+| `backend/db/backup_lock.py` | POSIX flock shared/exclusive lock — prevents image deletion racing with backup packaging |
+| `backend/routers/backup.py` | `GET /api/backup/status` (admin) and `POST /api/backup/trigger` (admin) endpoints |
+| `backend/routers/health.py` | `GET /health` — DB integrity check + backup staleness check; returns 503 when backup is `never` or `stale` |
+| `backend/backup_worker.py` | Standalone process: runs on startup then every `BACKUP_INTERVAL_SECONDS` seconds; retries after 30 s if DB schema is not yet initialized; POSIX flock prevents concurrent runs |
+| `backend/scripts/promote_admin.py` | CLI to promote an existing user to admin (required to obtain tokens for backup API) |
+| `backend/main.py` | App factory — database init only, no backup scheduling |
+| `backend/services/image_storage.py` | Defines `IMAGES_DIR`; acquires shared flock before deleting images |
+| `docker-compose.yml` | `backup-worker` service + `backend_backups` and `backend_images` named volumes |
+| `frontend/pages/status/StatusPage.tsx` | `/status` page — shows backup inventory and manual trigger (admin only) |
