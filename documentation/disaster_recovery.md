@@ -132,21 +132,47 @@ every 30 seconds; once the schema is ready the first backup runs immediately.
    Replace `wondercomic_YYYYMMDD_HHMMSS_ffffff.zip` with the chosen filename.
 
 5. **Restore the images from the backup archive.**
+
+   The script below moves the existing `/app/images` tree aside before
+   extracting, so the restored state exactly matches the archive with no
+   stale or corrupt files left behind. It also validates every archive entry
+   against a resolved path to reject any `../` traversal attempts.
+
    ```bash
    docker compose run --rm --no-deps backend \
      python3 -c "
-   import zipfile, pathlib
+   import datetime, pathlib, sys, zipfile
+
+   zip_path = pathlib.Path('/app/backups/wondercomic_YYYYMMDD_HHMMSS_ffffff.zip')
    images_dir = pathlib.Path('/app/images')
-   images_dir.mkdir(exist_ok=True)
-   with zipfile.ZipFile('/app/backups/wondercomic_YYYYMMDD_HHMMSS_ffffff.zip') as z:
+   timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+   aside = images_dir.parent / f'images_{timestamp}.bak'
+   had_existing = images_dir.exists()
+
+   if had_existing:
+       images_dir.rename(aside)
+   images_dir.mkdir(parents=True)
+   images_root = images_dir.resolve()
+   count = 0
+
+   with zipfile.ZipFile(zip_path) as z:
        for name in z.namelist():
            if name.startswith('images/') and not name.endswith('/'):
                rel = pathlib.Path(name).relative_to('images')
-               dest = images_dir / rel
+               dest = (images_dir / rel).resolve()
+               if not dest.is_relative_to(images_root):
+                   print(f'Unsafe archive entry rejected: {name}', file=sys.stderr)
+                   sys.exit(1)
                dest.parent.mkdir(parents=True, exist_ok=True)
                dest.write_bytes(z.read(name))
+               count += 1
+
+   print(f'Restored {count} image(s).')
+   if had_existing:
+       print(f'Old images kept at {aside} — remove when verified.')
    "
    ```
+   Replace `wondercomic_YYYYMMDD_HHMMSS_ffffff.zip` with the chosen filename.
 
 6. **Restart the backend and backup-worker.**
    ```bash
