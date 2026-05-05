@@ -85,8 +85,8 @@ function StoryCard({ story, onDeleteStory, onUpdateVisibility }: StoryCardProps)
       <button
         type="button"
         onClick={() => void onDeleteStory(story.id)}
-        className="absolute top-4 right-4 z-30 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-md opacity-0 group-hover:opacity-100 focus:opacity-100"
-        title="Delete Story"
+        className="absolute top-4 end-4 z-30 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-md opacity-0 group-hover:opacity-100 focus:opacity-100"
+        title={t('galleryPage.deleteStoryTitle')}
       >
         🗑️
       </button>

@@ -13,7 +13,12 @@
         "status": "ステータス"
       }
     },
-    "friends": "友達"
+    "friends": "友達",
+    "profileAriaLabel": "プロフィール",
+    "logoAlt": "Funova ロゴ",
+    "status": {
+      "loading": "読み込み中…"
+    }
   },
   "comicPanel": {
     "paintingScene": "シーンを描画中...",
@@ -24,7 +29,8 @@
     "editScene": "シーンを編集",
     "editPlaceholder": "例 好奇心旺盛な小さなロボットが地図を見ています...",
     "close": "閉じる",
-    "applyMagic": "魔法を適用✨"
+    "applyMagic": "魔法を適用✨",
+    "sceneAlt": "コミックの場面"
   },
   "galleryPage": {
     "mySavedBooks": "保存された書籍",
@@ -37,12 +43,17 @@
       "deleteFailed": "ストーリーを削除できませんでした。",
       "sharedWithFriends": "ストーリーをフレンドと共有しました。",
       "setPrivate": "ストーリーを非公開にしました。",
-      "shareFailed": "ストーリーの共有設定を更新できませんでした。"
+      "shareFailed": "ストーリーの共有設定を更新できませんでした。",
+      "loadFailed": "ストーリーを読み込めませんでした: {{message}}"
     },
     "sharing": {
       "label": "共有",
       "private": "非公開",
       "friends": "フレンド"
+    },
+    "deleteStoryTitle": "物語を削除",
+    "errors": {
+      "unknown": "不明なエラーです。"
     }
   },
   "friendLibrary": {
@@ -188,7 +199,21 @@
         "description": "モダンで大胆"
       }
     },
-    "back": "戻る"
+    "back": "戻る",
+    "voiceInput": {
+      "start": "音声入力を開始",
+      "stop": "音声入力を停止",
+      "errors": {
+        "unsupported": "このブラウザは音声認識に対応していません。",
+        "permissionDenied": "マイクの使用が拒否されました。",
+        "noMicrophone": "マイクが検出されませんでした。",
+        "noSpeech": "音声が検出されませんでした。",
+        "network": "ネットワークエラーのため音声認識を利用できません。",
+        "languageNotSupported": "この音声認識言語はサポートされていません。",
+        "unexpected": "音声認識が予期せず停止しました。"
+      }
+    },
+    "photoPreviewAlt": "選択した子どもの写真プレビュー"
   },
   "magicLoader": {
     "bindingTale": "物語を結合中...",
@@ -219,7 +244,7 @@
         "opening": "はじまり",
         "ending": "おわり"
       },
-      "turnPage": "ページをめくる →",
+      "turnPage": "ページをめくる",
       "ctaTitle": "気に入りましたか？",
       "ctaDescription": "はじまりとおわりの間の{{count}}枚のパネルを埋めます。",
       "generateFull": "完全な物語を生成",
@@ -259,6 +284,17 @@
       "generationFailed": "ストーリーの生成に失敗しました。",
       "noPanels": "ストーリー生成に失敗しました：パネルが返ってきませんでした。",
       "previewImagesMissing": "プレビュー画像がありません。プレビューを再生成してください。"
+    },
+    "readAloud": {
+      "read": "物語を読み上げる",
+      "pause": "物語の音声を一時停止",
+      "resume": "物語の音声を再開",
+      "stop": "物語の音声を停止",
+      "errors": {
+        "unsupported": "このブラウザはテキスト読み上げに対応していません。",
+        "empty": "読み上げる物語のテキストがありません。",
+        "playbackFailed": "テキスト読み上げの再生に失敗しました。"
+      }
     }
   },
   "auth": {
@@ -274,7 +310,10 @@
       "submit": "登録する",
       "submitting": "登録中…",
       "footerText": "すでにアカウントをお持ちですか？",
-      "footerLink": "ログイン"
+      "footerLink": "ログイン",
+      "notifications": {
+        "accountCreated": "アカウントを作成しました。"
+      }
     },
     "fields": {
       "emailLabel": "メールアドレス",
@@ -287,8 +326,30 @@
     "status": {
       "loading": "読み込み中…"
     },
+    "oauth": {
+      "separator": "または",
+      "continueWithGoogle": "Googleで続行",
+      "redirectingToGoogle": "Googleへ移動しています…",
+      "callback": {
+        "signingInTitle": "ログインしています",
+        "signingInDescription": "Googleログインを完了し、セッションを準備しています。",
+        "failedTitle": "Googleログインに失敗しました",
+        "retryDescription": "ログインページからGoogleログインをもう一度お試しください。",
+        "backToLogin": "ログインに戻る"
+      },
+      "errors": {
+        "linkConflict": "このGoogleアカウントのメールアドレスは、すでにパスワードログインで使用されています。メールアドレスとパスワードでログインしてください。",
+        "cancelled": "Googleログインがキャンセルされたか失敗しました。もう一度お試しください。",
+        "missingCode": "認証コードが見つかりません。Googleログインをもう一度お試しください。"
+      },
+      "notifications": {
+        "signInComplete": "Googleログインが完了しました。",
+        "signInFailed": "Googleログインに失敗しました。もう一度お試しください。"
+      }
+    },
     "errors": {
-      "authFailed": "認証に失敗しました"
+      "authFailed": "認証に失敗しました",
+      "oauthPasswordLogin": "このアカウントはGoogleログインを使用しています。Googleで続行してください。"
     }
   },
   "landing": {
@@ -441,7 +502,8 @@
       "actions": {
         "backUpNow": "今すぐバックアップ",
         "backingUp": "バックアップ中…"
-      }
+      },
+      "snapshotCount_one": "{{count}} 件のスナップショットが利用可能"
     },
     "errors": {
       "loadFailed": "ステータスの読み込みに失敗しました",
@@ -755,7 +817,13 @@
     },
     "avatar": {
       "uploading": "アップロード中…",
-      "change": "アバターを変更"
+      "change": "アバターを変更",
+      "alt": "{{username}} のアバター"
+    },
+    "cropper": {
+      "previewAlt": "アバターのプレビュー",
+      "zoom": "ズーム",
+      "usePhoto": "この写真を使う"
     },
     "fields": {
       "username": "ユーザー名",
@@ -780,5 +848,9 @@
       "uploadFailed": "アップロードに失敗しました",
       "logoutFailed": "ログアウトに失敗しました"
     }
+  },
+  "languageSwitcher": {
+    "selectLanguage": "言語を選択",
+    "languageOptions": "言語オプション"
   }
 }

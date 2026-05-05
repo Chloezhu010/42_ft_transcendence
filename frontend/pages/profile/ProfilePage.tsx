@@ -77,7 +77,7 @@ export function ProfilePage(): JSX.Element {
               <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-brand-primary/20 bg-brand-light">
                 <StorageImage
                   src={currentUser.avatar_url}
-                  alt={`${currentUser.username}'s avatar`}
+                  alt={t('profile.avatar.alt', { username: currentUser.username })}
                   className="w-full h-full object-cover"
                 />
               </div>

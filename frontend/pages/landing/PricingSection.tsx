@@ -48,7 +48,7 @@ function PricingSection(): JSX.Element {
         >
           <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-brand-accent/80 backdrop-blur-sm transform -rotate-1 border-2 border-brand-primary/10 shadow-sm rounded-lg" />
 
-          <div className="absolute top-4 right-4 text-xs font-semibold bg-brand-accent text-brand-dark px-3 py-1.5 rounded-full border-2 border-brand-primary transform rotate-12 shadow-soft">
+          <div className="absolute top-4 end-4 text-xs font-semibold bg-brand-accent text-brand-dark px-3 py-1.5 rounded-full border-2 border-brand-primary transform rotate-12 shadow-soft">
             {t('landing.pricing.library.badge')}
           </div>
 

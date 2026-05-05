@@ -61,6 +61,7 @@ export function SignupPage(): JSX.Element {
                 </>
             )}
             isLoadingSession={isLoadingSession}
+            successMessage={t('auth.signup.notifications.accountCreated')}
             submitLabel={t('auth.signup.submit')}
             submittingLabel={t('auth.signup.submitting')}
             title={t('auth.signup.title')}

@@ -22,7 +22,7 @@ function LegalPage({ documentKey }: LegalPageProps): JSX.Element {
       <header className="py-4 px-6 bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b-4 border-brand-primary/10 shadow-sm">
         <div className="max-w-4xl mx-auto flex justify-between items-center gap-4">
           <Link to="/" className="flex items-center">
-            <img src="/logo-highres.png" alt="Funova logo" className="h-12 w-auto object-contain" />
+            <img src="/logo-highres.png" alt={t('app.logoAlt')} className="h-12 w-auto object-contain" />
           </Link>
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
@@ -72,7 +72,7 @@ function LegalPage({ documentKey }: LegalPageProps): JSX.Element {
                     ))}
 
                     {block.bullets ? (
-                      <ul className="list-disc pl-6 space-y-2">
+                      <ul className="list-disc ps-6 space-y-2">
                         {block.bullets.map((bullet) => (
                           <li key={bullet}>{bullet}</li>
                         ))}

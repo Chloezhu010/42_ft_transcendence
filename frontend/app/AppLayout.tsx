@@ -36,7 +36,7 @@ function AppLayout(): JSX.Element {
       <header className="py-3 px-6 bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b-4 border-brand-primary/10 shadow-sm">
         <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-3">
           <Link to="/" className="flex items-center">
-            <img src="/logo-highres.png" alt="Funova logo" className="h-14 w-auto object-contain" />
+            <img src="/logo-highres.png" alt={t('app.logoAlt')} className="h-14 w-auto object-contain" />
           </Link>
 
           <div className="flex items-center gap-2 text-sm font-bold">
@@ -64,7 +64,7 @@ function AppLayout(): JSX.Element {
             {currentUser ? (
               <Link
                 to="/profile"
-                aria-label="Your profile"
+                aria-label={t('app.profileAriaLabel')}
                 className="w-10 h-10 rounded-full overflow-hidden border-2 border-brand-primary/20 bg-brand-light hover:border-brand-primary transition-colors"
               >
                 {currentUser.avatar_url ? (

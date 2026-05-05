@@ -13,20 +13,20 @@ function HeroSection(): JSX.Element {
     <section className="relative w-full min-h-[80vh] flex items-center overflow-hidden">
       <motion.div
         style={{ scale, y }}
-        className="absolute right-0 top-0 bottom-0 z-0 w-full md:w-[65%] h-full"
+        className="absolute end-0 top-0 bottom-0 z-0 w-full md:w-[65%] h-full"
       >
         <img
           src="/hero_image.png"
           alt={t('landing.hero.imageAlt')}
           className="w-full h-full object-cover object-center opacity-90"
         />
-        <div className="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-brand-light via-brand-light/50 to-transparent" />
+        <div className="absolute inset-y-0 start-0 w-1/3 bg-gradient-to-r from-brand-light via-brand-light/50 to-transparent rtl:bg-gradient-to-l" />
         <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-brand-light via-brand-light to-transparent" />
         <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-brand-light/50 to-transparent" />
       </motion.div>
 
       <div className="relative z-10 px-6 py-12 md:py-20 max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12 w-full">
-        <div className="flex-1 text-center md:text-left max-w-2xl">
+        <div className="flex-1 text-center md:text-start max-w-2xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -37,7 +37,7 @@ function HeroSection(): JSX.Element {
               <span className="text-brand-dark relative inline-block">
                 {t('landing.hero.titleLine2')}
                 <svg
-                  className="absolute -bottom-2 left-0 w-full h-4 text-brand-accent -z-10"
+                  className="absolute -bottom-2 start-0 w-full h-4 text-brand-accent -z-10"
                   viewBox="0 0 100 10"
                   preserveAspectRatio="none"
                 >

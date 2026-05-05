@@ -34,7 +34,7 @@ export function FriendRow({ friend, onOpenLibrary, onRemove, isRemoving = false 
       <button
         type="button"
         onClick={() => onOpenLibrary?.(friend.id)}
-        className="min-w-0 text-left transition-colors hover:text-brand-primary"
+        className="min-w-0 text-start transition-colors hover:text-brand-primary"
       >
         <p className="truncate text-lg font-semibold text-brand-dark">{friend.username}</p>
         <p className="text-sm text-brand-muted">{onlineLabel}</p>
@@ -55,7 +55,7 @@ export function FriendRow({ friend, onOpenLibrary, onRemove, isRemoving = false 
           type="button"
           disabled={isRemoving}
           onClick={() => onRemove(friend.id)}
-          className="ml-auto rounded-full border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 transition-colors hover:border-red-300 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="ms-auto rounded-full border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 transition-colors hover:border-red-300 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isRemoving ? t('friends.buttons.removing') : t('friends.buttons.remove')}
         </button>

@@ -3,7 +3,10 @@ export interface SupportedLanguage {
   label: string;
 }
 
+export type LanguageDirection = 'ltr' | 'rtl';
+
 export const defaultLanguage = 'en';
+export const rtlLanguageCodes = ['ar'];
 
 export const supportedLanguages: SupportedLanguage[] = [
   { code: 'en', label: 'English' },
@@ -15,6 +18,15 @@ export const supportedLanguages: SupportedLanguage[] = [
 ];
 
 export const supportedLanguageCodes = supportedLanguages.map((language) => language.code);
+
+const speechLocales: Record<string, string> = {
+  ar: 'ar-SA',
+  en: 'en-US',
+  es: 'es-ES',
+  fr: 'fr-FR',
+  ja: 'ja-JP',
+  zh: 'zh-CN',
+};
 
 export function normalizeLanguageCode(languageCode: string | null | undefined): string {
   if (!languageCode) {
@@ -32,4 +44,28 @@ export function normalizeLanguageCode(languageCode: string | null | undefined): 
   }
 
   return defaultLanguage;
+}
+
+export function getLanguageDirection(languageCode: string | null | undefined): LanguageDirection {
+  const normalizedCode = normalizeLanguageCode(languageCode);
+
+  return rtlLanguageCodes.includes(normalizedCode) ? 'rtl' : 'ltr';
+}
+
+export function getSpeechLocale(languageCode: string | null | undefined): string {
+  const normalizedCode = normalizeLanguageCode(languageCode);
+
+  return speechLocales[normalizedCode] ?? speechLocales[defaultLanguage];
+}
+
+export function getDirectionalArrow(
+  direction: 'back' | 'forward',
+  languageDirection: LanguageDirection,
+): string {
+  const isBack = direction === 'back';
+  if (languageDirection === 'rtl') {
+    return isBack ? '→' : '←';
+  }
+
+  return isBack ? '←' : '→';
 }

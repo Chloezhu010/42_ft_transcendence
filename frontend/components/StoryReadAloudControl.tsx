@@ -1,20 +1,30 @@
 import { useSpeechSynthesis } from '@/components/speech/useSpeechSynthesis';
+import { useTranslation } from 'react-i18next';
+import { getSpeechLocale } from '@/i18n.languages';
 
 interface StoryReadAloudControlProps {
   text: string;
   className?: string;
 }
 
-function getPrimaryControlLabel(isSpeaking: boolean, isPaused: boolean): string {
+function getPrimaryControlLabel(
+  isSpeaking: boolean,
+  isPaused: boolean,
+  labels: {
+    read: string;
+    pause: string;
+    resume: string;
+  },
+): string {
   if (isPaused) {
-    return 'Resume story audio';
+    return labels.resume;
   }
 
   if (isSpeaking) {
-    return 'Pause story audio';
+    return labels.pause;
   }
 
-  return 'Read story aloud';
+  return labels.read;
 }
 
 function getPrimaryControlIcon(isSpeaking: boolean, isPaused: boolean): string {
@@ -33,7 +43,15 @@ function StoryReadAloudControl({
   text,
   className = '',
 }: StoryReadAloudControlProps): JSX.Element {
-  const speech = useSpeechSynthesis();
+  const { i18n, t } = useTranslation();
+  const speechLocale = getSpeechLocale(i18n.resolvedLanguage || i18n.language);
+  const speech = useSpeechSynthesis({
+    errorMessages: {
+      unsupported: t('story.readAloud.errors.unsupported'),
+      empty: t('story.readAloud.errors.empty'),
+      playbackFailed: t('story.readAloud.errors.playbackFailed'),
+    },
+  });
 
   const handlePrimaryAction = () => {
     if (speech.isPaused) {
@@ -46,10 +64,14 @@ function StoryReadAloudControl({
       return;
     }
 
-    speech.speak(text);
+    speech.speak(text, { lang: speechLocale });
   };
 
-  const label = getPrimaryControlLabel(speech.isSpeaking, speech.isPaused);
+  const label = getPrimaryControlLabel(speech.isSpeaking, speech.isPaused, {
+    read: t('story.readAloud.read'),
+    pause: t('story.readAloud.pause'),
+    resume: t('story.readAloud.resume'),
+  });
   const icon = getPrimaryControlIcon(speech.isSpeaking, speech.isPaused);
 
   return (
@@ -67,8 +89,8 @@ function StoryReadAloudControl({
       {speech.isSpeaking || speech.isPaused ? (
         <button
           type="button"
-          aria-label="Stop story audio"
-          title="Stop story audio"
+          aria-label={t('story.readAloud.stop')}
+          title={t('story.readAloud.stop')}
           onClick={speech.stop}
           className="w-10 h-10 rounded-full bg-white/90 border-2 border-brand-primary/20 shadow-soft text-brand-primary font-black hover:bg-brand-light transition-colors"
         >
