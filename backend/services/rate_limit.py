@@ -86,3 +86,8 @@ generation_rate_limiter = FixedWindowRateLimiter(
     max_requests=_read_positive_int("GENERATION_RATE_LIMIT_REQUESTS", 20),
     window_seconds=_read_positive_int("GENERATION_RATE_LIMIT_WINDOW_SECONDS", 60),
 )
+
+public_api_rate_limiter = FixedWindowRateLimiter(
+    max_requests=_read_positive_int("PUBLIC_API_RATE_LIMIT_REQUESTS", 60),
+    window_seconds=_read_positive_int("PUBLIC_API_RATE_LIMIT_WINDOW_SECONDS", 60),
+)
