@@ -85,9 +85,7 @@ def require_podman_stack():
         text=True,
     )
     running = [
-        name
-        for name in result.stdout.splitlines()
-        if "-backend-" in name or "_backend_" in name or name == "backend"
+        name for name in result.stdout.splitlines() if "-backend-" in name or "_backend_" in name or name == "backend"
     ]
     if not running:
         pytest.skip("Podman stack not running — skipping monitoring tests")
