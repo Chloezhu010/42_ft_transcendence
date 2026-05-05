@@ -178,6 +178,17 @@ async def _create_tables(db: aiosqlite.Connection):
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(story_id, panel_order)
         );
+
+        CREATE TABLE IF NOT EXISTS api_keys (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            name TEXT NOT NULL,
+            key_prefix TEXT NOT NULL UNIQUE,
+            key_hash TEXT NOT NULL UNIQUE,
+            is_active BOOLEAN NOT NULL DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            last_used_at TIMESTAMP
+        );
     """)
 
     await _migrate_users_password_hash_nullable(db)
