@@ -1,5 +1,6 @@
 """Public schema exports for backend request and response contracts."""
 
+from schemas.api_keys import ApiKeyCreateRequest, ApiKeyCreateResponse, ApiKeyResponse
 from schemas.auth import LoginRequest, OauthExchangeRequest, SignupRequest, TokenResponse
 from schemas.friends import FriendResponse
 from schemas.generation import (
@@ -29,6 +30,9 @@ from schemas.stories import (
 from schemas.users import PublicUserResponse, UserResponse, UserUpdateRequest
 
 __all__ = [
+    "ApiKeyCreateRequest",
+    "ApiKeyCreateResponse",
+    "ApiKeyResponse",
     "EditPanelImageRequest",
     "EditPanelImageResponse",
     "FriendResponse",
