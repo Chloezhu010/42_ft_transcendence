@@ -2,14 +2,14 @@
 
 ## System Topology
 
-The stack runs as three Docker Compose services behind nginx. nginx terminates TLS and fans requests out by prefix: `/api`, `/health`, and `/images` reach FastAPI, everything else reaches the Vite dev server. FastAPI owns every side effect — SQLite writes, the images volume, and all Gemini calls — so the frontend never talks to external services directly.
+The stack runs as Podman Compose services behind nginx. nginx terminates TLS and fans requests out by prefix: `/api`, `/health`, and `/images` reach FastAPI, everything else reaches the Vite dev server. On no-sudo Fedora machines, nginx is published on host port `8443` for HTTPS. FastAPI owns every side effect — SQLite writes, the images volume, and all Gemini calls — so the frontend never talks to external services directly.
 
 ```mermaid
 flowchart LR
     User(("User<br/>Browser"))
     Gemini["Google Gemini API<br/>text + images"]
 
-    subgraph Compose["Docker Compose"]
+    subgraph Compose["Podman Compose"]
         direction LR
         Nginx["nginx<br/>HTTPS · reverse proxy"]
         Vite["frontend<br/>Vite + React"]
@@ -18,7 +18,7 @@ flowchart LR
         ImgVol[("images volume<br/>cover + panels")]
     end
 
-    User -- "HTTPS :443" --> Nginx
+    User -- "HTTPS :8443" --> Nginx
     Nginx -- "/" --> Vite
     Nginx -- "/api, /health" --> Fast
     Nginx -- "/images" --> Fast
@@ -151,13 +151,13 @@ Notes:
 | Auth | JWT (PyJWT) + bcrypt (passlib) | Stateless tokens, industry-standard password hashing |
 | AI | Google Gemini API | Story scripts + panel image generation |
 | HTTPS | nginx (reverse proxy + TLS) | Mandatory per subject; terminates TLS in front of both services |
-| Containerization | Docker Compose | Single-command startup as required by subject |
+| Containerization | Podman Compose | Single-command startup on Fedora no-sudo machines |
 
 ### Justifications
 
 - **FastAPI over Django/Flask:** Native async, Pydantic v2 built-in for request validation, automatic OpenAPI docs, Python 3.13 compatible.
 - **SQLite:** Zero setup overhead; WAL mode enables concurrent reads. Sufficient for the project scope — no distributed deployment needed.
-- **JWT over server sessions:** Stateless, works across Docker services without shared session storage.
+- **JWT over server sessions:** Stateless, works across container services without shared session storage.
 - **Gemini API:** Supports both text (story scripts) and image generation in a single SDK; rate limiting handled with exponential backoff.
 
 ## Database Schema

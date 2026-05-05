@@ -24,10 +24,10 @@ A multi-user web application where users create personalized AI-powered comic bo
 
 ```bash
 cp .env.example .env    # fill in required secrets
-docker compose up --build
+podman compose up --build
 ```
 
-Open **https://localhost** in Google Chrome.
+Open **https://localhost:8443** in Google Chrome.
 
 ## Environment Variables
 
@@ -38,8 +38,8 @@ Copy `.env.example` to `.env` and fill in required values:
 | `GEMINI_API_KEY` | Google Gemini API key | **Yes** |
 | `JWT_SECRET_KEY` | Secret used to sign JWT access tokens | **Yes** |
 | `SESSION_SECRET_KEY` | Secret used to sign backend session cookies | **Yes** |
-| `VITE_API_BASE_URL` | Backend URL seen by browser (default: `http://localhost:8000`) | No |
-| `FRONTEND_URL` | CORS allowed origin (default: `http://localhost:3000`) | No |
+| `VITE_API_BASE_URL` | Backend URL seen by browser during non-container dev (default: `http://localhost:8000`) | No |
+| `FRONTEND_URL` | CORS allowed origin (default in Podman: `https://localhost:8443`) | No |
 | `DB_PATH` | SQLite database file path (default: `wondercomic.db`) | No |
 
 > Never commit `.env` — it is git-ignored. Only `.env.example` is tracked.
@@ -52,11 +52,11 @@ Copy `.env.example` to `.env` and fill in required values:
 | Backend | FastAPI (Python 3.13+), SQLite via aiosqlite |
 | Auth | JWT (PyJWT) + bcrypt |
 | AI | Google Gemini API |
-| Infra | Docker Compose, nginx (HTTPS) |
+| Infra | Podman Compose, nginx (HTTPS) |
 
 ## Docs
 
-- [Development Guide](documentation/development.md) — local dev, docker commands, pre-push checks
+- [Development Guide](documentation/development.md) — local dev, Podman commands, pre-push checks
 - [Architecture](documentation/architecture.md) — tech stack details, database schema
 - [Roadmap](documentation/roadmap.md) — features, modules, implementation phases, contributions
 - [Resources](documentation/resources.md) — documentation links, AI usage

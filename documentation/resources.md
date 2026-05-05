@@ -13,7 +13,7 @@
 - [aiosqlite](https://aiosqlite.omnilib.dev/)
 - [Google Gemini API (google-genai)](https://ai.google.dev/gemini-api/docs)
 - [nginx HTTPS with self-signed cert](https://nginx.org/en/docs/http/configuring_https_servers.html)
-- [Docker Compose reference](https://docs.docker.com/compose/compose-file/)
+- [Podman Compose docs](https://docs.podman.io/en/latest/markdown/podman-compose.1.html)
 
 ## AI Usage
 

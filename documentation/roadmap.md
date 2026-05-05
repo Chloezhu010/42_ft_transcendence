@@ -16,7 +16,7 @@
 | Story gallery | Browse past stories, re-read, delete | existing |
 | Privacy Policy page | Static page, linked from footer | _TBD_ |
 | Terms of Service page | Static page, linked from footer | _TBD_ |
-| HTTPS | nginx TLS termination in Docker Compose | _TBD_ |
+| HTTPS | nginx TLS termination in Podman Compose | _TBD_ |
 | _[Module features]_ | _[TBD based on chosen modules]_ | _TBD_ |
 
 ## Modules
@@ -77,8 +77,8 @@ _[Fill in per module once team finalizes selection]_
 - [ ] Fill in team logins at top of README
 - [ ] Finalize module table (reach 14 points)
 - [ ] Complete Individual Contributions section
-- [ ] `docker compose up --build` starts cleanly from a fresh clone
-- [ ] Open Chrome → https://localhost → zero console errors
+- [ ] `podman compose up --build` starts cleanly from a fresh clone
+- [ ] Open Chrome → https://localhost:8443 → zero console errors
 - [ ] Privacy Policy and Terms of Service pages reachable from footer
 - [ ] All team members have commits visible in `git log`
 

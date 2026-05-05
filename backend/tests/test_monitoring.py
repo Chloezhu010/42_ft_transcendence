@@ -23,7 +23,7 @@ Covers:
     - Security: all HTTP methods are blocked on that path
     - Alertmanager internal health and readiness
     - Alertmanager configuration: receiver and routing are correct
-    - End-to-end: backend webhook is reachable from inside the Docker network
+    - End-to-end: backend webhook is reachable from inside the container network
 """
 
 import json
@@ -37,7 +37,7 @@ import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-HTTPS_BASE = "https://localhost"
+HTTPS_BASE = "https://localhost:8443"
 GRAFANA_ADMIN_PASSWORD = os.environ.get("GRAFANA_ADMIN_PASSWORD", "admin")
 GRAFANA_URL = f"{HTTPS_BASE}/grafana"
 
@@ -45,23 +45,27 @@ GRAFANA_URL = f"{HTTPS_BASE}/grafana"
 def _resolve_container(service: str) -> str:
     """Return the actual container name for a Compose service name.
 
-    Docker Compose prefixes containers with the project name, e.g.
-    'tran_main1-prometheus-1'. We look for any running container whose
-    name contains '-<service>-' to stay project-name-agnostic.
+    Podman Compose prefixes containers with the project name, e.g.
+    '42_ft_transcendence_backend_1'. We look for any running container
+    whose name contains the service with Compose separators.
     """
     result = subprocess.run(
-        ["docker", "ps", "--filter", f"name={service}", "--format", "{{.Names}}"],
+        ["podman", "ps", "--filter", f"name={service}", "--format", "{{.Names}}"],
         capture_output=True,
         text=True,
     )
-    candidates = [n for n in result.stdout.splitlines() if f"-{service}-" in n]
+    candidates = [
+        name
+        for name in result.stdout.splitlines()
+        if f"-{service}-" in name or f"_{service}_" in name or name == service
+    ]
     return candidates[0] if candidates else service
 
 
-def docker_exec(service: str, command: str) -> subprocess.CompletedProcess:
+def container_exec(service: str, command: str) -> subprocess.CompletedProcess:
     container = _resolve_container(service)
     return subprocess.run(
-        ["docker", "exec", container, "sh", "-c", command],
+        ["podman", "exec", container, "sh", "-c", command],
         capture_output=True,
         text=True,
     )
@@ -73,16 +77,20 @@ def docker_exec(service: str, command: str) -> subprocess.CompletedProcess:
 
 
 @pytest.fixture(scope="session", autouse=True)
-def require_docker_stack():
-    """Skip the entire module when the Docker stack is not running."""
+def require_podman_stack():
+    """Skip the entire module when the Podman stack is not running."""
     result = subprocess.run(
-        ["docker", "ps", "--filter", "name=backend", "--format", "{{.Names}}"],
+        ["podman", "ps", "--filter", "name=backend", "--format", "{{.Names}}"],
         capture_output=True,
         text=True,
     )
-    running = [n for n in result.stdout.splitlines() if "-backend-" in n]
+    running = [
+        name
+        for name in result.stdout.splitlines()
+        if "-backend-" in name or "_backend_" in name or name == "backend"
+    ]
     if not running:
-        pytest.skip("Docker stack not running — skipping monitoring tests")
+        pytest.skip("Podman stack not running — skipping monitoring tests")
 
 
 @pytest.fixture(scope="session")
@@ -102,10 +110,14 @@ def grafana_admin():
 
 @pytest.fixture(scope="session")
 def backend_metrics_text():
-    result = docker_exec(
+    result = container_exec(
         "backend",
         'python3 -c "'
         "import urllib.request; "
+        "\ntry:\n"
+        "    urllib.request.urlopen('http://localhost:8000/api/nonexistent-for-metrics-probe').read()\n"
+        "except Exception:\n"
+        "    pass\n"
         "print(urllib.request.urlopen('http://localhost:8000/metrics').read().decode())"
         '"',
     )
@@ -115,14 +127,14 @@ def backend_metrics_text():
 
 @pytest.fixture(scope="session")
 def prometheus_targets():
-    result = docker_exec("prometheus", "wget -qO- http://localhost:9090/api/v1/targets")
+    result = container_exec("prometheus", "wget -qO- http://localhost:9090/api/v1/targets")
     assert result.returncode == 0, f"Cannot fetch Prometheus targets: {result.stderr}"
     return json.loads(result.stdout)
 
 
 @pytest.fixture(scope="session")
 def prometheus_rules():
-    result = docker_exec("prometheus", "wget -qO- http://localhost:9090/api/v1/rules")
+    result = container_exec("prometheus", "wget -qO- http://localhost:9090/api/v1/rules")
     assert result.returncode == 0, f"Cannot fetch Prometheus rules: {result.stderr}"
     return json.loads(result.stdout)
 
@@ -355,7 +367,7 @@ class TestAlertRules:
 class TestAlertmanagerIntegration:
     def test_alertmanager_listed_in_prometheus(self):
         """Prometheus must have at least one active Alertmanager configured."""
-        result = docker_exec(
+        result = container_exec(
             "prometheus",
             "wget -qO- 'http://localhost:9090/api/v1/alertmanagers'",
         )
@@ -369,7 +381,7 @@ class TestAlertmanagerIntegration:
 
     def test_alertmanager_url_points_to_correct_service(self):
         """Active Alertmanager URL must reference the alertmanager service."""
-        result = docker_exec(
+        result = container_exec(
             "prometheus",
             "wget -qO- 'http://localhost:9090/api/v1/alertmanagers'",
         )
@@ -380,7 +392,7 @@ class TestAlertmanagerIntegration:
 
     def test_alertmanager_health_ok(self):
         """Alertmanager container must respond healthy on its API."""
-        result = docker_exec(
+        result = container_exec(
             "alertmanager",
             "wget -qO- 'http://localhost:9093/-/healthy'",
         )
@@ -396,7 +408,7 @@ class TestAlertmanagerIntegration:
 class TestPrometheusRetention:
     def test_tsdb_retention_flag_is_set(self):
         """Prometheus TSDB retention must be configured (15d / 1GB)."""
-        result = docker_exec(
+        result = container_exec(
             "prometheus",
             "cat /proc/1/cmdline | tr '\\0' '\\n'",
         )
@@ -487,7 +499,7 @@ class TestGrafanaSecurity:
         assert result != 0, "Port 3000 is open on the host — Grafana is directly reachable without nginx/HTTPS."
 
     def test_grafana_served_over_https_only(self, http):
-        """Grafana must be served via HTTPS (port 443 through nginx), not plain HTTP."""
+        """Grafana must be served via HTTPS (host port 8443 through nginx), not plain HTTP."""
         response = http.get(f"{GRAFANA_URL}/login", timeout=10)
         assert response.url.startswith("https://"), f"Response URL is not HTTPS: {response.url}"
 
@@ -727,16 +739,16 @@ class TestWebhookAccessControl:
 
 class TestAlertmanagerHealth:
     def test_alertmanager_healthy_endpoint(self):
-        """Alertmanager /-/healthy must return OK from inside Docker network."""
-        result = docker_exec(
+        """Alertmanager /-/healthy must return OK from inside container network."""
+        result = container_exec(
             "alertmanager",
             "wget -qO- 'http://localhost:9093/-/healthy'",
         )
         assert result.returncode == 0, f"Alertmanager health check failed.\nstderr: {result.stderr}"
 
     def test_alertmanager_ready_endpoint(self):
-        """Alertmanager /-/ready must return OK from inside Docker network."""
-        result = docker_exec(
+        """Alertmanager /-/ready must return OK from inside container network."""
+        result = container_exec(
             "alertmanager",
             "wget -qO- 'http://localhost:9093/-/ready'",
         )
@@ -744,7 +756,7 @@ class TestAlertmanagerHealth:
 
     def test_alertmanager_status_api_responds(self):
         """Alertmanager /api/v2/status must return valid JSON."""
-        result = docker_exec(
+        result = container_exec(
             "alertmanager",
             "wget -qO- 'http://localhost:9093/api/v2/status'",
         )
@@ -760,7 +772,7 @@ class TestAlertmanagerHealth:
 
 class TestAlertmanagerConfiguration:
     def _get_alertmanager_config(self) -> dict:
-        result = docker_exec(
+        result = container_exec(
             "alertmanager",
             "wget -qO- 'http://localhost:9093/api/v2/status'",
         )
@@ -789,7 +801,7 @@ class TestAlertmanagerConfiguration:
 
 
 # ---------------------------------------------------------------------------
-# End-to-end: backend webhook reachable from inside Docker network
+# End-to-end: backend webhook reachable from inside container network
 # ---------------------------------------------------------------------------
 
 
@@ -809,7 +821,7 @@ class TestBackendWebhookInternal:
                 ],
             }
         )
-        result = docker_exec(
+        result = container_exec(
             "alertmanager",
             f"wget -qO- --post-data='{fake_payload}' "
             "--header='Content-Type: application/json' "
@@ -833,7 +845,7 @@ class TestBackendWebhookInternal:
                 ],
             }
         )
-        result = docker_exec(
+        result = container_exec(
             "alertmanager",
             f"wget -qO- --post-data='{fake_payload}' "
             "--header='Content-Type: application/json' "
