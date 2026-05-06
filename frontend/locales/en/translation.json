@@ -34,29 +34,38 @@
   },
   "galleryPage": {
     "mySavedBooks": "My Saved Books",
+    "noResults": "No stories match your search yet.",
+    "resultsCount": "Showing {{shown}} of {{total}} stories",
     "noStoriesFound": "No stories found yet.",
-    "noMatches": "No stories match your search.",
+    "noResults": "No stories match your search yet.",
     "readNow": "READ NOW",
     "untitledMasterpiece": "Untitled Masterpiece",
-    "deleteStory": "Are you sure you want to delete this story? This cannot be undone.",
-    "resultsCount": "{{count}} result",
-    "resultsCount_plural": "{{count}} results",
+    "search": {
+      "label": "Search",
+      "placeholder": "Search by title or hero"
+    },
+    "filters": {
+      "visibility": "Visibility",
+      "visibilityAll": "All",
+      "visibilityPrivate": "Private",
+      "visibilityFriends": "Friends",
+      "archetype": "Archetype",
+      "archetypeAll": "All archetypes",
+      "reset": "Reset filters"
+    },
+    "sort": {
+      "label": "Sort",
+      "recent": "Newest first",
+      "oldest": "Oldest first",
+      "titleAsc": "Title (A-Z)",
+      "titleDesc": "Title (Z-A)"
+    },
     "pagination": {
       "previous": "Previous",
       "next": "Next",
       "pageOf": "Page {{page}} of {{total}}"
     },
-    "filters": {
-      "searchLabel": "Search title",
-      "searchPlaceholder": "Search by title",
-      "fromDateLabel": "From date",
-      "toDateLabel": "To date",
-      "sortLabel": "Sort",
-      "sortDate": "Date",
-      "sortTitle": "Title",
-      "sortDesc": "Desc",
-      "sortAsc": "Asc"
-    },
+    "deleteStory": "Are you sure you want to delete this story? This cannot be undone.",
     "notifications": {
       "storyDeleted": "Story deleted.",
       "deleteFailed": "Failed to delete story.",

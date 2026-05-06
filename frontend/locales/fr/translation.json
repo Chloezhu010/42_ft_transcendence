@@ -34,29 +34,37 @@
   },
   "galleryPage": {
     "mySavedBooks": "Mes Livres Sauvegardés",
+    "resultsCount": "Affichage de {{shown}} sur {{total}} histoires",
     "noStoriesFound": "Aucune histoire trouvée pour le moment.",
-    "noMatches": "Aucune histoire ne correspond à votre recherche.",
+    "noResults": "Aucune histoire ne correspond à votre recherche.",
     "readNow": "LIRE MAINTENANT",
     "untitledMasterpiece": "Chef-d'œuvre sans titre",
-    "deleteStory": "Êtes-vous sûr de vouloir supprimer cette histoire? Cela ne peut pas être annulé.",
-    "resultsCount": "{{count}} résultat",
-    "resultsCount_plural": "{{count}} résultats",
+    "search": {
+      "label": "Rechercher",
+      "placeholder": "Rechercher par titre ou héros"
+    },
+    "filters": {
+      "visibility": "Visibilité",
+      "visibilityAll": "Toutes",
+      "visibilityPrivate": "Privé",
+      "visibilityFriends": "Amis",
+      "archetype": "Archétype",
+      "archetypeAll": "Tous les archétypes",
+      "reset": "Réinitialiser les filtres"
+    },
+    "sort": {
+      "label": "Trier",
+      "recent": "Les plus récentes",
+      "oldest": "Les plus anciennes",
+      "titleAsc": "Titre (A-Z)",
+      "titleDesc": "Titre (Z-A)"
+    },
     "pagination": {
       "previous": "Précédent",
       "next": "Suivant",
       "pageOf": "Page {{page}} sur {{total}}"
     },
-    "filters": {
-      "searchLabel": "Rechercher par titre",
-      "searchPlaceholder": "Rechercher par titre",
-      "fromDateLabel": "Date de début",
-      "toDateLabel": "Date de fin",
-      "sortLabel": "Trier",
-      "sortDate": "Date",
-      "sortTitle": "Titre",
-      "sortDesc": "Desc",
-      "sortAsc": "Asc"
-    },
+    "deleteStory": "Êtes-vous sûr de vouloir supprimer cette histoire? Cela ne peut pas être annulé.",
     "notifications": {
       "storyDeleted": "Histoire supprimée.",
       "deleteFailed": "Impossible de supprimer l'histoire.",
