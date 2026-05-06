@@ -56,7 +56,7 @@ curl -X POST -H "Authorization: Bearer <token>" http://localhost:8000/api/backup
 
 ```bash
 # Docker deployment
-curl -k -H "Authorization: Bearer <token>" https://localhost/api/backup/status
+curl -k -H "Authorization: Bearer <token>" https://localhost:8443/api/backup/status
 
 # Local dev
 curl -H "Authorization: Bearer <token>" http://localhost:8000/api/backup/status
@@ -84,7 +84,7 @@ for a visual backup inventory and a **Back up now** button.
 | `unavailable` | Backup metadata could not be read | 503 |
 
 ```bash
-curl -k https://localhost/health
+curl -k https://localhost:8443/health
 # {"status":"healthy","version":"1.0.0","checks":{"database":"ok","backup":"ok"}}
 ```
 
