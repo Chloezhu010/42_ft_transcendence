@@ -9,7 +9,7 @@ from the frontend application API: frontend routes use JWT bearer auth, while pu
 Use the nginx HTTPS entrypoint in production or evaluation:
 
 ```text
-https://localhost/api/public
+https://localhost:8443/api/public
 ```
 
 For local backend-only tests, the same routes are available from the FastAPI service:
@@ -36,7 +36,7 @@ Raw API keys are shown only once when created. The database stores only a hash o
 API keys are managed through JWT-protected application routes. Log in or sign up first, then create a key:
 
 ```bash
-curl -k https://localhost/api/api-keys \
+curl -k https://localhost:8443/api/api-keys \
   -X POST \
   -H "Authorization: Bearer $JWT" \
   -H "Content-Type: application/json" \
@@ -61,14 +61,14 @@ The response includes `key` once:
 List key metadata without raw secrets:
 
 ```bash
-curl -k https://localhost/api/api-keys \
+curl -k https://localhost:8443/api/api-keys \
   -H "Authorization: Bearer $JWT"
 ```
 
 Revoke a key:
 
 ```bash
-curl -k https://localhost/api/api-keys/1 \
+curl -k https://localhost:8443/api/api-keys/1 \
   -X DELETE \
   -H "Authorization: Bearer $JWT"
 ```
@@ -100,7 +100,7 @@ multi-worker production deployment would need shared storage such as Redis.
 ## GET List Stories
 
 ```bash
-curl -k https://localhost/api/public/stories \
+curl -k https://localhost:8443/api/public/stories \
   -H "X-API-Key: $PUBLIC_API_KEY"
 ```
 
@@ -136,7 +136,7 @@ Response:
 ## GET One Story
 
 ```bash
-curl -k https://localhost/api/public/stories/12 \
+curl -k https://localhost:8443/api/public/stories/12 \
   -H "X-API-Key: $PUBLIC_API_KEY"
 ```
 
@@ -146,7 +146,7 @@ Returns a full story with profile and panels. If the story does not exist or bel
 ## POST Create Story
 
 ```bash
-curl -k https://localhost/api/public/stories \
+curl -k https://localhost:8443/api/public/stories \
   -X POST \
   -H "X-API-Key: $PUBLIC_API_KEY" \
   -H "Content-Type: application/json" \
@@ -180,7 +180,7 @@ Response: `200 OK` with the created full story.
 ## PUT Update Story Visibility
 
 ```bash
-curl -k https://localhost/api/public/stories/12/visibility \
+curl -k https://localhost:8443/api/public/stories/12/visibility \
   -X PUT \
   -H "X-API-Key: $PUBLIC_API_KEY" \
   -H "Content-Type: application/json" \
@@ -197,7 +197,7 @@ Response: `200 OK` with the updated full story.
 ## DELETE Story
 
 ```bash
-curl -k https://localhost/api/public/stories/12 \
+curl -k https://localhost:8443/api/public/stories/12 \
   -X DELETE \
   -H "X-API-Key: $PUBLIC_API_KEY"
 ```
