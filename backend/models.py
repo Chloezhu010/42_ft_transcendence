@@ -1,5 +1,6 @@
-"""
-Pydantic models for request/response validation.
+"""Compatibility exports for the old `models` module.
+
+New code should import request and response contracts from `schemas`.
 """
 
 from datetime import datetime
@@ -29,6 +30,13 @@ class TokenResponse(BaseModel):
 
     access_token: str
     token_type: str = "bearer"
+
+
+# --- Oauth Model ---
+class OauthExchangeRequest(BaseModel):
+    """Request body for exchanging OAuth code for JWT token."""
+
+    code: str = Field(min_length=1)
 
 
 # --- User Models ---

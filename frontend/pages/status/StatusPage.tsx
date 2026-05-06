@@ -38,7 +38,7 @@ function HealthSection({ health }: HealthSectionProps): JSX.Element {
         <span className={`font-bold text-lg ${isHealthy ? 'text-green-700' : 'text-red-700'}`}>
           {isHealthy ? t('statusPage.health.healthy') : t('statusPage.health.unhealthy')}
         </span>
-        <span className="ml-auto text-xs text-gray-400 font-mono">{health.version}</span>
+        <span className="ms-auto text-xs text-gray-400 font-mono">{health.version}</span>
       </div>
       <ul className="space-y-2">
         {Object.entries(health.checks).map(([name, result]) => {
@@ -52,7 +52,7 @@ function HealthSection({ health }: HealthSectionProps): JSX.Element {
                 className={`w-2 h-2 rounded-full flex-shrink-0 ${isCheckOk ? 'bg-green-400' : 'bg-red-400'}`}
               />
               <span className="font-medium capitalize text-gray-600">{checkLabel}</span>
-              <span className={`ml-auto font-mono text-xs ${isCheckOk ? 'text-green-600' : 'text-red-600'}`}>
+              <span className={`ms-auto font-mono text-xs ${isCheckOk ? 'text-green-600' : 'text-red-600'}`}>
                 {resultLabel}
               </span>
             </li>

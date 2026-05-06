@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { defaultLanguage, normalizeLanguageCode, supportedLanguages } from '@/i18n.languages';
+import {
+  defaultLanguage,
+  getLanguageDirection,
+  normalizeLanguageCode,
+  supportedLanguages,
+} from '@/i18n.languages';
 
 function getLanguageLabel(languageCode: string): string {
   return (
@@ -11,11 +16,12 @@ function getLanguageLabel(languageCode: string): string {
 }
 
 function LanguageSwitcher(): JSX.Element {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const resolvedLanguage = i18n.resolvedLanguage || i18n.language || defaultLanguage;
   const language = normalizeLanguageCode(resolvedLanguage);
+  const languageDirection = getLanguageDirection(language);
   const currentLanguageLabel = getLanguageLabel(language);
 
   useEffect(() => {
@@ -49,20 +55,21 @@ function LanguageSwitcher(): JSX.Element {
     <div
       ref={containerRef}
       className="relative"
+      dir={languageDirection}
     >
       <button
         type="button"
         aria-haspopup="menu"
         aria-expanded={isOpen}
-        aria-label="Select language"
+        aria-label={t('languageSwitcher.selectLanguage')}
         onClick={() => setIsOpen((previous) => !previous)}
-        className="min-w-[7.5rem] rounded-full border border-brand-primary/15 bg-white/85 px-4 py-2 pr-9 text-sm font-bold text-brand-primary shadow-sm backdrop-blur-sm transition-colors hover:border-brand-primary/35 hover:bg-white focus:outline-none focus:ring-2 focus:ring-brand-accent/60"
+        className="min-w-[7.5rem] rounded-full border border-brand-primary/15 bg-white/85 py-2 pe-9 ps-4 text-start text-sm font-bold text-brand-primary shadow-sm backdrop-blur-sm transition-colors hover:border-brand-primary/35 hover:bg-white focus:outline-none focus:ring-2 focus:ring-brand-accent/60"
       >
         {currentLanguageLabel}
       </button>
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-brand-muted"
+        className="pointer-events-none absolute inset-y-0 end-3 flex items-center text-brand-muted"
       >
         ▾
       </span>
@@ -70,8 +77,8 @@ function LanguageSwitcher(): JSX.Element {
       {isOpen ? (
         <div
           role="menu"
-          aria-label="Language options"
-          className="absolute right-0 top-[calc(100%+0.5rem)] z-50 min-w-full overflow-hidden rounded-[1.35rem] border border-brand-primary/15 bg-white/95 p-2 shadow-[0_16px_40px_rgba(74,43,106,0.16)] backdrop-blur-md"
+          aria-label={t('languageSwitcher.languageOptions')}
+          className="absolute end-0 top-[calc(100%+0.5rem)] z-50 min-w-full overflow-hidden rounded-[1.35rem] border border-brand-primary/15 bg-white/95 p-2 shadow-[0_16px_40px_rgba(74,43,106,0.16)] backdrop-blur-md"
         >
           {supportedLanguages.map((supportedLanguage) => {
             const isActive = supportedLanguage.code === language;
@@ -83,7 +90,7 @@ function LanguageSwitcher(): JSX.Element {
                 role="menuitemradio"
                 aria-checked={isActive}
                 onClick={() => handleLanguageChange(supportedLanguage.code)}
-                className={`flex w-full items-center justify-between rounded-2xl px-3 py-2 text-left text-sm font-bold transition-colors ${
+                className={`flex w-full items-center justify-between rounded-2xl px-3 py-2 text-start text-sm font-bold transition-colors ${
                   isActive
                     ? 'bg-brand-light text-brand-primary'
                     : 'text-brand-dark hover:bg-brand-light/70'

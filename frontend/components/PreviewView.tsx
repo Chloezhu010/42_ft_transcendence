@@ -6,9 +6,16 @@ import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ComicPanel from '@/components/ComicPanel';
+import StoryReadAloudControl from '@/components/StoryReadAloudControl';
 import type { ComicPanelData, Story } from '@/types';
 import { SketchyButton } from '@/components/design-system/Primitives';
 import { Heading, Label, Text } from '@/components/design-system/Typography';
+import { getPreviewReadAloudText } from '@/utils';
+import {
+  getDirectionalArrow,
+  getLanguageDirection,
+  type LanguageDirection,
+} from '@/i18n.languages';
 
 interface PreviewViewProps {
   story: Story;
@@ -29,6 +36,7 @@ interface PreviewBookFrameProps {
   rightPage: ReactNode;
   backHref: string;
   isReadOnly: boolean;
+  readAloudText: string;
 }
 
 interface PreviewTitlePageProps {
@@ -49,6 +57,18 @@ interface PreviewGeneratePageProps {
   isReadOnly: boolean;
 }
 
+function getNavigationSideClassName(
+  navigationDirection: 'previous' | 'next',
+  languageDirection: LanguageDirection,
+): string {
+  const isPrevious = navigationDirection === 'previous';
+  if (languageDirection === 'rtl') {
+    return isPrevious ? 'right-0' : 'left-0'; // rtl-ok: direction-aware helper
+  }
+
+  return isPrevious ? 'left-0' : 'right-0'; // rtl-ok: direction-aware helper
+}
+
 function PreviewBookFrame({
   currentPage,
   currentPageLabel,
@@ -59,22 +79,30 @@ function PreviewBookFrame({
   rightPage,
   backHref,
   isReadOnly,
+  readAloudText,
 }: PreviewBookFrameProps): JSX.Element {
   const isFirstPage = currentPage === 0;
   const isLastPage = currentPage === 1;
   const previousButtonStateClass = isFirstPage ? 'opacity-0 pointer-events-none' : '';
   const nextButtonStateClass = isLastPage ? 'opacity-0 pointer-events-none' : '';
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
+  const languageDirection = getLanguageDirection(i18n.resolvedLanguage || i18n.language);
+  const previousButtonSideClass = getNavigationSideClassName('previous', languageDirection);
+  const nextButtonSideClass = getNavigationSideClassName('next', languageDirection);
+  const previousArrow = getDirectionalArrow('back', languageDirection);
+  const nextArrow = getDirectionalArrow('forward', languageDirection);
+  const spreadDirectionClass = languageDirection === 'rtl' ? 'flex-row-reverse' : 'flex-row';
 
   return (
     <div className="flex-1 flex flex-col animate-in fade-in duration-700 h-[calc(100vh-140px)] relative">
-      <div className="absolute top-4 left-4 z-30">
+      <div className="absolute top-4 start-4 z-30">
         <Link to={backHref} className="text-sm font-bold text-brand-muted hover:text-brand-primary flex items-center gap-2 transition-colors bg-white/80 backdrop-blur-sm py-3 px-6 rounded-full shadow-soft border-2 border-brand-primary/10">
-          <span>←</span> {t('story.preview.backToLibrary')}
+          <span>{previousArrow}</span> {t('story.preview.backToLibrary')}
         </Link>
       </div>
 
-      <div className="absolute top-4 right-4 z-30">
+      <div className="absolute top-4 end-4 z-30 flex items-center gap-3">
+        <StoryReadAloudControl text={readAloudText} />
         <div className="bg-white/90 backdrop-blur-sm py-2 px-4 rounded-full shadow-soft border border-brand-secondary/20">
           <Label className="text-brand-primary uppercase tracking-widest">
             {isReadOnly ? t('story.preview.readOnly') : t('story.preview.label')}
@@ -87,10 +115,10 @@ function PreviewBookFrame({
         aria-label={t('story.preview.ariaPrevious')}
         onClick={onPreviousPage}
         disabled={isFirstPage}
-        className={`absolute left-0 top-1/2 -translate-y-1/2 z-40 w-16 h-16 flex items-center justify-center text-2xl !p-0 rounded-full ${previousButtonStateClass}`}
+        className={`absolute ${previousButtonSideClass} top-1/2 -translate-y-1/2 z-40 w-16 h-16 flex items-center justify-center text-2xl !p-0 rounded-full ${previousButtonStateClass}`}
         style={{ borderRadius: '9999px' }}
       >
-        ←
+        {previousArrow}
       </SketchyButton>
 
       <SketchyButton
@@ -98,18 +126,18 @@ function PreviewBookFrame({
         aria-label={t('story.preview.ariaNext')}
         onClick={onNextPage}
         disabled={isLastPage}
-        className={`absolute right-0 top-1/2 -translate-y-1/2 z-40 w-16 h-16 flex items-center justify-center text-2xl !p-0 rounded-full ${nextButtonStateClass}`}
+        className={`absolute ${nextButtonSideClass} top-1/2 -translate-y-1/2 z-40 w-16 h-16 flex items-center justify-center text-2xl !p-0 rounded-full ${nextButtonStateClass}`}
         style={{ borderRadius: '9999px' }}
       >
-        →
+        {nextArrow}
       </SketchyButton>
 
       <div className="flex-1 flex items-center justify-center perspective-[2000px] py-8">
         <div key={currentPage} className="book-flip relative transition-all duration-500 flex items-center justify-center shadow-2xl w-full max-w-[900px] aspect-[3/2]">
-          <div className="flex w-full h-full rounded-3xl shadow-[0_30px_70px_rgba(0,0,0,0.2)] bg-white overflow-hidden relative border-4 border-brand-secondary/5">
+          <div className={`flex ${spreadDirectionClass} w-full h-full rounded-3xl shadow-[0_30px_70px_rgba(0,0,0,0.2)] bg-white overflow-hidden relative border-4 border-brand-secondary/5`}>
             <div className="absolute left-1/2 top-0 bottom-0 w-[4px] bg-black/10 z-30 -translate-x-1/2" />
 
-            <div className="flex-1 relative border-r border-gray-100 overflow-hidden bg-white">
+            <div className="flex-1 relative border-e border-gray-100 overflow-hidden bg-white">
               <div className="absolute inset-0 z-20 page-shadow-left pointer-events-none" />
               {leftPage}
             </div>
@@ -122,12 +150,12 @@ function PreviewBookFrame({
         </div>
       </div>
 
-      <div className="absolute bottom-4 left-0 right-0 flex justify-center items-center pointer-events-none z-50">
-        <div className="bg-white/95 backdrop-blur-md px-6 py-2 rounded-full shadow-2xl flex items-center space-x-4 border-2 border-brand-secondary/20">
+      <div className="absolute inset-x-0 bottom-4 flex justify-center items-center pointer-events-none z-50">
+        <div className="bg-white/95 backdrop-blur-md px-6 py-2 rounded-full shadow-2xl flex items-center gap-4 border-2 border-brand-secondary/20">
           <span className="text-[10px] font-bold text-brand-primary uppercase tracking-widest">
             {currentPageLabel}
           </span>
-          <div className="flex space-x-1.5">
+          <div className="flex gap-1.5">
             {pageLabels.map((pageLabel, index) => {
               const isActivePage = index === currentPage;
               const pageIndicatorClass = isActivePage
@@ -153,14 +181,17 @@ function PreviewTitlePage({
   foreword,
   onOpenEndingSpread,
 }: PreviewTitlePageProps): JSX.Element {
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
+  const languageDirection = getLanguageDirection(i18n.resolvedLanguage || i18n.language);
+  const nextArrow = getDirectionalArrow('forward', languageDirection);
+
   return (
     <div className="h-full flex flex-col justify-center p-12 md:p-16">
       <Label className="text-brand-primary/50 text-[10px] mb-4">{t('story.preview.label')}</Label>
       <Heading variant="h3" className="text-brand-primary mb-6 italic underline decoration-brand-accent decoration-4">
         {title}
       </Heading>
-      <Text className="text-brand-dark/80 italic border-l-4 border-brand-accent pl-6">
+      <Text className="text-brand-dark/80 italic border-s-4 border-brand-accent ps-6">
         &quot;{foreword}&quot;
       </Text>
       <button
@@ -168,7 +199,7 @@ function PreviewTitlePage({
         onClick={onOpenEndingSpread}
         className="mt-8 text-brand-primary/40 hover:text-brand-primary transition-colors text-sm font-bold"
       >
-        {t('story.preview.turnPage')}
+        {t('story.preview.turnPage')} <span>{nextArrow}</span>
       </button>
     </div>
   );
@@ -247,6 +278,7 @@ function PreviewView({
   const currentPageLabel = pageLabels[previewPage] || '';
   const middlePanelCount = Math.max(0, story.panels.length - 2);
   const backHref = ownerUserId ? `/friends/${ownerUserId}/library` : '/gallery';
+  const readAloudText = getPreviewReadAloudText(story);
 
   if (!firstPanel || !lastPanel) {
     return null;
@@ -310,6 +342,7 @@ function PreviewView({
       rightPage={rightPage}
       backHref={backHref}
       isReadOnly={isReadOnly}
+      readAloudText={readAloudText}
     />
   );
 }

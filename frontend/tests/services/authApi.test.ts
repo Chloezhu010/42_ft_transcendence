@@ -1,7 +1,8 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   acceptFriendRequest,
+  exchangeOAuthCode,
   getFriends,
   getMe,
   getOutgoingFriendRequests,
@@ -13,6 +14,7 @@ import {
   removeFriend,
   sendFriendRequest,
   signup,
+  startGoogleOAuth,
   updateMe,
   uploadAvatar,
 } from '@api';
@@ -609,5 +611,73 @@ describe('authApi', () => {
     );
 
     await expect(removeFriend('friend-token', 999)).rejects.toThrow('Friendship not found');
+  });
+});
+
+describe('startGoogleOAuth', () => {
+  beforeEach(() => {
+    Object.defineProperty(window, 'location', {
+      value: { href: '' },
+      writable: true,
+    });
+  });
+
+  it('sets window.location.href to the Google OAuth start URL', () => {
+    startGoogleOAuth();
+    expect(window.location.href).toContain('/api/auth/oauth/google/start');
+  });
+});
+
+describe('exchangeOAuthCode', () => {
+  it('POSTs the code and returns a TokenResponse', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({ access_token: 'oauth-token', token_type: 'bearer' }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+      )
+    );
+
+    const result = await exchangeOAuthCode('one-time-code');
+
+    expect(result).toEqual({ access_token: 'oauth-token', token_type: 'bearer' });
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/api/auth/oauth/exchange'),
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ code: 'one-time-code' }),
+        headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
+      })
+    );
+  });
+
+  it('throws with backend detail when the code is expired or invalid', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ detail: 'OAuth code expired or already used' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+        statusText: 'Bad Request',
+      })
+    );
+
+    await expect(exchangeOAuthCode('stale-code')).rejects.toThrow(
+      'OAuth code expired or already used'
+    );
+  });
+
+  it('throws a formatted validation error when the code field is missing', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          detail: [{ loc: ['body', 'code'], msg: 'field required', type: 'missing' }],
+        }),
+        {
+          status: 422,
+          headers: { 'Content-Type': 'application/json' },
+          statusText: 'Unprocessable Entity',
+        }
+      )
+    );
+
+    await expect(exchangeOAuthCode('')).rejects.toThrow('body.code: field required');
   });
 });

@@ -13,7 +13,8 @@ URL contract (authoritative: tests/test_friend_routes.py):
 from fastapi import APIRouter, Depends, HTTPException
 
 from auth_utils import get_current_user
-from db.crud_users import (
+from db.database import get_db
+from db.friendships_crud import (
     accept_friend_request,
     get_friend_view,
     get_friends,
@@ -22,8 +23,7 @@ from db.crud_users import (
     remove_friend,
     send_friend_request,
 )
-from db.database import get_db
-from models import FriendResponse
+from schemas.friends import FriendResponse
 
 router = APIRouter(prefix="/api/friends", tags=["friends"])
 

@@ -1,5 +1,6 @@
-"""
-CRUD operations for database entities (async SQLite).
+"""Compatibility exports for the old `db.crud` module.
+
+New code should import from the domain-specific `*_crud` modules.
 """
 
 import asyncio

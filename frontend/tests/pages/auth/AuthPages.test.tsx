@@ -5,18 +5,38 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { LoginPage, SignupPage } from '@/pages/auth';
 
-const { mockNavigate, mockUseAuth, mockLogin, mockSignup } = vi.hoisted(() => ({
+const { mockNavigate, mockUseAuth, mockLogin, mockSignup, mockStartGoogleOAuth, mockToastError, mockToastSuccess } = vi.hoisted(() => ({
   mockNavigate: vi.fn(),
   mockUseAuth: vi.fn(),
   mockLogin: vi.fn(),
   mockSignup: vi.fn(),
+  mockStartGoogleOAuth: vi.fn(),
+  mockToastError: vi.fn(),
+  mockToastSuccess: vi.fn(),
+}));
+
+vi.mock('@api', () => ({
+  startGoogleOAuth: mockStartGoogleOAuth,
+}));
+
+vi.mock('sonner', () => ({
+  toast: {
+    error: mockToastError,
+    success: mockToastSuccess,
+  },
 }));
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
+    i18n: {
+      resolvedLanguage: 'en',
+      language: 'en',
+      changeLanguage: vi.fn(),
+    },
     t: (key: string) => {
       const translations: Record<string, string> = {
         'auth.errors.authFailed': 'Authentication failed',
+        'auth.errors.oauthPasswordLogin': 'This account uses Google sign-in. Continue with Google instead.',
         'auth.fields.emailLabel': 'Email',
         'auth.fields.emailPlaceholder': 'you@example.com',
         'auth.fields.passwordLabel': 'Password',
@@ -28,12 +48,18 @@ vi.mock('react-i18next', () => ({
         'auth.login.submit': 'Sign in',
         'auth.login.submitting': 'Signing in...',
         'auth.login.title': 'Welcome back',
+        'auth.oauth.continueWithGoogle': 'Continue with Google',
+        'auth.oauth.redirectingToGoogle': 'Redirecting to Google...',
+        'auth.oauth.separator': 'or',
         'auth.signup.footerLink': 'Log in',
         'auth.signup.footerText': 'Already have an account?',
+        'auth.signup.notifications.accountCreated': 'Account created.',
         'auth.signup.submit': 'Sign up',
         'auth.signup.submitting': 'Creating account...',
         'auth.signup.title': 'Create your account',
         'auth.status.loading': 'Loading…',
+        'languageSwitcher.languageOptions': 'Language options',
+        'languageSwitcher.selectLanguage': 'Select language',
       };
 
       return translations[key] ?? key;
@@ -68,6 +94,7 @@ function buildAuthValue() {
 describe('auth pages', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    sessionStorage.clear();
     mockUseAuth.mockReturnValue(buildAuthValue());
   });
 
@@ -92,8 +119,54 @@ describe('auth pages', () => {
       expect(mockLogin).toHaveBeenCalledWith('alice@example.com', 'wrong-password');
     });
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Invalid email or password');
+    expect(mockToastError).toHaveBeenCalledWith('Invalid email or password');
     expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['LoginPage', LoginPage],
+    ['SignupPage', SignupPage],
+  ])('renders the Continue with Google button on %s', (_label, Page) => {
+    render(
+      <MemoryRouter>
+        <Page />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByRole('button', { name: /continue with google/i })).toBeInTheDocument();
+  });
+
+  it('starts the Google OAuth flow when the Google button is clicked', () => {
+    render(
+      <MemoryRouter>
+        <LoginPage />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /continue with google/i }));
+
+    expect(mockStartGoogleOAuth).toHaveBeenCalledTimes(1);
+    expect(sessionStorage.getItem('auth.oauthRedirectPath')).toBe('/');
+  });
+
+  it('preserves the protected-route redirect (location.state.from) when starting Google OAuth', () => {
+    render(
+      <MemoryRouter
+        initialEntries={[
+          {
+            pathname: '/login',
+            state: { from: { pathname: '/create', search: '', hash: '' } },
+          },
+        ]}
+      >
+        <LoginPage />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /continue with google/i }));
+
+    expect(mockStartGoogleOAuth).toHaveBeenCalledTimes(1);
+    expect(sessionStorage.getItem('auth.oauthRedirectPath')).toBe('/create');
   });
 
   it('navigates home after signup succeeds', async () => {

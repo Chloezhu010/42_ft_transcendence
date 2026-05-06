@@ -10,10 +10,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from prometheus_fastapi_instrumentator import Instrumentator
+from starlette.middleware.sessions import SessionMiddleware
 
 from config import get_config
 from db.database import init_db
-from routers import auth, backup, friend, generation, health, monitoring, stories, user
+from routers import api_keys, auth, backup, friend, generation, health, monitoring, public_stories, stories, user
 
 
 @asynccontextmanager
@@ -42,8 +43,14 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "X-API-Key"],
+)
+
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=config.session_secret_key,
+    https_only=config.session_cookie_secure,
 )
 
 # Serve images as static files
@@ -67,10 +74,12 @@ app.mount("/images", StaticFiles(directory=str(images_dir)), name="images")
 
 # Register routers
 app.include_router(auth.router)
+app.include_router(api_keys.router)
 app.include_router(user.router)
 app.include_router(friend.router)
 app.include_router(generation.router)
 app.include_router(stories.router)
+app.include_router(public_stories.router)
 app.include_router(monitoring.router)
 app.include_router(backup.router)
 app.include_router(health.router)

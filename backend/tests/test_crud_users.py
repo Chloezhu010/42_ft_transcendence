@@ -3,23 +3,25 @@ import pytest
 import pytest_asyncio
 
 from auth_utils import verify_password
-from db.crud_users import (
+from db.database import init_db
+from db.friendships_crud import (
     accept_friend_request,
-    create_user,
     get_friends,
     get_friendship_between,
     get_outgoing_pending_requests,
     get_pending_requests,
+    remove_friend,
+    send_friend_request,
+)
+from db.users_crud import (
+    create_user,
     get_user_by_email,
     get_user_by_id,
-    remove_friend,
     search_users_by_username,
-    send_friend_request,
     set_online_status,
     update_avatar,
     update_user,
 )
-from db.database import init_db
 
 
 @pytest_asyncio.fixture

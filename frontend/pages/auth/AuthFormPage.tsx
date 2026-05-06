@@ -1,10 +1,20 @@
+/**
+ * Shared shell for LoginPage and SignupPage. Owns the cross-cutting concerns:
+ * AuthFormPage owns the title, error alert, submit button, and footer chrome.
+ */
 import { useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 
 import type { UserResponse } from '@api';
+import { startGoogleOAuth } from '@api';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { SketchyButton } from '@/components/design-system/Primitives';
+
+const OAUTH_REDIRECT_PATH_KEY = 'auth.oauthRedirectPath';
+const OAUTH_PASSWORD_LOGIN_ERROR = 'this account does not use password login';
 
 interface AuthFormPageProps {
     currentUser: UserResponse | null;
@@ -13,10 +23,41 @@ interface AuthFormPageProps {
     footerText: string;
     isLoadingSession: boolean;
     renderFields: (isSubmitting: boolean) => ReactNode;
+    successMessage?: string;
     submitLabel: string;
     submittingLabel: string;
     title: string;
     onSubmit: () => Promise<void>;
+}
+
+function saveOAuthRedirectPath(path: string): void {
+    sessionStorage.setItem(OAUTH_REDIRECT_PATH_KEY, path);
+}
+
+function getLocalizedAuthErrorMessage(error: unknown, t: (key: string) => string): string {
+    if (!(error instanceof Error)) {
+        return t('auth.errors.authFailed');
+    }
+
+    const normalizedMessage = error.message.trim().replace(/\.$/, '').toLowerCase();
+    if (normalizedMessage === OAUTH_PASSWORD_LOGIN_ERROR) {
+        return t('auth.errors.oauthPasswordLogin');
+    }
+
+    return error.message;
+}
+
+function AuthPageShell({ children }: { children: ReactNode }): JSX.Element {
+    return (
+        <div className="flex min-h-screen flex-col">
+            <header className="flex justify-end px-6 py-4">
+                <LanguageSwitcher />
+            </header>
+            <main className="flex flex-1 items-center justify-center px-6 py-12">
+                {children}
+            </main>
+        </div>
+    );
 }
 
 export function AuthFormPage({
@@ -26,6 +67,7 @@ export function AuthFormPage({
     footerText,
     isLoadingSession,
     renderFields,
+    successMessage,
     submitLabel,
     submittingLabel,
     title,
@@ -41,28 +83,37 @@ export function AuthFormPage({
         ? `${redirectTo.pathname ?? '/'}${redirectTo.search ?? ''}${redirectTo.hash ?? ''}`
         : '/';
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [isOAuthStarting, setIsOAuthStarting] = useState(false);
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
         event.preventDefault();
         setIsSubmitting(true);
-        setError(null);
 
         try {
             await onSubmit();
+            if (successMessage) {
+                toast.success(successMessage);
+            }
             navigate(redirectPath, { replace: true });
         } catch (error) {
-            setError(error instanceof Error ? error.message : t('auth.errors.authFailed'));
+            const message = getLocalizedAuthErrorMessage(error, t);
+            toast.error(message);
         } finally {
             setIsSubmitting(false);
         }
     }
 
+    function handleGoogleSignIn(): void {
+        setIsOAuthStarting(true);
+        saveOAuthRedirectPath(redirectPath);
+        startGoogleOAuth();
+    }
+
     if (isLoadingSession) {
         return (
-            <div className="flex flex-1 items-center justify-center">
+            <AuthPageShell>
                 <p className="font-rounded text-xl text-brand-muted">{t('auth.status.loading')}</p>
-            </div>
+            </AuthPageShell>
         );
     }
 
@@ -71,21 +122,27 @@ export function AuthFormPage({
     }
 
     return (
-        <div className="flex flex-1 items-center justify-center py-12">
+        <AuthPageShell>
             <div className="w-full max-w-md rounded-2xl border-4 border-brand-primary/20 bg-white p-10 shadow-soft">
                 <h1 className="mb-8 text-center font-sans text-3xl font-bold text-brand-dark">{title}</h1>
                 <form onSubmit={handleSubmit}>
                     <div className="space-y-6">{renderFields(isSubmitting)}</div>
-                    {error && (
-                        <p
-                            role="alert"
-                            className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600"
-                        >
-                            {error}
-                        </p>
-                    )}
                     <SketchyButton type="submit" disabled={isSubmitting} className="mt-6 w-full">
                         {isSubmitting ? submittingLabel : submitLabel}
+                    </SketchyButton>
+                    <div className="mt-6 flex items-center gap-3 text-xs uppercase tracking-wide text-brand-muted">
+                        <span className="h-px flex-1 bg-brand-muted/30" />
+                        <span>{t('auth.oauth.separator')}</span>
+                        <span className="h-px flex-1 bg-brand-muted/30" />
+                    </div>
+                    <SketchyButton
+                        type="button"
+                        variant="outline"
+                        disabled={isSubmitting || isOAuthStarting}
+                        onClick={handleGoogleSignIn}
+                        className="mt-6 w-full"
+                    >
+                        {isOAuthStarting ? t('auth.oauth.redirectingToGoogle') : t('auth.oauth.continueWithGoogle')}
                     </SketchyButton>
                 </form>
                 <p className="mt-6 text-center text-sm text-brand-muted">
@@ -99,6 +156,6 @@ export function AuthFormPage({
                     </Link>
                 </p>
             </div>
-        </div>
+        </AuthPageShell>
     );
 }

@@ -13,7 +13,12 @@
         "status": "Status"
       }
     },
-    "friends": "Friends"
+    "friends": "Friends",
+    "profileAriaLabel": "Your profile",
+    "logoAlt": "Funova logo",
+    "status": {
+      "loading": "Loading…"
+    }
   },
   "comicPanel": {
     "paintingScene": "Painting Scene...",
@@ -24,7 +29,8 @@
     "editScene": "Edit Scene",
     "editPlaceholder": "e.g. Add a curious little robot looking at the map...",
     "close": "Close",
-    "applyMagic": "Apply Magic ✨"
+    "applyMagic": "Apply Magic ✨",
+    "sceneAlt": "Comic scene"
   },
   "galleryPage": {
     "mySavedBooks": "My Saved Books",
@@ -37,12 +43,17 @@
       "deleteFailed": "Failed to delete story.",
       "sharedWithFriends": "Story shared with friends.",
       "setPrivate": "Story set to private.",
-      "shareFailed": "Failed to update story sharing."
+      "shareFailed": "Failed to update story sharing.",
+      "loadFailed": "Failed to load stories: {{message}}"
     },
     "sharing": {
       "label": "Sharing",
       "private": "Private",
       "friends": "Friends"
+    },
+    "deleteStoryTitle": "Delete story",
+    "errors": {
+      "unknown": "Unknown error."
     }
   },
   "friendLibrary": {
@@ -188,7 +199,21 @@
         "description": "Modern and bold"
       }
     },
-    "back": "Back"
+    "back": "Back",
+    "voiceInput": {
+      "start": "Start voice input",
+      "stop": "Stop voice input",
+      "errors": {
+        "unsupported": "Speech recognition is not supported in this browser.",
+        "permissionDenied": "Microphone permission was denied.",
+        "noMicrophone": "No microphone was detected.",
+        "noSpeech": "No speech was detected.",
+        "network": "Speech recognition is unavailable because of a network error.",
+        "languageNotSupported": "This speech recognition language is not supported.",
+        "unexpected": "Speech recognition stopped unexpectedly."
+      }
+    },
+    "photoPreviewAlt": "Selected child photo preview"
   },
   "magicLoader": {
     "bindingTale": "Binding the Tale...",
@@ -219,7 +244,7 @@
         "opening": "Opening",
         "ending": "Ending"
       },
-      "turnPage": "Turn page →",
+      "turnPage": "Turn page",
       "ctaTitle": "Like what you see?",
       "ctaDescription": "We'll fill in the {{count}} panels between opening and ending.",
       "generateFull": "Generate Full Story",
@@ -259,6 +284,17 @@
       "generationFailed": "Story generation failed.",
       "noPanels": "Story generation failed: no panels returned.",
       "previewImagesMissing": "Preview images are missing. Please regenerate the preview."
+    },
+    "readAloud": {
+      "read": "Read story aloud",
+      "pause": "Pause story audio",
+      "resume": "Resume story audio",
+      "stop": "Stop story audio",
+      "errors": {
+        "unsupported": "Text-to-speech is not supported in this browser.",
+        "empty": "There is no story text to read aloud.",
+        "playbackFailed": "Text-to-speech playback failed."
+      }
     }
   },
   "auth": {
@@ -274,7 +310,10 @@
       "submit": "Sign up",
       "submitting": "Signing up…",
       "footerText": "Already have an account?",
-      "footerLink": "Log in"
+      "footerLink": "Log in",
+      "notifications": {
+        "accountCreated": "Account created."
+      }
     },
     "fields": {
       "emailLabel": "Email",
@@ -287,8 +326,30 @@
     "status": {
       "loading": "Loading…"
     },
+    "oauth": {
+      "separator": "or",
+      "continueWithGoogle": "Continue with Google",
+      "redirectingToGoogle": "Redirecting to Google…",
+      "callback": {
+        "signingInTitle": "Signing you in",
+        "signingInDescription": "Completing your Google sign-in and preparing your session.",
+        "failedTitle": "Google sign-in failed",
+        "retryDescription": "Please retry the Google sign-in flow from the login page.",
+        "backToLogin": "Back to login"
+      },
+      "errors": {
+        "linkConflict": "This Google account matches an email that already uses password login. Sign in with email and password instead.",
+        "cancelled": "Google sign-in was cancelled or failed. Please try again.",
+        "missingCode": "No authorization code found. Please try signing in with Google again."
+      },
+      "notifications": {
+        "signInComplete": "Google sign-in complete.",
+        "signInFailed": "Google sign-in failed. Please try again."
+      }
+    },
     "errors": {
-      "authFailed": "Authentication failed"
+      "authFailed": "Authentication failed",
+      "oauthPasswordLogin": "This account uses Google sign-in. Continue with Google instead."
     }
   },
   "landing": {
@@ -761,7 +822,13 @@
     },
     "avatar": {
       "uploading": "Uploading…",
-      "change": "Change avatar"
+      "change": "Change avatar",
+      "alt": "{{username}}'s avatar"
+    },
+    "cropper": {
+      "previewAlt": "Avatar preview",
+      "zoom": "Zoom",
+      "usePhoto": "Use photo"
     },
     "fields": {
       "username": "Username",
@@ -786,5 +853,9 @@
       "uploadFailed": "Upload failed",
       "logoutFailed": "Logout failed"
     }
+  },
+  "languageSwitcher": {
+    "selectLanguage": "Select language",
+    "languageOptions": "Language options"
   }
 }

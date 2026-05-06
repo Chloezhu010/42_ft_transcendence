@@ -13,7 +13,12 @@
         "status": "État"
       }
     },
-    "friends": "Amis"
+    "friends": "Amis",
+    "profileAriaLabel": "Votre profil",
+    "logoAlt": "Logo Funova",
+    "status": {
+      "loading": "Chargement…"
+    }
   },
   "comicPanel": {
     "paintingScene": "Peindre une Scène...",
@@ -24,7 +29,8 @@
     "editScene": "Modifier la Scène",
     "editPlaceholder": "p.ex. Ajouter un petit robot curieux regardant la carte...",
     "close": "Fermer",
-    "applyMagic": "Appliquer la Magie ✨"
+    "applyMagic": "Appliquer la Magie ✨",
+    "sceneAlt": "Scène de bande dessinée"
   },
   "galleryPage": {
     "mySavedBooks": "Mes Livres Sauvegardés",
@@ -37,12 +43,17 @@
       "deleteFailed": "Impossible de supprimer l'histoire.",
       "sharedWithFriends": "Histoire partagée avec les amis.",
       "setPrivate": "Histoire définie comme privée.",
-      "shareFailed": "Impossible de mettre à jour le partage de l'histoire."
+      "shareFailed": "Impossible de mettre à jour le partage de l'histoire.",
+      "loadFailed": "Impossible de charger les histoires : {{message}}"
     },
     "sharing": {
       "label": "Partage",
       "private": "Privé",
       "friends": "Amis"
+    },
+    "deleteStoryTitle": "Supprimer l'histoire",
+    "errors": {
+      "unknown": "Erreur inconnue."
     }
   },
   "friendLibrary": {
@@ -188,7 +199,21 @@
         "description": "Moderne et audacieux"
       }
     },
-    "back": "Retour"
+    "back": "Retour",
+    "voiceInput": {
+      "start": "Demarrer la saisie vocale",
+      "stop": "Arreter la saisie vocale",
+      "errors": {
+        "unsupported": "La reconnaissance vocale n'est pas prise en charge par ce navigateur.",
+        "permissionDenied": "L'autorisation du microphone a ete refusee.",
+        "noMicrophone": "Aucun microphone n'a ete detecte.",
+        "noSpeech": "Aucune parole n'a ete detectee.",
+        "network": "La reconnaissance vocale est indisponible en raison d'une erreur reseau.",
+        "languageNotSupported": "Cette langue de reconnaissance vocale n'est pas prise en charge.",
+        "unexpected": "La reconnaissance vocale s'est arretee de maniere inattendue."
+      }
+    },
+    "photoPreviewAlt": "Aperçu de la photo d'enfant sélectionnée"
   },
   "magicLoader": {
     "bindingTale": "Lier l'Histoire...",
@@ -219,7 +244,7 @@
         "opening": "Ouverture",
         "ending": "Conclusion"
       },
-      "turnPage": "Tourner la page →",
+      "turnPage": "Tourner la page",
       "ctaTitle": "Ça vous plaît ?",
       "ctaDescription": "Nous compléterons les {{count}} planches entre l'ouverture et la conclusion.",
       "generateFull": "Générer l'histoire complète",
@@ -259,6 +284,17 @@
       "generationFailed": "La génération de l'histoire a échoué.",
       "noPanels": "La génération de l'histoire a échoué : aucune planche renvoyée.",
       "previewImagesMissing": "Les images d'aperçu sont manquantes. Veuillez régénérer l'aperçu."
+    },
+    "readAloud": {
+      "read": "Lire l'histoire a voix haute",
+      "pause": "Mettre l'audio en pause",
+      "resume": "Reprendre l'audio",
+      "stop": "Arreter l'audio",
+      "errors": {
+        "unsupported": "La synthese vocale n'est pas prise en charge par ce navigateur.",
+        "empty": "Aucun texte d'histoire a lire.",
+        "playbackFailed": "La lecture audio a echoue."
+      }
     }
   },
   "auth": {
@@ -274,7 +310,10 @@
       "submit": "S'inscrire",
       "submitting": "Inscription…",
       "footerText": "Vous avez déjà un compte ?",
-      "footerLink": "Se connecter"
+      "footerLink": "Se connecter",
+      "notifications": {
+        "accountCreated": "Compte créé."
+      }
     },
     "fields": {
       "emailLabel": "E-mail",
@@ -287,8 +326,30 @@
     "status": {
       "loading": "Chargement…"
     },
+    "oauth": {
+      "separator": "ou",
+      "continueWithGoogle": "Continuer avec Google",
+      "redirectingToGoogle": "Redirection vers Google…",
+      "callback": {
+        "signingInTitle": "Connexion en cours",
+        "signingInDescription": "Finalisation de votre connexion Google et preparation de votre session.",
+        "failedTitle": "Echec de la connexion Google",
+        "retryDescription": "Veuillez relancer la connexion Google depuis la page de connexion.",
+        "backToLogin": "Retour a la connexion"
+      },
+      "errors": {
+        "linkConflict": "Ce compte Google correspond a une adresse e-mail qui utilise deja la connexion par mot de passe. Connectez-vous avec l'e-mail et le mot de passe.",
+        "cancelled": "La connexion Google a ete annulee ou a echoue. Veuillez reessayer.",
+        "missingCode": "Aucun code d'autorisation trouve. Veuillez reessayer la connexion Google."
+      },
+      "notifications": {
+        "signInComplete": "Connexion Google terminee.",
+        "signInFailed": "Echec de la connexion Google. Veuillez reessayer."
+      }
+    },
     "errors": {
-      "authFailed": "Échec de l'authentification"
+      "authFailed": "Échec de l'authentification",
+      "oauthPasswordLogin": "Ce compte utilise la connexion Google. Continuez avec Google."
     }
   },
   "landing": {
@@ -761,7 +822,13 @@
     },
     "avatar": {
       "uploading": "Téléversement…",
-      "change": "Changer l'avatar"
+      "change": "Changer l'avatar",
+      "alt": "Avatar de {{username}}"
+    },
+    "cropper": {
+      "previewAlt": "Aperçu de l'avatar",
+      "zoom": "Zoom",
+      "usePhoto": "Utiliser cette photo"
     },
     "fields": {
       "username": "Nom d'utilisateur",
@@ -786,5 +853,9 @@
       "uploadFailed": "Échec du téléversement",
       "logoutFailed": "Échec de la déconnexion"
     }
+  },
+  "languageSwitcher": {
+    "selectLanguage": "Choisir la langue",
+    "languageOptions": "Options de langue"
   }
 }

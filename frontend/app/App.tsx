@@ -4,7 +4,7 @@
  */
 import { useEffect } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import { LoginPage, SignupPage } from '@/pages/auth';
+import { LoginPage, SignupPage, GoogleOAuthCallbackPage } from '@/pages/auth';
 import { FriendLibraryPage } from '@/pages/friend-library';
 import { GalleryPage } from '@/pages/gallery';
 import { LandingPage } from '@/pages/landing';
@@ -48,6 +48,7 @@ export function App(): JSX.Element {
         </Route>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/auth/callback" element={<GoogleOAuthCallbackPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>

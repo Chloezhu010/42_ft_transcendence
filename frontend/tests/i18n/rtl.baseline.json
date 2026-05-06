@@ -1,0 +1,4 @@
+{
+  "description": "Snapshot of legacy physical-class usage. Audit fails if NEW entries appear or if listed entries no longer match (regenerate with UPDATE_RTL_BASELINE=1).",
+  "violations": []
+}

@@ -3,7 +3,8 @@
  * Lets the user pick a file, zoom, and emit a 512x512 JPEG File ready for upload.
  * Uses only <canvas> + pointer events — no external crop library.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { SketchyButton } from '@/components/design-system/Primitives';
 
 const OUTPUT_SIZE = 512; // final square size sent to backend
@@ -18,19 +19,33 @@ interface AvatarCropperProps {
 }
 
 export function AvatarCropper({ file, onCancel, onCropComplete }: AvatarCropperProps): JSX.Element {
+  const { t } = useTranslation();
   const [zoom, setZoom] = useState(1);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isImageReady, setIsImageReady] = useState(false);
   const imgRef = useRef<HTMLImageElement | null>(null);
-  const imageUrl = useMemo(() => URL.createObjectURL(file), [file]);
 
   // Revoke the object URL when the selected file changes or the cropper unmounts.
   useEffect(() => {
-    return () => URL.revokeObjectURL(imageUrl);
-  }, [imageUrl]);
+    const nextImageUrl = URL.createObjectURL(file);
+    let isActive = true;
+
+    queueMicrotask(() => {
+      if (!isActive) return;
+      setIsImageReady(false);
+      setImageUrl(nextImageUrl);
+    });
+
+    return () => {
+      isActive = false;
+      URL.revokeObjectURL(nextImageUrl);
+    };
+  }, [file]);
 
   // Render the center-cropped square at OUTPUT_SIZE and emit as a File.
   function handleConfirm(): void {
     const img = imgRef.current;
-    if (!img) return;
+    if (!img || !isImageReady || img.naturalWidth === 0 || img.naturalHeight === 0) return;
     const canvas = document.createElement('canvas');
     canvas.width = OUTPUT_SIZE;
     canvas.height = OUTPUT_SIZE;
@@ -61,21 +76,25 @@ export function AvatarCropper({ file, onCancel, onCropComplete }: AvatarCropperP
         className="relative overflow-hidden rounded-full border-4 border-brand-primary/20 bg-brand-light"
         style={{ width: VIEW_SIZE, height: VIEW_SIZE }}
       >
-        <img
-          ref={imgRef}
-          src={imageUrl}
-          alt="Avatar preview"
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            transform: `scale(${zoom})`,
-            transformOrigin: 'center',
-          }}
-        />
+        {imageUrl ? (
+          <img
+            ref={imgRef}
+            src={imageUrl}
+            alt={t('profile.cropper.previewAlt')}
+            onLoad={() => setIsImageReady(true)}
+            onError={() => setIsImageReady(false)}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              transform: `scale(${zoom})`,
+              transformOrigin: 'center',
+            }}
+          />
+        ) : null}
       </div>
       <label className="flex items-center gap-3 text-sm text-brand-muted">
-        Zoom
+        {t('profile.cropper.zoom')}
         <input
           type="range"
           min={1}
@@ -87,10 +106,10 @@ export function AvatarCropper({ file, onCancel, onCropComplete }: AvatarCropperP
       </label>
       <div className="flex gap-3">
         <SketchyButton type="button" variant="outline" onClick={onCancel}>
-          Cancel
+          {t('profile.actions.cancel')}
         </SketchyButton>
-        <SketchyButton type="button" onClick={handleConfirm}>
-          Use photo
+        <SketchyButton type="button" onClick={handleConfirm} disabled={!isImageReady}>
+          {t('profile.cropper.usePhoto')}
         </SketchyButton>
       </div>
     </div>

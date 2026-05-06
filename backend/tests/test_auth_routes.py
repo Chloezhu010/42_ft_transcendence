@@ -1,5 +1,6 @@
 import asyncio
 
+import aiosqlite
 import pytest
 from fastapi.testclient import TestClient
 
@@ -9,12 +10,18 @@ from tests.conftest import _init_test_db, make_test_app
 
 # --- Fixtures ---
 @pytest.fixture
-def client(tmp_path):
+def client_with_db_path(tmp_path):
     """Fresh DB + TestClient per test function."""
     db_path = str(tmp_path / "test.db")
     asyncio.run(_init_test_db(db_path))
     with TestClient(make_test_app(db_path, router)) as c:
-        yield c
+        yield c, db_path
+
+
+@pytest.fixture
+def client(client_with_db_path):
+    test_client, _ = client_with_db_path
+    return test_client
 
 
 # --- Test cases ---
@@ -140,6 +147,35 @@ def test_login_nonexistent_email(client):
         },
     )
     assert resp.status_code == 401
+
+
+def test_login_oauth_only_user_returns_401_without_crashing(client_with_db_path):
+    """Test login for an OAuth-only user with no local password hash."""
+    client, db_path = client_with_db_path
+
+    async def seed_oauth_only_user() -> None:
+        async with aiosqlite.connect(db_path) as db:
+            await db.execute(
+                """
+                INSERT INTO users (email, username, password_hash)
+                VALUES (?, ?, ?)
+                """,
+                ("oauth@example.com", "oauth-user", None),
+            )
+            await db.commit()
+
+    asyncio.run(seed_oauth_only_user())
+
+    resp = client.post(
+        "/api/auth/login",
+        json={
+            "email": "oauth@example.com",
+            "password": "password123",
+        },
+    )
+
+    assert resp.status_code == 401
+    assert "does not use password login" in resp.json()["detail"].lower()
 
 
 # --- Logout ---

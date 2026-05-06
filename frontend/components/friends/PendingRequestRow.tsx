@@ -42,7 +42,7 @@ export function PendingRequestRow({
       </div>
 
       {(onAccept || onDecline) ? (
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ms-auto flex items-center gap-2">
           {onDecline ? (
             <button
               type="button"

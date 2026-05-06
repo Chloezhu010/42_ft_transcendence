@@ -11,7 +11,7 @@ function MagicLoader(): JSX.Element {
               <div className="h-full bg-brand-primary animate-[ink_3s_ease-in-out_infinite]"></div>
             </div>
           </div>
-          <div className="relative z-10 flex space-x-8">
+          <div className="relative z-10 flex gap-8">
             {[0, 1, 2].map((i) => (
               <div
                 key={i}

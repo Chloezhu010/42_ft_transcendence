@@ -1,10 +1,22 @@
-import aiosqlite  # for async SQLite access
-from aiosqlite import Row  # for type hinting database rows
+"""Compatibility exports for the old `db.crud_users` module.
 
-from auth_utils import hash_password  # for password hashing and token creation
+New code should import from `db.users_crud` or `db.friendships_crud`.
+"""
+
+import aiosqlite
+from aiosqlite import Row
+
+from auth_utils import hash_password
 
 
 # --- User identity ---
+async def create_oauth_user(db: aiosqlite.Connection, username: str, email: str) -> int:
+    """Create a new OAuth-only user (no password) and return their ID."""
+    cursor = await db.execute("INSERT INTO users (username, email) VALUES (?, ?)", (username, email))
+    await db.commit()
+    return cursor.lastrowid
+
+
 async def create_user(db: aiosqlite.Connection, username: str, email: str, password: str) -> int:
     """Create a new user and return their ID."""
     hashed_pwd = hash_password(password)  # hash the password before storing

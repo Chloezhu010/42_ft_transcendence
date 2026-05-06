@@ -13,7 +13,12 @@
         "status": "状态"
       }
     },
-    "friends": "好友"
+    "friends": "好友",
+    "profileAriaLabel": "你的个人资料",
+    "logoAlt": "Funova 标志",
+    "status": {
+      "loading": "正在加载…"
+    }
   },
   "comicPanel": {
     "paintingScene": "绘制场景...",
@@ -24,7 +29,8 @@
     "editScene": "编辑场景",
     "editPlaceholder": "例如 添加一个好奇的小机器人查看地图...",
     "close": "关闭",
-    "applyMagic": "应用魔法 ✨"
+    "applyMagic": "应用魔法 ✨",
+    "sceneAlt": "漫画场景"
   },
   "galleryPage": {
     "mySavedBooks": "我保存的书籍",
@@ -37,12 +43,17 @@
       "deleteFailed": "无法删除故事。",
       "sharedWithFriends": "故事已与好友共享。",
       "setPrivate": "故事已设为私密。",
-      "shareFailed": "无法更新故事分享设置。"
+      "shareFailed": "无法更新故事分享设置。",
+      "loadFailed": "无法加载故事：{{message}}"
     },
     "sharing": {
       "label": "分享",
       "private": "私密",
       "friends": "好友"
+    },
+    "deleteStoryTitle": "删除故事",
+    "errors": {
+      "unknown": "未知错误。"
     }
   },
   "friendLibrary": {
@@ -188,7 +199,21 @@
         "description": "摩登大胆"
       }
     },
-    "back": "返回"
+    "back": "返回",
+    "voiceInput": {
+      "start": "开始语音输入",
+      "stop": "停止语音输入",
+      "errors": {
+        "unsupported": "此浏览器不支持语音识别。",
+        "permissionDenied": "麦克风权限被拒绝。",
+        "noMicrophone": "未检测到麦克风。",
+        "noSpeech": "未检测到语音。",
+        "network": "由于网络错误，语音识别不可用。",
+        "languageNotSupported": "不支持此语音识别语言。",
+        "unexpected": "语音识别意外停止。"
+      }
+    },
+    "photoPreviewAlt": "已选择儿童照片预览"
   },
   "magicLoader": {
     "bindingTale": "绑定故事...",
@@ -219,7 +244,7 @@
         "opening": "开篇",
         "ending": "结尾"
       },
-      "turnPage": "翻页 →",
+      "turnPage": "翻页",
       "ctaTitle": "喜欢现在的样子吗？",
       "ctaDescription": "我们会补全开篇与结尾之间的 {{count}} 个分镜。",
       "generateFull": "生成完整故事",
@@ -259,6 +284,17 @@
       "generationFailed": "故事生成失败。",
       "noPanels": "故事生成失败：未返回分镜。",
       "previewImagesMissing": "预览图像缺失，请重新生成预览。"
+    },
+    "readAloud": {
+      "read": "朗读故事",
+      "pause": "暂停故事音频",
+      "resume": "继续故事音频",
+      "stop": "停止故事音频",
+      "errors": {
+        "unsupported": "此浏览器不支持文本转语音。",
+        "empty": "没有可朗读的故事文本。",
+        "playbackFailed": "文本转语音播放失败。"
+      }
     }
   },
   "auth": {
@@ -274,7 +310,10 @@
       "submit": "注册",
       "submitting": "正在注册…",
       "footerText": "已经有账号？",
-      "footerLink": "登录"
+      "footerLink": "登录",
+      "notifications": {
+        "accountCreated": "账号已创建。"
+      }
     },
     "fields": {
       "emailLabel": "邮箱",
@@ -287,8 +326,30 @@
     "status": {
       "loading": "加载中…"
     },
+    "oauth": {
+      "separator": "或",
+      "continueWithGoogle": "使用 Google 继续",
+      "redirectingToGoogle": "正在跳转到 Google…",
+      "callback": {
+        "signingInTitle": "正在登录",
+        "signingInDescription": "正在完成 Google 登录并准备你的会话。",
+        "failedTitle": "Google 登录失败",
+        "retryDescription": "请从登录页面重新尝试 Google 登录。",
+        "backToLogin": "返回登录"
+      },
+      "errors": {
+        "linkConflict": "此 Google 账号的邮箱已使用密码登录。请改用邮箱和密码登录。",
+        "cancelled": "Google 登录已取消或失败。请重试。",
+        "missingCode": "未找到授权码。请重新尝试使用 Google 登录。"
+      },
+      "notifications": {
+        "signInComplete": "Google 登录已完成。",
+        "signInFailed": "Google 登录失败，请重试。"
+      }
+    },
     "errors": {
-      "authFailed": "认证失败"
+      "authFailed": "认证失败",
+      "oauthPasswordLogin": "此账号使用 Google 登录。请改用 Google 继续。"
     }
   },
   "landing": {
@@ -446,7 +507,8 @@
       "actions": {
         "backUpNow": "立即备份",
         "backingUp": "备份中…"
-      }
+      },
+      "snapshotCount_one": "{{count}} 个备份快照可用"
     },
     "errors": {
       "loadFailed": "加载系统状态失败",
@@ -760,7 +822,13 @@
     },
     "avatar": {
       "uploading": "上传中…",
-      "change": "更换头像"
+      "change": "更换头像",
+      "alt": "{{username}} 的头像"
+    },
+    "cropper": {
+      "previewAlt": "头像预览",
+      "zoom": "缩放",
+      "usePhoto": "使用此照片"
     },
     "fields": {
       "username": "用户名",
@@ -785,5 +853,9 @@
       "uploadFailed": "上传失败",
       "logoutFailed": "退出登录失败"
     }
+  },
+  "languageSwitcher": {
+    "selectLanguage": "选择语言",
+    "languageOptions": "语言选项"
   }
 }

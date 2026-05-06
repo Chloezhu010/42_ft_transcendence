@@ -13,7 +13,12 @@
         "status": "الحالة"
       }
     },
-    "friends": "الأصدقاء"
+    "friends": "الأصدقاء",
+    "profileAriaLabel": "ملفك الشخصي",
+    "logoAlt": "شعار Funova",
+    "status": {
+      "loading": "جارٍ التحميل…"
+    }
   },
   "comicPanel": {
     "paintingScene": "رسم المشهد...",
@@ -24,7 +29,8 @@
     "editScene": "تعديل المشهد",
     "editPlaceholder": "مثال: أضف روبوت صغير فضولي ينظر إلى الخريطة...",
     "close": "إغلاق",
-    "applyMagic": "تطبيق السحر ✨"
+    "applyMagic": "تطبيق السحر ✨",
+    "sceneAlt": "مشهد قصصي مصور"
   },
   "galleryPage": {
     "mySavedBooks": "كتبي المحفوظة",
@@ -37,12 +43,17 @@
       "deleteFailed": "تعذر حذف القصة.",
       "sharedWithFriends": "تمت مشاركة القصة مع الأصدقاء.",
       "setPrivate": "تم تعيين القصة كخاصة.",
-      "shareFailed": "تعذر تحديث مشاركة القصة."
+      "shareFailed": "تعذر تحديث مشاركة القصة.",
+      "loadFailed": "تعذر تحميل القصص: {{message}}"
     },
     "sharing": {
       "label": "المشاركة",
       "private": "خاص",
       "friends": "الأصدقاء"
+    },
+    "deleteStoryTitle": "حذف القصة",
+    "errors": {
+      "unknown": "خطأ غير معروف."
     }
   },
   "friendLibrary": {
@@ -188,7 +199,21 @@
         "description": "حديث وجريء"
       }
     },
-    "back": "رجوع"
+    "back": "رجوع",
+    "voiceInput": {
+      "start": "بدء الإدخال الصوتي",
+      "stop": "إيقاف الإدخال الصوتي",
+      "errors": {
+        "unsupported": "التعرف على الكلام غير مدعوم في هذا المتصفح.",
+        "permissionDenied": "تم رفض إذن الميكروفون.",
+        "noMicrophone": "لم يتم العثور على ميكروفون.",
+        "noSpeech": "لم يتم اكتشاف أي كلام.",
+        "network": "التعرف على الكلام غير متاح بسبب خطأ في الشبكة.",
+        "languageNotSupported": "لغة التعرف على الكلام هذه غير مدعومة.",
+        "unexpected": "توقف التعرف على الكلام بشكل غير متوقع."
+      }
+    },
+    "photoPreviewAlt": "معاينة صورة الطفل المحددة"
   },
   "magicLoader": {
     "bindingTale": "ربط الحكاية...",
@@ -219,7 +244,7 @@
         "opening": "البداية",
         "ending": "النهاية"
       },
-      "turnPage": "اقلب الصفحة →",
+      "turnPage": "اقلب الصفحة",
       "ctaTitle": "هل يعجبك ما ترى؟",
       "ctaDescription": "سنكمل {{count}} لوحات بين البداية والنهاية.",
       "generateFull": "توليد القصة كاملة",
@@ -259,6 +284,17 @@
       "generationFailed": "فشل توليد القصة.",
       "noPanels": "فشل توليد القصة: لم يتم إرجاع أي لوحات.",
       "previewImagesMissing": "صور المعاينة مفقودة. يرجى إعادة توليد المعاينة."
+    },
+    "readAloud": {
+      "read": "قراءة القصة بصوت عال",
+      "pause": "إيقاف صوت القصة مؤقتا",
+      "resume": "استئناف صوت القصة",
+      "stop": "إيقاف صوت القصة",
+      "errors": {
+        "unsupported": "تحويل النص إلى كلام غير مدعوم في هذا المتصفح.",
+        "empty": "لا يوجد نص قصة لقراءته بصوت عال.",
+        "playbackFailed": "فشل تشغيل تحويل النص إلى كلام."
+      }
     }
   },
   "auth": {
@@ -274,7 +310,10 @@
       "submit": "إنشاء حساب",
       "submitting": "جارٍ إنشاء الحساب…",
       "footerText": "لديك حساب بالفعل؟",
-      "footerLink": "تسجيل الدخول"
+      "footerLink": "تسجيل الدخول",
+      "notifications": {
+        "accountCreated": "تم إنشاء الحساب."
+      }
     },
     "fields": {
       "emailLabel": "البريد الإلكتروني",
@@ -287,8 +326,30 @@
     "status": {
       "loading": "جارٍ التحميل…"
     },
+    "oauth": {
+      "separator": "أو",
+      "continueWithGoogle": "المتابعة باستخدام Google",
+      "redirectingToGoogle": "جارٍ التحويل إلى Google…",
+      "callback": {
+        "signingInTitle": "جارٍ تسجيل دخولك",
+        "signingInDescription": "جارٍ إكمال تسجيل الدخول عبر Google وتجهيز جلستك.",
+        "failedTitle": "فشل تسجيل الدخول عبر Google",
+        "retryDescription": "يرجى إعادة محاولة تسجيل الدخول عبر Google من صفحة تسجيل الدخول.",
+        "backToLogin": "العودة إلى تسجيل الدخول"
+      },
+      "errors": {
+        "linkConflict": "حساب Google هذا يطابق بريدًا إلكترونيًا يستخدم تسجيل الدخول بكلمة مرور بالفعل. سجّل الدخول بالبريد الإلكتروني وكلمة المرور بدلاً من ذلك.",
+        "cancelled": "تم إلغاء تسجيل الدخول عبر Google أو فشل. حاول مرة أخرى.",
+        "missingCode": "لم يتم العثور على رمز تفويض. يرجى محاولة تسجيل الدخول عبر Google مرة أخرى."
+      },
+      "notifications": {
+        "signInComplete": "اكتمل تسجيل الدخول عبر Google.",
+        "signInFailed": "فشل تسجيل الدخول عبر Google. حاول مرة أخرى."
+      }
+    },
     "errors": {
-      "authFailed": "فشل المصادقة"
+      "authFailed": "فشل المصادقة",
+      "oauthPasswordLogin": "يستخدم هذا الحساب تسجيل الدخول عبر Google. تابع باستخدام Google."
     }
   },
   "landing": {
@@ -764,7 +825,13 @@
     },
     "avatar": {
       "uploading": "جارٍ الرفع…",
-      "change": "تغيير الصورة"
+      "change": "تغيير الصورة",
+      "alt": "الصورة الرمزية لـ {{username}}"
+    },
+    "cropper": {
+      "previewAlt": "معاينة الصورة الرمزية",
+      "zoom": "تكبير",
+      "usePhoto": "استخدام الصورة"
     },
     "fields": {
       "username": "اسم المستخدم",
@@ -789,5 +856,9 @@
       "uploadFailed": "فشل الرفع",
       "logoutFailed": "فشل تسجيل الخروج"
     }
+  },
+  "languageSwitcher": {
+    "selectLanguage": "اختر اللغة",
+    "languageOptions": "خيارات اللغة"
   }
 }
