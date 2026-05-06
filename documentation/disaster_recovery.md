@@ -15,7 +15,7 @@ API, which is safe to run while the application is live (WAL mode).
 | Mechanism | SQLite `Connection.backup()` (online, no downtime) |
 | Schedule | On startup + every 24 hours automatically |
 | Retention | Last 7 snapshots (oldest deleted automatically) |
-| Storage | `backend_backups` named Docker volume, mounted at `/app/backups` in the container (Compose prefixes the physical name with the project name, e.g. `tran_main1_backend_backups`) |
+| Storage | `backend_backups` named Podman volume, mounted at `/app/backups` in the container (Compose prefixes the physical name with the project name, e.g. `tran_main1_backend_backups`) |
 | Filename format | `wondercomic_YYYYMMDD_HHMMSS_ffffff.db` (microsecond precision) |
 
 ### Manual Backup (API)
@@ -23,8 +23,8 @@ API, which is safe to run while the application is live (WAL mode).
 Trigger an immediate backup without restarting:
 
 ```bash
-# Docker deployment (through nginx on port 443)
-curl -k -X POST -H "Authorization: Bearer <token>" https://localhost/api/backup/trigger
+# Podman deployment (through nginx on host port 8443)
+curl -k -X POST -H "Authorization: Bearer <token>" https://localhost:8443/api/backup/trigger
 
 # Local dev (uvicorn direct, no nginx)
 curl -X POST -H "Authorization: Bearer <token>" http://localhost:8000/api/backup/trigger
@@ -33,8 +33,8 @@ curl -X POST -H "Authorization: Bearer <token>" http://localhost:8000/api/backup
 ### Check Backup Status (API)
 
 ```bash
-# Docker deployment
-curl -k https://localhost/api/backup/status
+# Podman deployment
+curl -k https://localhost:8443/api/backup/status
 
 # Local dev
 curl http://localhost:8000/api/backup/status
@@ -45,46 +45,46 @@ The `-k` flag skips certificate verification for the self-signed dev cert.
 
 ### Status UI
 
-Visit `https://localhost/status` (Docker) or `http://localhost:3000/status` (local dev)
+Visit `https://localhost:8443/status` (Podman) or `http://localhost:3000/status` (local dev)
 for a visual backup inventory and a **Back up now** button.
 
 ---
 
 ## Restore Procedures
 
-### Scenario 1 — Corrupt or missing database (Docker deployment)
+### Scenario 1 — Corrupt or missing database (Podman deployment)
 
 1. **Stop the backend container.**
    ```bash
-   docker compose stop backend
+   podman compose stop backend
    ```
 
 2. **Identify the backup to restore.**
    ```bash
-   docker compose run --rm --no-deps backend ls /app/backups
+   podman compose run --rm --no-deps backend ls /app/backups
    ```
    Pick the most recent `wondercomic_YYYYMMDD_HHMMSS_ffffff.db` file.
 
 3. **Copy the backup over the live database.**
    ```bash
-   docker compose run --rm --no-deps backend \
+   podman compose run --rm --no-deps backend \
      cp /app/backups/wondercomic_YYYYMMDD_HHMMSS_ffffff.db /app/wondercomic.db
    ```
    Replace `wondercomic_YYYYMMDD_HHMMSS_ffffff.db` with the chosen filename.
-   `docker compose run` starts a temporary container with the same volume mounts as
+   `podman compose run` starts a temporary container with the same volume mounts as
    the backend service (both the named backup volume and the bind-mounted app
    directory), so no manual volume name resolution is needed.
 
 4. **Restart the backend.**
    ```bash
-   docker compose start backend
+   podman compose start backend
    ```
 
-5. **Verify** by visiting `https://localhost/status` or running `curl -k https://localhost/health`.
+5. **Verify** by visiting `https://localhost:8443/status` or running `curl -k https://localhost:8443/health`.
 
 ---
 
-### Scenario 2 — Local development (no Docker)
+### Scenario 2 — Local development (no Podman)
 
 1. **Stop the running server** (Ctrl+C in the uvicorn terminal).
 
@@ -105,7 +105,7 @@ for a visual backup inventory and a **Back up now** button.
 If no backup exists the application will recreate an empty database with the
 correct schema on next startup (handled by `init_db()` in `db/database.py`).
 User-generated images stored in the `backend/images/` folder are unaffected
-because they live in a separate Docker volume (`backend_images`).
+because they live in a separate Podman volume (`backend_images`).
 
 ---
 

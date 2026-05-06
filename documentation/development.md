@@ -1,6 +1,6 @@
 # Development Guide
 
-## Local Development (without Docker)
+## Local Development (without Podman)
 
 **Backend** (from `backend/`):
 ```bash
@@ -16,16 +16,20 @@ npm test          # run tests (vitest)
 npm run build     # production build → dist/
 ```
 
-## Docker Compose Commands
+## Podman Compose Commands
 
 ```bash
-docker compose up --build      # Build and start (foreground)
-docker compose up --build -d   # Build and start (background)
-docker compose down            # Stop and remove containers
-docker compose logs -f         # Follow all service logs
-docker compose logs backend    # Backend logs only
-docker compose logs frontend   # Frontend logs only
+podman compose up --build      # Build and start (foreground)
+podman compose up --build -d   # Build and start (background)
+podman compose down            # Stop and remove containers
+podman compose logs -f         # Follow all service logs
+podman compose logs backend    # Backend logs only
+podman compose logs frontend   # Frontend logs only
 ```
+
+The container stack maps nginx to unprivileged host ports for no-sudo Fedora
+machines. Open `https://localhost:8443` for the app, or
+`http://localhost:8080` to test the HTTP-to-HTTPS redirect.
 
 ## Pre-push Checks
 

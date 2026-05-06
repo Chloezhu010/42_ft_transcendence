@@ -54,7 +54,7 @@ allowed_origins = [
     "http://localhost:5173",
     "http://localhost:3000",
     "http://localhost:3001",
-    "https://localhost",
+    "https://localhost:8443",
 ]
 if config.frontend_url not in allowed_origins:
     allowed_origins.append(config.frontend_url)

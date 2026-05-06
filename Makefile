@@ -1,10 +1,10 @@
 
 
 up:
-	docker compose up --build -d
+	podman compose up --build -d
 
 down:
-	docker compose down
+	podman compose down
 
 re: down up
 
@@ -17,8 +17,8 @@ clean:
 
 fclean:
 	# Stop and remove compose resources for this project
-	docker compose down --rmi all --volumes --remove-orphans
+	podman compose down --rmi all --volumes --remove-orphans
 	# Remove any dangling resources system-wide
-	docker system prune -af --volumes
+	podman system prune -af --volumes
 	# Extra safety: remove unused networks explicitly
-	docker network prune -f
+	podman network prune -f
