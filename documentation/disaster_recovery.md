@@ -45,8 +45,8 @@ After promotion, log in as that user through the web UI to obtain a fresh JWT.
 Both endpoints require an admin JWT token (see _Granting Admin Access_ above).
 
 ```bash
-# Docker deployment (through nginx on port 443)
-curl -k -X POST -H "Authorization: Bearer <token>" https://localhost/api/backup/trigger
+# Docker deployment (through nginx on host port 8443)
+curl -k -X POST -H "Authorization: Bearer <token>" https://localhost:8443/api/backup/trigger
 
 # Local dev (uvicorn direct, no nginx)
 curl -X POST -H "Authorization: Bearer <token>" http://localhost:8000/api/backup/trigger
@@ -67,7 +67,7 @@ The `-k` flag skips certificate verification for the self-signed dev cert.
 
 ### Status UI
 
-Visit `https://localhost/status` (Docker) or `http://localhost:3000/status` (local dev)
+Visit `https://localhost:8443/status` (Docker) or `http://localhost:3000/status` (local dev)
 for a visual backup inventory and a **Back up now** button.
 
 ---
@@ -127,7 +127,7 @@ Pass `RESTORE_BACKUP_SECRET` via `--env-file` so the script can authenticate.
    docker compose start backend backup-worker
    ```
 
-5. **Verify** by visiting `https://localhost/status` or running `curl -k https://localhost/health`.
+5. **Verify** by visiting `https://localhost:8443/status` or running `curl -k https://localhost:8443/health`.
 
 ---
 
