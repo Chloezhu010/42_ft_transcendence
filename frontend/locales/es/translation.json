@@ -191,7 +191,7 @@
     "eyeColor": "Color de ojos",
     "archetypes": {
       "explorer": {
-        "label": "Explorador Valiente",
+        "label": "Explorador",
         "description": "Busca aventuras."
       },
       "inventor": {

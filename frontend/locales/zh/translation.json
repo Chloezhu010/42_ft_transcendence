@@ -185,13 +185,13 @@
       "girl": "女孩",
       "neutral": "中性"
     },
-    "heroNamePlaceholder": "英雄的名字...",
+    "heroNamePlaceholder": "英雄名字...",
     "skinTone": "肤色",
     "hairColor": "发色",
     "eyeColor": "瞳孔颜色",
     "archetypes": {
       "explorer": {
-        "label": "勇敢的探险家",
+        "label": "探险家",
         "description": "寻求冒险。"
       },
       "inventor": {
@@ -236,7 +236,7 @@
         "noMicrophone": "未检测到麦克风。",
         "noSpeech": "未检测到语音。",
         "network": "由于网络错误，语音识别不可用。",
-        "languageNotSupported": "不支持此语音识别语言。",
+        "languageNotSupported": "不支持语音识别此语言。",
         "unexpected": "语音识别意外停止。"
       }
     },
@@ -248,7 +248,7 @@
   },
   "mainPage": {
     "title": "宝贝专属<accent>传奇</accent>",
-    "transformStories": "将睡前故事转变为电影漫画体验。",
+    "transformStories": "将睡前故事变为电影漫画体验。",
     "startAdventure": "开始您的冒险",
     "viewLibrary": "查看图书馆"
   },
@@ -336,7 +336,7 @@
       "title": "创建你的账号",
       "submit": "注册",
       "submitting": "正在注册…",
-      "footerText": "已经有账号？",
+      "footerText": "已有账号？",
       "footerLink": "登录",
       "notifications": {
         "accountCreated": "账号已创建。"
@@ -365,13 +365,13 @@
         "backToLogin": "返回登录"
       },
       "errors": {
-        "linkConflict": "此 Google 账号的邮箱已使用密码登录。请改用邮箱和密码登录。",
-        "cancelled": "Google 登录已取消或失败。请重试。",
+        "linkConflict": "此 Google 账号的邮箱已使用密码登录, 请改用邮箱和密码登录。",
+        "cancelled": "Google 登录已取消或失败, 请重试。",
         "missingCode": "未找到授权码。请重新尝试使用 Google 登录。"
       },
       "notifications": {
         "signInComplete": "Google 登录已完成。",
-        "signInFailed": "Google 登录失败，请重试。"
+        "signInFailed" : "Google 登录失败，请重试。"
       }
     },
     "errors": {

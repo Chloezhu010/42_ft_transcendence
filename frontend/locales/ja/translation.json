@@ -191,7 +191,7 @@
     "eyeColor": "目の色",
     "archetypes": {
       "explorer": {
-        "label": "勇敢な探検家",
+        "label": "探検家",
         "description": "冒険を求める。"
       },
       "inventor": {
@@ -211,7 +211,7 @@
     "artStyles": {
       "classic": {
         "label": "クラシックコミック",
-        "description": "太い線、鮮やかな色"
+        "description": "鮮やかな色"
       },
       "watercolor": {
         "label": "水彩画",
@@ -223,7 +223,7 @@
       },
       "digital": {
         "label": "デジタルポップ",
-        "description": "モダンで大胆"
+        "description": "モダンで個性的"
       }
     },
     "back": "戻る",

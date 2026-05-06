@@ -24,7 +24,7 @@ export interface ArchetypeOption {
 export type GenderOption = KidProfile['gender'];
 
 export const ARCHETYPES: ArchetypeOption[] = [
-  { id: 'explorer', label: 'Brave Explorer', Icon: Icons.Explorer, description: 'Seeking adventure.' },
+  { id: 'explorer', label: 'Explorer', Icon: Icons.Explorer, description: 'Seeking adventure.' },
   { id: 'inventor', label: 'Inventor', Icon: Icons.Inventor, description: 'Solves problems.' },
   { id: 'guardian', label: 'Guardian', Icon: Icons.Guardian, description: 'Protects others.' },
   { id: 'dreamer', label: 'Dreamer', Icon: Icons.Dreamer, description: 'Makes magic real.' },

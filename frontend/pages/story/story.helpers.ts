@@ -22,7 +22,7 @@ export function createEmptyKidProfile(): KidProfile {
     eyeColor: 'Blue',
     favoriteColor: 'Purple',
     dream: '',
-    archetype: 'Brave Explorer',
+    archetype: 'Explorer',
     language: undefined,
     photoUrl: '',
     artStyle: 'Classic Comic',
