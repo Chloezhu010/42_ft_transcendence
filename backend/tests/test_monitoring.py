@@ -37,7 +37,7 @@ import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-HTTPS_BASE = "https://localhost"
+HTTPS_BASE = "https://localhost:8443"
 GRAFANA_ADMIN_PASSWORD = os.environ.get("GRAFANA_ADMIN_PASSWORD", "admin")
 GRAFANA_URL = f"{HTTPS_BASE}/grafana"
 
@@ -487,7 +487,7 @@ class TestGrafanaSecurity:
         assert result != 0, "Port 3000 is open on the host — Grafana is directly reachable without nginx/HTTPS."
 
     def test_grafana_served_over_https_only(self, http):
-        """Grafana must be served via HTTPS (port 443 through nginx), not plain HTTP."""
+        """Grafana must be served via HTTPS through nginx, not plain HTTP."""
         response = http.get(f"{GRAFANA_URL}/login", timeout=10)
         assert response.url.startswith("https://"), f"Response URL is not HTTPS: {response.url}"
 

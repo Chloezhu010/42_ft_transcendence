@@ -23,8 +23,8 @@ API, which is safe to run while the application is live (WAL mode).
 Trigger an immediate backup without restarting:
 
 ```bash
-# Docker deployment (through nginx on port 443)
-curl -k -X POST -H "Authorization: Bearer <token>" https://localhost/api/backup/trigger
+# Docker deployment (through nginx on host port 8443)
+curl -k -X POST -H "Authorization: Bearer <token>" https://localhost:8443/api/backup/trigger
 
 # Local dev (uvicorn direct, no nginx)
 curl -X POST -H "Authorization: Bearer <token>" http://localhost:8000/api/backup/trigger
@@ -34,7 +34,7 @@ curl -X POST -H "Authorization: Bearer <token>" http://localhost:8000/api/backup
 
 ```bash
 # Docker deployment
-curl -k https://localhost/api/backup/status
+curl -k https://localhost:8443/api/backup/status
 
 # Local dev
 curl http://localhost:8000/api/backup/status
@@ -45,7 +45,7 @@ The `-k` flag skips certificate verification for the self-signed dev cert.
 
 ### Status UI
 
-Visit `https://localhost/status` (Docker) or `http://localhost:3000/status` (local dev)
+Visit `https://localhost:8443/status` (Docker) or `http://localhost:3000/status` (local dev)
 for a visual backup inventory and a **Back up now** button.
 
 ---
@@ -80,7 +80,7 @@ for a visual backup inventory and a **Back up now** button.
    docker compose start backend
    ```
 
-5. **Verify** by visiting `https://localhost/status` or running `curl -k https://localhost/health`.
+5. **Verify** by visiting `https://localhost:8443/status` or running `curl -k https://localhost:8443/health`.
 
 ---
 

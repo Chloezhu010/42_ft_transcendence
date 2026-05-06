@@ -78,7 +78,7 @@ _[Fill in per module once team finalizes selection]_
 - [ ] Finalize module table (reach 14 points)
 - [ ] Complete Individual Contributions section
 - [ ] `docker compose up --build` starts cleanly from a fresh clone
-- [ ] Open Chrome → https://localhost → zero console errors
+- [ ] Open Chrome → https://localhost:8443 → zero console errors
 - [ ] Privacy Policy and Terms of Service pages reachable from footer
 - [ ] All team members have commits visible in `git log`
 
