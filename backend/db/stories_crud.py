@@ -1,6 +1,7 @@
 """CRUD operations for stories."""
 
 import aiosqlite
+from typing import Literal
 
 from db.kid_profiles_crud import create_kid_profile, get_kid_profile
 from db.panels_crud import create_panels, get_panels_for_story
@@ -9,6 +10,7 @@ from schemas.stories import (
     PanelResponse,
     StoryCreate,
     StoryListItem,
+    StoryListResponse,
     StoryResponse,
     StoryUpdatePanels,
     StoryVisibility,
@@ -79,34 +81,91 @@ async def get_story_by_id(db: aiosqlite.Connection, story_id: int, user_id: int)
     return _build_story_response(row, profile, panels)
 
 
-async def list_stories(db: aiosqlite.Connection, user_id: int) -> list[StoryListItem]:
-    """Get all stories with summary info."""
+def _build_story_list_item(row, profile: KidProfileResponse) -> StoryListItem:
+    return StoryListItem(
+        id=row["id"],
+        title=row["title"],
+        cover_image_url=row["cover_image_path"],
+        visibility=row["visibility"],
+        is_unlocked=bool(row["is_unlocked"]),
+        created_at=row["created_at"],
+        profile=profile,
+    )
+
+
+async def list_stories(
+    db: aiosqlite.Connection,
+    user_id: int,
+    *,
+    search: str | None,
+    visibility: StoryVisibility | None,
+    archetype: str | None,
+    sort: Literal["recent", "oldest", "title_asc", "title_desc"],
+    page: int,
+    page_size: int,
+) -> StoryListResponse:
+    """Get filtered, sorted, paginated stories with summary info."""
+    search_term = f"%{search.strip().lower()}%" if search else None
+    archetype_value = archetype.strip() if archetype else None
+
+    where_clauses = ["s.user_id = ?"]
+    params: list[object] = [user_id]
+
+    if visibility:
+        where_clauses.append("s.visibility = ?")
+        params.append(visibility)
+
+    if archetype_value:
+        where_clauses.append("kp.archetype = ?")
+        params.append(archetype_value)
+
+    if search_term:
+        where_clauses.append("(LOWER(COALESCE(s.title, '')) LIKE ? OR LOWER(kp.name) LIKE ?)")
+        params.extend([search_term, search_term])
+
+    where_sql = " AND ".join(where_clauses)
+
+    if sort == "oldest":
+        order_sql = "s.created_at ASC"
+    elif sort == "title_asc":
+        order_sql = "LOWER(COALESCE(s.title, '')) ASC, s.created_at DESC"
+    elif sort == "title_desc":
+        order_sql = "LOWER(COALESCE(s.title, '')) DESC, s.created_at DESC"
+    else:
+        order_sql = "s.created_at DESC"
+
+    count_cursor = await db.execute(
+        f"""
+        SELECT COUNT(*) as total
+        FROM stories s
+        JOIN kid_profiles kp ON kp.id = s.kid_profile_id
+        WHERE {where_sql}
+        """,
+        params,
+    )
+    count_row = await count_cursor.fetchone()
+    total = count_row["total"] if count_row else 0
+
+    offset = (page - 1) * page_size
     cursor = await db.execute(
-        """
-        SELECT id, title, cover_image_path, visibility, is_unlocked, created_at, kid_profile_id
-        FROM stories
-        WHERE user_id = ?
-        ORDER BY created_at DESC
-    """,
-        (user_id,),
+        f"""
+        SELECT s.id, s.title, s.cover_image_path, s.visibility, s.is_unlocked, s.created_at, s.kid_profile_id
+        FROM stories s
+        JOIN kid_profiles kp ON kp.id = s.kid_profile_id
+        WHERE {where_sql}
+        ORDER BY {order_sql}
+        LIMIT ? OFFSET ?
+        """,
+        (*params, page_size, offset),
     )
     rows = await cursor.fetchall()
 
-    results = []
+    items: list[StoryListItem] = []
     for row in rows:
         profile = await get_kid_profile(db, row["kid_profile_id"])
-        results.append(
-            StoryListItem(
-                id=row["id"],
-                title=row["title"],
-                cover_image_url=row["cover_image_path"],
-                visibility=row["visibility"],
-                is_unlocked=bool(row["is_unlocked"]),
-                created_at=row["created_at"],
-                profile=profile,
-            )
-        )
-    return results
+        items.append(_build_story_list_item(row, profile))
+
+    return StoryListResponse(items=items, total=total, page=page, page_size=page_size)
 
 
 async def delete_story(db: aiosqlite.Connection, story_id: int, user_id: int) -> bool:

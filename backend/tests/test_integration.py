@@ -231,7 +231,7 @@ def test_story_full_lifecycle(client):
 
     # List — new story appears
     listing = client.get("/api/stories", headers=alice_h).json()
-    assert any(s["id"] == story_id for s in listing)
+    assert any(s["id"] == story_id for s in listing["items"])
 
     # Get by ID
     detail = client.get(f"/api/stories/{story_id}", headers=alice_h)
@@ -244,7 +244,8 @@ def test_story_full_lifecycle(client):
 
     # Confirm gone
     assert client.get(f"/api/stories/{story_id}", headers=alice_h).status_code == 404
-    assert all(s["id"] != story_id for s in client.get("/api/stories", headers=alice_h).json())
+    remaining = client.get("/api/stories", headers=alice_h).json()["items"]
+    assert all(s["id"] != story_id for s in remaining)
 
 
 def test_get_nonexistent_story_returns_404(client):
@@ -413,7 +414,7 @@ def test_owner_can_update_story_visibility(client):
 
     listing = client.get("/api/stories", headers=alice_h)
     assert listing.status_code == 200
-    assert listing.json()[0]["visibility"] == "shared_with_friends"
+    assert listing.json()["items"][0]["visibility"] == "shared_with_friends"
 
 
 def test_patch_story_nonexistent_returns_404(client):
@@ -465,7 +466,7 @@ def test_story_list_scoped_to_current_user(client):
 
     # Bob's list must be empty — he cannot see Alice's story
     bob_stories = client.get("/api/stories", headers=bob_h).json()
-    assert bob_stories == []
+    assert bob_stories["items"] == []
 
 
 def test_cannot_get_another_users_story(client):
