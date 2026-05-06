@@ -99,87 +99,35 @@ every 30 seconds; once the schema is ready the first backup runs immediately.
 
 ### Scenario 1 — Corrupt or missing database and/or images (Docker deployment)
 
+Use `restore_backup.py` — the same script as local dev, now working in Docker too.
+Pass `RESTORE_BACKUP_SECRET` via `--env-file` so the script can authenticate.
+
 1. **Stop the backend and backup-worker containers.**
    ```bash
    docker compose stop backend backup-worker
    ```
 
-2. **Remove WAL sidecar files.**
-   SQLite keeps a write-ahead log (`wondercomic.db-wal`) and shared-memory file
-   (`wondercomic.db-shm`) alongside the main database. If these files from the old
-   (possibly corrupt) database are present when the backend restarts with the restored
-   database, SQLite will attempt to apply them, causing inconsistency. Delete them first.
-   ```bash
-   docker compose run --rm --no-deps backend \
-     sh -c "rm -f /app/wondercomic.db-wal /app/wondercomic.db-shm"
-   ```
-
-3. **Identify the backup to restore.**
+2. **List available backups.**
    ```bash
    docker compose run --rm --no-deps backend ls /app/backups
    ```
-   Pick the most recent `wondercomic_YYYYMMDD_HHMMSS_ffffff.zip` file.
+   Note the filename you want to restore.
 
-4. **Extract the database from the backup archive.**
+3. **Run the restore script.**
    ```bash
-   docker compose run --rm --no-deps backend \
-     python3 -c "
-   import zipfile
-   with zipfile.ZipFile('/app/backups/wondercomic_YYYYMMDD_HHMMSS_ffffff.zip') as z:
-       z.extract('wondercomic.db', '/app')
-   "
+   docker compose run --rm --no-deps --env-file .env backend \
+     python3 /app/scripts/restore_backup.py
    ```
-   Replace `wondercomic_YYYYMMDD_HHMMSS_ffffff.zip` with the chosen filename.
+   The script will prompt for `RESTORE_BACKUP_SECRET`, list available backups,
+   ask you to choose one, confirm, then handle WAL removal, DB extraction, and
+   image restoration automatically.
 
-5. **Restore the images from the backup archive.**
-
-   The script below moves the existing `/app/images` tree aside before
-   extracting, so the restored state exactly matches the archive with no
-   stale or corrupt files left behind. It also validates every archive entry
-   against a resolved path to reject any `../` traversal attempts.
-
-   ```bash
-   docker compose run --rm --no-deps backend \
-     python3 -c "
-   import datetime, pathlib, sys, zipfile
-
-   zip_path = pathlib.Path('/app/backups/wondercomic_YYYYMMDD_HHMMSS_ffffff.zip')
-   images_dir = pathlib.Path('/app/images')
-   timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-   aside = images_dir.parent / f'images_{timestamp}.bak'
-   had_existing = images_dir.exists()
-
-   if had_existing:
-       images_dir.rename(aside)
-   images_dir.mkdir(parents=True)
-   images_root = images_dir.resolve()
-   count = 0
-
-   with zipfile.ZipFile(zip_path) as z:
-       for name in z.namelist():
-           if name.startswith('images/') and not name.endswith('/'):
-               rel = pathlib.Path(name).relative_to('images')
-               dest = (images_dir / rel).resolve()
-               if not dest.is_relative_to(images_root):
-                   print(f'Unsafe archive entry rejected: {name}', file=sys.stderr)
-                   sys.exit(1)
-               dest.parent.mkdir(parents=True, exist_ok=True)
-               dest.write_bytes(z.read(name))
-               count += 1
-
-   print(f'Restored {count} image(s).')
-   if had_existing:
-       print(f'Old images kept at {aside} — remove when verified.')
-   "
-   ```
-   Replace `wondercomic_YYYYMMDD_HHMMSS_ffffff.zip` with the chosen filename.
-
-6. **Restart the backend and backup-worker.**
+4. **Restart the backend and backup-worker.**
    ```bash
    docker compose start backend backup-worker
    ```
 
-7. **Verify** by visiting `https://localhost/status` or running `curl -k https://localhost/health`.
+5. **Verify** by visiting `https://localhost/status` or running `curl -k https://localhost/health`.
 
 ---
 

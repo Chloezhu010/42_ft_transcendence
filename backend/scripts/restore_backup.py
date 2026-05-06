@@ -8,14 +8,17 @@ Run from the repo root:
 import getpass
 import hmac
 import os
+import shutil
 import sys
 import zipfile
 from datetime import datetime
 from pathlib import Path
 
-# scripts/ → backend/ → repo root
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-BACKEND_DIR = REPO_ROOT / "backend"
+# scripts/ is one level inside the backend directory in both layouts:
+#   local : tran_main1/backend/scripts/restore_backup.py  → parent.parent = backend/
+#   Docker: /app/scripts/restore_backup.py                → parent.parent = /app/
+BACKEND_DIR = Path(__file__).resolve().parent.parent
+REPO_ROOT = BACKEND_DIR.parent
 ENV_FILE = REPO_ROOT / ".env"
 
 
@@ -101,9 +104,16 @@ def main() -> None:
     # Move existing images aside so the restored tree is an exact replica of the
     # archive — no stale files from newer or deleted content survive the restore.
     # The .bak directory remains as a safety net if extraction fails.
+    # When images_dir is a Docker named-volume mount point rename() raises OSError
+    # (EBUSY / cross-device); fall back to copying the contents and clearing in place.
     if images_dir.exists():
-        images_dir.rename(aside_dir)
-    images_dir.mkdir(parents=True)
+        try:
+            images_dir.rename(aside_dir)
+            images_dir.mkdir(parents=True)
+        except OSError:
+            shutil.copytree(str(images_dir), str(aside_dir))
+            for item in list(images_dir.iterdir()):
+                shutil.rmtree(str(item)) if item.is_dir() else item.unlink()
     image_count = 0
 
     try:

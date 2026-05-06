@@ -12,9 +12,11 @@ import sqlite3
 import sys
 from pathlib import Path
 
-# scripts/ → backend/ → repo root
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-BACKEND_DIR = REPO_ROOT / "backend"
+# scripts/ is one level inside the backend directory in both layouts:
+#   local : tran_main1/backend/scripts/promote_admin.py  → parent.parent = backend/
+#   Docker: /app/scripts/promote_admin.py                → parent.parent = /app/
+BACKEND_DIR = Path(__file__).resolve().parent.parent
+REPO_ROOT = BACKEND_DIR.parent
 ENV_FILE = REPO_ROOT / ".env"
 
 
