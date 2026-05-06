@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 
 from routers.api_keys import router as api_keys_router
 from routers.auth import router as auth_router
+from services.rate_limit import api_key_management_rate_limiter
 from tests.conftest import _init_test_db, make_test_app
 
 _ALICE = {"username": "alice", "email": "alice@example.com", "password": "Password123!"}
@@ -51,6 +52,35 @@ def test_post_keys_requires_jwt(client):
     response = client.post("/api/api-keys", json={"name": "Demo key"})
 
     assert response.status_code == 401
+
+
+def test_post_keys_returns_429_when_user_exceeds_quota(client):
+    asyncio.run(api_key_management_rate_limiter.configure(max_requests=2, window_seconds=60))
+    alice_headers = _signup(client, _ALICE)
+
+    first = client.post("/api/api-keys", json={"name": "First key"}, headers=alice_headers)
+    second = client.post("/api/api-keys", json={"name": "Second key"}, headers=alice_headers)
+    limited = client.post("/api/api-keys", json={"name": "Third key"}, headers=alice_headers)
+
+    assert first.status_code == 200
+    assert second.status_code == 200
+    assert limited.status_code == 429
+    assert limited.json()["detail"] == "API key management rate limit exceeded. Please try again later."
+    assert int(limited.headers["Retry-After"]) > 0
+
+
+def test_post_keys_rate_limit_is_per_user(client):
+    asyncio.run(api_key_management_rate_limiter.configure(max_requests=1, window_seconds=60))
+    alice_headers = _signup(client, _ALICE)
+    bob_headers = _signup(client, _BOB)
+
+    alice_first = client.post("/api/api-keys", json={"name": "Alice first"}, headers=alice_headers)
+    alice_limited = client.post("/api/api-keys", json={"name": "Alice second"}, headers=alice_headers)
+    bob_first = client.post("/api/api-keys", json={"name": "Bob first"}, headers=bob_headers)
+
+    assert alice_first.status_code == 200
+    assert alice_limited.status_code == 429
+    assert bob_first.status_code == 200
 
 
 def test_get_keys_lists_only_caller_keys(client):

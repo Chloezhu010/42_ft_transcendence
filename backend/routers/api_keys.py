@@ -7,15 +7,29 @@ from auth_utils import get_current_user
 from db import api_keys_crud
 from db.database import get_db
 from schemas import ApiKeyCreateRequest, ApiKeyCreateResponse, ApiKeyResponse
+from services.rate_limit import api_key_management_rate_limiter
 
 router = APIRouter(prefix="/api/api-keys", tags=["api-keys"])
+
+
+async def require_api_key_management_quota(current_user: dict = Depends(get_current_user)) -> dict:
+    """Apply per-user quota before mutating API key records."""
+    decision = await api_key_management_rate_limiter.check(f"user:{current_user['id']}")
+    if decision.allowed:
+        return current_user
+
+    raise HTTPException(
+        status_code=429,
+        detail="API key management rate limit exceeded. Please try again later.",
+        headers={"Retry-After": str(decision.retry_after_seconds)},
+    )
 
 
 @router.post("", response_model=ApiKeyCreateResponse)
 async def create_api_key(
     request: ApiKeyCreateRequest,
     db: aiosqlite.Connection = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(require_api_key_management_quota),
 ):
     """Create an API key for the current user and return the raw key once."""
     return await api_keys_crud.create_api_key(db, current_user["id"], request.name)
