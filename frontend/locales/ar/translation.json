@@ -191,7 +191,7 @@
     "eyeColor": "لون العين",
     "archetypes": {
       "explorer": {
-        "label": "مستكشف شجاع",
+        "label": "مستكشف",
         "description": "يبحث عن المغامرة."
       },
       "inventor": {
