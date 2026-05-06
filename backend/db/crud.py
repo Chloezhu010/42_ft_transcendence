@@ -3,6 +3,8 @@
 New code should import from the domain-specific `*_crud` modules.
 """
 
+import asyncio
+
 import aiosqlite
 
 from models import (
@@ -21,7 +23,7 @@ from services.image_storage import delete_local_image, save_base64_image
 
 # --- Kid Profile CRUD ---
 async def create_kid_profile(db: aiosqlite.Connection, profile: KidProfileCreate, user_id: int) -> int:
-    """Create a kid profile and return its ID."""
+    """Insert a kid profile row and return its ID. Does not commit — caller owns the transaction."""
     cursor = await db.execute(
         """
         INSERT INTO kid_profiles (
@@ -42,7 +44,6 @@ async def create_kid_profile(db: aiosqlite.Connection, profile: KidProfileCreate
             user_id,
         ),
     )
-    await db.commit()
     return cursor.lastrowid
 
 
@@ -70,7 +71,7 @@ async def get_kid_profile(db: aiosqlite.Connection, profile_id: int) -> KidProfi
 
 # --- Panel CRUD ---
 async def create_panels(db: aiosqlite.Connection, story_id: int, panels: list[PanelCreate]) -> None:
-    """Create panels for a story."""
+    """Insert panel rows for a story. Does not commit — caller owns the transaction."""
     for panel in panels:
         panel_filename = None
         if panel.image_base64:
@@ -83,7 +84,6 @@ async def create_panels(db: aiosqlite.Connection, story_id: int, panels: list[Pa
         """,
             (story_id, panel.panel_order, panel.text, panel.image_prompt, panel_filename),
         )
-    await db.commit()
 
 
 async def get_panels_for_story(db: aiosqlite.Connection, story_id: int) -> list[PanelResponse]:
@@ -128,7 +128,7 @@ def _build_story_response(row, profile: KidProfileResponse, panels: list[PanelRe
 
 
 async def create_story(db: aiosqlite.Connection, story: StoryCreate, user_id: int) -> StoryResponse:
-    """Create a story with profile and panels."""
+    """Create a story with profile and panels in a single transaction."""
     profile_id = await create_kid_profile(db, story.profile, user_id)
 
     cover_filename = None
@@ -152,11 +152,11 @@ async def create_story(db: aiosqlite.Connection, story: StoryCreate, user_id: in
             user_id,
         ),
     )
-    await db.commit()
-
     story_id = cursor.lastrowid
 
     await create_panels(db, story_id, story.panels)
+
+    await db.commit()
 
     return await get_story_by_id(db, story_id, user_id)
 
@@ -227,9 +227,11 @@ async def delete_story(db: aiosqlite.Connection, story_id: int, user_id: int) ->
     await db.execute("DELETE FROM stories WHERE id = ? AND user_id = ?", (story_id, user_id))
     await db.commit()
 
-    # Delete local image files
+    # Run image deletions off the event loop — delete_local_image acquires
+    # a shared flock which can block if a backup is in progress.
+    loop = asyncio.get_running_loop()
     for path in image_paths:
-        delete_local_image(path)
+        await loop.run_in_executor(None, delete_local_image, path)
 
     return True
 

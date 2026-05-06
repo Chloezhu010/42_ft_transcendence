@@ -5,6 +5,7 @@
 *.db-wal
 
 backend/images/
+backend/backups/
 **/__pycache__/
 backend/.venv/
 backend/.ruff_cache/

@@ -486,11 +486,16 @@
       "healthy": "Healthy",
       "unhealthy": "Unhealthy",
       "checks": {
-        "database": "Database"
+        "database": "Database",
+        "backup": "Backup"
       },
       "results": {
         "ok": "ok",
-        "unavailable": "unavailable"
+        "unavailable": "unavailable",
+        "never": "never",
+        "corrupted": "corrupted",
+        "schema_incomplete": "schema incomplete",
+        "stale": "stale"
       }
     },
     "backups": {

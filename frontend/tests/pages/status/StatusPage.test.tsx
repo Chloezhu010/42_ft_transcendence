@@ -300,6 +300,91 @@ describe('StatusPage', () => {
     });
   });
 
+  describe('auth-state transitions', () => {
+    it('does not commit stale backup data when auth changes before the request resolves', async () => {
+      let resolveBackup!: (data: typeof BACKUP_STATUS_WITH_ENTRIES) => void;
+      mockGetBackupStatus.mockReturnValueOnce(
+        new Promise<typeof BACKUP_STATUS_WITH_ENTRIES>((res) => {
+          resolveBackup = res;
+        }),
+      );
+
+      const { rerender } = render(
+        <MemoryRouter>
+          <StatusPage />
+        </MemoryRouter>,
+      );
+
+      // Health resolves; backup request is still in flight.
+      await waitFor(() => expect(screen.getByText(/1\.0\.0/)).toBeInTheDocument());
+
+      // Auth changes to non-admin before backup resolves.
+      mockUseAuth.mockReturnValue({ accessToken: null, currentUser: null });
+      rerender(
+        <MemoryRouter>
+          <StatusPage />
+        </MemoryRouter>,
+      );
+
+      // Stale backup request resolves after auth was revoked.
+      resolveBackup(BACKUP_STATUS_WITH_ENTRIES);
+
+      // Backup filenames must not appear.
+      await waitFor(() => {
+        expect(screen.queryByText(/wondercomic_20260426_100000\.db/)).not.toBeInTheDocument();
+      });
+    });
+
+    it('clears the backup section when the user loses admin access', async () => {
+      const { rerender } = render(
+        <MemoryRouter>
+          <StatusPage />
+        </MemoryRouter>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText(/wondercomic_20260426_100000\.db/)).toBeInTheDocument();
+      });
+
+      mockUseAuth.mockReturnValue({ accessToken: null, currentUser: null });
+      rerender(
+        <MemoryRouter>
+          <StatusPage />
+        </MemoryRouter>,
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByText(/wondercomic_20260426_100000\.db/)).not.toBeInTheDocument();
+      });
+    });
+
+    it('clears the backup section when the user loses the admin role', async () => {
+      const { rerender } = render(
+        <MemoryRouter>
+          <StatusPage />
+        </MemoryRouter>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText(/wondercomic_20260426_100000\.db/)).toBeInTheDocument();
+      });
+
+      mockUseAuth.mockReturnValue({
+        accessToken: 'test-token',
+        currentUser: { id: 1, username: 'admin', email: 'admin@example.com', avatar_url: null, is_online: true, is_admin: false, created_at: '2026-01-01T00:00:00+00:00' },
+      });
+      rerender(
+        <MemoryRouter>
+          <StatusPage />
+        </MemoryRouter>,
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByText(/wondercomic_20260426_100000\.db/)).not.toBeInTheDocument();
+      });
+    });
+  });
+
   describe('error state', () => {
     it('shows an error message when health status fetch fails', async () => {
       mockGetHealthStatus.mockRejectedValue(new Error('Service unavailable'));

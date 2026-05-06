@@ -486,11 +486,16 @@
       "healthy": "Opérationnel",
       "unhealthy": "Dégradé",
       "checks": {
-        "database": "Base de données"
+        "database": "Base de données",
+        "backup": "Sauvegarde"
       },
       "results": {
         "ok": "ok",
-        "unavailable": "indisponible"
+        "unavailable": "indisponible",
+        "never": "jamais",
+        "corrupted": "corrompu",
+        "schema_incomplete": "schéma incomplet",
+        "stale": "obsolète"
       }
     },
     "backups": {

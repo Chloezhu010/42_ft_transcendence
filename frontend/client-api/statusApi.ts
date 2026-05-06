@@ -19,16 +19,23 @@ export interface BackupStatus {
   backups: BackupEntry[];
 }
 
-export async function getHealthStatus(): Promise<HealthCheck> {
-  const response = await apiFetch(`${API_BASE_URL}/health`, { method: 'GET' });
+export async function getHealthStatus(options?: { signal?: AbortSignal }): Promise<HealthCheck> {
+  const response = await apiFetch(`${API_BASE_URL}/health`, { method: 'GET', signal: options?.signal });
   if (response.ok || response.status === 503) {
     return response.json() as Promise<HealthCheck>;
   }
   throw await buildApiError(response, 'Health check failed');
 }
 
-export async function getBackupStatus(): Promise<BackupStatus> {
-  const response = await apiFetch(`${API_BASE}/backup/status`, { method: 'GET' });
+export async function getBackupStatus(
+  accessToken: string,
+  options?: { signal?: AbortSignal },
+): Promise<BackupStatus> {
+  const response = await apiFetch(`${API_BASE}/backup/status`, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${accessToken}` },
+    signal: options?.signal,
+  });
   if (!response.ok) {
     throw await buildApiError(response, 'Failed to fetch backup status');
   }

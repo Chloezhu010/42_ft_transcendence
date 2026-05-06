@@ -486,11 +486,16 @@
       "healthy": "正常",
       "unhealthy": "异常",
       "checks": {
-        "database": "数据库"
+        "database": "数据库",
+        "backup": "备份"
       },
       "results": {
         "ok": "正常",
-        "unavailable": "不可用"
+        "unavailable": "不可用",
+        "never": "从未",
+        "corrupted": "已损坏",
+        "schema_incomplete": "结构不完整",
+        "stale": "已过期"
       }
     },
     "backups": {
