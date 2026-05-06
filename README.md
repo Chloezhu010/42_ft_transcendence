@@ -27,17 +27,18 @@ An AI-powered comic book generator for children. Authenticated users build a kid
 - **Docker** ≥ 24.x and **Docker Compose** v2
 - A **Google Gemini API key** (get one at https://aistudio.google.com/apikey)
 - Modern Chromium-based browser (Chrome / Edge) — required for the Web Speech API
-- Free TCP ports `443` (HTTPS) and `3000` (Vite dev server)
+- Free TCP port `443` (HTTPS, exposed by the nginx container)
 
 For local development outside Docker:
 - **Python ≥ 3.13** with [`uv`](https://github.com/astral-sh/uv)
 - **Node.js ≥ 20**
+- Free TCP port `3000` (Vite dev server)
 
 ### Setup
 
 ```bash
 git clone <this-repo>
-cd 42_ft_transcendence
+cd <this-repo>
 cp .env.example .env       # then fill in the required secrets below
 ```
 
@@ -132,9 +133,11 @@ users                              friendships
 ├── id PK                          ├── id PK
 ├── email UNIQUE NOT NULL          ├── requester_id  → users(id)
 ├── username UNIQUE NOT NULL       ├── addressee_id  → users(id)
-├── password_hash (bcrypt)         ├── status (pending/accepted/rejected/blocked)
-├── avatar_path                    └── created_at
+├── password_hash (bcrypt,         ├── status (pending/accepted/rejected)
+│   nullable for OAuth users)      └── created_at
+├── avatar_path
 ├── is_online
+├── is_admin
 ├── created_at
 └── updated_at
 
@@ -187,7 +190,7 @@ Full DDL and rationale: [Architecture → Database Schema](documentation/archite
 | Story gallery | Browse, re-read, and delete past stories | xinzhang |
 | Read-aloud (TTS) + voice prompts (STT) | Web Speech API integration for reading and dictation | ymiao |
 | Custom design system | 12 reusable React components (typography, buttons, cards, archetype icons) | xinzhang |
-| Notification system | `sonner`-based toasts wired across all user flows (34+ call sites) | xinzhang |
+| Notification system | `sonner`-based toasts wired across all user flows (34 call sites across 7 files) | xinzhang |
 | Internationalization | 6 languages: en/fr/es/zh/ja/ar; runtime language switcher | xinzhang |
 | RTL support | Arabic translation, logical-property CSS, ratcheting static audit, direction-aware UI | xinzhang |
 | HTTPS via nginx | TLS-terminating reverse proxy in Docker Compose | auzou |
@@ -224,13 +227,13 @@ Full DDL and rationale: [Architecture → Database Schema](documentation/archite
 
 2. **Public API — Major.** Five third-party endpoints under `routers/public_stories.py`, authenticated by `X-API-Key` header (`public_api_auth.py`), per-key fixed-window rate limiting (`services/rate_limit.py`), JWT-protected key management UI at `/api/api-keys`, and OpenAPI docs at `/docs`. See [Public API Usage](documentation/public_api_usage.md).
 
-3. **Notification system — Minor.** `sonner` v2 wired into 8 files across auth, profile, friends, gallery, and story flows (34+ toast call sites); covers success, error, and info states with consistent styling.
+3. **Notification system — Minor.** `sonner` v2 wired into 7 files across auth, profile, friends, gallery, and story flows (34 toast call sites); covers success, error, and info states with consistent styling.
 
 4. **Custom design system — Minor.** 12 reusable React components in `frontend/components/design-system/`: 4 typography (`Typography`, `Heading`, `Text`, `Label`), 4 sketchy form/layout primitives (`SketchyButton`, `SketchyCard`, `SketchyInput`, `SketchyTextarea`), 4 archetype icons (`Explorer`, `Inventor`, `Guardian`, `Dreamer`) sharing a typed `IconProps` contract.
 
 5. **Multiple languages — Minor.** Six languages (en, fr, es, zh, ja, ar) implemented with `i18next`. Language switcher in the navbar, full translation files in `frontend/locales/`. Exceeds the 3-language minimum.
 
-6. **RTL support — Minor (Accessibility).** Arabic is fully translated (859 lines). 49 logical-property class usages (`ms-/me-/ps-/pe-/start-/end-`); a ratcheting static audit (`tests/i18n/rtlAudit.test.ts`) blocks new physical-side classes; `getDirectionalArrow()` flips arrows; `i18n.on('languageChanged')` updates `<html dir>` + `<html lang>` for seamless switching.
+6. **RTL support — Minor (Accessibility).** Arabic is fully translated (859 lines). ~130 logical-property class usages (`ms-/me-/ps-/pe-/start-/end-`) across `app/`, `components/`, and `pages/`; a ratcheting static audit (`tests/i18n/rtlAudit.test.ts`) blocks new physical-side classes; `getDirectionalArrow()` flips arrows; `i18n.on('languageChanged')` updates `<html dir>` + `<html lang>` for seamless switching.
 
 7. **Standard user management — Major.** JWT signup/login (`routers/auth.py`), profile edit + avatar upload (`services/avatar_upload.py`), full friend request flow (`routers/friend.py`), online status tracking. All side-effects are user-scoped via the `current_user` dependency.
 

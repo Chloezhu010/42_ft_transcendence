@@ -182,9 +182,9 @@ friendships
 ├── addressee_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
 ├── status        TEXT NOT NULL DEFAULT 'pending'
 │                 CHECK(status IN ('pending','accepted','rejected'))
-├── created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-│  CHECK(requester_id != addressee_id)
-└─ UNIQUE(requester_id, addressee_id)
+└── created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+   table-level: CHECK(requester_id != addressee_id),
+                UNIQUE(requester_id, addressee_id)
 
 oauth_accounts
 ├── id                INTEGER PRIMARY KEY AUTOINCREMENT
@@ -193,8 +193,8 @@ oauth_accounts
 ├── provider_user_id  TEXT NOT NULL
 ├── provider_email    TEXT
 ├── created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-├── updated_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-└─ UNIQUE(provider, provider_user_id)
+└── updated_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+   table-level: UNIQUE(provider, provider_user_id)
 
 oauth_results                              ← short-lived OAuth handoff codes
 ├── code        TEXT PRIMARY KEY
@@ -239,8 +239,8 @@ panels
 ├── text         TEXT NOT NULL
 ├── image_prompt TEXT
 ├── image_path   TEXT
-├── created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-└─ UNIQUE(story_id, panel_order)
+└── created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+   table-level: UNIQUE(story_id, panel_order)
 
 api_keys
 ├── id           INTEGER PRIMARY KEY AUTOINCREMENT
