@@ -85,6 +85,15 @@ class StoryListItem(BaseModel):
     profile: KidProfileResponse
 
 
+class StoryListResponse(BaseModel):
+    """Paginated story list response."""
+
+    items: list[StoryListItem]
+    total: int
+    page: int
+    page_size: int
+
+
 class StoryResponse(BaseModel):
     """Full story details."""
 

@@ -3,7 +3,9 @@ Story CRUD API routes.
 """
 
 import aiosqlite
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Literal
+
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from auth_utils import get_current_user
 from db import stories_crud
@@ -14,8 +16,10 @@ from metrics import story_funnel_total
 from schemas import (
     StoryCreate,
     StoryListItem,
+    StoryListResponse,
     StoryResponse,
     StoryUpdatePanels,
+    StoryVisibility,
     StoryVisibilityUpdateRequest,
     UpdatePanelImageRequest,
 )
@@ -37,10 +41,28 @@ async def create_story(
     return result
 
 
-@router.get("/stories", response_model=list[StoryListItem])
-async def list_stories(db: aiosqlite.Connection = Depends(get_db), current_user: dict = Depends(get_current_user)):
-    """Get all stories (summary view)."""
-    return await stories_crud.list_stories(db, current_user["id"])
+@router.get("/stories", response_model=StoryListResponse)
+async def list_stories(
+    search: str | None = None,
+    visibility: StoryVisibility | Literal["all"] = "all",
+    archetype: str | None = None,
+    sort: Literal["recent", "oldest", "title_asc", "title_desc"] = "recent",
+    page: int = Query(1, ge=1),
+    page_size: int = Query(8, ge=1, le=40),
+    db: aiosqlite.Connection = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    """Get stories with optional filters, sorting, and pagination."""
+    return await stories_crud.list_stories(
+        db,
+        current_user["id"],
+        search=search,
+        visibility=None if visibility == "all" else visibility,
+        archetype=archetype,
+        sort=sort,
+        page=page,
+        page_size=page_size,
+    )
 
 
 @router.get("/stories/{story_id}", response_model=StoryResponse)
