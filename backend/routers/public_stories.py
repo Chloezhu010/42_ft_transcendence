@@ -40,7 +40,10 @@ async def create_public_story(
     api_key_context: dict = Depends(require_public_api_quota),
 ):
     """Create a story owned by the API key owner."""
-    return await stories_crud.create_story(db, story, api_key_context["user_id"])
+    result = await stories_crud.create_story(db, story, api_key_context["user_id"])
+    if result is None:
+        raise HTTPException(status_code=500, detail="Failed to create story")
+    return result
 
 
 @router.put("/stories/{story_id}/visibility", response_model=StoryResponse)
