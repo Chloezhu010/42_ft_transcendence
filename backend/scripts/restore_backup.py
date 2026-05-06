@@ -143,12 +143,13 @@ def main() -> None:
         print(f"Error: {chosen.name} is not a valid zip file.", file=sys.stderr)
         sys.exit(1)
 
+    if aside_dir.exists():
+        shutil.rmtree(str(aside_dir))
+
     print("\nRestore complete.")
     print(f"  Database restored to: {db_path}")
     print(f"  Images restored:      {image_count}")
     print(f"  Backup used:          {chosen.name}")
-    if aside_dir.exists():
-        print(f"  Old images kept at:   {aside_name}/  (remove when verified)")
 
 
 if __name__ == "__main__":

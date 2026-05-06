@@ -115,7 +115,7 @@ Pass `RESTORE_BACKUP_SECRET` via `--env-file` so the script can authenticate.
 
 3. **Run the restore script.**
    ```bash
-   docker compose run --rm --no-deps --env-file .env backend \
+   docker compose run --rm --no-deps backend \
      python3 /app/scripts/restore_backup.py
    ```
    The script will prompt for `RESTORE_BACKUP_SECRET`, list available backups,

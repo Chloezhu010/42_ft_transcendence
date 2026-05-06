@@ -132,6 +132,9 @@ def _locked_backup(db_path: str) -> str:
             timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S_%f")
             filename = f"wondercomic_{timestamp}.zip"
             _sync_backup(db_path, BACKUP_DIR / filename)
+            # Remove legacy .db-format backups from before the zip migration.
+            for legacy in BACKUP_DIR.glob("wondercomic_*.db"):
+                legacy.unlink(missing_ok=True)
             existing = sorted(BACKUP_DIR.glob("wondercomic_*.zip"))
             for old in existing[:-MAX_BACKUPS]:
                 old.unlink(missing_ok=True)
