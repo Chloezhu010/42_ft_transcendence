@@ -34,9 +34,36 @@
   },
   "galleryPage": {
     "mySavedBooks": "保存された書籍",
+    "resultsCount": "全{{total}}件中{{shown}}件を表示",
     "noStoriesFound": "まだストーリーが見つかりません。",
+    "noResults": "検索条件に一致するストーリーがありません。",
     "readNow": "今読む",
     "untitledMasterpiece": "無題の傑作",
+    "search": {
+      "label": "検索",
+      "placeholder": "タイトルまたはヒーローで検索"
+    },
+    "filters": {
+      "visibility": "公開範囲",
+      "visibilityAll": "すべて",
+      "visibilityPrivate": "非公開",
+      "visibilityFriends": "フレンド",
+      "archetype": "アーキタイプ",
+      "archetypeAll": "すべてのアーキタイプ",
+      "reset": "フィルターをリセット"
+    },
+    "sort": {
+      "label": "並び替え",
+      "recent": "新しい順",
+      "oldest": "古い順",
+      "titleAsc": "タイトル (A-Z)",
+      "titleDesc": "タイトル (Z-A)"
+    },
+    "pagination": {
+      "previous": "前へ",
+      "next": "次へ",
+      "pageOf": "{{total}}ページ中{{page}}ページ"
+    },
     "deleteStory": "このストーリーを削除してもよろしいですか？これは元に戻すことはできません。",
     "notifications": {
       "storyDeleted": "ストーリーを削除しました。",

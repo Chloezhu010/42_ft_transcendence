@@ -34,9 +34,36 @@
   },
   "galleryPage": {
     "mySavedBooks": "Mes Livres Sauvegardés",
+    "resultsCount": "Affichage de {{shown}} sur {{total}} histoires",
     "noStoriesFound": "Aucune histoire trouvée pour le moment.",
+    "noResults": "Aucune histoire ne correspond à votre recherche.",
     "readNow": "LIRE MAINTENANT",
     "untitledMasterpiece": "Chef-d'œuvre sans titre",
+    "search": {
+      "label": "Rechercher",
+      "placeholder": "Rechercher par titre ou héros"
+    },
+    "filters": {
+      "visibility": "Visibilité",
+      "visibilityAll": "Toutes",
+      "visibilityPrivate": "Privé",
+      "visibilityFriends": "Amis",
+      "archetype": "Archétype",
+      "archetypeAll": "Tous les archétypes",
+      "reset": "Réinitialiser les filtres"
+    },
+    "sort": {
+      "label": "Trier",
+      "recent": "Les plus récentes",
+      "oldest": "Les plus anciennes",
+      "titleAsc": "Titre (A-Z)",
+      "titleDesc": "Titre (Z-A)"
+    },
+    "pagination": {
+      "previous": "Précédent",
+      "next": "Suivant",
+      "pageOf": "Page {{page}} sur {{total}}"
+    },
     "deleteStory": "Êtes-vous sûr de vouloir supprimer cette histoire? Cela ne peut pas être annulé.",
     "notifications": {
       "storyDeleted": "Histoire supprimée.",

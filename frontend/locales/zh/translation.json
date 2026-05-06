@@ -34,9 +34,41 @@
   },
   "galleryPage": {
     "mySavedBooks": "我保存的书籍",
+    "resultsCount": "显示 {{shown}} / {{total}} 个故事",
     "noStoriesFound": "还没有找到任何故事。",
+<<<<<<< HEAD
     "readNow": "现在阅读",
     "untitledMasterpiece": "无标题杰作",
+=======
+    "noResults": "没有符合搜索条件的故事。",
+    "readNow": "现在阅读",
+    "untitledMasterpiece": "无标题杰作",
+    "search": {
+      "label": "搜索",
+      "placeholder": "按标题或主角搜索"
+    },
+    "filters": {
+      "visibility": "可见性",
+      "visibilityAll": "全部",
+      "visibilityPrivate": "私密",
+      "visibilityFriends": "好友",
+      "archetype": "原型",
+      "archetypeAll": "全部原型",
+      "reset": "重置筛选"
+    },
+    "sort": {
+      "label": "排序",
+      "recent": "最新",
+      "oldest": "最早",
+      "titleAsc": "标题 (A-Z)",
+      "titleDesc": "标题 (Z-A)"
+    },
+    "pagination": {
+      "previous": "上一页",
+      "next": "下一页",
+      "pageOf": "第 {{page}} / {{total}} 页"
+    },
+>>>>>>> ead7eb7 (feat/add advanced search functionality with filters, sorting, and pagination from both frontend and backend)
     "deleteStory": "您确定要删除此故事吗？这将无法撤消。",
     "notifications": {
       "storyDeleted": "故事已删除。",

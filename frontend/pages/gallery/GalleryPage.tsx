@@ -3,6 +3,7 @@
  * Renders loading, empty, and card-grid states from page-level data.
  */
 import { Link } from 'react-router-dom';
+import { useMemo } from 'react';
 import type { StoryListItem, StoryVisibility } from '@api';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
@@ -144,13 +145,121 @@ function StoryCard({ story, onDeleteStory, onUpdateVisibility }: StoryCardProps)
 }
 
 function GalleryPage(): JSX.Element {
-  const { isLoading, onDeleteStory, onUpdateVisibility, stories } = useGalleryPage();
+  const {
+    archetypeFilter,
+    filteredCount,
+    isLoading,
+    onArchetypeFilterChange,
+    onDeleteStory,
+    onPageChange,
+    onResetFilters,
+    onSearchChange,
+    onSortChange,
+    onUpdateVisibility,
+    onVisibilityFilterChange,
+    page,
+    searchQuery,
+    sortKey,
+    stories,
+    totalCount,
+    totalPages,
+    visibilityFilter,
+    visibleStories,
+  } = useGalleryPage();
   const { t } = useTranslation();
+  const archetypeOptions = useMemo(() => ARCHETYPES.map((option) => option.id), []);
+  const filtersActive = Boolean(
+    searchQuery.trim() || visibilityFilter !== 'all' || archetypeFilter !== 'all' || sortKey !== 'recent'
+  );
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 animate-in fade-in duration-700">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-4xl font-black text-gray-800">{t('galleryPage.mySavedBooks')}</h2>
+      <div className="flex flex-col gap-6 mb-8">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 className="text-4xl font-black text-gray-800">{t('galleryPage.mySavedBooks')}</h2>
+            <p className="text-sm text-gray-500 mt-1">
+              {t('galleryPage.resultsCount', { shown: filteredCount, total: totalCount })}
+            </p>
+          </div>
+          {filtersActive ? (
+            <button
+              type="button"
+              onClick={onResetFilters}
+              className="text-sm font-semibold text-purple-700 hover:text-purple-900 transition-colors"
+            >
+              {t('galleryPage.filters.reset')}
+            </button>
+          ) : null}
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+          <div className="flex flex-col gap-2">
+            <label htmlFor="gallery-search" className="text-xs font-bold uppercase tracking-[0.18em] text-gray-400">
+              {t('galleryPage.search.label')}
+            </label>
+            <input
+              id="gallery-search"
+              type="search"
+              value={searchQuery}
+              onChange={(event) => onSearchChange(event.target.value)}
+              placeholder={t('galleryPage.search.placeholder')}
+              className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 shadow-sm focus:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-200"
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="gallery-visibility" className="text-xs font-bold uppercase tracking-[0.18em] text-gray-400">
+              {t('galleryPage.filters.visibility')}
+            </label>
+            <select
+              id="gallery-visibility"
+              value={visibilityFilter}
+              onChange={(event) => onVisibilityFilterChange(event.target.value as 'all' | StoryVisibility)}
+              className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 shadow-sm focus:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-200"
+            >
+              <option value="all">{t('galleryPage.filters.visibilityAll')}</option>
+              <option value="private">{t('galleryPage.filters.visibilityPrivate')}</option>
+              <option value="shared_with_friends">{t('galleryPage.filters.visibilityFriends')}</option>
+            </select>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="gallery-archetype" className="text-xs font-bold uppercase tracking-[0.18em] text-gray-400">
+              {t('galleryPage.filters.archetype')}
+            </label>
+            <select
+              id="gallery-archetype"
+              value={archetypeFilter}
+              onChange={(event) => onArchetypeFilterChange(event.target.value)}
+              className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 shadow-sm focus:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-200"
+            >
+              <option value="all">{t('galleryPage.filters.archetypeAll')}</option>
+              {archetypeOptions.map((archetype) => (
+                <option key={archetype} value={archetype}>
+                  {getArchetypeLabel(archetype, t)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="gallery-sort" className="text-xs font-bold uppercase tracking-[0.18em] text-gray-400">
+              {t('galleryPage.sort.label')}
+            </label>
+            <select
+              id="gallery-sort"
+              value={sortKey}
+              onChange={(event) => onSortChange(event.target.value as typeof sortKey)}
+              className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 shadow-sm focus:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-200"
+            >
+              <option value="recent">{t('galleryPage.sort.recent')}</option>
+              <option value="oldest">{t('galleryPage.sort.oldest')}</option>
+              <option value="title_asc">{t('galleryPage.sort.titleAsc')}</option>
+              <option value="title_desc">{t('galleryPage.sort.titleDesc')}</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       {isLoading ? (
@@ -158,22 +267,56 @@ function GalleryPage(): JSX.Element {
           <div className="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          {stories.map((story) => (
-            <StoryCard
-              key={story.id}
-              story={story}
-              onDeleteStory={onDeleteStory}
-              onUpdateVisibility={onUpdateVisibility}
-            />
-          ))}
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            {visibleStories.map((story) => (
+              <StoryCard
+                key={story.id}
+                story={story}
+                onDeleteStory={onDeleteStory}
+                onUpdateVisibility={onUpdateVisibility}
+              />
+            ))}
 
-          {stories.length === 0 && (
-            <div className="col-span-full text-center py-20 text-gray-400">
-              <p className="text-xl font-medium italic">{t('galleryPage.noStoriesFound')}</p>
+            {totalCount === 0 && (
+              <div className="col-span-full text-center py-20 text-gray-400">
+                <p className="text-xl font-medium italic">{t('galleryPage.noStoriesFound')}</p>
+              </div>
+            )}
+
+            {totalCount > 0 && filteredCount === 0 && (
+              <div className="col-span-full text-center py-20 text-gray-400">
+                <p className="text-xl font-medium italic">{t('galleryPage.noResults')}</p>
+              </div>
+            )}
+          </div>
+
+          {totalCount > 0 && filteredCount > 0 && (
+            <div className="mt-10 flex flex-wrap items-center justify-between gap-4">
+              <p className="text-sm text-gray-500">
+                {t('galleryPage.pagination.pageOf', { page, total: totalPages })}
+              </p>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => onPageChange(page - 1)}
+                  disabled={page <= 1}
+                  className="px-4 py-2 rounded-full border border-gray-200 text-sm font-semibold text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed hover:border-purple-200 hover:text-purple-900 transition-colors"
+                >
+                  {t('galleryPage.pagination.previous')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onPageChange(page + 1)}
+                  disabled={page >= totalPages}
+                  className="px-4 py-2 rounded-full border border-gray-200 text-sm font-semibold text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed hover:border-purple-200 hover:text-purple-900 transition-colors"
+                >
+                  {t('galleryPage.pagination.next')}
+                </button>
+              </div>
             </div>
           )}
-        </div>
+        </>
       )}
     </div>
   );

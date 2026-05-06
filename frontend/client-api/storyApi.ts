@@ -54,6 +54,24 @@ export interface StoryListItem {
   profile: KidProfileResponse;
 }
 
+export interface StoryListResponse {
+  items: StoryListItem[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export type StoryListSortKey = 'recent' | 'oldest' | 'title_asc' | 'title_desc';
+
+export interface StoryListQuery {
+  search?: string;
+  visibility?: StoryVisibility | 'all';
+  archetype?: string;
+  sort?: StoryListSortKey;
+  page?: number;
+  pageSize?: number;
+}
+
 export interface SaveStoryParams {
   profile: {
     name: string;
@@ -164,8 +182,36 @@ export async function updatePanelImage(
 /**
  * Get list of all saved stories for the authenticated user.
  */
-export async function getStories(accessToken: string): Promise<StoryListItem[]> {
-  const response = await apiFetch(`${API_BASE}/stories`, {
+export async function getStories(accessToken: string, query: StoryListQuery = {}): Promise<StoryListResponse> {
+  const params = new URLSearchParams();
+
+  if (query.search) {
+    params.set('search', query.search);
+  }
+
+  if (query.visibility) {
+    params.set('visibility', query.visibility);
+  }
+
+  if (query.archetype) {
+    params.set('archetype', query.archetype);
+  }
+
+  if (query.sort) {
+    params.set('sort', query.sort);
+  }
+
+  if (query.page) {
+    params.set('page', String(query.page));
+  }
+
+  if (query.pageSize) {
+    params.set('page_size', String(query.pageSize));
+  }
+
+  const queryString = params.toString();
+  const url = queryString ? `${API_BASE}/stories?${queryString}` : `${API_BASE}/stories`;
+  const response = await apiFetch(url, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
 
@@ -173,7 +219,7 @@ export async function getStories(accessToken: string): Promise<StoryListItem[]> 
     throw await buildApiError(response, 'Failed to fetch stories');
   }
 
-  return (await response.json()) as StoryListItem[];
+  return (await response.json()) as StoryListResponse;
 }
 
 /**

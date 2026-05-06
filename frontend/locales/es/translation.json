@@ -34,9 +34,36 @@
   },
   "galleryPage": {
     "mySavedBooks": "Mis Libros Guardados",
+    "resultsCount": "Mostrando {{shown}} de {{total}} historias",
     "noStoriesFound": "Ninguna historia encontrada aún.",
+    "noResults": "Ninguna historia coincide con tu búsqueda.",
     "readNow": "LEER AHORA",
     "untitledMasterpiece": "Obra Maestra sin Título",
+    "search": {
+      "label": "Buscar",
+      "placeholder": "Buscar por título o héroe"
+    },
+    "filters": {
+      "visibility": "Visibilidad",
+      "visibilityAll": "Todas",
+      "visibilityPrivate": "Privado",
+      "visibilityFriends": "Amigos",
+      "archetype": "Arquetipo",
+      "archetypeAll": "Todos los arquetipos",
+      "reset": "Restablecer filtros"
+    },
+    "sort": {
+      "label": "Ordenar",
+      "recent": "Más recientes",
+      "oldest": "Más antiguas",
+      "titleAsc": "Título (A-Z)",
+      "titleDesc": "Título (Z-A)"
+    },
+    "pagination": {
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "pageOf": "Página {{page}} de {{total}}"
+    },
     "deleteStory": "¿Está seguro de que desea eliminar esta historia? Esto no se puede deshacer.",
     "notifications": {
       "storyDeleted": "Historia eliminada.",

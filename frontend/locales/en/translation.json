@@ -34,9 +34,36 @@
   },
   "galleryPage": {
     "mySavedBooks": "My Saved Books",
+    "noResults": "No stories match your search yet.",
+    "resultsCount": "Showing {{shown}} of {{total}} stories",
     "noStoriesFound": "No stories found yet.",
     "readNow": "READ NOW",
     "untitledMasterpiece": "Untitled Masterpiece",
+    "search": {
+      "label": "Search",
+      "placeholder": "Search by title or hero"
+    },
+    "filters": {
+      "visibility": "Visibility",
+      "visibilityAll": "All",
+      "visibilityPrivate": "Private",
+      "visibilityFriends": "Friends",
+      "archetype": "Archetype",
+      "archetypeAll": "All archetypes",
+      "reset": "Reset filters"
+    },
+    "sort": {
+      "label": "Sort",
+      "recent": "Newest first",
+      "oldest": "Oldest first",
+      "titleAsc": "Title (A-Z)",
+      "titleDesc": "Title (Z-A)"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "pageOf": "Page {{page}} of {{total}}"
+    },
     "deleteStory": "Are you sure you want to delete this story? This cannot be undone.",
     "notifications": {
       "storyDeleted": "Story deleted.",
