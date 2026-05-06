@@ -17,7 +17,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from config import get_config
 from db.backup import create_backup
 from db.database import init_db
-from routers import auth, backup, friend, generation, health, monitoring, stories, user
+from routers import api_keys, auth, backup, friend, generation, health, monitoring, public_stories, stories, user
 
 _BACKUP_INTERVAL_SECONDS = 24 * 60 * 60
 
@@ -63,8 +63,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "X-API-Key"],
 )
 
 app.add_middleware(
@@ -94,10 +94,12 @@ app.mount("/images", StaticFiles(directory=str(images_dir)), name="images")
 
 # Register routers
 app.include_router(auth.router)
+app.include_router(api_keys.router)
 app.include_router(user.router)
 app.include_router(friend.router)
 app.include_router(generation.router)
 app.include_router(stories.router)
+app.include_router(public_stories.router)
 app.include_router(monitoring.router)
 app.include_router(backup.router)
 app.include_router(health.router)

@@ -1,3 +1,4 @@
+import asyncio
 import os
 
 os.environ.setdefault("GEMINI_API_KEY", "test-gemini-key")
@@ -9,10 +10,19 @@ os.environ.setdefault("GOOGLE_REDIRECT_URI", "http://localhost:8000/api/auth/oau
 os.environ.setdefault("BCRYPT_ROUNDS", "4")
 
 import aiosqlite
+import pytest
 from fastapi import FastAPI
 from fastapi.routing import APIRouter
 
 from db.database import _create_tables, get_db
+from services.rate_limit import api_key_management_rate_limiter
+
+
+@pytest.fixture(autouse=True)
+def reset_api_key_management_rate_limiter():
+    asyncio.run(api_key_management_rate_limiter.configure(max_requests=10, window_seconds=60))
+    yield
+    asyncio.run(api_key_management_rate_limiter.configure(max_requests=10, window_seconds=60))
 
 
 async def _init_test_db(db_path: str) -> None:
