@@ -55,4 +55,4 @@
 | ✅ | Already implemented — claimable now |
 | ⚠️ | Partially implemented — needs specific work to claim |
 | ❌ | Not started |
-| 🚫 | Blocked — requires a game module (we have none) |
+| 🚫 | Blocked |

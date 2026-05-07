@@ -59,5 +59,5 @@
 
 ## AI usage during development
 
-- **Claude Code (Anthropic)** — used by the team for: scaffold analysis against the subject, gap analysis on module requirements, README and `CLAUDE.md` drafting, architecture diagram drafting, exploratory refactor proposals, and pair-style debugging on tricky integration points (Gemini streaming JSON parser, RTL logical-property migration). Every AI-suggested change was read, understood, and edited by the responsible team member before being committed; no generated code was merged unreviewed.
+- **Claude Code & Codex** — used by the team for: scaffold analysis against the subject, gap analysis on module requirements, README and `AGENTS.md`/`CLAUDE.md` drafting, architecture diagram drafting, exploratory refactor proposals, and pair-style debugging on tricky integration points (Gemini streaming JSON parser, RTL logical-property migration). Every AI-suggested change was read, understood, and edited by the responsible team member before being committed; no generated code was merged unreviewed.
 - **GitHub Copilot** — occasional inline completion during routine boilerplate (TypeScript types, test scaffolds). Not used for design or architectural decisions.
