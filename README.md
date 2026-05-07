@@ -27,7 +27,7 @@ An AI-powered comic book generator for children. Authenticated users build a kid
 - **Docker** ≥ 24.x and **Docker Compose** v2
 - A **Google Gemini API key** (get one at https://aistudio.google.com/apikey)
 - Modern Chromium-based browser (Chrome / Edge) — required for the Web Speech API
-- Free TCP port `443` (HTTPS, exposed by the nginx container)
+- Free TCP port `8443` (HTTPS, exposed by the nginx container)
 
 For local development outside Docker:
 - **Python ≥ 3.13** with [`uv`](https://github.com/astral-sh/uv)
@@ -49,10 +49,10 @@ cp .env.example .env       # then fill in the required secrets below
 | `GEMINI_API_KEY` | Google Gemini API key | **Yes** |
 | `JWT_SECRET_KEY` | Secret used to sign JWT access tokens | **Yes** |
 | `SESSION_SECRET_KEY` | Secret used to sign backend session cookies | **Yes** |
-| `GOOGLE_OAUTH_CLIENT_ID` | OAuth 2.0 client ID (for Google login) | Optional |
-| `GOOGLE_OAUTH_CLIENT_SECRET` | OAuth 2.0 client secret | Optional |
+| `GOOGLE_CLIENT_ID` | OAuth 2.0 client ID (for Google login) | Optional |
+| `GOOGLE_CLIENT_SECRET` | OAuth 2.0 client secret | Optional |
 | `VITE_API_BASE_URL` | Backend URL seen by browser for local backend-only dev (default: same origin in Docker) | No |
-| `FRONTEND_URL` | CORS allowed origin (Docker default: `https://localhost`; local dev default: `http://localhost:3000`) | No |
+| `FRONTEND_URL` | CORS allowed origin (Docker default: `https://localhost:8443`; local dev default: `http://localhost:3000`) | No |
 | `DB_PATH` | SQLite database file path (default: `wondercomic.db`) | No |
 
 > Never commit `.env` — it is git-ignored. Only `.env.example` is tracked.
@@ -63,7 +63,7 @@ cp .env.example .env       # then fill in the required secrets below
 make up          # docker compose up --build
 ```
 
-Then open **https://localhost** in Chrome (accept the self-signed certificate on first visit).
+Then open **https://localhost:8443** in Chrome (accept the self-signed certificate on first visit).
 
 Useful commands:
 
@@ -73,7 +73,7 @@ make logs        # tail logs
 docker compose logs backend    # backend logs only
 ```
 
-See [Development Guide](documentation/development.md) for non-Docker workflows and pre-push checks.
+Fedora users can run the stack with Podman through `make podman-up`; see [Development Guide](documentation/development.md) for Podman commands, non-Docker workflows, and pre-push checks.
 
 ---
 

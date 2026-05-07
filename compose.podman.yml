@@ -1,0 +1,4 @@
+services:
+  node_exporter:
+    pid: host
+    userns_mode: host

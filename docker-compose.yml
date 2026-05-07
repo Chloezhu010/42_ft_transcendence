@@ -88,7 +88,6 @@ services:
 
   prometheus:
     image: docker.io/prom/prometheus:v3.5.1
-    container_name: prometheus
     expose:
       - "9090"
     volumes:

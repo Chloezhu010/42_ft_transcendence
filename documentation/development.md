@@ -5,6 +5,7 @@
 - **Python 3.13+** and [uv](https://docs.astral.sh/uv/) (backend)
 - **Node.js 22+** and npm (frontend)
 - **Docker + Docker Compose v2** (containerised run)
+- **Podman + podman-compose** on Fedora when using the Podman workflow
 - A `.env` file at repo root — copy `.env.example` and fill in secrets
 
 ## Local Development (without Docker)
@@ -38,9 +39,43 @@ docker compose logs backend      # Backend logs only
 docker compose logs frontend     # Frontend logs only
 ```
 
-Open **https://localhost** in Google Chrome. Accept the self-signed certificate warning on first load.
+Open **https://localhost:8443** in Google Chrome. Accept the self-signed certificate warning on first load.
 
-Grafana is available at **https://localhost/grafana** (credentials: admin / `$GRAFANA_ADMIN_PASSWORD`).
+Grafana is available at **https://localhost:8443/grafana** (credentials: admin / `$GRAFANA_ADMIN_PASSWORD`).
+
+## Fedora / Podman Commands
+
+Install the supported Podman Compose provider:
+
+```bash
+sudo dnf install podman podman-compose
+```
+
+The Podman targets use `docker-compose.yml` plus `compose.podman.yml`, which adds the namespace settings needed by `node_exporter` for host metrics:
+
+```bash
+make podman-up       # podman compose -f docker-compose.yml -f compose.podman.yml up --build -d
+make podman-logs     # Follow all service logs
+make podman-down     # Stop and remove containers
+make podman-fclean   # Remove Podman compose resources, images, volumes, and dangling networks
+```
+
+Use these diagnostics when a Fedora startup issue needs investigation:
+
+```bash
+podman info
+podman compose version
+podman compose -f docker-compose.yml -f compose.podman.yml ps
+podman compose -f docker-compose.yml -f compose.podman.yml logs backend frontend nginx prometheus alertmanager grafana node_exporter backup-worker
+```
+
+If `node_exporter` is the only failing service under rootless Podman, run the same compose files with rootful Podman for full host metrics:
+
+```bash
+sudo podman compose -f docker-compose.yml -f compose.podman.yml up --build -d
+```
+
+The app remains available through nginx at **https://localhost:8443**.
 
 ## Pre-push Checks
 

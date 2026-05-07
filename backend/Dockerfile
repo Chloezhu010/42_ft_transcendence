@@ -1,10 +1,10 @@
 # Use Python slim with uv pre-installed via COPY
-FROM python:3.13-slim
+FROM docker.io/library/python:3.13-slim
 
 WORKDIR /app
 
 # Install uv directly
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.11.7 /uv /usr/local/bin/uv
 
 # Copy dependency files first
 COPY pyproject.toml uv.lock* ./
