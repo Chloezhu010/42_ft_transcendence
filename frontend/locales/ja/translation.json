@@ -486,11 +486,16 @@
       "healthy": "正常",
       "unhealthy": "異常",
       "checks": {
-        "database": "データベース"
+        "database": "データベース",
+        "backup": "バックアップ"
       },
       "results": {
         "ok": "正常",
-        "unavailable": "利用不可"
+        "unavailable": "利用不可",
+        "never": "なし",
+        "corrupted": "破損",
+        "schema_incomplete": "スキーマ不完全",
+        "stale": "期限切れ"
       }
     },
     "backups": {

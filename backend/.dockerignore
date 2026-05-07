@@ -31,6 +31,7 @@ Dockerfile
 
 # Generated files (will be mounted as volume)
 images/
+backups/
 
 # Database (local dev)
 *.db

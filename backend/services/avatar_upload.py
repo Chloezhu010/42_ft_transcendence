@@ -1,5 +1,6 @@
 """Avatar upload workflow helpers."""
 
+import asyncio
 import uuid
 from dataclasses import dataclass
 from pathlib import Path
@@ -8,7 +9,8 @@ from typing import Any
 import aiofiles
 from fastapi import UploadFile
 
-from db.users_crud import get_user_by_id, update_avatar
+from db.backup_lock import image_delete_lock
+from db.crud_users import get_user_by_id, update_avatar
 
 DEFAULT_IMAGE_DIR = Path(__file__).resolve().parent.parent / "images"
 ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/jpg", "image/png", "image/webp"}
@@ -98,7 +100,8 @@ def _delete_previous_avatar(image_dir: Path, avatar_path: str | None) -> None:
     if not avatar_path or avatar_path == DEFAULT_AVATAR_PATH:
         return
 
-    (image_dir / avatar_path).unlink(missing_ok=True)
+    with image_delete_lock():
+        (image_dir / avatar_path).unlink(missing_ok=True)
 
 
 async def replace_user_avatar(
@@ -122,5 +125,6 @@ async def replace_user_avatar(
         stored_avatar.absolute_path.unlink(missing_ok=True)
         raise
 
-    _delete_previous_avatar(image_dir, current_user["avatar_path"])
+    loop = asyncio.get_running_loop()
+    await loop.run_in_executor(None, _delete_previous_avatar, image_dir, current_user["avatar_path"])
     return updated_row

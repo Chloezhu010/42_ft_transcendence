@@ -51,8 +51,8 @@ cp .env.example .env       # then fill in the required secrets below
 | `SESSION_SECRET_KEY` | Secret used to sign backend session cookies | **Yes** |
 | `GOOGLE_OAUTH_CLIENT_ID` | OAuth 2.0 client ID (for Google login) | Optional |
 | `GOOGLE_OAUTH_CLIENT_SECRET` | OAuth 2.0 client secret | Optional |
-| `VITE_API_BASE_URL` | Backend URL seen by the browser (default: `http://localhost:8000`) | No |
-| `FRONTEND_URL` | CORS allowed origin (default: `http://localhost:3000`) | No |
+| `VITE_API_BASE_URL` | Backend URL seen by browser for local backend-only dev (default: same origin in Docker) | No |
+| `FRONTEND_URL` | CORS allowed origin (Docker default: `https://localhost`; local dev default: `http://localhost:3000`) | No |
 | `DB_PATH` | SQLite database file path (default: `wondercomic.db`) | No |
 
 > Never commit `.env` — it is git-ignored. Only `.env.example` is tracked.

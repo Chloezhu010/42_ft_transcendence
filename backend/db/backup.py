@@ -1,67 +1,163 @@
 """
-SQLite online-backup utilities.
+SQLite online-backup utilities — includes generated images.
 
-Uses sqlite3's built-in Connection.backup() API, which is safe under
-concurrent writes (WAL mode is in effect at runtime). Backups are
-stored in a rotating set; once MAX_BACKUPS is reached the oldest file
-is removed automatically.
+Each backup is a zip archive containing:
+  - wondercomic.db   — a consistent SQLite snapshot via Connection.backup()
+  - images/          — all files under the backend/images directory (recursive)
 
-create_backup() is serialized by _backup_lock so that concurrent callers
-(scheduled task + manual trigger) never race on filename generation or
-the rotation glob/unlink.
+Using zip means the DB and its referenced image files travel together, so
+restoring a backup restores user content end-to-end.
+
+create_backup() acquires an exclusive POSIX file lock (LOCK_FILE) before
+writing, so concurrent callers from different processes (backup-worker +
+manual API trigger) are serialized and never race on filename generation,
+zip writes, or rotation.
 """
 
 import asyncio
+import fcntl
+import os
 import sqlite3
+import tempfile
+import zipfile
 from datetime import UTC, datetime
 from pathlib import Path
 
-from db.database import DB_PATH
+from db.backup_lock import LOCK_FILE
+from db.database import DB_PATH, REQUIRED_TABLES
+from services.image_storage import IMAGES_DIR
 
 BACKUP_DIR = Path("backups")
 MAX_BACKUPS = 7  # keep at most 7 daily snapshots
 
-# Serializes concurrent create_backup() calls within the process.
-_backup_lock = asyncio.Lock()
+
+def _parse_positive_int(env_name: str, default: int) -> int:
+    """Parse an environment variable as a positive integer.
+
+    Returns *default* when the variable is absent.  Raises ValueError with a
+    human-readable message when the value is present but not a valid integer or
+    is not strictly positive (0 would make the worker spin; negative values
+    crash time.sleep).
+    """
+    raw = os.getenv(env_name)
+    if raw is None:
+        return default
+    try:
+        value = int(raw)
+    except ValueError:
+        raise ValueError(f"{env_name}={raw!r} is not a valid integer") from None
+    if value <= 0:
+        raise ValueError(f"{env_name} must be a positive integer, got {value}")
+    return value
 
 
-def _sync_backup(db_path: str, dest_path: str) -> None:
-    """Perform a synchronous SQLite online backup via the C-level API."""
-    with sqlite3.connect(db_path) as src, sqlite3.connect(dest_path) as dst:
-        src.backup(dst)
+BACKUP_INTERVAL = _parse_positive_int("BACKUP_INTERVAL_SECONDS", 24 * 60 * 60)
+# A backup is considered stale when it is older than 1.5× the scheduled interval.
+# This gives the worker one extra half-cycle of grace (restarts, schema retries, …).
+STALE_THRESHOLD = BACKUP_INTERVAL * 1.5
+
+
+class SchemaNotReadyError(RuntimeError):
+    """Raised when the database is missing required application tables.
+
+    This happens if the backup worker races with the backend on startup
+    before init_db() has run.  Callers should skip the backup and retry
+    on the next scheduled interval rather than treating this as a hard
+    failure.
+    """
+
+
+def _check_schema(db_path: str) -> None:
+    """Raise SchemaNotReadyError if any required table is absent."""
+    with sqlite3.connect(db_path) as conn:
+        placeholders = ",".join("?" * len(REQUIRED_TABLES))
+        rows = conn.execute(
+            f"SELECT name FROM sqlite_master WHERE type='table' AND name IN ({placeholders})",
+            tuple(REQUIRED_TABLES),
+        ).fetchall()
+        found = {row[0] for row in rows}
+        missing = REQUIRED_TABLES - found
+        if missing:
+            raise SchemaNotReadyError(f"missing tables: {', '.join(sorted(missing))}")
+
+
+def _sync_backup(db_path: str, dest_zip: Path) -> None:
+    """Write a zip archive atomically: write to a temp file, verify, then rename.
+
+    The temp file lives in BACKUP_DIR (same filesystem as dest_zip) so the
+    final os.rename() is atomic.  On any failure the temp file is deleted and
+    dest_zip is never created, keeping the backup directory free of partial
+    archives that list_backups() or /health could mistake for valid snapshots.
+    """
+    fd, tmp_str = tempfile.mkstemp(dir=BACKUP_DIR, suffix=".zip.tmp")
+    tmp_path = Path(tmp_str)
+    try:
+        os.close(fd)
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_db = Path(tmp_dir) / "wondercomic.db"
+            with sqlite3.connect(db_path) as src, sqlite3.connect(str(tmp_db)) as dst:
+                src.backup(dst)
+
+            with zipfile.ZipFile(tmp_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+                zf.write(tmp_db, "wondercomic.db")
+                images_dir = Path(IMAGES_DIR)
+                if images_dir.exists():
+                    for img_file in images_dir.rglob("*"):
+                        if img_file.is_file():
+                            zf.write(img_file, f"images/{img_file.relative_to(images_dir)}")
+
+        with zipfile.ZipFile(tmp_path) as zf:
+            bad = zf.testzip()
+            if bad is not None:
+                raise zipfile.BadZipFile(f"corrupt entry in archive: {bad}")
+
+        tmp_path.rename(dest_zip)
+    except:
+        tmp_path.unlink(missing_ok=True)
+        raise
+
+
+def _locked_backup(db_path: str) -> str:
+    """Acquire the cross-process file lock, then run backup + rotation.
+
+    Blocks until any concurrent backup (worker or API) finishes.
+    Returns the filename of the newly created archive.
+    """
+    BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+    with open(LOCK_FILE, "w") as fh:
+        fcntl.flock(fh, fcntl.LOCK_EX)
+        try:
+            _check_schema(db_path)
+            # Microsecond precision avoids filename collisions on back-to-back calls.
+            timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S_%f")
+            filename = f"wondercomic_{timestamp}.zip"
+            _sync_backup(db_path, BACKUP_DIR / filename)
+            # Remove legacy .db-format backups from before the zip migration.
+            for legacy in BACKUP_DIR.glob("wondercomic_*.db"):
+                legacy.unlink(missing_ok=True)
+            existing = sorted(BACKUP_DIR.glob("wondercomic_*.zip"))
+            for old in existing[:-MAX_BACKUPS]:
+                old.unlink(missing_ok=True)
+            return filename
+        finally:
+            fcntl.flock(fh, fcntl.LOCK_UN)
 
 
 async def create_backup() -> str:
-    """Create a timestamped backup of the database.
+    """Create a timestamped backup archive of the database and images.
 
     Returns:
         The filename (not full path) of the new backup.
     """
-    async with _backup_lock:
-        BACKUP_DIR.mkdir(parents=True, exist_ok=True)
-
-        # Microsecond precision avoids filename collisions on rapid or
-        # concurrent calls that land in the same wall-clock second.
-        timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S_%f")
-        filename = f"wondercomic_{timestamp}.db"
-        dest = BACKUP_DIR / filename
-
-        loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, _sync_backup, DB_PATH, str(dest))
-
-        # Rotate: drop oldest when over the limit
-        existing = sorted(BACKUP_DIR.glob("wondercomic_*.db"))
-        for old in existing[:-MAX_BACKUPS]:
-            old.unlink(missing_ok=True)
-
-        return filename
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, _locked_backup, DB_PATH)
 
 
 def list_backups() -> list[dict]:
     """Return metadata for all available backups, newest first."""
     if not BACKUP_DIR.exists():
         return []
-    files = sorted(BACKUP_DIR.glob("wondercomic_*.db"), reverse=True)
+    files = sorted(BACKUP_DIR.glob("wondercomic_*.zip"), reverse=True)
     return [
         {
             "filename": f.name,
@@ -76,7 +172,7 @@ def get_last_backup_time() -> str | None:
     """Return ISO 8601 timestamp of the most recent backup, or None."""
     if not BACKUP_DIR.exists():
         return None
-    files = sorted(BACKUP_DIR.glob("wondercomic_*.db"))
+    files = sorted(BACKUP_DIR.glob("wondercomic_*.zip"))
     if not files:
         return None
     return datetime.fromtimestamp(files[-1].stat().st_mtime, tz=UTC).isoformat()

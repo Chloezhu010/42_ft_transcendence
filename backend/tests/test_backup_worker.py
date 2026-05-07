@@ -1,0 +1,45 @@
+"""
+Unit tests for backup_worker._run_once().
+
+Cross-process serialization is now handled inside create_backup() via a
+POSIX file lock, so _run_once() is intentionally thin: call create_backup(),
+log, handle exceptions, and return the number of seconds the main loop
+should sleep before the next attempt.
+"""
+
+from unittest.mock import AsyncMock, patch
+
+import backup_worker
+from db.backup import SchemaNotReadyError
+
+
+class TestRunOnce:
+    def test_calls_create_backup(self):
+        mock_create = AsyncMock()
+        with patch.object(backup_worker, "create_backup", mock_create):
+            backup_worker._run_once()
+        mock_create.assert_called_once()
+
+    def test_returns_interval_on_success(self):
+        with patch.object(backup_worker, "create_backup", AsyncMock()):
+            assert backup_worker._run_once() == backup_worker.INTERVAL
+
+    def test_does_not_raise_when_create_backup_raises(self):
+        with patch.object(backup_worker, "create_backup", AsyncMock(side_effect=RuntimeError("disk full"))):
+            backup_worker._run_once()  # must not propagate
+
+    def test_returns_failure_retry_on_generic_exception(self):
+        with patch.object(backup_worker, "create_backup", AsyncMock(side_effect=RuntimeError("disk full"))):
+            assert backup_worker._run_once() == backup_worker.FAILURE_RETRY
+
+    def test_does_not_raise_when_schema_not_ready(self):
+        with patch.object(
+            backup_worker, "create_backup", AsyncMock(side_effect=SchemaNotReadyError("missing tables: panels"))
+        ):
+            backup_worker._run_once()  # must not propagate
+
+    def test_returns_schema_retry_when_schema_not_ready(self):
+        with patch.object(
+            backup_worker, "create_backup", AsyncMock(side_effect=SchemaNotReadyError("missing tables: panels"))
+        ):
+            assert backup_worker._run_once() == backup_worker.SCHEMA_RETRY

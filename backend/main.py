@@ -2,8 +2,6 @@
 FastAPI main application with CORS and API routes.
 """
 
-import asyncio
-import contextlib
 import shutil
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -15,35 +13,17 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from starlette.middleware.sessions import SessionMiddleware
 
 from config import get_config
-from db.backup import create_backup
 from db.database import init_db
 from routers import api_keys, auth, backup, friend, generation, health, monitoring, public_stories, stories, user
-
-_BACKUP_INTERVAL_SECONDS = 24 * 60 * 60
-
-
-async def _schedule_backups() -> None:
-    """Run a backup immediately on startup, then repeat every 24 hours."""
-    while True:
-        try:
-            await create_backup()
-        except Exception as exc:
-            print(f"Scheduled backup failed: {exc}")
-        await asyncio.sleep(_BACKUP_INTERVAL_SECONDS)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Manage database lifecycle and scheduled backup task."""
+    """Initialize the database on startup."""
     config = get_config()
     print(f"Starting WonderComic API with frontend URL: {config.frontend_url}")
-
     await init_db()
-    backup_task = asyncio.create_task(_schedule_backups())
     yield
-    backup_task.cancel()
-    with contextlib.suppress(asyncio.CancelledError):
-        await backup_task
 
 
 app = FastAPI(title="WonderComic API", version="1.0.0", lifespan=lifespan)
