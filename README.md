@@ -2,13 +2,13 @@
 
 ---
 
-# ft_transcendence — WonderComic
+# ft_transcendence — Funova
 
 An AI-powered comic book generator for children. Authenticated users build a kid character profile (appearance, archetype, dream, art style), and the app uses Google's Gemini API to produce a fully illustrated short comic — title, foreword, 10–18 panels, and cover art — with a per-user gallery to revisit, edit, and share past stories.
 
 ## Description
 
-**WonderComic** turns a short character wizard into a finished, illustrated comic book. The frontend streams the title and foreword character-by-character while the backend generates panel images in parallel, then saves the result to a per-user gallery.
+**Funova** turns a short character wizard into a finished, illustrated comic book. The frontend streams the title and foreword character-by-character while the backend generates panel images in parallel, then saves the result to a per-user gallery.
 
 ### Key Features
 
@@ -198,7 +198,7 @@ See [Architecture](documentation/architecture.md) for full system topology, sequ
 
 12. **Health check + status page — Minor (DevOps).** `GET /health` (`routers/health.py`); in-app `StatusPage.tsx` shows health + recent backups + manual backup trigger; `db/backup.py` uses the SQLite online-backup API with 7-day rotation; scheduled 24-hour task in `main.py`.
 
-The full module status table — including the dropped *Backend as microservices* candidate — lives in [`module_checklist.md`](module_checklist.md).
+The full module status table lives in [`module_checklist.md`](module_checklist.md).
 
 ---
 
