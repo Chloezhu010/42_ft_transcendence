@@ -36,7 +36,17 @@ vi.mock('react-i18next', () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
         'auth.errors.authFailed': 'Authentication failed',
+        'auth.errors.emailInvalid': 'Enter a valid email address.',
+        'auth.errors.emailRequired': 'Enter your email address.',
+        'auth.errors.emailTaken': 'This email is already taken.',
+        'auth.errors.invalidCredentials': 'Invalid email or password.',
         'auth.errors.oauthPasswordLogin': 'This account uses Google sign-in. Continue with Google instead.',
+        'auth.errors.passwordRequired': 'Enter your password.',
+        'auth.errors.passwordTooLong': 'Password must be 72 characters or fewer.',
+        'auth.errors.passwordTooShort': 'Password must be at least 8 characters.',
+        'auth.errors.usernameRequired': 'Enter a username.',
+        'auth.errors.usernameTaken': 'This username is already taken.',
+        'auth.errors.usernameTooLong': 'Username must be 50 characters or fewer.',
         'auth.fields.emailLabel': 'Email',
         'auth.fields.emailPlaceholder': 'you@example.com',
         'auth.fields.passwordLabel': 'Password',
@@ -119,7 +129,51 @@ describe('auth pages', () => {
       expect(mockLogin).toHaveBeenCalledWith('alice@example.com', 'wrong-password');
     });
 
-    expect(mockToastError).toHaveBeenCalledWith('Invalid email or password');
+    expect(mockToastError).toHaveBeenCalledWith('Invalid email or password.');
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('shows a localized login validation error before calling the API', async () => {
+    render(
+      <MemoryRouter>
+        <LoginPage />
+      </MemoryRouter>
+    );
+
+    fireEvent.change(screen.getByPlaceholderText('you@example.com'), {
+      target: { value: 'alice@example.com' },
+    });
+    fireEvent.change(screen.getByPlaceholderText('••••••••'), {
+      target: { value: 'short' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Sign in' }));
+
+    await waitFor(() => {
+      expect(mockToastError).toHaveBeenCalledWith('Password must be at least 8 characters.');
+    });
+    expect(mockLogin).not.toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('shows a localized email validation error before calling the API', async () => {
+    render(
+      <MemoryRouter>
+        <LoginPage />
+      </MemoryRouter>
+    );
+
+    fireEvent.change(screen.getByPlaceholderText('you@example.com'), {
+      target: { value: 'not-an-email' },
+    });
+    fireEvent.change(screen.getByPlaceholderText('••••••••'), {
+      target: { value: 'Password123!' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Sign in' }));
+
+    await waitFor(() => {
+      expect(mockToastError).toHaveBeenCalledWith('Enter a valid email address.');
+    });
+    expect(mockLogin).not.toHaveBeenCalled();
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
@@ -196,5 +250,57 @@ describe('auth pages', () => {
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true });
     });
+  });
+
+  it('shows a localized signup validation error before calling the API', async () => {
+    render(
+      <MemoryRouter>
+        <SignupPage />
+      </MemoryRouter>
+    );
+
+    fireEvent.change(screen.getByPlaceholderText('you@example.com'), {
+      target: { value: 'alice@example.com' },
+    });
+    fireEvent.change(screen.getByPlaceholderText('your_username'), {
+      target: { value: 'alice' },
+    });
+    fireEvent.change(screen.getByPlaceholderText('••••••••'), {
+      target: { value: 'short' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Sign up' }));
+
+    await waitFor(() => {
+      expect(mockToastError).toHaveBeenCalledWith('Password must be at least 8 characters.');
+    });
+    expect(mockSignup).not.toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('localizes duplicate signup errors returned by the API', async () => {
+    mockSignup.mockRejectedValue(new Error('Email already taken'));
+
+    render(
+      <MemoryRouter>
+        <SignupPage />
+      </MemoryRouter>
+    );
+
+    fireEvent.change(screen.getByPlaceholderText('you@example.com'), {
+      target: { value: 'alice@example.com' },
+    });
+    fireEvent.change(screen.getByPlaceholderText('your_username'), {
+      target: { value: 'alice' },
+    });
+    fireEvent.change(screen.getByPlaceholderText('••••••••'), {
+      target: { value: 'Password123!' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Sign up' }));
+
+    await waitFor(() => {
+      expect(mockSignup).toHaveBeenCalledWith('alice@example.com', 'alice', 'Password123!');
+    });
+    expect(mockToastError).toHaveBeenCalledWith('This email is already taken.');
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 });

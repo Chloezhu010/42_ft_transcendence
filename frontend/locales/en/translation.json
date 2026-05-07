@@ -349,6 +349,16 @@
     },
     "errors": {
       "authFailed": "Authentication failed",
+      "emailRequired": "Enter your email address.",
+      "emailInvalid": "Enter a valid email address.",
+      "emailTaken": "This email is already taken.",
+      "usernameRequired": "Enter a username.",
+      "usernameTooLong": "Username must be 50 characters or fewer.",
+      "usernameTaken": "This username is already taken.",
+      "passwordRequired": "Enter your password.",
+      "passwordTooShort": "Password must be at least 8 characters.",
+      "passwordTooLong": "Password must be 72 characters or fewer.",
+      "invalidCredentials": "Invalid email or password.",
       "oauthPasswordLogin": "This account uses Google sign-in. Continue with Google instead."
     }
   },

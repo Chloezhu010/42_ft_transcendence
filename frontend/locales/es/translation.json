@@ -349,6 +349,16 @@
     },
     "errors": {
       "authFailed": "Error de autenticación",
+      "emailRequired": "Introduce tu correo electronico.",
+      "emailInvalid": "Introduce un correo electronico valido.",
+      "emailTaken": "Este correo electronico ya esta en uso.",
+      "usernameRequired": "Introduce un nombre de usuario.",
+      "usernameTooLong": "El nombre de usuario debe tener 50 caracteres o menos.",
+      "usernameTaken": "Este nombre de usuario ya esta en uso.",
+      "passwordRequired": "Introduce tu contrasena.",
+      "passwordTooShort": "La contrasena debe tener al menos 8 caracteres.",
+      "passwordTooLong": "La contrasena debe tener 72 caracteres o menos.",
+      "invalidCredentials": "Correo electronico o contrasena invalidos.",
       "oauthPasswordLogin": "Esta cuenta usa inicio de sesion con Google. Continua con Google."
     }
   },
