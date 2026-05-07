@@ -349,6 +349,16 @@
     },
     "errors": {
       "authFailed": "فشل المصادقة",
+      "emailRequired": "أدخل بريدك الإلكتروني.",
+      "emailInvalid": "أدخل بريدًا إلكترونيًا صالحًا.",
+      "emailTaken": "هذا البريد الإلكتروني مستخدم بالفعل.",
+      "usernameRequired": "أدخل اسم مستخدم.",
+      "usernameTooLong": "يجب ألا يزيد اسم المستخدم عن 50 حرفًا.",
+      "usernameTaken": "اسم المستخدم هذا مستخدم بالفعل.",
+      "passwordRequired": "أدخل كلمة المرور.",
+      "passwordTooShort": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل.",
+      "passwordTooLong": "يجب ألا تزيد كلمة المرور عن 72 حرفًا.",
+      "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
       "oauthPasswordLogin": "يستخدم هذا الحساب تسجيل الدخول عبر Google. تابع باستخدام Google."
     }
   },

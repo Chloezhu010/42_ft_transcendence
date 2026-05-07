@@ -349,6 +349,16 @@
     },
     "errors": {
       "authFailed": "認証に失敗しました",
+      "emailRequired": "メールアドレスを入力してください。",
+      "emailInvalid": "有効なメールアドレスを入力してください。",
+      "emailTaken": "このメールアドレスはすでに使用されています。",
+      "usernameRequired": "ユーザー名を入力してください。",
+      "usernameTooLong": "ユーザー名は50文字以下にしてください。",
+      "usernameTaken": "このユーザー名はすでに使用されています。",
+      "passwordRequired": "パスワードを入力してください。",
+      "passwordTooShort": "パスワードは8文字以上にしてください。",
+      "passwordTooLong": "パスワードは72文字以下にしてください。",
+      "invalidCredentials": "メールアドレスまたはパスワードが正しくありません。",
       "oauthPasswordLogin": "このアカウントはGoogleログインを使用しています。Googleで続行してください。"
     }
   },

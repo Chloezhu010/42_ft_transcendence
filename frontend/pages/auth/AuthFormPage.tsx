@@ -14,7 +14,10 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { SketchyButton } from '@/components/design-system/Primitives';
 
 const OAUTH_REDIRECT_PATH_KEY = 'auth.oauthRedirectPath';
+const INVALID_CREDENTIALS_ERROR = 'invalid email or password';
 const OAUTH_PASSWORD_LOGIN_ERROR = 'this account does not use password login';
+const EMAIL_TAKEN_ERROR = 'email already taken';
+const USERNAME_TAKEN_ERROR = 'username already taken';
 
 interface AuthFormPageProps {
     currentUser: UserResponse | null;
@@ -27,6 +30,7 @@ interface AuthFormPageProps {
     submitLabel: string;
     submittingLabel: string;
     title: string;
+    useAppValidation?: boolean;
     onSubmit: () => Promise<void>;
 }
 
@@ -40,8 +44,17 @@ function getLocalizedAuthErrorMessage(error: unknown, t: (key: string) => string
     }
 
     const normalizedMessage = error.message.trim().replace(/\.$/, '').toLowerCase();
+    if (normalizedMessage === INVALID_CREDENTIALS_ERROR) {
+        return t('auth.errors.invalidCredentials');
+    }
     if (normalizedMessage === OAUTH_PASSWORD_LOGIN_ERROR) {
         return t('auth.errors.oauthPasswordLogin');
+    }
+    if (normalizedMessage === EMAIL_TAKEN_ERROR) {
+        return t('auth.errors.emailTaken');
+    }
+    if (normalizedMessage === USERNAME_TAKEN_ERROR) {
+        return t('auth.errors.usernameTaken');
     }
 
     return error.message;
@@ -71,6 +84,7 @@ export function AuthFormPage({
     submitLabel,
     submittingLabel,
     title,
+    useAppValidation = false,
     onSubmit,
 }: AuthFormPageProps): JSX.Element {
     const { t } = useTranslation();
@@ -125,7 +139,7 @@ export function AuthFormPage({
         <AuthPageShell>
             <div className="w-full max-w-md rounded-2xl border-4 border-brand-primary/20 bg-white p-10 shadow-soft">
                 <h1 className="mb-8 text-center font-sans text-3xl font-bold text-brand-dark">{title}</h1>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} noValidate={useAppValidation}>
                     <div className="space-y-6">{renderFields(isSubmitting)}</div>
                     <SketchyButton type="submit" disabled={isSubmitting} className="mt-6 w-full">
                         {isSubmitting ? submittingLabel : submitLabel}
