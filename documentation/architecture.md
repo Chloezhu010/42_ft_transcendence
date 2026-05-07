@@ -162,14 +162,17 @@ Notes:
 
 ## Database Schema
 
+Authoritative DDL lives in `backend/db/database.py`. All tables use SQLite with foreign keys + `ON DELETE CASCADE` on user-owned data.
+
 ```
 users
 ├── id            INTEGER PRIMARY KEY AUTOINCREMENT
-├── email         TEXT UNIQUE NOT NULL
-├── username      TEXT UNIQUE NOT NULL
-├── password_hash TEXT NOT NULL          ← bcrypt via passlib
-├── avatar_path   TEXT                   ← stored in backend/images/avatars/
-├── is_online     BOOLEAN DEFAULT 0
+├── email         TEXT NOT NULL UNIQUE
+├── username      TEXT NOT NULL UNIQUE
+├── password_hash TEXT                   ← nullable for OAuth-only users (bcrypt via passlib otherwise)
+├── avatar_path   TEXT DEFAULT 'default-avatar.png'
+├── is_online     BOOLEAN NOT NULL DEFAULT 0
+├── is_admin      BOOLEAN NOT NULL DEFAULT 0
 ├── created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 └── updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
@@ -177,34 +180,57 @@ friendships
 ├── id            INTEGER PRIMARY KEY AUTOINCREMENT
 ├── requester_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
 ├── addressee_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
-├── status        TEXT CHECK(status IN ('pending','accepted', 'rejected', 'blocked'))
+├── status        TEXT NOT NULL DEFAULT 'pending'
+│                 CHECK(status IN ('pending','accepted','rejected'))
 └── created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+   table-level: CHECK(requester_id != addressee_id),
+                UNIQUE(requester_id, addressee_id)
+
+oauth_accounts
+├── id                INTEGER PRIMARY KEY AUTOINCREMENT
+├── user_id           INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
+├── provider          TEXT NOT NULL           ← e.g. 'google'
+├── provider_user_id  TEXT NOT NULL
+├── provider_email    TEXT
+├── created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+└── updated_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+   table-level: UNIQUE(provider, provider_user_id)
+
+oauth_results                              ← short-lived OAuth handoff codes
+├── code        TEXT PRIMARY KEY
+├── user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
+├── expires_at  TIMESTAMP NOT NULL
+└── created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
 kid_profiles
-├── id            INTEGER PRIMARY KEY AUTOINCREMENT
-├── user_id       INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
-├── name          TEXT NOT NULL
-├── gender        TEXT NOT NULL CHECK(gender IN ('boy','girl','neutral'))
-├── skin_tone     TEXT NOT NULL
-├── hair_color    TEXT NOT NULL
-├── eye_color     TEXT NOT NULL
+├── id             INTEGER PRIMARY KEY AUTOINCREMENT
+├── user_id        INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
+├── name           TEXT NOT NULL
+├── gender         TEXT NOT NULL CHECK(gender IN ('boy','girl','neutral'))
+├── skin_tone      TEXT NOT NULL
+├── hair_color     TEXT NOT NULL
+├── eye_color      TEXT NOT NULL
 ├── favorite_color TEXT NOT NULL
-├── dream         TEXT
-├── archetype     TEXT
-├── art_style     TEXT
-└── created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+├── dream          TEXT
+├── archetype      TEXT
+├── art_style      TEXT
+├── language       TEXT                     ← preferred narration language
+└── created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
 stories
-├── id                   INTEGER PRIMARY KEY AUTOINCREMENT
-├── user_id              INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
-├── kid_profile_id       INTEGER NOT NULL REFERENCES kid_profiles(id) ON DELETE CASCADE
-├── title                TEXT
-├── foreword             TEXT
+├── id                    INTEGER PRIMARY KEY AUTOINCREMENT
+├── user_id               INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
+├── kid_profile_id        INTEGER NOT NULL REFERENCES kid_profiles(id) ON DELETE CASCADE
+├── title                 TEXT
+├── foreword              TEXT
 ├── character_description TEXT
-├── cover_image_prompt   TEXT
-├── cover_image_path     TEXT
-├── created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-└── updated_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+├── cover_image_prompt    TEXT
+├── cover_image_path      TEXT
+├── visibility            TEXT NOT NULL DEFAULT 'private'
+│                         CHECK(visibility IN ('private','shared_with_friends'))
+├── is_unlocked           BOOLEAN NOT NULL DEFAULT 1   ← preview vs. full story
+├── created_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+└── updated_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
 panels
 ├── id           INTEGER PRIMARY KEY AUTOINCREMENT
@@ -214,10 +240,22 @@ panels
 ├── image_prompt TEXT
 ├── image_path   TEXT
 └── created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-       UNIQUE(story_id, panel_order)
+   table-level: UNIQUE(story_id, panel_order)
+
+api_keys
+├── id           INTEGER PRIMARY KEY AUTOINCREMENT
+├── user_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
+├── name         TEXT NOT NULL
+├── key_prefix   TEXT NOT NULL UNIQUE        ← shown to the user; used for lookup
+├── key_hash     TEXT NOT NULL UNIQUE        ← sha256 of the full key
+├── is_active    BOOLEAN NOT NULL DEFAULT 1
+├── created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+└── last_used_at TIMESTAMP
 ```
 
-**Key changes from scaffold:** `user_id` in `kid_profiles` and `stories` changed from `TEXT DEFAULT 'local-user'` to `INTEGER NOT NULL REFERENCES users(id)`. All story/profile data is now user-scoped.
+**Migrations:** `init_db()` in `backend/db/database.py` runs idempotent migrations on startup — relaxing `users.password_hash` to nullable for OAuth users, and adding `stories.visibility` / `is_unlocked` if missing on older databases.
+
+**Key changes from scaffold:** `user_id` in `kid_profiles` and `stories` changed from `TEXT DEFAULT 'local-user'` to `INTEGER NOT NULL REFERENCES users(id)`. All story/profile data is user-scoped.
 
 ## Streaming Story Intro
 
