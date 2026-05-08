@@ -132,7 +132,7 @@ See [Architecture](documentation/architecture.md) for full system topology, sequ
 | Google OAuth 2.0 | Sign-in via Google, account linking, callback page | czhu |
 | Profile management | View/edit username, avatar upload | czhu |
 | Friends system | Friend requests (send/accept/reject), online status indicator | czhu |
-| Public API | 5 API-key-authenticated, rate-limited, OpenAPI-documented endpoints; per-user key management UI | czhu |
+| Public API | API-key-authenticated, rate-limited, per-user key management UI | czhu |
 | Character wizard | Multi-step kid profile form (name, appearance, archetype, dream, art style) | xinzhang |
 | Story script generation | Gemini text generation, NDJSON streaming for title/foreword typewriter | ymiao |
 | Panel image generation | Per-panel Gemini image generation with consistent character visual guide | ymiao |
@@ -176,7 +176,7 @@ See [Architecture](documentation/architecture.md) for full system topology, sequ
 
 1. **Framework — Major.** React 19 + Vite + TypeScript on the frontend; FastAPI (Python 3.13) + Pydantic v2 on the backend. Both go beyond raw HTML/Node — strict typing, async I/O, automatic OpenAPI generation.
 
-2. **Public API — Major.** Five third-party endpoints under `routers/public_stories.py`, authenticated by `X-API-Key` header (`public_api_auth.py`), per-key fixed-window rate limiting (`services/rate_limit.py`), JWT-protected key management UI at `/api/api-keys`, and OpenAPI docs at `/docs`. See [Public API Usage](documentation/public_api_usage.md).
+2. **Public API — Major.** Seven third-party endpoints under `routers/public_stories.py`: full CRUD on stories (list, read, create, update visibility, delete) plus an AI **preview-then-generate** flow (`POST /stories/preview` returns a script without saving; `POST /stories/generate` runs the full Gemini pipeline — script + cover + panel images — and saves). Authenticated by `X-API-Key` header (`public_api_auth.py`), per-key fixed-window rate limiting (`services/rate_limit.py`), JWT-protected key management UI at `/api-keys`. See [Public API Usage](documentation/public_api_usage.md).
 
 3. **Notification system — Minor.** `sonner` v2 wired into 7 files across auth, profile, friends, gallery, and story flows (34 toast call sites); covers success, error, and info states with consistent styling.
 
@@ -206,7 +206,7 @@ The full module status table lives in [`module_checklist.md`](module_checklist.m
 
 | Login | Contributed | Challenges & how they were overcome |
 |-------|-------------|-------------------------------------|
-| **czhu** | User management module (signup/login, JWT, profile, avatars, friends), Google OAuth 2.0, Public API module (5 endpoints, API key auth, per-key rate limiter, key management UI), README, project-management coordination as PO. | Designing a public-API key model that reuses the JWT user identity for *managing* keys but is independent at the *request* level — solved by a thin `X-API-Key` dependency that resolves to a `user_id` and feeds the same query layer as the JWT path. |
+| **czhu** | User management module (signup/login, JWT, profile, avatars, friends), Google OAuth 2.0, Public API module (7 endpoints including AI preview-then-generate flow, API key auth, per-key rate limiter, key management UI), README, project-management coordination as PO. | Designing a public-API key model that reuses the JWT user identity for *managing* keys but is independent at the *request* level — solved by a thin `X-API-Key` dependency that resolves to a `user_id` and feeds the same query layer as the JWT path. |
 | **xinzhang** | Frontend application shell, character wizard, comic reader UI, gallery page, design system (12 components), notification system (sonner), full i18n (6 languages) and RTL support (logical properties + ratcheting audit), Privacy/Terms pages. PM coordination. | Retrofitting RTL onto a finished LTR codebase — solved by introducing a static audit test that fails CI when physical-side classes (`ml-`, `pr-`, etc.) are added, so the codebase ratchets toward 100% logical properties without a single big-bang migration. |
 | **ymiao** | Architecture and tech-lead reviews, full Gemini integration (text + image), NDJSON streaming intro with custom JSON state machine, Magic Revision panel editing, Web Speech API read-aloud + voice prompts. | Streaming a JSON document character-by-character without pulling in a full streaming JSON parser — solved with a small purpose-built state machine (`backend/llm/streaming.py::StoryIntroStreamer`) that only handles the two top-level string fields we actually need. |
 | **auzou** | Docker Compose stack, nginx HTTPS reverse proxy, full Prometheus + Grafana + Alertmanager + node_exporter setup with provisioned dashboards and alert rules, health check endpoint, status page UI, automated SQLite backups with rotation. | Wiring Prometheus to scrape FastAPI and exposing custom metrics without polluting business logic — solved by isolating instrumentation in `backend/metrics.py` and using `prometheus-fastapi-instrumentator` middleware so handlers stay clean. |
