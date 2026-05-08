@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - **Python 3.13+** and [uv](https://docs.astral.sh/uv/) (backend)
-- **Node.js 22+** and npm (frontend)
+- **Node.js 20+** and npm (frontend; Docker uses `node:20-alpine`)
 - **Docker + Docker Compose v2** (containerised run)
 - A `.env` file at repo root — copy `.env.example` and fill in secrets
 
@@ -38,9 +38,9 @@ docker compose logs backend      # Backend logs only
 docker compose logs frontend     # Frontend logs only
 ```
 
-Open **https://localhost** in Google Chrome. Accept the self-signed certificate warning on first load.
+Open **https://localhost:8443** in Google Chrome. Accept the self-signed certificate warning on first load.
 
-Grafana is available at **https://localhost/grafana** (credentials: admin / `$GRAFANA_ADMIN_PASSWORD`).
+Grafana is available at **https://localhost:8443/grafana** (credentials: admin / `$GRAFANA_ADMIN_PASSWORD`).
 
 ## Pre-push Checks
 

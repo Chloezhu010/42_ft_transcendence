@@ -14,15 +14,14 @@
 ## Auth
 
 - [PyJWT](https://pyjwt.readthedocs.io/)
-- [passlib bcrypt](https://passlib.readthedocs.io/en/stable/lib/passlib.hash.bcrypt.html)
 - [Authlib (OAuth client)](https://docs.authlib.org/en/latest/client/index.html)
 - [Google OAuth 2.0 — Web server flow](https://developers.google.com/identity/protocols/oauth2/web-server)
 
 ## Frontend
 
-- [React 19 docs](https://react.dev/)
+- [React docs](https://react.dev/)
 - [Vite docs](https://vitejs.dev/)
-- [React Router v7](https://reactrouter.com/)
+- [React Router](https://reactrouter.com/)
 - [Tailwind CSS](https://tailwindcss.com/docs)
 - [Tailwind logical properties + RTL](https://tailwindcss.com/docs/hover-focus-and-other-states#rtl-support)
 - [Framer Motion](https://www.framer.com/motion/)
@@ -56,8 +55,3 @@
 - [Grafana provisioning](https://grafana.com/docs/grafana/latest/administration/provisioning/)
 - [Alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/)
 - [node_exporter](https://github.com/prometheus/node_exporter)
-
-## AI usage during development
-
-- **Claude Code & Codex** — used by the team for: scaffold analysis against the subject, gap analysis on module requirements, README and `AGENTS.md`/`CLAUDE.md` drafting, architecture diagram drafting, exploratory refactor proposals, and pair-style debugging on tricky integration points (Gemini streaming JSON parser, RTL logical-property migration). Every AI-suggested change was read, understood, and edited by the responsible team member before being committed; no generated code was merged unreviewed.
-- **GitHub Copilot** — occasional inline completion during routine boilerplate (TypeScript types, test scaffolds). Not used for design or architectural decisions.
