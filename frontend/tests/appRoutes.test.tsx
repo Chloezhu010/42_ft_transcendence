@@ -21,6 +21,10 @@ vi.mock('@api', () => ({
   signup: vi.fn(),
 }));
 
+vi.mock('@/pages/api-keys', () => ({
+  ApiKeysPage: () => <div>API keys route</div>,
+}));
+
 function renderApp(initialEntry: string): void {
   render(
     <MemoryRouter initialEntries={[initialEntry]}>
@@ -33,6 +37,7 @@ function renderApp(initialEntry: string): void {
 
 beforeEach(() => {
   window.scrollTo = vi.fn();
+  localStorage.clear();
   mockExchangeOAuthCode.mockResolvedValue({ access_token: 'oauth-token', token_type: 'bearer' });
   mockGetMe.mockResolvedValue({
     id: 1,
@@ -86,6 +91,25 @@ describe('App public routes', () => {
     renderApp('/auth/callback?code=test-code');
     await waitFor(() => {
       expect(screen.getByTestId('google-oauth-callback')).toBeInTheDocument();
+    });
+  });
+
+  it('renders the protected API keys route for an authenticated user', async () => {
+    localStorage.setItem('auth.accessToken', 'stored-token');
+
+    renderApp('/api-keys');
+
+    await waitFor(() => {
+      expect(screen.getByText('API keys route')).toBeInTheDocument();
+    });
+    expect(screen.getByRole('link', { name: /api keys/i })).toHaveAttribute('href', '/api-keys');
+  });
+
+  it('redirects unauthenticated API keys requests to login', async () => {
+    renderApp('/api-keys');
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: /welcome back/i })).toBeInTheDocument();
     });
   });
 

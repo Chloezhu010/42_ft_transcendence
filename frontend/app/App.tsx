@@ -5,6 +5,7 @@
 import { useEffect } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { LoginPage, SignupPage, GoogleOAuthCallbackPage } from '@/pages/auth';
+import { ApiKeysPage } from '@/pages/api-keys';
 import { FriendLibraryPage } from '@/pages/friend-library';
 import { GalleryPage } from '@/pages/gallery';
 import { LandingPage } from '@/pages/landing';
@@ -41,6 +42,7 @@ export function App(): JSX.Element {
             <Route path="/book/:id" element={<StoryPage />} />
             <Route path="/gallery" element={<GalleryPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/api-keys" element={<ApiKeysPage />} />
             <Route path="/friends" element={<FriendsPage />} />
             <Route path="/friends/:userId/library" element={<FriendLibraryPage />} />
             <Route path="/friends/:userId/library/:id" element={<StoryPage />} />
