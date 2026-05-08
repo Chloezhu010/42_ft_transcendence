@@ -14,6 +14,7 @@
       }
     },
     "friends": "好友",
+    "apiKeys": "API 密钥",
     "profileAriaLabel": "你的个人资料",
     "logoAlt": "Funova 标志",
     "status": {
@@ -862,6 +863,58 @@
       "saveFailed": "保存失败",
       "uploadFailed": "上传失败",
       "logoutFailed": "退出登录失败"
+    }
+  },
+  "apiKeys": {
+    "title": "API 密钥",
+    "description": "为公共 API 创建和吊销密钥。",
+    "header": {
+      "eyebrow": "公共 API"
+    },
+    "create": {
+      "label": "密钥名称",
+      "placeholder": "生产环境集成",
+      "submit": "创建密钥",
+      "creating": "正在创建..."
+    },
+    "created": {
+      "title": "立即复制此密钥",
+      "description": "出于安全考虑，完整密钥只会显示一次。",
+      "copy": "复制密钥",
+      "dismiss": "关闭"
+    },
+    "list": {
+      "title": "现有密钥",
+      "count": "{{count}} 个密钥",
+      "loading": "正在加载...",
+      "empty": "还没有 API 密钥。",
+      "createdAt": "创建时间",
+      "lastUsedAt": "上次使用",
+      "neverUsed": "从未使用"
+    },
+    "status": {
+      "active": "有效",
+      "revoked": "已吊销"
+    },
+    "actions": {
+      "revoke": "吊销",
+      "revoking": "正在吊销...",
+      "confirmRevoke": "要吊销此 API 密钥吗？",
+      "cancel": "取消"
+    },
+    "notifications": {
+      "created": "API 密钥已创建。请立即复制。",
+      "copied": "API 密钥已复制。",
+      "revoked": "API 密钥已吊销。"
+    },
+    "errors": {
+      "loadFailed": "无法加载 API 密钥。",
+      "createFailed": "无法创建 API 密钥。",
+      "revokeFailed": "无法吊销 API 密钥。",
+      "rateLimited": "请求过多。请稍后重试。",
+      "nameRequired": "密钥名称不能为空。",
+      "nameTooLong": "密钥名称最多 100 个字符。",
+      "copyFailed": "无法复制 API 密钥。"
     }
   },
   "languageSwitcher": {

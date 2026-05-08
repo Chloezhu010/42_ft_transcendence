@@ -8,3 +8,4 @@ export * from './friendApi';
 export * from './storyApi';
 export * from './generationApi';
 export * from './statusApi';
+export * from './apiKeyApi';

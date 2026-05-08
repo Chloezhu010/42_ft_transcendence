@@ -14,6 +14,7 @@
       }
     },
     "friends": "الأصدقاء",
+    "apiKeys": "مفاتيح API",
     "profileAriaLabel": "ملفك الشخصي",
     "logoAlt": "شعار Funova",
     "status": {
@@ -865,6 +866,58 @@
       "saveFailed": "فشل الحفظ",
       "uploadFailed": "فشل الرفع",
       "logoutFailed": "فشل تسجيل الخروج"
+    }
+  },
+  "apiKeys": {
+    "title": "مفاتيح API",
+    "description": "أنشئ مفاتيح للواجهة العامة وقم بإلغائها.",
+    "header": {
+      "eyebrow": "API العام"
+    },
+    "create": {
+      "label": "اسم المفتاح",
+      "placeholder": "تكامل الإنتاج",
+      "submit": "إنشاء مفتاح",
+      "creating": "جارٍ الإنشاء..."
+    },
+    "created": {
+      "title": "انسخ هذا المفتاح الآن",
+      "description": "لأسباب أمنية، سيظهر المفتاح الكامل مرة واحدة فقط.",
+      "copy": "نسخ المفتاح",
+      "dismiss": "إغلاق"
+    },
+    "list": {
+      "title": "المفاتيح الحالية",
+      "count": "{{count}} مفاتيح",
+      "loading": "جارٍ التحميل...",
+      "empty": "لا توجد مفاتيح API بعد.",
+      "createdAt": "تاريخ الإنشاء",
+      "lastUsedAt": "آخر استخدام",
+      "neverUsed": "لم يستخدم بعد"
+    },
+    "status": {
+      "active": "نشط",
+      "revoked": "ملغى"
+    },
+    "actions": {
+      "revoke": "إلغاء",
+      "revoking": "جارٍ الإلغاء...",
+      "confirmRevoke": "هل تريد إلغاء مفتاح API هذا؟",
+      "cancel": "إلغاء"
+    },
+    "notifications": {
+      "created": "تم إنشاء مفتاح API. انسخه الآن.",
+      "copied": "تم نسخ مفتاح API.",
+      "revoked": "تم إلغاء مفتاح API."
+    },
+    "errors": {
+      "loadFailed": "تعذر تحميل مفاتيح API.",
+      "createFailed": "تعذر إنشاء مفتاح API.",
+      "revokeFailed": "تعذر إلغاء مفتاح API.",
+      "rateLimited": "طلبات كثيرة جدًا. يرجى الانتظار ثم المحاولة مرة أخرى.",
+      "nameRequired": "لا يمكن أن يكون اسم المفتاح فارغًا.",
+      "nameTooLong": "يجب أن يكون اسم المفتاح 100 حرف أو أقل.",
+      "copyFailed": "تعذر نسخ مفتاح API."
     }
   },
   "languageSwitcher": {

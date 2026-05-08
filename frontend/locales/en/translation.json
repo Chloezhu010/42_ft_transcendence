@@ -14,6 +14,7 @@
       }
     },
     "friends": "Friends",
+    "apiKeys": "API keys",
     "profileAriaLabel": "Your profile",
     "logoAlt": "Funova logo",
     "status": {
@@ -862,6 +863,58 @@
       "saveFailed": "Save failed",
       "uploadFailed": "Upload failed",
       "logoutFailed": "Logout failed"
+    }
+  },
+  "apiKeys": {
+    "title": "API keys",
+    "description": "Create and revoke keys for the public API.",
+    "header": {
+      "eyebrow": "Public API"
+    },
+    "create": {
+      "label": "Key name",
+      "placeholder": "Production integration",
+      "submit": "Create key",
+      "creating": "Creating..."
+    },
+    "created": {
+      "title": "Copy this key now",
+      "description": "For security, this full key will only be shown once.",
+      "copy": "Copy key",
+      "dismiss": "Dismiss"
+    },
+    "list": {
+      "title": "Existing keys",
+      "count": "{{count}} keys",
+      "loading": "Loading...",
+      "empty": "No API keys yet.",
+      "createdAt": "Created",
+      "lastUsedAt": "Last used",
+      "neverUsed": "Never used"
+    },
+    "status": {
+      "active": "Active",
+      "revoked": "Revoked"
+    },
+    "actions": {
+      "revoke": "Revoke",
+      "revoking": "Revoking...",
+      "confirmRevoke": "Revoke this API key?",
+      "cancel": "Cancel"
+    },
+    "notifications": {
+      "created": "API key created. Copy it now.",
+      "copied": "API key copied.",
+      "revoked": "API key revoked."
+    },
+    "errors": {
+      "loadFailed": "Failed to load API keys.",
+      "createFailed": "Failed to create API key.",
+      "revokeFailed": "Failed to revoke API key.",
+      "rateLimited": "Too many requests. Please wait and try again.",
+      "nameRequired": "Key name cannot be empty.",
+      "nameTooLong": "Key name must be 100 characters or fewer.",
+      "copyFailed": "Could not copy API key."
     }
   },
   "languageSwitcher": {
