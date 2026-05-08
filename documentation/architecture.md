@@ -2,7 +2,7 @@
 
 ## System Topology
 
-The stack runs as three Docker Compose services behind nginx. nginx terminates TLS and fans requests out by prefix: `/api`, `/health`, and `/images` reach FastAPI, everything else reaches the Vite dev server. FastAPI owns every side effect — SQLite writes, the images volume, and all Gemini calls — so the frontend never talks to external services directly.
+Application traffic runs through nginx in Docker Compose. nginx terminates TLS and fans requests out by prefix: `/api`, `/health`, and `/images` reach FastAPI, everything else reaches the Vite dev server. FastAPI owns every side effect — SQLite writes, the images volume, and all Gemini calls — so the frontend never talks to external services directly. The same Compose stack also includes backup and monitoring services.
 
 ```mermaid
 flowchart LR
@@ -18,7 +18,7 @@ flowchart LR
         ImgVol[("images volume<br/>cover + panels")]
     end
 
-    User -- "HTTPS :443" --> Nginx
+    User -- "HTTPS :8443 host -> :443 container" --> Nginx
     Nginx -- "/" --> Vite
     Nginx -- "/api, /health" --> Fast
     Nginx -- "/images" --> Fast
@@ -144,11 +144,11 @@ Notes:
 |-------|-----------|-----|
 | Frontend framework | React 19 + Vite 6 + TypeScript 5.8 | Fast HMR, component ecosystem, strong typing |
 | Routing | React Router v7 | SPA client-side routing |
-| Styling | Tailwind CSS | Utility-first, rapid iteration, CDN for dev |
+| Styling | Tailwind CSS | Utility-first, rapid iteration, logical-property utilities for RTL |
 | Animation | Framer Motion | Page transitions, loading states |
 | Backend framework | FastAPI (Python 3.13+) | Async-native, Pydantic validation, auto OpenAPI docs |
 | Database | SQLite via aiosqlite | Zero-setup, WAL mode for concurrent reads |
-| Auth | JWT (PyJWT) + bcrypt (passlib) | Stateless tokens, industry-standard password hashing |
+| Auth | JWT (PyJWT) + bcrypt | Stateless tokens, industry-standard password hashing |
 | AI | Google Gemini API | Story scripts + panel image generation |
 | HTTPS | nginx (reverse proxy + TLS) | Mandatory per subject; terminates TLS in front of both services |
 | Containerization | Docker Compose | Single-command startup as required by subject |
@@ -169,7 +169,7 @@ users
 ├── id            INTEGER PRIMARY KEY AUTOINCREMENT
 ├── email         TEXT NOT NULL UNIQUE
 ├── username      TEXT NOT NULL UNIQUE
-├── password_hash TEXT                   ← nullable for OAuth-only users (bcrypt via passlib otherwise)
+├── password_hash TEXT                   ← nullable for OAuth-only users (bcrypt otherwise)
 ├── avatar_path   TEXT DEFAULT 'default-avatar.png'
 ├── is_online     BOOLEAN NOT NULL DEFAULT 0
 ├── is_admin      BOOLEAN NOT NULL DEFAULT 0

@@ -4,7 +4,7 @@
 
 # ft_transcendence — Funova
 
-An AI-powered comic book generator for children. Authenticated users build a kid character profile (appearance, archetype, dream, art style), and the app uses Google's Gemini API to produce a fully illustrated short comic — title, foreword, 10–18 panels, and cover art — with a per-user gallery to revisit, edit, and share past stories.
+An AI-powered comic book generator for children. Authenticated users build a kid character profile (appearance, archetype, dream, art style), and the app uses Google's Gemini API to produce a fully illustrated short comic — title, foreword, 10 panels, and cover art — with a per-user gallery to revisit, edit, and share past stories.
 
 ## Description
 
@@ -26,12 +26,12 @@ An AI-powered comic book generator for children. Authenticated users build a kid
 
 - **Docker** ≥ 24.x and **Docker Compose** v2
 - A **Google Gemini API key** (get one at https://aistudio.google.com/apikey)
-- Modern Chromium-based browser (Chrome / Edge) — required for the Web Speech API
-- Free TCP port `443` (HTTPS, exposed by the nginx container)
+- Modern Chromium-based browser (Chrome) — required for the Web Speech API
+- Free TCP port `8443` (HTTPS, mapped to the nginx container)
 
 For local development outside Docker:
 - **Python ≥ 3.13** with [`uv`](https://github.com/astral-sh/uv)
-- **Node.js ≥ 20**
+- **Node.js ≥ 20** with npm (frontend dependencies such as Vite and TypeScript are installed by `npm install`)
 - Free TCP port `3000` (Vite dev server)
 
 ### Setup
@@ -49,28 +49,36 @@ cp .env.example .env       # then fill in the required secrets below
 | `GEMINI_API_KEY` | Google Gemini API key | **Yes** |
 | `JWT_SECRET_KEY` | Secret used to sign JWT access tokens | **Yes** |
 | `SESSION_SECRET_KEY` | Secret used to sign backend session cookies | **Yes** |
-| `GOOGLE_OAUTH_CLIENT_ID` | OAuth 2.0 client ID (for Google login) | Optional |
-| `GOOGLE_OAUTH_CLIENT_SECRET` | OAuth 2.0 client secret | Optional |
+| `GOOGLE_CLIENT_ID` | OAuth 2.0 client ID (for Google login) | Optional |
+| `GOOGLE_CLIENT_SECRET` | OAuth 2.0 client secret | Optional |
+| `GOOGLE_REDIRECT_URI` | OAuth callback URL (Docker default: `https://localhost:8443/api/auth/oauth/google/callback`) | Optional |
 | `VITE_API_BASE_URL` | Backend URL seen by browser for local backend-only dev (default: same origin in Docker) | No |
-| `FRONTEND_URL` | CORS allowed origin (Docker default: `https://localhost`; local dev default: `http://localhost:3000`) | No |
+| `FRONTEND_URL` | CORS allowed origin (Docker default: `https://localhost:8443`; local dev default: `http://localhost:3000`) | No |
 | `DB_PATH` | SQLite database file path (default: `wondercomic.db`) | No |
+| `BCRYPT_ROUNDS` | Password hashing cost factor, 4-31 (default: `12`) | No |
+| `BACKUP_INTERVAL_SECONDS` | Backup-worker interval in seconds (default: `86400`) | No |
+| `PUBLIC_API_RATE_LIMIT_REQUESTS` | Public API requests allowed per key per window (default: `60`) | No |
+| `PUBLIC_API_RATE_LIMIT_WINDOW_SECONDS` | Public API rate-limit window in seconds (default: `60`) | No |
+| `ADMIN_PROMOTION_SECRET` | Local secret required by `backend/scripts/promote_admin.py` | No |
+| `RESTORE_BACKUP_SECRET` | Local secret required by `backend/scripts/restore_backup.py` | No |
+| `GRAFANA_ADMIN_PASSWORD` | Grafana admin password for the Docker Compose monitoring stack | **Yes** |
 
 > Never commit `.env` — it is git-ignored. Only `.env.example` is tracked.
 
 ### Run
 
 ```bash
-make up          # docker compose up --build
+make up          # docker compose up --build -d
 ```
 
-Then open **https://localhost** in Chrome (accept the self-signed certificate on first visit).
+Then open **https://localhost:8443** in Chrome (accept the self-signed certificate on first visit).
 
 Useful commands:
 
 ```bash
 make down        # stop all services
-make logs        # tail logs
-docker compose logs backend    # backend logs only
+docker compose logs -f          # tail all service logs
+docker compose logs -f backend  # tail backend logs only
 ```
 
 See [Development Guide](documentation/development.md) for non-Docker workflows and pre-push checks.
@@ -106,7 +114,7 @@ See [Development Guide](documentation/development.md) for non-Docker workflows a
 | Styling | Tailwind CSS | Utility-first, RTL-friendly with logical properties |
 | Backend framework | FastAPI (Python 3.13+) | Async-native, Pydantic v2 validation, automatic OpenAPI docs |
 | Database | **SQLite** via aiosqlite | Zero-setup, WAL mode for concurrent reads; sufficient for single-node scope and trivial to back up by file copy |
-| Auth | JWT (PyJWT) + bcrypt (passlib) + Authlib (OAuth) | Stateless tokens that work across containers without shared session storage |
+| Auth | JWT (PyJWT) + bcrypt + Authlib (OAuth) | Stateless tokens that work across containers without shared session storage |
 | AI | Google Gemini API (`google-genai`) | One SDK for both text generation (story scripts) and image generation (panels + cover) |
 | HTTPS | nginx (TLS termination + reverse proxy) | Mandatory per subject; offloads TLS from FastAPI/Vite |
 | Containerization | Docker Compose | Single-command startup, required by the subject |
@@ -121,6 +129,38 @@ See [Development Guide](documentation/development.md) for non-Docker workflows a
 - **Gemini over OpenAI/Stable Diffusion** — One SDK covers both modalities, exponential-backoff retry is straightforward, and the streaming API powers the title/foreword typewriter effect.
 
 See [Architecture](documentation/architecture.md) for full system topology, sequence diagrams, and the database schema.
+
+---
+
+## Database Schema
+
+The project uses SQLite. User-owned data is scoped through `users.id`, and foreign keys use `ON DELETE CASCADE` so deleting a user removes their profiles, stories, panels, OAuth identities, API keys, and friendships.
+
+```mermaid
+erDiagram
+    users ||--o{ kid_profiles : owns
+    users ||--o{ stories : owns
+    users ||--o{ api_keys : owns
+    users ||--o{ oauth_accounts : links
+    users ||--o{ oauth_results : receives
+    users ||--o{ friendships : requester
+    users ||--o{ friendships : addressee
+    kid_profiles ||--o{ stories : generates
+    stories ||--o{ panels : contains
+```
+
+| Table | Key fields | Purpose |
+|-------|------------|---------|
+| `users` | `id INTEGER PK`, `email TEXT UNIQUE`, `username TEXT UNIQUE`, `password_hash TEXT`, `avatar_path TEXT`, `is_online BOOLEAN`, `is_admin BOOLEAN` | Authenticated users and profile metadata |
+| `friendships` | `requester_id INTEGER FK`, `addressee_id INTEGER FK`, `status TEXT CHECK(pending/accepted/rejected)` | Friend requests and accepted friendships |
+| `oauth_accounts` | `user_id INTEGER FK`, `provider TEXT`, `provider_user_id TEXT`, `provider_email TEXT` | Linked Google OAuth identities |
+| `oauth_results` | `code TEXT PK`, `user_id INTEGER FK`, `expires_at TIMESTAMP` | Short-lived OAuth handoff codes |
+| `kid_profiles` | `user_id INTEGER FK`, `name TEXT`, `gender TEXT`, `skin_tone TEXT`, `hair_color TEXT`, `eye_color TEXT`, `favorite_color TEXT`, `dream TEXT`, `archetype TEXT`, `art_style TEXT`, `language TEXT` | Character profiles used to generate stories |
+| `stories` | `user_id INTEGER FK`, `kid_profile_id INTEGER FK`, `title TEXT`, `foreword TEXT`, `character_description TEXT`, `cover_image_prompt TEXT`, `cover_image_path TEXT`, `visibility TEXT`, `is_unlocked BOOLEAN` | Saved comic stories and sharing state |
+| `panels` | `story_id INTEGER FK`, `panel_order INTEGER`, `text TEXT`, `image_prompt TEXT`, `image_path TEXT`, `UNIQUE(story_id, panel_order)` | Ordered comic panels for each story |
+| `api_keys` | `user_id INTEGER FK`, `name TEXT`, `key_prefix TEXT UNIQUE`, `key_hash TEXT UNIQUE`, `is_active BOOLEAN`, `last_used_at TIMESTAMP` | Public API credentials and revocation state |
+
+The authoritative DDL and startup migrations live in `backend/db/database.py`; a fuller schema explanation is available in [Architecture](documentation/architecture.md#database-schema).
 
 ---
 
@@ -184,19 +224,19 @@ See [Architecture](documentation/architecture.md) for full system topology, sequ
 
 5. **Multiple languages — Minor.** Six languages (en, fr, es, zh, ja, ar) implemented with `i18next`. Language switcher in the navbar, full translation files in `frontend/locales/`. Exceeds the 3-language minimum.
 
-6. **RTL support — Minor (Accessibility).** Arabic is fully translated (859 lines). ~130 logical-property class usages (`ms-/me-/ps-/pe-/start-/end-`) across `app/`, `components/`, and `pages/`; a ratcheting static audit (`tests/i18n/rtlAudit.test.ts`) blocks new physical-side classes; `getDirectionalArrow()` flips arrows; `i18n.on('languageChanged')` updates `<html dir>` + `<html lang>` for seamless switching.
+6. **RTL support — Minor (Accessibility).** Arabic is fully translated (859 lines). ~130 logical-property class usages (`ms-/me-/ps-/pe-/start-/end-`) across `frontend/app/`, `frontend/components/`, and `frontend/pages/`; a ratcheting static audit (`frontend/tests/i18n/rtlAudit.test.ts`) blocks new physical-side classes; `getDirectionalArrow()` flips arrows; `i18n.on('languageChanged')` updates `<html dir>` + `<html lang>` for seamless switching.
 
-7. **Standard user management — Major.** JWT signup/login (`routers/auth.py`), profile edit + avatar upload (`services/avatar_upload.py`), full friend request flow (`routers/friend.py`), online status tracking. All side-effects are user-scoped via the `current_user` dependency.
+7. **Standard user management — Major.** JWT signup/login (`backend/routers/auth.py`), profile edit + avatar upload (`backend/services/avatar_upload.py`), full friend request flow (`backend/routers/friend.py`), online status tracking. All side-effects are user-scoped via the `current_user` dependency.
 
-8. **OAuth 2.0 — Minor (User Management).** Google OAuth in `services/oauth/` (client, account_linking, result_store), `GoogleOAuthCallbackPage.tsx` on the frontend, `db/crud_oauth.py` for persistence; supports linking an OAuth identity to an existing email/password account.
+8. **OAuth 2.0 — Minor (User Management).** Google OAuth in `backend/services/oauth/` (client, account_linking, result_store), `frontend/pages/auth/GoogleOAuthCallbackPage.tsx` on the frontend, `backend/db/crud_oauth.py` for persistence; supports linking an OAuth identity to an existing email/password account.
 
 9. **LLM system interface — Major (AI).** Gemini text + image generation with retry (`backend/llm/gemini_service.py`); story-script streaming via NDJSON (`POST /api/generate/story-script/stream`) drives the live title/foreword typewriter UX. Streaming JSON state machine in `backend/llm/streaming.py` parses partial JSON without a full streaming parser dependency.
 
-10. **Voice / speech — Minor (AI).** Web Speech API integration: `useSpeechSynthesis.ts` (TTS), `useSpeechRecognition.ts` (STT), `StoryReadAloudControl.tsx` for in-book read-aloud. Tests cover the hooks.
+10. **Voice / speech — Minor (AI).** Web Speech API integration: `frontend/components/speech/useSpeechSynthesis.ts` (TTS), `frontend/components/speech/useSpeechRecognition.ts` (STT), `frontend/components/StoryReadAloudControl.tsx` for in-book read-aloud. Tests cover the hooks.
 
-11. **Prometheus + Grafana — Major (DevOps).** Full observability stack in `docker-compose.yml`: prometheus, grafana, alertmanager, node_exporter. `/metrics` exposed via `prometheus-fastapi-instrumentator`; custom application metrics in `backend/metrics.py`; provisioned dashboard at `backend/grafana/provisioning/dashboards/wondercomic.json`; alert rules in `alerts.rules.yml` with webhook receiver at `routers/monitoring.py`.
+11. **Prometheus + Grafana — Major (DevOps).** Full observability stack in `docker-compose.yml`: prometheus, grafana, alertmanager, node_exporter. `/metrics` exposed via `prometheus-fastapi-instrumentator`; custom application metrics in `backend/metrics.py`; provisioned dashboard at `backend/grafana/provisioning/dashboards/wondercomic.json`; alert rules in `alerts.rules.yml` with webhook receiver at `backend/routers/monitoring.py`.
 
-12. **Health check + status page — Minor (DevOps).** `GET /health` (`routers/health.py`); in-app `StatusPage.tsx` shows health + recent backups + manual backup trigger; `db/backup.py` uses the SQLite online-backup API with 7-day rotation; scheduled 24-hour task in `main.py`.
+12. **Health check + status page — Minor (DevOps).** `GET /health` (`backend/routers/health.py`); in-app `frontend/pages/status/StatusPage.tsx` shows health + recent backups + manual backup trigger; `backend/db/backup.py` uses the SQLite online-backup API with 7-day rotation; scheduled worker in `backend/backup_worker.py`.
 
 The full module status table lives in [`module_checklist.md`](module_checklist.md).
 
@@ -215,10 +255,10 @@ The full module status table lives in [`module_checklist.md`](module_checklist.m
 
 ## Resources
 
-### Documentation referenced
+### Major Documentation referenced
 
 - [FastAPI](https://fastapi.tiangolo.com/) and [FastAPI security / OAuth2 with JWT](https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/)
-- [passlib bcrypt](https://passlib.readthedocs.io/en/stable/lib/passlib.hash.bcrypt.html), [PyJWT](https://pyjwt.readthedocs.io/), [Authlib](https://docs.authlib.org/)
+- [bcrypt](https://github.com/pyca/bcrypt/), [PyJWT](https://pyjwt.readthedocs.io/), [Authlib](https://docs.authlib.org/)
 - [React 19](https://react.dev/), [Vite](https://vitejs.dev/), [Tailwind CSS](https://tailwindcss.com/docs), [Framer Motion](https://www.framer.com/motion/), [React Router v7](https://reactrouter.com/)
 - [aiosqlite](https://aiosqlite.omnilib.dev/), [SQLite WAL mode](https://www.sqlite.org/wal.html)
 - [Google Gemini API (`google-genai`)](https://ai.google.dev/gemini-api/docs)
@@ -228,9 +268,13 @@ The full module status table lives in [`module_checklist.md`](module_checklist.m
 - [nginx HTTPS configuration](https://nginx.org/en/docs/http/configuring_https_servers.html)
 - [Docker Compose reference](https://docs.docker.com/compose/compose-file/)
 
+To see a detailed list, go to [resources.md](./documentation/resources.md)
+
 ### AI usage
 
 - **Codex** — used by the team for: scaffold analysis against the subject, gap analysis on module requirements, README and `AGENTS.md` drafting, architecture diagram drafting, exploratory refactor proposals, and pair-style debugging on tricky integration points. Every AI-suggested change was read, understood, and edited by the responsible team member before being committed; no generated code was merged unreviewed.
+
+- **GitHub Copilot** — occasional inline completion during routine boilerplate (TypeScript types, test scaffolds). Not used for design or architectural decisions.
 
 ---
 

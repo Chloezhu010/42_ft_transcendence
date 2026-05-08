@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - **Python 3.13+** and [uv](https://docs.astral.sh/uv/) (backend)
-- **Node.js 22+** and npm (frontend)
+- **Node.js 20+** and npm (frontend; CI uses Node.js 22, Docker uses `node:20-alpine`)
 - **Docker + Docker Compose v2** (containerised run)
 - A `.env` file at repo root — copy `.env.example` and fill in secrets
 
@@ -24,8 +24,11 @@ For Google OAuth locally, also set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, a
 npm install
 npm run dev       # http://localhost:3000
 npm test          # run vitest
-npm run build     # production build → dist/ (also type-checks)
+npm run typecheck # TypeScript check
+npm run build     # production build → dist/
 ```
+
+Vite, TypeScript, React, and test tooling are project dependencies installed by `npm install`; only Node.js and npm need to be installed globally.
 
 ## Docker Compose Commands
 
@@ -38,9 +41,9 @@ docker compose logs backend      # Backend logs only
 docker compose logs frontend     # Frontend logs only
 ```
 
-Open **https://localhost** in Google Chrome. Accept the self-signed certificate warning on first load.
+Open **https://localhost:8443** in Google Chrome. Accept the self-signed certificate warning on first load.
 
-Grafana is available at **https://localhost/grafana** (credentials: admin / `$GRAFANA_ADMIN_PASSWORD`).
+Grafana is available at **https://localhost:8443/grafana** (credentials: admin / `$GRAFANA_ADMIN_PASSWORD`).
 
 ## Pre-push Checks
 
@@ -55,8 +58,10 @@ uv run pytest                     # tests
 
 **Frontend** (from `frontend/`):
 ```bash
+npm run lint         # eslint
 npm test -- --run    # vitest (non-interactive)
-npm run build        # TypeScript compilation + Vite build
+npm run typecheck    # TypeScript compilation check
+npm run build        # Vite production build
 ```
 
 If your change touches both sides, run both sets of checks.
@@ -68,7 +73,7 @@ Two GitHub Actions workflows run on PRs and pushes to `main`:
 | Workflow | Triggers on | Steps |
 |----------|------------|-------|
 | `backend-ci.yml` | `backend/**` changes | ruff lint → ruff format check → pytest |
-| `frontend-ci.yml` | `frontend/**` changes | npm install → vitest → tsc build |
+| `frontend-ci.yml` | `frontend/**` changes | npm ci → eslint → typecheck → vitest → Vite build |
 
 ## Frontend Path Alias
 

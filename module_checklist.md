@@ -1,6 +1,6 @@
 # ft_transcendence — Module Checklist
 
-> Source: `docs/subject.md`
+> Source: 42 ft_transcendence subject
 > Target: **14 points** (Major = 2 pts, Minor = 1 pt)
 > Bonus: up to 5 extra points for modules beyond 14
 
@@ -23,7 +23,7 @@
 | 8 | AI | LLM system interface (Gemini story + image generation) | Major | 2 | ✅ Done | Low | Text + image generation with retry; story-script streaming via NDJSON (`POST /api/generate/story-script/stream`) drives the live title/foreword intro |
 | 9 | AI | Voice / speech integration | Minor | 1 | ✅ Done | Low | Web Speech API: `components/speech/useSpeechSynthesis.ts`, `useSpeechRecognition.ts`, `StoryReadAloudControl.tsx` (with tests) |
 | 10 | DevOps | Prometheus + Grafana monitoring | Major | 2 | ✅ Done | Low | Full stack in `docker-compose.yml`: prometheus, grafana, alertmanager, node_exporter; `/metrics` via `prometheus-fastapi-instrumentator`; custom metrics in `metrics.py`; provisioned dashboard at `backend/grafana/provisioning/dashboards/wondercomic.json`; alert rules + webhook receiver at `routers/monitoring.py` |
-| 11 | DevOps | Health check + status page + automated backups | Minor | 1 | ✅ Done | Low | `GET /health` (`routers/health.py`), `StatusPage.tsx` UI shows health + backups + manual trigger, `db/backup.py` uses SQLite online-backup API with 7-day rotation, scheduled 24h task in `main.py` |
+| 11 | DevOps | Health check + status page + automated backups | Minor | 1 | ✅ Done | Low | `GET /health` (`routers/health.py`), `StatusPage.tsx` UI shows health + backups + manual trigger, `db/backup.py` uses SQLite online-backup API with 7-day rotation, scheduled by the `backup-worker` Compose service |
 
 ### Point Breakdown
 
