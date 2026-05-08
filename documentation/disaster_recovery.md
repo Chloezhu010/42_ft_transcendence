@@ -30,8 +30,8 @@ Both backup API endpoints require an **admin JWT token**. Use the `promote_admin
 to grant admin rights to an existing user — no code changes or API exposure needed.
 
 ```bash
-# Run from the repo root
-python backend/scripts/promote_admin.py
+# Run from backend/
+uv run python scripts/promote_admin.py
 ```
 
 The script prompts for `ADMIN_PROMOTION_SECRET` (set in `.env`) then the target username
@@ -145,9 +145,9 @@ restoration in one step.
 
 1. **Stop the running server** (Ctrl+C in the uvicorn terminal).
 
-2. **Run the restore script** from the repo root.
+2. **Run the restore script** from `backend/`.
    ```bash
-   python backend/scripts/restore_backup.py
+   uv run python scripts/restore_backup.py
    ```
    The script will:
    - Prompt for `RESTORE_BACKUP_SECRET`

@@ -55,7 +55,12 @@ cp .env.example .env       # then fill in the required secrets below
 | `VITE_API_BASE_URL` | Backend URL seen by browser for local backend-only dev (default: same origin in Docker) | No |
 | `FRONTEND_URL` | CORS allowed origin (Docker default: `https://localhost:8443`; local dev default: `http://localhost:3000`) | No |
 | `DB_PATH` | SQLite database file path (default: `wondercomic.db`) | No |
+| `BCRYPT_ROUNDS` | Password hashing cost factor, 4-31 (default: `12`) | No |
 | `BACKUP_INTERVAL_SECONDS` | Backup-worker interval in seconds (default: `86400`) | No |
+| `PUBLIC_API_RATE_LIMIT_REQUESTS` | Public API requests allowed per key per window (default: `60`) | No |
+| `PUBLIC_API_RATE_LIMIT_WINDOW_SECONDS` | Public API rate-limit window in seconds (default: `60`) | No |
+| `ADMIN_PROMOTION_SECRET` | Local secret required by `backend/scripts/promote_admin.py` | No |
+| `RESTORE_BACKUP_SECRET` | Local secret required by `backend/scripts/restore_backup.py` | No |
 | `GRAFANA_ADMIN_PASSWORD` | Grafana admin password for the Docker Compose monitoring stack | **Yes** |
 
 > Never commit `.env` — it is git-ignored. Only `.env.example` is tracked.
@@ -263,7 +268,7 @@ The full module status table lives in [`module_checklist.md`](module_checklist.m
 - [nginx HTTPS configuration](https://nginx.org/en/docs/http/configuring_https_servers.html)
 - [Docker Compose reference](https://docs.docker.com/compose/compose-file/)
 
-To see a detailed list, go to [resource.md](./documentation/resources.md)
+To see a detailed list, go to [resources.md](./documentation/resources.md)
 
 ### AI usage
 
