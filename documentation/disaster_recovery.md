@@ -127,7 +127,12 @@ Pass `RESTORE_BACKUP_SECRET` via `--env-file` so the script can authenticate.
    docker compose start backend backup-worker
    ```
 
-5. **Verify** by visiting `https://localhost:8443/status` or running `curl -k https://localhost:8443/health`.
+5. **Restart nginx** so it re-resolves the backend's new IP address (podman/Docker assigns a new IP each time a container restarts).
+   ```bash
+   docker compose restart nginx
+   ```
+
+6. **Verify** by visiting `https://localhost:8443/status` or running `curl -k https://localhost:8443/health`.
 
 ---
 
