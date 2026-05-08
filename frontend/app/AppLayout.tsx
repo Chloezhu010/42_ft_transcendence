@@ -61,6 +61,12 @@ function AppLayout(): JSX.Element {
             >
               {t('app.friends', { defaultValue: 'Friends' })}
             </Link>
+            <Link
+              to="/api-keys"
+              className="text-brand-muted hover:text-brand-primary transition-colors px-4 py-2 rounded-full hover:bg-brand-light"
+            >
+              {t('app.apiKeys', { defaultValue: 'API keys' })}
+            </Link>
             {currentUser ? (
               <Link
                 to="/profile"

@@ -14,6 +14,7 @@
       }
     },
     "friends": "Amigos",
+    "apiKeys": "Claves API",
     "profileAriaLabel": "Tu perfil",
     "logoAlt": "Logotipo de Funova",
     "status": {
@@ -862,6 +863,57 @@
       "saveFailed": "Error al guardar",
       "uploadFailed": "Error al subir",
       "logoutFailed": "Error al cerrar sesión"
+    }
+  },
+  "apiKeys": {
+    "title": "Claves API",
+    "description": "Crea y revoca claves para la API pública.",
+    "header": {
+      "eyebrow": "API pública"
+    },
+    "create": {
+      "label": "Nombre de la clave",
+      "placeholder": "Integración de producción",
+      "submit": "Crear clave",
+      "creating": "Creando..."
+    },
+    "created": {
+      "title": "Copia esta clave ahora",
+      "description": "Por seguridad, esta clave completa solo se mostrará una vez.",
+      "copy": "Copiar clave",
+      "copied": "Clave API copiada",
+      "copyFailed": "No se pudo copiar la clave API.",
+      "copiedReady": "Clave API creada. Cópiala ahora.",
+      "dismiss": "Cerrar"
+    },
+    "list": {
+      "title": "Claves existentes",
+      "count": "{{count}} claves",
+      "loading": "Cargando...",
+      "empty": "Todavía no hay claves API.",
+      "createdAt": "Creada",
+      "lastUsedAt": "Último uso",
+      "neverUsed": "Nunca usada"
+    },
+    "status": {
+      "active": "Activa",
+      "revoked": "Revocada"
+    },
+    "actions": {
+      "revoke": "Revocar",
+      "revoking": "Revocando...",
+      "confirmRevoke": "¿Revocar esta clave API?"
+    },
+    "notifications": {
+      "revoked": "Clave API revocada."
+    },
+    "errors": {
+      "loadFailed": "No se pudieron cargar las claves API.",
+      "createFailed": "No se pudo crear la clave API.",
+      "revokeFailed": "No se pudo revocar la clave API.",
+      "rateLimited": "Demasiadas solicitudes. Espera e inténtalo de nuevo.",
+      "nameRequired": "El nombre de la clave no puede estar vacío.",
+      "nameTooLong": "El nombre de la clave debe tener 100 caracteres o menos."
     }
   },
   "languageSwitcher": {

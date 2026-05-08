@@ -14,6 +14,7 @@
       }
     },
     "friends": "Amis",
+    "apiKeys": "Clés API",
     "profileAriaLabel": "Votre profil",
     "logoAlt": "Logo Funova",
     "status": {
@@ -862,6 +863,57 @@
       "saveFailed": "Échec de l'enregistrement",
       "uploadFailed": "Échec du téléversement",
       "logoutFailed": "Échec de la déconnexion"
+    }
+  },
+  "apiKeys": {
+    "title": "Clés API",
+    "description": "Créez et révoquez des clés pour l'API publique.",
+    "header": {
+      "eyebrow": "API publique"
+    },
+    "create": {
+      "label": "Nom de la clé",
+      "placeholder": "Intégration production",
+      "submit": "Créer une clé",
+      "creating": "Création..."
+    },
+    "created": {
+      "title": "Copiez cette clé maintenant",
+      "description": "Pour votre sécurité, cette clé complète ne sera affichée qu'une seule fois.",
+      "copy": "Copier la clé",
+      "copied": "Clé API copiée",
+      "copyFailed": "Impossible de copier la clé API.",
+      "copiedReady": "Clé API créée. Copiez-la maintenant.",
+      "dismiss": "Fermer"
+    },
+    "list": {
+      "title": "Clés existantes",
+      "count": "{{count}} clés",
+      "loading": "Chargement...",
+      "empty": "Aucune clé API pour le moment.",
+      "createdAt": "Créée",
+      "lastUsedAt": "Dernière utilisation",
+      "neverUsed": "Jamais utilisée"
+    },
+    "status": {
+      "active": "Active",
+      "revoked": "Révoquée"
+    },
+    "actions": {
+      "revoke": "Révoquer",
+      "revoking": "Révocation...",
+      "confirmRevoke": "Révoquer cette clé API ?"
+    },
+    "notifications": {
+      "revoked": "Clé API révoquée."
+    },
+    "errors": {
+      "loadFailed": "Impossible de charger les clés API.",
+      "createFailed": "Impossible de créer la clé API.",
+      "revokeFailed": "Impossible de révoquer la clé API.",
+      "rateLimited": "Trop de requêtes. Veuillez patienter puis réessayer.",
+      "nameRequired": "Le nom de la clé ne peut pas être vide.",
+      "nameTooLong": "Le nom de la clé doit contenir 100 caractères ou moins."
     }
   },
   "languageSwitcher": {
